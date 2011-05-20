@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World, MainActivity!</string>
+    <string name="app_name">OpenTripPlanner</string>
+    <string name="choose_mode">Choose a mode to travel by</string>
+    <string-array name="travel_mode">
+    	<item>Transit</item>
+    	<item>Bus and Train</item>
+    	<item>Bus Only</item>
+    	<item>Train Only</item>
+    	<item>Walk Only</item>
+    	<item>Bicycle</item>
+    	<item>Transit and Bicycle</item>
+    </string-array>
+    <string name="choose_optimization">Choose an optimization</string>
+    <string-array name="optimization">
+        <item>Quickest</item>
+        <item>Safest</item>
+        <item>Fewest Transfers</item>
+    </string-array>
+    <string name="enable_gps">Enable GPS</string>
+    <string name="disable_gps">Disable GPS</string>
+    <string name="settings">Settings</string>
+    <string name="exit">Exit</string>
+</resources>

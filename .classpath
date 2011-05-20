@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+	<classpathentry kind="lib" path="/home/marcy/code/android/osmdroid-android-3.0.4.jar"/>
+	<classpathentry kind="lib" path="/home/marcy/code/android/slf4j-android-1.5.8.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/GData"/>
+	<classpathentry kind="lib" path="/home/marcy/code/android/opencsv-2.3.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
