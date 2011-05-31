@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" android:orientation="vertical">
 
-<RelativeLayout android:layout_width="fill_parent" android:id="@+id/relativeLayout1" android:layout_height="wrap_content" android:gravity="left">
+<RelativeLayout android:layout_width="fill_parent" android:id="@+id/relativeLayout1" android:layout_height="wrap_content" android:gravity="left" android:paddingTop="5dip">
     <EditText android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_toLeftOf="@+id/btnStartLocation" android:text="My Location" android:id="@+id/tbStartLocation"></EditText>
-    <ImageButton android:layout_height="wrap_content" android:layout_alignParentRight="true" android:src="@android:drawable/ic_input_get" android:id="@+id/btnStartLocation" android:layout_width="50dip"></ImageButton>
+    <ImageButton android:layout_height="wrap_content" android:layout_alignParentRight="true" android:id="@+id/btnStartLocation" android:src="@android:drawable/ic_input_get" android:layout_width="40dip" android:scaleType="center"></ImageButton>
 </RelativeLayout>
 
-<RelativeLayout android:layout_width="fill_parent" android:id="@+id/relativeLayout2" android:layout_height="wrap_content" android:gravity="left">
+<RelativeLayout android:layout_width="fill_parent" android:id="@+id/relativeLayout2" android:layout_height="wrap_content" android:gravity="left" android:layout_below="@+id/relativeLayout1">
     <EditText android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_toLeftOf="@+id/btnEndLocation" android:text="End Location" android:id="@+id/tbEndLocation"></EditText>
-    <ImageButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentRight="true" android:src="@android:drawable/ic_input_get" android:id="@+id/btnEndLocation"></ImageButton>
+    <ImageButton android:layout_height="wrap_content" android:layout_alignParentRight="true" android:id="@+id/btnEndLocation" android:src="@android:drawable/ic_input_get" android:layout_width="40dip" android:scaleType="centerCrop"></ImageButton>
 </RelativeLayout>
 
-<RelativeLayout android:id="@+id/relativeLayout3" android:layout_width="fill_parent" android:layout_height="wrap_content">
-    <Spinner android:layout_width="wrap_content" android:layout_height="wrap_content" android:entries="@array/travel_mode" android:prompt="@string/choose_mode" android:id="@+id/ddlMode"></Spinner>
-    <Spinner android:id="@+id/ddlOptimization" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_toRightOf="@+id/ddlMode" android:prompt="@string/choose_optimization" android:entries="@array/optimization"></Spinner>
-    <Button android:text="Plan Trip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_toRightOf="@+id/ddlOptimization" android:id="@+id/btnPlanTrip"></Button>
+<RelativeLayout android:id="@+id/relativeLayout3" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@+id/relativeLayout2">
+    <Spinner android:layout_height="wrap_content" android:entries="@array/travel_mode" android:prompt="@string/choose_mode" android:id="@+id/ddlMode" android:layout_width="125dip"></Spinner>
+    <Spinner android:id="@+id/ddlOptimization" android:layout_height="wrap_content" android:layout_toRightOf="@+id/ddlMode" android:prompt="@string/choose_optimization" android:entries="@array/optimization" android:layout_width="125dip"></Spinner>
+    <Button android:text="Plan Trip" android:layout_height="wrap_content" android:layout_toRightOf="@+id/ddlOptimization" android:id="@+id/btnPlanTrip" android:layout_width="75dip"></Button>
 </RelativeLayout>
 
 <org.osmdroid.views.MapView
@@ -25,6 +25,12 @@ android:layout_width="fill_parent"
 android:layout_height="fill_parent"
 android:enabled="true"
 android:clickable="true"
+android:layout_below="@+id/relativeLayout3"
 />
-
-</LinearLayout>
+<ImageView android:id="@+id/drag"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:src="@drawable/icon"
+android:visibility="gone"
+/> 
+</RelativeLayout>

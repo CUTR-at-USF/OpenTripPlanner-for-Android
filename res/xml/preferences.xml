@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Settings" android:key="settings">
+        <CheckBoxPreference android:summary="Request wheelchair accessible routes" android:title="Wheelchair Accessible" android:key="wheelchair_accessible" android:defaultValue="false"></CheckBoxPreference>
+    </PreferenceCategory>
+</PreferenceScreen>
