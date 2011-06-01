@@ -19,13 +19,14 @@
     <Button android:text="Plan Trip" android:layout_height="wrap_content" android:layout_toRightOf="@+id/ddlOptimization" android:id="@+id/btnPlanTrip" android:layout_width="75dip"></Button>
 </RelativeLayout>
 
+<RelativeLayout android:id="@+id/relativeLayout4" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@+id/relativeLayout3">
+
 <org.osmdroid.views.MapView
 android:id="@+id/mapview"
 android:layout_width="fill_parent" 
 android:layout_height="fill_parent"
 android:enabled="true"
 android:clickable="true"
-android:layout_below="@+id/relativeLayout3"
 />
 <ImageView android:id="@+id/drag"
 android:layout_width="wrap_content"
@@ -33,4 +34,5 @@ android:layout_height="wrap_content"
 android:src="@drawable/icon"
 android:visibility="gone"
 /> 
+</RelativeLayout>
 </RelativeLayout>

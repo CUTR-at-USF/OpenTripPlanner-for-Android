@@ -14,9 +14,11 @@ import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.MapView.Projection;
 import org.osmdroid.views.overlay.ItemizedOverlay;
+import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.MyLocationOverlay;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.ItemizedIconOverlay.OnItemGestureListener;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
 
@@ -32,6 +34,7 @@ import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -138,7 +141,10 @@ public class MainActivity extends Activity {
 
 		mc = mv.getController();
 		mc.setZoom(20);
-		mc.setCenter(getLastLocation());
+		//mc.setCenter(getLastLocation());
+		
+		mc.setCenter(getPoint(40.76793169992044, -73.98180484771729));
+		
 //		mv.setOnLongClickListener(new OnLongClickListener() {
 //			
 //			@Override
@@ -170,18 +176,19 @@ public class MainActivity extends Activity {
 
 		Drawable marker = getResources().getDrawable(R.drawable.icon);
 		marker.setBounds(0, 0, marker.getIntrinsicWidth(), marker.getIntrinsicHeight());
-		mv.getOverlays().add(new SitesOverlay(marker));
+		SitesOverlay so = new SitesOverlay(marker, new ArrayList<OverlayItem>());
+		so.setFocusItemsOnTap(true);
+		//so.setFocusedItem(0);
+		mv.getOverlays().add(so);
 
+		
+		
 		//SitesOverlay so = new SitesOverlay(getResources().getDrawable(R.drawable.icon));
 		//so.addOverlayItem(overlayitem);
 		//mv.getOverlays().add(so);
 		
-		String Url = "https://spreadsheets.google.com/ccc?key=0AgWy8ujaGosCdDhxTC04cUZNeHo0eGFBQTBpU2dxN0E&hl=en&authkey=CK-H__IP";
+		/*String Url = "https://spreadsheets.google.com/ccc?key=0AgWy8ujaGosCdDhxTC04cUZNeHo0eGFBQTBpU2dxN0E&hl=en&authkey=CK-H__IP";
 		Url = "https://spreadsheets.google.com/pub?hl=en&hl=en&key=0AgWy8ujaGosCdDhxTC04cUZNeHo0eGFBQTBpU2dxN0E&single=true&gid=0&output=csv";
-		/*GDataClient client = new com.google.android.common.gdata2.AndroidGDataClient(this);
-		GDataParserFactory spreadsheetFactory = new 
-		SpreadsheetsClient s = new SpreadsheetsClient(client, spreadsheetFactory));
-		s.*/
 		
 		HttpClient client = new DefaultHttpClient();
 		String result = "";
@@ -189,7 +196,6 @@ public class MainActivity extends Activity {
 			result = Http.get(Url).use(client).charset("UTF-8").followRedirects(true).asString();
 			Log.d(TAG, "Spreadsheet: " + result);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -210,15 +216,8 @@ public class MainActivity extends Activity {
 			e.printStackTrace();
 		}
 		
-		
-		//GDataClient client = new SpreadsheetGDataClient("test", "http", "http://www.google.com");
-		//client.getMediaEntryAsStream(new URL(Url), arg1, arg2)
-		
-		//ServiceDataClient client = new ServiceDataC
-		//GDataParserFactory spreadSheetFactory = new XmlSpreadsheetsGDataParserFactory(new XmlParserFactory)
-		//SpreadsheetsClient c = new SpreadsheetsClient(client, spreadsheetFactory);
-		
 		Log.d(TAG, "Servers: " + knownServers.size());
+		*/
 	}
 	
 	private NavigationService mBoundService;
@@ -469,7 +468,7 @@ public class MainActivity extends Activity {
 		return (new GeoPoint((int) (lat * 1000000.0), (int) (lon * 1000000.0)));
 	}
 	
-	private class SitesOverlay extends ItemizedOverlay<OverlayItem> {
+	private class SitesOverlay extends ItemizedOverlayWithFocus<OverlayItem> {
 		private List<OverlayItem> items=new ArrayList<OverlayItem>();
 		private Drawable marker=null;
 		private OverlayItem inDrag=null;
@@ -478,11 +477,28 @@ public class MainActivity extends Activity {
 		private int yDragImageOffset=0;
 		private int xDragTouchOffset=0;
 		private int yDragTouchOffset=0;
-
-		private Matrix lastDrawMatrix;
+		private Point t = new Point(0, 0);
 		
-		public SitesOverlay(Drawable marker) {
-		super(marker, new DefaultResourceProxyImpl(getApplicationContext()));
+		public SitesOverlay(Drawable marker, List<OverlayItem> i) {
+		super(i, marker, marker, Color.BLACK, new OnItemGestureListener<OverlayItem>() {
+            @Override
+            public boolean onItemSingleTapUp(final int index, final OverlayItem item) {
+                    Toast.makeText(
+                                    MainActivity.this,
+                                    "Item '" + item.mTitle + "' (index=" + index
+                                                    + ") got single tapped up", Toast.LENGTH_LONG).show();
+                    return true;
+            }
+
+            @Override
+            public boolean onItemLongPress(final int index, final OverlayItem item) {
+                    Toast.makeText(
+                                    MainActivity.this,
+                                    "Item '" + item.mTitle + "' (index=" + index
+                                                    + ") got long pressed", Toast.LENGTH_LONG).show();
+                    return false;
+            }
+    }, new DefaultResourceProxyImpl(getApplicationContext()));
 		this.marker=marker;
 
 		dragImage=(ImageView)findViewById(R.id.drag);
@@ -519,121 +535,71 @@ public class MainActivity extends Activity {
 		boolean shadow) {
 		super.draw(canvas, mapView, shadow);
 		
-		lastDrawMatrix = canvas.getMatrix();
 		//boundCenterBottom(marker);
 		}
 		 
 		@Override
 		public int size() {
+			if(items == null) {
+				return 0;
+			}
 		return(items.size());
 		}
 
-		
 		@Override
 		public boolean onTouchEvent(MotionEvent event, MapView mapView) {
-		final int action=event.getAction();
-		final int x=(int)event.getX();
-		final int y=(int)event.getY();
-		boolean result=false;
+			final int action = event.getAction();
+			final int x = (int) event.getX();
+			final int y = (int) event.getY();
+			final Projection pj = mapView.getProjection();
+			
+			boolean result = false;
 
-		
-		final Projection pj = mapView.getProjection();
-		int eventX = (int) event.getX();
-		int eventY = (int) event.getY();
+			if (action == MotionEvent.ACTION_DOWN) {
+				for (OverlayItem item : items) {
 
-		final int markerWidth = this.marker.getIntrinsicWidth();
-		final int markerHeight = this.marker.getIntrinsicHeight();
+					Point p = new Point(0, 0);
+					pj.fromMapPixels(x, y, t);
+					pj.toPixels(item.getPoint(), p);
 
-		/*
-		 * These objects are created to avoid construct new ones every
-		 * cycle.
-		 */
-		final Rect curMarkerBounds = new Rect();
-		final Point mCurScreenCoords = new Point();
-		
-		
-		if (action==MotionEvent.ACTION_DOWN) {
-		for (OverlayItem item : items) {
-		Point p=new Point(0,0);
+                    if (hitTest(item, marker, t.x - p.x, t.y - p.y)) {
+						result = true;
+						inDrag = item;
+						items.remove(inDrag);
+						populate();
 
-		GeoPoint g = item.getPoint();
-		GeoPoint t = new GeoPoint(((double)g.getLatitudeE6())/1E6, ((double)g.getLongitudeE6())/1E6);
-		
-		mv.getProjection().toMapPixels(g, p);
+						xDragTouchOffset = 0;
+						yDragTouchOffset = 0;
 
-		Rect r = marker.getBounds();
-		int x1 = x-p.x;
-		int y1 = y-p.y;
-		if (hitTest(item, marker, x-p.x, y-p.y)) {
-			Log.d(TAG, "WIN!!");
+						setDragImagePosition(x, y);
+						dragImage.setVisibility(View.VISIBLE);
+
+						xDragTouchOffset = t.x - p.x;
+						yDragTouchOffset = t.y - p.y;
+
+						break;
+					}
+				}
+			} else if (action == MotionEvent.ACTION_MOVE && inDrag != null) {
+				dragImage.setVisibility(View.VISIBLE);
+				setDragImagePosition(x, y);
+				result = true;
+			} else if (action == MotionEvent.ACTION_UP && inDrag != null) {
+				dragImage.setVisibility(View.GONE);
+
+				GeoPoint pt = pj.fromPixels(x - xDragTouchOffset, y - yDragTouchOffset);
+				OverlayItem toDrop = new OverlayItem(inDrag.getTitle(),
+						inDrag.getSnippet(), pt);
+
+				items.add(toDrop);
+				populate();
+				inDrag = null;
+				result = true;
+			}
+
+			return (result || super.onTouchEvent(event, mapView));
 		}
 		
-		mv.getProjection().toMapPixels(t, p);
-		if (hitTest(item, marker, x-p.x, y-p.y)) {
-			Log.d(TAG, "WIN!!!!");
-		}
-		
-
-
-		//for (int i = 0; i < this.mItemList.size(); i++) {
-			//final T mItem = this.mItemList.get(i);
-			pj.toPixels(item.mGeoPoint, mCurScreenCoords);
-			float[] xyPoint = { mCurScreenCoords.x, mCurScreenCoords.y };
-			lastDrawMatrix.mapPoints(xyPoint);
-			mCurScreenCoords.set((int) xyPoint[0], (int) xyPoint[1]);
-			final int left = mCurScreenCoords.x - markerWidth;// - item.getWidth(); //- this.mMarkerHotSpot.x;
-			final int right = left + markerWidth;
-			// the dreaded 50 px default android translation
-			// http://mobiledevelop.blogspot.com/2009/02/android-canvas translation-discussion.html
-			final int top = mCurScreenCoords.y -50 - markerHeight;// - item.getHeight(); // - this.mMarkerHotSpot.y - 50;
-			final int bottom = top + markerHeight;
-
-			curMarkerBounds.set(left, top, right, bottom);
-			if (curMarkerBounds.contains(eventX, eventY)) {
-				
-			//}
-		
-		//if (hitTest(item, marker, x-p.x, y-p.y)) {
-		result=true;
-		inDrag=item;
-		items.remove(inDrag);
-		populate();
-
-		xDragTouchOffset=0;
-		yDragTouchOffset=0;
-
-		setDragImagePosition(p.x, p.y);
-		dragImage.setVisibility(View.VISIBLE);
-
-		xDragTouchOffset=x-p.x;
-		yDragTouchOffset=y-p.y;
-
-		break;
-		}
-		}
-		}
-		else if (action==MotionEvent.ACTION_MOVE && inDrag!=null) {
-		setDragImagePosition(x, y);
-		result=true;
-		}
-		else if (action==MotionEvent.ACTION_UP && inDrag!=null) {
-		dragImage.setVisibility(View.GONE);
-
-		GeoPoint pt= mv.getProjection().fromPixels(x-xDragTouchOffset,
-		y-yDragTouchOffset);
-		OverlayItem toDrop=new OverlayItem(inDrag.getTitle(),
-		inDrag.getSnippet(), pt);
-
-		items.add(toDrop);
-		populate();
-
-		inDrag=null;
-		result=true;
-		}
-
-		return(result || super.onTouchEvent(event, mapView));
-		}
-
 		private void setDragImagePosition(int x, int y) {
 		RelativeLayout.LayoutParams lp=
 		(RelativeLayout.LayoutParams)dragImage.getLayoutParams();
@@ -647,6 +613,35 @@ public class MainActivity extends Activity {
 		public boolean onSnapToItem(int arg0, int arg1, Point arg2, MapView arg3) {
 			// TODO Auto-generated method stub
 			return false;
+		}
+		
+		@Override
+		public boolean onLongPress(MotionEvent e, MapView mv) {
+			Log.d(TAG, "LONG PRESS! " + e.getX() + " " + e.getY());
+			
+			final CharSequence[] items = {"Start Location", "End Location"};
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+			builder.setTitle("Choose Location Type");
+			builder.setItems(items, new DialogInterface.OnClickListener() {
+			    public void onClick(DialogInterface dialog, int item) {
+			        Toast.makeText(getApplicationContext(), items[item], Toast.LENGTH_SHORT).show();
+			    }
+			});
+			AlertDialog alert = builder.create();
+			alert.show();
+			
+			GeoPoint point = mv.getProjection().fromPixels(e.getX(),
+					e.getY());//new GeoPoint((double)e.getX(), (double)e.getY());
+			OverlayItem overlayitem = new OverlayItem("Title!", "Description!",
+			point);
+			//itemizedoverlay.addOverlayItem(overlayitem);
+			
+			addOverlayItem(overlayitem);
+			mv.invalidate();
+			
+			//drawAt(new Canvas(), getResources().getDrawable(R.drawable.icon), (int)e.getX(), (int)e.getY(), true);
+			return true;
 		}
 	}	
 }
