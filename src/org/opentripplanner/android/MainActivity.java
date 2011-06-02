@@ -174,7 +174,7 @@ public class MainActivity extends Activity {
 		//itemizedoverlay.addOverlayItem(overlayitem);
 		//mv.getOverlays().add(itemizedoverlay);
 
-		Drawable marker = getResources().getDrawable(R.drawable.icon);
+		Drawable marker = getResources().getDrawable(R.drawable.start);
 		marker.setBounds(0, 0, marker.getIntrinsicWidth(), marker.getIntrinsicHeight());
 		SitesOverlay so = new SitesOverlay(marker, new ArrayList<OverlayItem>());
 		so.setFocusItemsOnTap(true);
@@ -478,30 +478,15 @@ public class MainActivity extends Activity {
 		private int xDragTouchOffset=0;
 		private int yDragTouchOffset=0;
 		private Point t = new Point(0, 0);
+		private Point p = new Point(0, 0);
 		
 		public SitesOverlay(Drawable marker, List<OverlayItem> i) {
-		super(i, marker, marker, Color.BLACK, new OnItemGestureListener<OverlayItem>() {
-            @Override
-            public boolean onItemSingleTapUp(final int index, final OverlayItem item) {
-                    Toast.makeText(
-                                    MainActivity.this,
-                                    "Item '" + item.mTitle + "' (index=" + index
-                                                    + ") got single tapped up", Toast.LENGTH_LONG).show();
-                    return true;
-            }
-
-            @Override
-            public boolean onItemLongPress(final int index, final OverlayItem item) {
-                    Toast.makeText(
-                                    MainActivity.this,
-                                    "Item '" + item.mTitle + "' (index=" + index
-                                                    + ") got long pressed", Toast.LENGTH_LONG).show();
-                    return false;
-            }
-    }, new DefaultResourceProxyImpl(getApplicationContext()));
+		super(i, marker, marker, Color.BLACK, null, new DefaultResourceProxyImpl(getApplicationContext()));
 		this.marker=marker;
 
 		dragImage=(ImageView)findViewById(R.id.drag);
+		dragImage.setImageDrawable(getResources().getDrawable(R.drawable.start));
+		
 		xDragImageOffset=dragImage.getDrawable().getIntrinsicWidth()/2;
 		yDragImageOffset=dragImage.getDrawable().getIntrinsicHeight();
 
@@ -558,7 +543,6 @@ public class MainActivity extends Activity {
 			if (action == MotionEvent.ACTION_DOWN) {
 				for (OverlayItem item : items) {
 
-					Point p = new Point(0, 0);
 					pj.fromMapPixels(x, y, t);
 					pj.toPixels(item.getPoint(), p);
 
@@ -595,6 +579,12 @@ public class MainActivity extends Activity {
 				populate();
 				inDrag = null;
 				result = true;
+				
+				pj.fromMapPixels(x, y, t);
+				
+				if((t.x - p.x) == xDragTouchOffset && (t.y - p.y) == yDragTouchOffset){
+					Log.d(TAG, "Do something here if desired because we didn't move item " + toDrop.getTitle());
+				}
 			}
 
 			return (result || super.onTouchEvent(event, mapView));
