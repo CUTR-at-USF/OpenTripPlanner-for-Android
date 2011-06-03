@@ -1,28 +1,27 @@
 package org.opentripplanner.android;
 
 import java.io.IOException;
-import java.io.StringReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONObject;
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.MapView.Projection;
-import org.osmdroid.views.overlay.ItemizedOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.MyLocationOverlay;
-import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
-import org.osmdroid.views.overlay.ItemizedIconOverlay.OnItemGestureListener;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlSerializer;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
+import de.mastacode.http.Http;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -35,13 +34,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Point;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
-import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
@@ -51,26 +47,11 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnLongClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
-import au.com.bytecode.opencsv.CSVReader;
-
-/*import com.google.wireless.gdata.client.GDataParserFactory;
-import com.google.wireless.gdata.data.Entry;
-import com.google.wireless.gdata.docs.SpreadsheetsClient;
-import com.google.wireless.gdata.docs.SpreadsheetsClient.SpreadsheetEntry;
-import com.google.wireless.gdata.parser.GDataParser;
-import com.google.wireless.gdata.parser.ParseException;
-import com.google.wireless.gdata.serializer.GDataSerializer;
-import com.google.wireless.gdata2.client.GDataClient;
-import com.google.wireless.gdata2.data.*;*/
-
-
-import de.mastacode.http.Http;
 
 public class MainActivity extends Activity {
 
@@ -218,6 +199,34 @@ public class MainActivity extends Activity {
 		
 		Log.d(TAG, "Servers: " + knownServers.size());
 		*/
+		
+		
+		String u = "http://go.cutr.usf.edu:8083/opentripplanner-api-webapp/ws/metadata";
+		HttpClient client = new DefaultHttpClient();
+		String result = "";
+		try {
+			result = Http.get(u).use(client).header("Accept", "application/json").charset("UTF-8").followRedirects(true).asString();
+			Log.d(TAG, "Result: " + result);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		GsonBuilder gsonb = new GsonBuilder();
+		Gson gson = gsonb.create();
+		 
+		JSONObject j;
+		GraphMetadata metadata = null;
+		 
+		try
+		{
+		    j = new JSONObject(result);
+		    metadata = gson.fromJson(j.toString(), GraphMetadata.class);
+		}
+		catch(Exception e)
+		{
+		    e.printStackTrace();
+		}
+		Log.d(TAG, "Metadata: " + metadata.getMaxLatitude());
 	}
 	
 	private NavigationService mBoundService;
