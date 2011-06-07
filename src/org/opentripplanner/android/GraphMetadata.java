@@ -1,12 +1,17 @@
 package org.opentripplanner.android;
 
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Root;
+
 public class GraphMetadata {
 
 	/**
      * The bounding box of the graph, in decimal degrees.
      */
+	@Element
     private double minLatitude, minLongitude, maxLatitude, maxLongitude;
 
+    @Root
     public GraphMetadata() {
     }
 

@@ -2,27 +2,37 @@ package org.opentripplanner.android;
 
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
+import org.opentripplanner.api.model.Response;
+import org.opentripplanner.api.model.TripPlan;
+import org.opentripplanner.util.DateDeserializer;
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.MapView.Projection;
+import org.osmdroid.views.overlay.ItemizedOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.MyLocationOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.PathOverlay;
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.core.Persister;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import de.mastacode.http.Http;
 
+import android.R.bool;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
@@ -48,6 +58,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -66,7 +77,16 @@ public class MainActivity extends Activity {
 	private ImageButton btnEndLocation;
 	private Button btnPlanTrip;
 
-	MapItemizedOverlay itemizedoverlay;
+	private EditText tbStartLocation;
+	private EditText tbEndLocation;
+	
+	//MapItemizedOverlay itemizedoverlay;
+	
+	//OverlayItem startMarker;
+	//OverlayItem endMarker;
+	
+	MapOverlay startMarker;
+	MapOverlay endMarker;
 	
 	private static LocationManager locationManager;
 	private static final int EXIT_ID = 1;
@@ -85,17 +105,23 @@ public class MainActivity extends Activity {
 
 		btnStartLocation = (ImageButton) findViewById(R.id.btnStartLocation);
 		btnEndLocation = (ImageButton) findViewById(R.id.btnEndLocation);
+		tbStartLocation = (EditText) findViewById(R.id.tbStartLocation);
+		tbEndLocation = (EditText) findViewById(R.id.tbEndLocation);
 		btnPlanTrip = (Button) findViewById(R.id.btnPlanTrip);
 		
 		
 		//Intent svc = new Intent(this, NavigationService.class);
 		//startService(svc);
 		
+		GeoPoint currentLocation = getLastLocation();
+		
 		
 		OnClickListener ocl = new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				mBoundService.updateNotification();
+				
+				final int buttonID = v.getId();
 				
 				final CharSequence[] items = {"Current Location", "Contact Address", "Point on Map"};
 
@@ -104,6 +130,24 @@ public class MainActivity extends Activity {
 				builder.setItems(items, new DialogInterface.OnClickListener() {
 				    public void onClick(DialogInterface dialog, int item) {
 				        Toast.makeText(getApplicationContext(), items[item], Toast.LENGTH_SHORT).show();
+				        
+				        if(items[item].equals("Current Location")) {
+				        	if(buttonID == R.id.btnStartLocation) {
+				        		tbStartLocation.setText("My Location");
+				        		startMarker.setLocation(getLastLocation());
+				        	} else if(buttonID == R.id.btnEndLocation) {
+				        		tbEndLocation.setText("My Location");
+				        		endMarker.setLocation(getLastLocation());
+				        	}
+				        } else if(items[item].equals("Contact Address")) {
+				        	//TODO
+				        } else { //Point on Map
+				        	if(buttonID == R.id.btnStartLocation) {
+				        		tbStartLocation.setText(startMarker.getLocationFormatedString());
+				        	} else if(buttonID == R.id.btnEndLocation) {
+				        		tbEndLocation.setText(endMarker.getLocationFormatedString());
+				        	}
+				        }
 				    }
 				});
 				AlertDialog alert = builder.create();
@@ -121,48 +165,59 @@ public class MainActivity extends Activity {
 		mv.setMultiTouchControls(true);
 
 		mc = mv.getController();
-		mc.setZoom(20);
-		//mc.setCenter(getLastLocation());
+		mc.setZoom(17);
+		mc.setCenter(currentLocation);
 		
-		mc.setCenter(getPoint(40.76793169992044, -73.98180484771729));
+		//Handle rotations                  final Object[] data = (Object[]) getLastNonConfigurationInstance();                  if ((data != null) && ((Boolean) data[0])) {                          mOsmv.getController().setZoom(16);                          showStep();                  } 
 		
-//		mv.setOnLongClickListener(new OnLongClickListener() {
-//			
-//			@Override
-//			public boolean onLongClick(View v) {
-//				Log.d(TAG, "Long clicked mv!");
-//				return false;
-//			}
-//		});
 		
-		// ---Add a location marker---
-		 //MapOverlay mapOverlay = new MapOverlay(this, getLastLocation());
-		// List<Overlay> listOfOverlays = mv.getOverlays();
-		// listOfOverlays.clear();
-		// listOfOverlays.add(mapOverlay);
-		//mv.getOverlays().add(mapOverlay);
-		//mv.invalidate();
+		
 
 		mlo = new MyLocationOverlay(this, mv);
 		// mlo.enableCompass();
 		mv.getOverlays().add(mlo);
 
-		itemizedoverlay = new MapItemizedOverlay(getResources().getDrawable(R.drawable.arrow), new DefaultResourceProxyImpl(this), this);
+		//itemizedoverlay = new MapItemizedOverlay(getResources().getDrawable(R.drawable.arrow), new DefaultResourceProxyImpl(this), this);
 		
-		GeoPoint point = getLastLocation();
-		OverlayItem overlayitem = new OverlayItem("Title!", "Description!",
-		point);
+		//startMarker = new OverlayItem("Start", "Starting location", currentLocation);
+		//endMarker = new OverlayItem("End", "Ending location", getPoint(28.062286, -82.417717));
+		
 		//itemizedoverlay.addOverlayItem(overlayitem);
 		//mv.getOverlays().add(itemizedoverlay);
 
-		Drawable marker = getResources().getDrawable(R.drawable.start);
-		marker.setBounds(0, 0, marker.getIntrinsicWidth(), marker.getIntrinsicHeight());
-		SitesOverlay so = new SitesOverlay(marker, new ArrayList<OverlayItem>());
-		so.setFocusItemsOnTap(true);
+		//Drawable marker = getResources().getDrawable(R.drawable.start);
+		//marker.setBounds(0, 0, marker.getIntrinsicWidth(), marker.getIntrinsicHeight());
+		//SitesOverlay so = new SitesOverlay(marker);
+		//so.setFocusItemsOnTap(true);
 		//so.setFocusedItem(0);
-		mv.getOverlays().add(so);
+		//so.addOverlayItem(startMarker);
+		//so.addOverlayItem(endMarker);
+		//mv.getOverlays().add(so);
 
 		
+		//Drawable marker1 = getResources().getDrawable(R.drawable.end);
+		//marker1.setBounds(0, 0, marker1.getIntrinsicWidth(), marker1.getIntrinsicHeight());
+		//SitesOverlay so1 = new SitesOverlay(marker1);
+		//so.setFocusItemsOnTap(true);
+		//so.setFocusedItem(0);
+		//so1.addOverlayItem(endMarker);
+		//so.addOverlayItem(endMarker);
+		//mv.getOverlays().add(so1);
+		
+		startMarker = new MapOverlay(this, R.drawable.start);
+		startMarker.setLocation(currentLocation);
+		mv.getOverlays().add(startMarker);
+		
+		endMarker = new MapOverlay(this, R.drawable.end);
+		endMarker.setLocation(getPoint(28.062286, -82.417717));
+		mv.getOverlays().add(endMarker);
+		
+		PathOverlay po = new PathOverlay(Color.DKGRAY, this);
+		po.addPoint(getPoint(28.062286, -82.417717));
+		po.addPoint(getPoint(28.062296, -82.417517));
+		po.addPoint(getPoint(28.062386, -82.417917));
+		po.addPoint(getPoint(28.064286, -82.418717));
+		mv.getOverlays().add(po);
 		
 		//SitesOverlay so = new SitesOverlay(getResources().getDrawable(R.drawable.icon));
 		//so.addOverlayItem(overlayitem);
@@ -201,7 +256,7 @@ public class MainActivity extends Activity {
 		*/
 		
 		
-		String u = "http://go.cutr.usf.edu:8083/opentripplanner-api-webapp/ws/metadata";
+/*		String u = "http://go.cutr.usf.edu:8083/opentripplanner-api-webapp/ws/metadata";
 		HttpClient client = new DefaultHttpClient();
 		String result = "";
 		try {
@@ -226,7 +281,72 @@ public class MainActivity extends Activity {
 		{
 		    e.printStackTrace();
 		}
-		Log.d(TAG, "Metadata: " + metadata.getMaxLatitude());
+		Log.d(TAG, "Metadata: " + metadata.getMaxLatitude());*/
+		
+		btnPlanTrip.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				
+				String u = "http://go.cutr.usf.edu:8083/opentripplanner-api-webapp/ws/plan?fromPlace=28.066192823902,-82.416927819827&toPlace=28.064072155861,-82.41109133301&arr=Depart&min=QUICK&maxWalkDistance=7600&mode=WALK&itinID=1&submit&date=06/07/2011&time=11:34%20am";
+				HttpClient client = new DefaultHttpClient();
+				String result = "";
+				try {
+					result = Http.get(u).use(client).header("Accept", "application/xml").charset("UTF-8").followRedirects(true).asString();
+					Log.d(TAG, "Result: " + result);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
+				Serializer serializer = new Persister();
+				//File source = new File("example.xml");
+				Response plan = null;
+				try {
+					plan = serializer.read(Response.class, result);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				Log.d(TAG, "Done!");
+				if(plan != null){
+					Log.d(TAG, "Result - " + plan.getPlan().from.name);
+				}
+
+
+				
+				/*String u = "http://go.cutr.usf.edu:8083/opentripplanner-api-webapp/ws/plan?fromPlace=28.066192823902,-82.416927819827&toPlace=28.064072155861,-82.41109133301&arr=Depart&min=QUICK&maxWalkDistance=7600&mode=WALK&itinID=1&submit&date=06/07/2011&time=11:34%20am";
+				
+				HttpClient client = new DefaultHttpClient();
+				String result = "";
+				try {
+					result = Http.get(u).use(client).header("Accept", "application/json").charset("UTF-8").followRedirects(true).asString();
+					Log.d(TAG, "Result: " + result);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
+				GsonBuilder gsonb = new GsonBuilder();
+				//DateDeserializer ds = new DateDeserializer();
+				//gsonb.registerTypeAdapter(Date.class, ds);
+				Gson gson = gsonb.create();
+				 
+				JSONObject j;
+				Response plan = null;
+				 
+				try
+				{
+				    j = new JSONObject(result);
+				    plan = gson.fromJson(j.toString(), Response.class);
+				}
+				catch(Exception e)
+				{
+				    e.printStackTrace();
+				}
+				Log.d(TAG, "TripPlan: " + plan.getPlan().from.lat + " time: " + plan.getPlan().date);
+				*/
+			}
+		});
 	}
 	
 	private NavigationService mBoundService;
@@ -362,44 +482,196 @@ public class MainActivity extends Activity {
 	private Boolean isGPSEnabled() {
 		return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 	}
+	
+	public void moveMarker(Boolean start, GeoPoint point) {
+		if(start) {
+			startMarker.setLocation(point);
+			tbStartLocation.setText(startMarker.getLocationFormatedString());
+		} else {
+			endMarker.setLocation(point);
+			tbEndLocation.setText(endMarker.getLocationFormatedString());
+		}
+	}
 
 	class MapOverlay extends org.osmdroid.views.overlay.Overlay {
 
-		public GeoPoint p;
+		private GeoPoint location;
+		private int markerID = R.drawable.start;
+		
+		private Drawable marker = getResources().getDrawable(R.drawable.start);
+		private boolean inDrag = false;
+		private ImageView dragImage = null;
+		private int xDragImageOffset = 0;
+		private int yDragImageOffset = 0;
+		private int xDragTouchOffset = 0;
+		private int yDragTouchOffset = 0;
+		private Point t = new Point(0, 0);
+		private Point p = new Point(0, 0);
 
-		public MapOverlay(Context ctx) {
+		public MapOverlay(Context ctx, int markerID) {
 			super(ctx);
-			// TODO Auto-generated constructor stub
+			this.markerID = markerID;
+			this.marker = getResources().getDrawable(markerID);
+			
+			dragImage=(ImageView)findViewById(R.id.drag);
+			
+			
+			xDragImageOffset=dragImage.getDrawable().getIntrinsicWidth()/2;
+			yDragImageOffset=dragImage.getDrawable().getIntrinsicHeight();
+			
+			marker.setBounds(0, 0, marker.getIntrinsicWidth(), marker.getIntrinsicHeight());
 		}
 
 		public MapOverlay(MainActivity mainActivity, GeoPoint lastLocation) {
 			super(mainActivity);
-			p = lastLocation;
+			location = lastLocation;
 		}
 
 		@Override
-		protected void draw(Canvas c, MapView osmv, boolean shadow) {
+		protected void draw(final Canvas c, final MapView osmv, final boolean shadow) {
 			// super.draw(c, osmv, shadow);
 
 			Point screenPts = new Point();
-			osmv.getProjection().toPixels(p, screenPts);
-
-			Bitmap bmp = BitmapFactory.decodeResource(getResources(),
-					R.drawable.arrow);
+			osmv.getProjection().toPixels(location, screenPts);
+			
+			Bitmap bmp = BitmapFactory.decodeResource(getResources(), markerID);
 			c.drawBitmap(bmp, screenPts.x, screenPts.y, null);
 			return;
 		}
-
 	
+		@Override
+		public boolean onLongPress(final MotionEvent e, final MapView mv) {
+			Log.d(TAG, "LONG PRESS!");
+			
+			final CharSequence[] items = {"Start Location", "End Location"};
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+			builder.setTitle("Choose Type for Point");
+			builder.setItems(items, new DialogInterface.OnClickListener() {
+			    public void onClick(DialogInterface dialog, int item) {
+			        Toast.makeText(getApplicationContext(), items[item], Toast.LENGTH_SHORT).show();
+			        GeoPoint point = mv.getProjection().fromPixels(e.getX(), e.getY());
+			        if(items[item].equals("Start Location")) {
+			        	moveMarker(true, point);
+			        } else {
+			        	moveMarker(false, point);
+			        }
+			    }
+			});
+			AlertDialog alert = builder.create();
+			alert.show();
+			
+			return true;
+		}
 		
 		@Override
-		public boolean onLongPress(MotionEvent e, MapView mv) {
-			Log.d(TAG, "LONG PRESS!");
-			return true;
+		public boolean onTouchEvent(MotionEvent event, MapView mapView) {
+			final int action = event.getAction();
+			final int x = (int) event.getX();
+			final int y = (int) event.getY();
+			final Projection pj = mapView.getProjection();
+			
+			boolean result = false;
+
+			if (action == MotionEvent.ACTION_DOWN) {
+				Log.d(TAG, "Touch down!");
+				//for (OverlayItem item : items) {
+
+					pj.fromMapPixels(x, y, t);
+					pj.toPixels(this.getLocation(), p);
+
+                    if (marker.getBounds().contains(t.x - p.x, t.y - p.y)) {
+						result = true;
+						inDrag = true;
+						this.setEnabled(false);
+						//items.remove(inDrag);
+						//populate();
+
+						xDragTouchOffset = 0;
+						yDragTouchOffset = 0;
+
+						setDragImagePosition(x, y);
+						dragImage.setVisibility(View.VISIBLE);
+
+						xDragTouchOffset = t.x - p.x;
+						yDragTouchOffset = t.y - p.y;
+
+						dragImage.setImageDrawable(marker);
+						//break;
+					}
+				//}
+			} else if (action == MotionEvent.ACTION_MOVE && inDrag != false) {
+				dragImage.setVisibility(View.VISIBLE);
+				setDragImagePosition(x, y);
+				result = true;
+			} else if (action == MotionEvent.ACTION_UP && inDrag != false) {
+				dragImage.setVisibility(View.GONE);
+
+				GeoPoint pt = pj.fromPixels(x - xDragTouchOffset, y - yDragTouchOffset);
+				//OverlayItem toDrop = new OverlayItem(inDrag.getTitle(),
+				//		inDrag.getSnippet(), pt);
+
+				this.setLocation(pt);
+				this.setEnabled(true);
+				//items.add(toDrop);
+				//populate();
+				inDrag = false;
+				result = true;
+				
+				//pj.fromMapPixels(x, y, t);
+				
+				//if((t.x - p.x) == xDragTouchOffset && (t.y - p.y) == yDragTouchOffset){
+					//Log.d(TAG, "Do something here if desired because we didn't move item " + toDrop.getTitle());
+					
+					StringBuilder coords = new StringBuilder().append(pt.getLatitudeE6() / 1E6).append(", ").append(pt.getLongitudeE6() / 1E6);
+					if(markerID == R.drawable.start) {
+						tbStartLocation.setText(coords);
+					} else {
+						tbEndLocation.setText(coords);
+					}
+				//}
+			}
+
+			return (result || super.onTouchEvent(event, mapView));
+		}
+
+		/*@Override
+		public boolean onSingleTapConfirmed(final MotionEvent e, final MapView mapView) {
+			Log.d(TAG, "SINGLE TAP CONFIRMED!");
+			return false;
+		}*/
+
+		public GeoPoint getLocation() {
+			return location;
+		}
+
+		public void setLocation(GeoPoint location) {
+			this.location = location;
+		}
+
+		public int getMarkerID() {
+			return markerID;
+		}
+
+		public void setMarkerID(int markerID) {
+			this.markerID = markerID;
+		}
+		
+		private void setDragImagePosition(int x, int y) {
+			RelativeLayout.LayoutParams lp=
+			(RelativeLayout.LayoutParams)dragImage.getLayoutParams();
+
+			lp.setMargins(x-xDragImageOffset-xDragTouchOffset,
+			y-yDragImageOffset-yDragTouchOffset, 0, 0);
+			dragImage.setLayoutParams(lp);
+		}
+		
+		public String getLocationFormatedString() {
+			return new StringBuilder().append(location.getLatitudeE6() / 1E6).append(", ").append(location.getLongitudeE6() / 1E6).toString();
 		}
 	}
 
-	class MapItemizedOverlay extends org.osmdroid.views.overlay.ItemizedOverlay<OverlayItem> {
+/*	class MapItemizedOverlay extends org.osmdroid.views.overlay.ItemizedOverlay<OverlayItem> {
 
 		private ArrayList<OverlayItem> mOverlays = new ArrayList<OverlayItem>();
 		private Context mContext;
@@ -471,13 +743,13 @@ public class MainActivity extends Activity {
 			//drawAt(new Canvas(), getResources().getDrawable(R.drawable.icon), (int)e.getX(), (int)e.getY(), true);
 			return true;
 		}
-	}
+	}*/
 
 	private GeoPoint getPoint(double lat, double lon) {
 		return (new GeoPoint((int) (lat * 1000000.0), (int) (lon * 1000000.0)));
 	}
 	
-	private class SitesOverlay extends ItemizedOverlayWithFocus<OverlayItem> {
+/*	private class SitesOverlay extends ItemizedOverlay<OverlayItem> {
 		private List<OverlayItem> items=new ArrayList<OverlayItem>();
 		private Drawable marker=null;
 		private OverlayItem inDrag=null;
@@ -489,29 +761,32 @@ public class MainActivity extends Activity {
 		private Point t = new Point(0, 0);
 		private Point p = new Point(0, 0);
 		
-		public SitesOverlay(Drawable marker, List<OverlayItem> i) {
-		super(i, marker, marker, Color.BLACK, null, new DefaultResourceProxyImpl(getApplicationContext()));
+		public SitesOverlay(Drawable marker) {
+			super(marker, new DefaultResourceProxyImpl(getApplicationContext()));
+		//super(i, marker, marker, Color.BLACK, null, new DefaultResourceProxyImpl(getApplicationContext()));
 		this.marker=marker;
 
 		dragImage=(ImageView)findViewById(R.id.drag);
-		dragImage.setImageDrawable(getResources().getDrawable(R.drawable.start));
+		//dragImage.setImageDrawable(getResources().getDrawable(R.drawable.start));
+		
+		dragImage.setImageDrawable(marker);
 		
 		xDragImageOffset=dragImage.getDrawable().getIntrinsicWidth()/2;
 		yDragImageOffset=dragImage.getDrawable().getIntrinsicHeight();
 
-		items.add(new OverlayItem("UN", "United Nations", getPoint(40.748963847316034,
-				-73.96807193756104)));
-		items.add(new OverlayItem("Lincoln Center",
-		"Home of Jazz at Lincoln Center", getPoint(40.76866299974387,
-				-73.98268461227417)));
-		items.add(new OverlayItem("Carnegie Hall",
-		"Where you go with practice, practice, practice", getPoint(40.765136435316755,
-				-73.97989511489868)));
-		items.add(new OverlayItem("The Downtown Club",
-		"Original home of the Heisman Trophy", getPoint(40.70686417491799,
-				-74.01572942733765)));
-
-		populate();
+//		items.add(new OverlayItem("UN", "United Nations", getPoint(40.748963847316034,
+//				-73.96807193756104)));
+//		items.add(new OverlayItem("Lincoln Center",
+//		"Home of Jazz at Lincoln Center", getPoint(40.76866299974387,
+//				-73.98268461227417)));
+//		items.add(new OverlayItem("Carnegie Hall",
+//		"Where you go with practice, practice, practice", getPoint(40.765136435316755,
+//				-73.97989511489868)));
+//		items.add(new OverlayItem("The Downtown Club",
+//		"Original home of the Heisman Trophy", getPoint(40.70686417491799,
+//				-74.01572942733765)));
+//
+//		populate();
 		}
 
 		@Override
@@ -593,6 +868,8 @@ public class MainActivity extends Activity {
 				
 				if((t.x - p.x) == xDragTouchOffset && (t.y - p.y) == yDragTouchOffset){
 					Log.d(TAG, "Do something here if desired because we didn't move item " + toDrop.getTitle());
+					tbEndLocation.setText(new StringBuilder().append(toDrop.getPoint().getLatitudeE6() / 1E6).append(", ")
+			                .append(toDrop.getPoint().getLongitudeE6() / 1E6));
 				}
 			}
 
@@ -642,5 +919,5 @@ public class MainActivity extends Activity {
 			//drawAt(new Canvas(), getResources().getDrawable(R.drawable.icon), (int)e.getX(), (int)e.getY(), true);
 			return true;
 		}
-	}	
+	}	*/
 }
