@@ -10,6 +10,8 @@ import java.util.List;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
+import org.opentripplanner.api.model.EncodedPolylineBean;
+import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Response;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.util.DateDeserializer;
@@ -40,6 +42,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -48,21 +51,29 @@ import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.ContactsContract;
 import android.provider.Settings;
+import android.provider.Contacts.People;
+import android.provider.ContactsContract.CommonDataKinds.StructuredPostal;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.TextView.OnEditorActionListener;
 
 public class MainActivity extends Activity {
 
@@ -92,6 +103,7 @@ public class MainActivity extends Activity {
 	private static final int EXIT_ID = 1;
 	private static final int GPS_ID = 2;
 	private static final int SETTINGS_ID = 3;
+	private static final int CHOOSE_CONTACT = 4;
 	
 	private static final String TAG = "MainActivity";
 
@@ -128,7 +140,8 @@ public class MainActivity extends Activity {
 				AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
 				builder.setTitle("Choose Start Location");
 				builder.setItems(items, new DialogInterface.OnClickListener() {
-				    public void onClick(DialogInterface dialog, int item) {
+				    
+					public void onClick(DialogInterface dialog, int item) {
 				        Toast.makeText(getApplicationContext(), items[item], Toast.LENGTH_SHORT).show();
 				        
 				        if(items[item].equals("Current Location")) {
@@ -141,6 +154,8 @@ public class MainActivity extends Activity {
 				        	}
 				        } else if(items[item].equals("Contact Address")) {
 				        	//TODO
+				        	Intent intent = new Intent(Intent.ACTION_PICK, People.CONTENT_URI);
+				        	startActivityForResult(intent, CHOOSE_CONTACT);
 				        } else { //Point on Map
 				        	if(buttonID == R.id.btnStartLocation) {
 				        		tbStartLocation.setText(startMarker.getLocationFormatedString());
@@ -159,6 +174,20 @@ public class MainActivity extends Activity {
 		
 		btnStartLocation.setOnClickListener(ocl);
 		btnEndLocation.setOnClickListener(ocl);
+		
+		tbStartLocation.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+		tbEndLocation.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		tbEndLocation.setOnEditorActionListener(new OnEditorActionListener() {
+			
+			@Override
+			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+				if(actionId == EditorInfo.IME_ACTION_DONE || event.getAction() == KeyEvent.ACTION_DOWN && 
+						event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+					Log.d(TAG, "Finished inputting - plan trip now!");
+				}
+				return false;
+			}
+		});
 		
 		mv = (MapView) findViewById(R.id.mapview);
 		mv.setBuiltInZoomControls(true);
@@ -313,6 +342,19 @@ public class MainActivity extends Activity {
 					Log.d(TAG, "Result - " + plan.getPlan().from.name);
 				}
 
+				if(plan != null && plan.getPlan() != null && plan.getPlan().itinerary.get(0) != null) {
+					List<Leg> legs = plan.getPlan().itinerary.get(0).legs;
+					if(!legs.isEmpty()) {
+						for (Leg leg : legs) {
+							List<GeoPoint> points = EncodedPolylineBean.decodePoly(leg.legGeometry.getPoints());
+							PathOverlay po = new PathOverlay(Color.DKGRAY, MainActivity.this);
+							for (GeoPoint geoPoint : points) {
+								po.addPoint(geoPoint);
+							}
+							mv.getOverlays().add(po);
+						}
+					}
+				}
 
 				
 				/*String u = "http://go.cutr.usf.edu:8083/opentripplanner-api-webapp/ws/plan?fromPlace=28.066192823902,-82.416927819827&toPlace=28.064072155861,-82.41109133301&arr=Depart&min=QUICK&maxWalkDistance=7600&mode=WALK&itinID=1&submit&date=06/07/2011&time=11:34%20am";
@@ -347,6 +389,61 @@ public class MainActivity extends Activity {
 				*/
 			}
 		});
+	}
+	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		
+		switch(requestCode) {
+			case (CHOOSE_CONTACT):
+				if(resultCode == Activity.RESULT_OK) {
+					Uri contactData = data.getData();
+					Cursor c = managedQuery(contactData, null, null, null, null);
+					if(c.moveToFirst()) {
+						Log.d(TAG, "Contact: " + c.getString(c.getColumnIndexOrThrow(People.DISPLAY_NAME)));
+						
+						String id = c.getString(c.getColumnIndexOrThrow(ContactsContract.Contacts._ID));
+						
+//						Cursor postals = getContentResolver().query(ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_URI, null, ContactsContract.CommonDataKinds.StructuredPostal.CONTACT_ID + 
+//								" = " + contactId, null, null);
+//						int postFormattedNdx = postals.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS);
+//						int postTypeNdx = postals.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.TYPE);
+//						int postStreetNdx = postals.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.STREET);
+//						while (postals.moveToNext()) {
+//							String postalData = postals.getString(postFormattedNdx);
+//							postalCat = postalCat+ postalData+ ", [";
+//							postalData = String.valueOf(postals.getInt(postTypeNdx));
+//							postalCat = postalCat+ postalData+ "], ";
+//							postalData = postals.getString(postStreetNdx);
+//							postalCat = postalCat+ postalData+ " ";         
+//						}
+//						postals.close();
+						
+						String where= ContactsContract.Data.CONTACT_ID
+							+ " = "
+							+ id
+							+ " AND ContactsContract.Data.MIMETYPE = '"
+							+ ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE
+							+ "'";
+							String[] projection = new String[] {
+							StructuredPostal.STREET, StructuredPostal.CITY,
+							StructuredPostal.POSTCODE, StructuredPostal.STREET,
+							StructuredPostal.REGION, StructuredPostal.COUNTRY,};
+							
+
+							Cursor cur = getContentResolver().query(
+							ContactsContract.Data.CONTENT_URI, projection, where, null,
+							StructuredPostal.COUNTRY + " asc");
+							
+							if(cur.moveToFirst()) {
+								Log.d(TAG, "Address? " + cur.getString(0));
+							}
+
+					}
+				}
+				break;
+		}
 	}
 	
 	private NavigationService mBoundService;
