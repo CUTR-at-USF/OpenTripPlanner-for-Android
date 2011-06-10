@@ -20,6 +20,7 @@
     </string-array>
     <string name="enable_gps">Enable GPS</string>
     <string name="disable_gps">Disable GPS</string>
+    <string name="my_location">My Location</string>
     <string name="settings">Settings</string>
     <string name="exit">Exit</string>
 </resources>

@@ -81,6 +81,7 @@ public class MainActivity extends Activity {
 	private MapController mc;
 	private MyLocationOverlay mlo;
 	private MenuItem mGPS;
+	private MenuItem mMyLocation;
 	private MenuItem mSettings;
 	private MenuItem mExit;
 	
@@ -103,7 +104,8 @@ public class MainActivity extends Activity {
 	private static final int EXIT_ID = 1;
 	private static final int GPS_ID = 2;
 	private static final int SETTINGS_ID = 3;
-	private static final int CHOOSE_CONTACT = 4;
+	private static final int MY_LOC_ID = 4;
+	private static final int CHOOSE_CONTACT = 5;
 	
 	private static final String TAG = "MainActivity";
 
@@ -521,9 +523,11 @@ public class MainActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(final Menu pMenu) {
 		mGPS = pMenu.add(0, GPS_ID, Menu.NONE, R.string.enable_gps);
+		mMyLocation = pMenu.add(0, MY_LOC_ID, Menu.NONE, R.string.my_location);
 		mSettings = pMenu.add(0, SETTINGS_ID, Menu.NONE, R.string.settings);
 		mExit = pMenu.add(0, EXIT_ID, Menu.NONE, R.string.exit);
 		mGPS.setIcon(android.R.drawable.ic_menu_compass);
+		mMyLocation.setIcon(android.R.drawable.ic_menu_mylocation);
 		mSettings.setIcon(android.R.drawable.ic_menu_preferences);
 		mExit.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
 		return true;
@@ -545,7 +549,10 @@ public class MainActivity extends Activity {
 		} else if (pItem == mGPS) {
 			Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 			startActivity(myIntent);
-		} else if (pItem == mSettings) {
+		} else if(pItem == mMyLocation) {
+			zoomToCurrentLocation();
+		}
+			else if (pItem == mSettings) {
 			//TODO - settings activity
 			startActivity(new Intent(this, SettingsActivity.class));
 		}
@@ -580,7 +587,7 @@ public class MainActivity extends Activity {
 		return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 	}
 	
-	public void moveMarker(Boolean start, GeoPoint point) {
+	private void moveMarker(Boolean start, GeoPoint point) {
 		if(start) {
 			startMarker.setLocation(point);
 			tbStartLocation.setText(startMarker.getLocationFormatedString());
@@ -588,6 +595,10 @@ public class MainActivity extends Activity {
 			endMarker.setLocation(point);
 			tbEndLocation.setText(endMarker.getLocationFormatedString());
 		}
+	}
+
+	private void zoomToCurrentLocation() {
+		mc.animateTo(getLastLocation());
 	}
 
 	class MapOverlay extends org.osmdroid.views.overlay.Overlay {
