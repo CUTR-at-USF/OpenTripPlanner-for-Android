@@ -44,16 +44,19 @@ import de.mastacode.http.Http;
 import android.R.bool;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -62,6 +65,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.provider.Contacts.People;
@@ -107,6 +111,9 @@ public class MainActivity extends Activity {
 	
 	MapOverlay startMarker;
 	MapOverlay endMarker;
+	PathOverlay routeOverlay;
+	
+	private SharedPreferences prefs;
 	
 	private static LocationManager locationManager;
 	private static final int EXIT_ID = 1;
@@ -122,6 +129,9 @@ public class MainActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		
+		prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		
 
 		locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
@@ -205,7 +215,7 @@ public class MainActivity extends Activity {
 		mv.setMultiTouchControls(true);
 
 		mc = mv.getController();
-		mc.setZoom(17);
+		mc.setZoom(10);
 		mc.setCenter(currentLocation);
 		
 		//Handle rotations                  final Object[] data = (Object[]) getLastNonConfigurationInstance();                  if ((data != null) && ((Boolean) data[0])) {                          mOsmv.getController().setZoom(16);                          showStep();                  } 
@@ -252,12 +262,12 @@ public class MainActivity extends Activity {
 		endMarker.setLocation(getPoint(28.062286, -82.417717));
 		mv.getOverlays().add(endMarker);
 		
-		PathOverlay po = new PathOverlay(Color.DKGRAY, this);
-		po.addPoint(getPoint(28.062286, -82.417717));
-		po.addPoint(getPoint(28.062296, -82.417517));
-		po.addPoint(getPoint(28.062386, -82.417917));
-		po.addPoint(getPoint(28.064286, -82.418717));
-		mv.getOverlays().add(po);
+		routeOverlay = new PathOverlay(Color.DKGRAY, this);
+		Paint paint = new Paint();
+        paint.setColor(Color.DKGRAY);
+        paint.setStrokeWidth(3.0f);
+        paint.setStyle(Paint.Style.STROKE);
+        mv.getOverlays().add(routeOverlay);
 		
 		//SitesOverlay so = new SitesOverlay(getResources().getDrawable(R.drawable.icon));
 		//so.addOverlayItem(overlayitem);
@@ -335,10 +345,20 @@ public class MainActivity extends Activity {
 				request.setTo(URLEncoder.encode(endMarker.getLocationFormatedString()));
 				request.setArriveBy(false);
 				request.setOptimize(OptimizeType.QUICK);
-				request.setMaxWalkDistance(new Double("7600"));
+				
+				
+				try{
+					Double maxWalk = Double.parseDouble(prefs.getString("max_walking_distance", "7600"));
+					request.setMaxWalkDistance(maxWalk);
+				} catch (NumberFormatException ex) {
+					request.setMaxWalkDistance(new Double("7600"));
+				}
+				
+				request.setWheelchair(prefs.getBoolean("wheelchair_accessible", false));
+				
 				request.setDateTime("06/07/2011", URLEncoder.encode("11:34 am"));
 				
-				new TripRequest().execute(request);
+				new TripRequest(MainActivity.this).execute(request);
 				
 				
 				
@@ -1019,32 +1039,47 @@ public class MainActivity extends Activity {
 	public class TripRequest extends AsyncTask<Request, Integer, Long> {
 		private TripPlan plan;
 		private static final String TAG = "OTP";
+		private ProgressDialog progressDialog;
+		private MainActivity activity;
+
+
+		public TripRequest(MainActivity activity) {
+	        this.activity = activity;
+	        progressDialog = new ProgressDialog(activity);
+	    }
+		protected void onPreExecute () {
+			progressDialog = ProgressDialog.show(MainActivity.this, "" , " Generating trip. Please wait ... ", true);
+		}
 
 		     protected Long doInBackground(Request... reqs) {
 		    	 Log.v(TAG, "In doInBackground");
+		    	 
 		         int count = reqs.length;
 		         long totalSize = 0;
 		         for (int i = 0; i < count; i++) {
 		            // totalSize += Downloader.downloadFile(reqs[i]);
 		        	 plan = requestPlan(reqs[i]);
-		             publishProgress((int) ((i / (float) count) * 100));
+		            // publishProgress((int) ((i / (float) count) * 100));
 		         }
 		         return totalSize;
 		     }
 
-		     protected void onProgressUpdate(Integer... progress) {
-		       //  setProgressPercent(progress[0]);
-		    	 //TODO - fix tag
-		    	 Log.v(TAG, "Progress: " + progress[0]);
-		     }
+//		     protected void onProgressUpdate(Integer... progress) {
+//		       //  setProgressPercent(progress[0]);
+//		    	 setProgress(progress[0]);
+//		    	 //TODO - fix tag
+//		    	 Log.v(TAG, "Progress: " + progress[0]);
+//		     }
 
 		     protected void onPostExecute(Long result) {
-		       //  showDialog("Downloaded " + result + " bytes");
-		    	 Log.v(TAG, "Result from async: " + result);//plan.from.name);
-		    	 //Toast.makeText(null, "Async is done!", Toast.LENGTH_SHORT).show();
+		     	 Log.v(TAG, "Result from async: " + result);//plan.from.name);
 		    	 
-		    	 Log.d(TAG, "Done!");
-					if(plan != null){
+		    	 if (progressDialog.isShowing()) {
+		    		 progressDialog.dismiss();
+		         }
+
+		    	 
+		    		if(plan != null){
 						Log.d(TAG, "Result - " + plan.from.name);
 					}
 
@@ -1053,11 +1088,11 @@ public class MainActivity extends Activity {
 						if(!legs.isEmpty()) {
 							for (Leg leg : legs) {
 								List<GeoPoint> points = EncodedPolylineBean.decodePoly(leg.legGeometry.getPoints());
-								PathOverlay po = new PathOverlay(Color.DKGRAY, MainActivity.this);
+								routeOverlay.clearPath();
 								for (GeoPoint geoPoint : points) {
-									po.addPoint(geoPoint);
+									routeOverlay.addPoint(geoPoint);
 								}
-								mv.getOverlays().add(po);
+								
 							}
 						}
 					}

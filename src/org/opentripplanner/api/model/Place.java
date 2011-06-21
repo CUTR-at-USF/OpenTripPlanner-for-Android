@@ -18,11 +18,7 @@ import java.util.logging.Logger;
 import org.opentripplanner.util.Constants;
 import org.simpleframework.xml.Element;
 
-import com.google.gson.annotations.SerializedName;
-
-//import javax.xml.bind.annotation.XmlElement; 
-
-import org.onebusaway.gtfs.model.AgencyAndId;
+//import org.onebusaway.gtfs.model.AgencyAndId;
 //import org.opentripplanner.util.Constants; 
 
 /** 
@@ -79,9 +75,9 @@ public class Place {
         this.name = name;
     }
 
-//    public Place(Double lon, Double lat, String name, AgencyAndId stopId) {
-//        this(lon, lat, name);
-//        this.stopId = stopId;
-//    }
+    public Place(Double lon, Double lat, String name, AgencyAndId stopId) {
+        this(lon, lat, name);
+        this.stopId = stopId;
+    }
 
 }
