@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.http.client.HttpClient;
@@ -12,8 +15,10 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 import org.opentripplanner.api.model.EncodedPolylineBean;
 import org.opentripplanner.api.model.Leg;
-import org.opentripplanner.api.model.Response;
 import org.opentripplanner.api.model.TripPlan;
+import org.opentripplanner.api.ws.Response;
+import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.util.Constants;
 import org.opentripplanner.util.DateDeserializer;
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.ResourceProxy;
@@ -28,6 +33,8 @@ import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.PathOverlay;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
+
+import org.opentripplanner.api.ws.Request;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -52,6 +59,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.ContactsContract;
@@ -107,7 +115,7 @@ public class MainActivity extends Activity {
 	private static final int MY_LOC_ID = 4;
 	private static final int CHOOSE_CONTACT = 5;
 	
-	private static final String TAG = "MainActivity";
+	private static final String TAG = "OTP";
 
 	/** Called when the activity is first created. */
 	@Override
@@ -186,6 +194,7 @@ public class MainActivity extends Activity {
 				if(actionId == EditorInfo.IME_ACTION_DONE || event.getAction() == KeyEvent.ACTION_DOWN && 
 						event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
 					Log.d(TAG, "Finished inputting - plan trip now!");
+					//TODO = call to plan trip button here?
 				}
 				return false;
 			}
@@ -319,44 +328,22 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				
-				String u = "http://go.cutr.usf.edu:8083/opentripplanner-api-webapp/ws/plan?fromPlace=28.066192823902,-82.416927819827&toPlace=28.064072155861,-82.41109133301&arr=Depart&min=QUICK&maxWalkDistance=7600&mode=WALK&itinID=1&submit&date=06/07/2011&time=11:34%20am";
-				HttpClient client = new DefaultHttpClient();
-				String result = "";
-				try {
-					result = Http.get(u).use(client).header("Accept", "application/xml").charset("UTF-8").followRedirects(true).asString();
-					Log.d(TAG, "Result: " + result);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				Request request = new Request();
+				//request.setFrom("28.066192823902,-82.416927819827");
+				//request.setTo("28.064072155861,-82.41109133301");
+				request.setFrom(URLEncoder.encode(startMarker.getLocationFormatedString()));
+				request.setTo(URLEncoder.encode(endMarker.getLocationFormatedString()));
+				request.setArriveBy(false);
+				request.setOptimize(OptimizeType.QUICK);
+				request.setMaxWalkDistance(new Double("7600"));
+				request.setDateTime("06/07/2011", URLEncoder.encode("11:34 am"));
 				
-				Serializer serializer = new Persister();
-				//File source = new File("example.xml");
-				Response plan = null;
-				try {
-					plan = serializer.read(Response.class, result);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				new TripRequest().execute(request);
 				
-				Log.d(TAG, "Done!");
-				if(plan != null){
-					Log.d(TAG, "Result - " + plan.getPlan().from.name);
-				}
+				
+				
+				
 
-				if(plan != null && plan.getPlan() != null && plan.getPlan().itinerary.get(0) != null) {
-					List<Leg> legs = plan.getPlan().itinerary.get(0).legs;
-					if(!legs.isEmpty()) {
-						for (Leg leg : legs) {
-							List<GeoPoint> points = EncodedPolylineBean.decodePoly(leg.legGeometry.getPoints());
-							PathOverlay po = new PathOverlay(Color.DKGRAY, MainActivity.this);
-							for (GeoPoint geoPoint : points) {
-								po.addPoint(geoPoint);
-							}
-							mv.getOverlays().add(po);
-						}
-					}
-				}
 
 				
 				/*String u = "http://go.cutr.usf.edu:8083/opentripplanner-api-webapp/ws/plan?fromPlace=28.066192823902,-82.416927819827&toPlace=28.064072155861,-82.41109133301&arr=Depart&min=QUICK&maxWalkDistance=7600&mode=WALK&itinID=1&submit&date=06/07/2011&time=11:34%20am";
@@ -682,7 +669,7 @@ public class MainActivity extends Activity {
 			boolean result = false;
 
 			if (action == MotionEvent.ACTION_DOWN) {
-				Log.d(TAG, "Touch down!");
+				//Log.d(TAG, "Touch down!");
 				//for (OverlayItem item : items) {
 
 					pj.fromMapPixels(x, y, t);
@@ -1028,4 +1015,114 @@ public class MainActivity extends Activity {
 			return true;
 		}
 	}	*/
+	
+	public class TripRequest extends AsyncTask<Request, Integer, Long> {
+		private TripPlan plan;
+		private static final String TAG = "OTP";
+
+		     protected Long doInBackground(Request... reqs) {
+		    	 Log.v(TAG, "In doInBackground");
+		         int count = reqs.length;
+		         long totalSize = 0;
+		         for (int i = 0; i < count; i++) {
+		            // totalSize += Downloader.downloadFile(reqs[i]);
+		        	 plan = requestPlan(reqs[i]);
+		             publishProgress((int) ((i / (float) count) * 100));
+		         }
+		         return totalSize;
+		     }
+
+		     protected void onProgressUpdate(Integer... progress) {
+		       //  setProgressPercent(progress[0]);
+		    	 //TODO - fix tag
+		    	 Log.v(TAG, "Progress: " + progress[0]);
+		     }
+
+		     protected void onPostExecute(Long result) {
+		       //  showDialog("Downloaded " + result + " bytes");
+		    	 Log.v(TAG, "Result from async: " + result);//plan.from.name);
+		    	 //Toast.makeText(null, "Async is done!", Toast.LENGTH_SHORT).show();
+		    	 
+		    	 Log.d(TAG, "Done!");
+					if(plan != null){
+						Log.d(TAG, "Result - " + plan.from.name);
+					}
+
+					if(plan != null && plan.itinerary.get(0) != null) {
+						List<Leg> legs = plan.itinerary.get(0).legs;
+						if(!legs.isEmpty()) {
+							for (Leg leg : legs) {
+								List<GeoPoint> points = EncodedPolylineBean.decodePoly(leg.legGeometry.getPoints());
+								PathOverlay po = new PathOverlay(Color.DKGRAY, MainActivity.this);
+								for (GeoPoint geoPoint : points) {
+									po.addPoint(geoPoint);
+								}
+								mv.getOverlays().add(po);
+							}
+						}
+					}
+		     }
+		 
+
+		private TripPlan requestPlan(Request requestParams) {
+			HashMap<String, String> tmp = requestParams.getParameters();
+
+			Collection c = tmp.entrySet();
+			Iterator itr = c.iterator();
+
+			String params = "";
+			boolean first = true;
+			while(itr.hasNext()){
+				if(first) {
+					params += "?" + itr.next();
+					first = false;
+				} else {
+					params += "&" + itr.next();						
+				}
+			}
+			
+			//fromPlace=28.066192823902,-82.416927819827
+			//&toPlace=28.064072155861,-82.41109133301
+			//&arr=Depart
+			//&min=QUICK
+			//&maxWalkDistance=7600
+			//&mode=WALK
+			//&itinID=1
+			//&submit
+			//&date=06/07/2011
+			//&time=11:34%20am
+			
+			//String u = "http://go.cutr.usf.edu:8083/opentripplanner-api-webapp/ws/plan?fromPlace=28.066192823902,-82.416927819827&toPlace=28.064072155861,-82.41109133301&arr=Depart&min=QUICK&maxWalkDistance=7600&mode=WALK&itinID=1&submit&date=06/07/2011&time=11:34%20am";
+			String u = "http://go.cutr.usf.edu:8083/opentripplanner-api-webapp/ws/plan" + params;
+			Log.d(TAG, "URL: " + u);
+			HttpClient client = new DefaultHttpClient();
+			String result = "";
+			try {
+				result = Http.get(u).use(client).header("Accept", "application/xml").header("Keep-Alive","timeout=60, max=100").charset("UTF-8").followRedirects(true).asString();
+				Log.d(TAG, "Result: " + result);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			OTPApp app = ((OTPApp) getApplication());
+			app.setServerURL("test");
+			
+			Serializer serializer = new Persister();
+
+			Response plan = null;
+			try {
+				plan = serializer.read(Response.class, result);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			//TODO - handle errors and error responses
+			if(plan == null) {
+				Log.d(TAG, "No response?");
+				return null;
+			}
+			return plan.getPlan();
+		}
+
+	}
+	
 }

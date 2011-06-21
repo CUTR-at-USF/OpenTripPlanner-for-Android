@@ -22,7 +22,7 @@ import com.google.gson.annotations.SerializedName;
 
 //import javax.xml.bind.annotation.XmlElement; 
 
-//import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.AgencyAndId;
 //import org.opentripplanner.util.Constants; 
 
 /** 
@@ -41,7 +41,8 @@ public class Place {
      * The ID of the stop.  Depending on the transit agency, this may or may not be something that
      * users care about.
      */
-    //public AgencyAndId stopId = null;
+    @Element(required=false)
+    public AgencyAndId stopId = null;
 
     /**
      * The longitude of the place.

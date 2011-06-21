@@ -1,4 +1,4 @@
-package org.opentripplanner.android;
+package org.opentripplanner.api.ws;
 
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
