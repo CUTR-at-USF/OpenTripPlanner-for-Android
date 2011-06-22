@@ -1,47 +1,29 @@
 package org.opentripplanner.android;
 
 import java.io.IOException;
-import java.net.URL;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONObject;
 import org.opentripplanner.api.model.EncodedPolylineBean;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.TripPlan;
+import org.opentripplanner.api.ws.Request;
 import org.opentripplanner.api.ws.Response;
 import org.opentripplanner.routing.core.OptimizeType;
-import org.opentripplanner.util.Constants;
-import org.opentripplanner.util.DateDeserializer;
-import org.osmdroid.DefaultResourceProxyImpl;
-import org.osmdroid.ResourceProxy;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.MapView.Projection;
-import org.osmdroid.views.overlay.ItemizedOverlay;
-import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.MyLocationOverlay;
-import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.PathOverlay;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 
-import org.opentripplanner.api.ws.Request;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import de.mastacode.http.Http;
-
-import android.R.bool;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -70,6 +52,7 @@ import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.provider.Contacts.People;
 import android.provider.ContactsContract.CommonDataKinds.StructuredPostal;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -86,6 +69,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
+import de.mastacode.http.Http;
 
 public class MainActivity extends Activity {
 
@@ -187,8 +171,6 @@ public class MainActivity extends Activity {
 				});
 				AlertDialog alert = builder.create();
 				alert.show();
-				
-				//use v.getId() to determine start or end button
 			}
 		};
 		
@@ -215,7 +197,7 @@ public class MainActivity extends Activity {
 		mv.setMultiTouchControls(true);
 
 		mc = mv.getController();
-		mc.setZoom(10);
+		mc.setZoom(12);
 		mc.setCenter(currentLocation);
 		
 		//Handle rotations                  final Object[] data = (Object[]) getLastNonConfigurationInstance();                  if ((data != null) && ((Boolean) data[0])) {                          mOsmv.getController().setZoom(16);                          showStep();                  } 
@@ -259,14 +241,17 @@ public class MainActivity extends Activity {
 		mv.getOverlays().add(startMarker);
 		
 		endMarker = new MapOverlay(this, R.drawable.end);
-		endMarker.setLocation(getPoint(28.062286, -82.417717));
+		//endMarker.setLocation(getPoint(28.062286, -82.417717));
+		endMarker.setLocation(currentLocation);
 		mv.getOverlays().add(endMarker);
 		
 		routeOverlay = new PathOverlay(Color.DKGRAY, this);
 		Paint paint = new Paint();
         paint.setColor(Color.DKGRAY);
-        paint.setStrokeWidth(3.0f);
-        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(5.0f);
+        paint.setStyle(Paint.Style.STROKE); 
+        paint.setAlpha(200);
+        routeOverlay.setPaint(paint);
         mv.getOverlays().add(routeOverlay);
 		
 		//SitesOverlay so = new SitesOverlay(getResources().getDrawable(R.drawable.icon));
@@ -356,15 +341,12 @@ public class MainActivity extends Activity {
 				
 				request.setWheelchair(prefs.getBoolean("wheelchair_accessible", false));
 				
-				request.setDateTime("06/07/2011", URLEncoder.encode("11:34 am"));
+				//request.setDateTime("06/07/2011", URLEncoder.encode("11:34 am"));
+				request.setDateTime(DateFormat.format("MM/dd/yy", System.currentTimeMillis()).toString(), 
+						DateFormat.format("hh:mmaa", System.currentTimeMillis()).toString());
 				
 				new TripRequest(MainActivity.this).execute(request);
 				
-				
-				
-				
-
-
 				
 				/*String u = "http://go.cutr.usf.edu:8083/opentripplanner-api-webapp/ws/plan?fromPlace=28.066192823902,-82.416927819827&toPlace=28.064072155861,-82.41109133301&arr=Depart&min=QUICK&maxWalkDistance=7600&mode=WALK&itinID=1&submit&date=06/07/2011&time=11:34%20am";
 				
@@ -558,8 +540,7 @@ public class MainActivity extends Activity {
 			startActivity(myIntent);
 		} else if(pItem == mMyLocation) {
 			zoomToCurrentLocation();
-		}
-			else if (pItem == mSettings) {
+		} else if (pItem == mSettings) {
 			//TODO - settings activity
 			startActivity(new Intent(this, SettingsActivity.class));
 		}
@@ -1042,27 +1023,26 @@ public class MainActivity extends Activity {
 		private ProgressDialog progressDialog;
 		private MainActivity activity;
 
-
 		public TripRequest(MainActivity activity) {
-	        this.activity = activity;
-	        progressDialog = new ProgressDialog(activity);
-	    }
-		protected void onPreExecute () {
-			progressDialog = ProgressDialog.show(MainActivity.this, "" , " Generating trip. Please wait ... ", true);
+			this.activity = activity;
+			progressDialog = new ProgressDialog(activity);
 		}
 
-		     protected Long doInBackground(Request... reqs) {
-		    	 Log.v(TAG, "In doInBackground");
-		    	 
-		         int count = reqs.length;
-		         long totalSize = 0;
-		         for (int i = 0; i < count; i++) {
-		            // totalSize += Downloader.downloadFile(reqs[i]);
-		        	 plan = requestPlan(reqs[i]);
-		            // publishProgress((int) ((i / (float) count) * 100));
-		         }
-		         return totalSize;
-		     }
+		protected void onPreExecute() {
+			progressDialog = ProgressDialog.show(MainActivity.this, "",
+					" Generating trip. Please wait ... ", true);
+		}
+
+		protected Long doInBackground(Request... reqs) {
+			int count = reqs.length;
+			long totalSize = 0;
+			for (int i = 0; i < count; i++) {
+				// totalSize += Downloader.downloadFile(reqs[i]);
+				plan = requestPlan(reqs[i]);
+				// publishProgress((int) ((i / (float) count) * 100));
+			}
+			return totalSize;
+		}
 
 //		     protected void onProgressUpdate(Integer... progress) {
 //		       //  setProgressPercent(progress[0]);
@@ -1071,32 +1051,28 @@ public class MainActivity extends Activity {
 //		    	 Log.v(TAG, "Progress: " + progress[0]);
 //		     }
 
-		     protected void onPostExecute(Long result) {
-		     	 Log.v(TAG, "Result from async: " + result);//plan.from.name);
-		    	 
-		    	 if (progressDialog.isShowing()) {
-		    		 progressDialog.dismiss();
-		         }
+		protected void onPostExecute(Long result) {
+			if (progressDialog.isShowing()) {
+				progressDialog.dismiss();
+			}
 
-		    	 
-		    		if(plan != null){
-						Log.d(TAG, "Result - " + plan.from.name);
-					}
-
-					if(plan != null && plan.itinerary.get(0) != null) {
-						List<Leg> legs = plan.itinerary.get(0).legs;
-						if(!legs.isEmpty()) {
-							for (Leg leg : legs) {
-								List<GeoPoint> points = EncodedPolylineBean.decodePoly(leg.legGeometry.getPoints());
-								routeOverlay.clearPath();
-								for (GeoPoint geoPoint : points) {
-									routeOverlay.addPoint(geoPoint);
-								}
-								
-							}
+			if (plan != null && plan.itinerary.get(0) != null) {
+				List<Leg> legs = plan.itinerary.get(0).legs;
+				if (!legs.isEmpty()) {
+					for (Leg leg : legs) {
+						List<GeoPoint> points = EncodedPolylineBean
+								.decodePoly(leg.legGeometry.getPoints());
+						routeOverlay.clearPath();
+						for (GeoPoint geoPoint : points) {
+							routeOverlay.addPoint(geoPoint);
 						}
 					}
-		     }
+				}
+			} else {
+				// TODO - handle errors here?
+				Log.e(TAG, "No route to display!");
+			}
+		}
 		 
 
 		private TripPlan requestPlan(Request requestParams) {
