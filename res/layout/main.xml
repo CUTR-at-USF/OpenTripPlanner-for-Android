@@ -1,38 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent" android:orientation="vertical">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:panel="http://schemas.android.com/apk/res/org.opentripplanner.android"
+    	android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+		android:orientation="vertical">
 
-<RelativeLayout android:layout_width="fill_parent" android:id="@+id/relativeLayout1" android:layout_height="wrap_content" android:gravity="left" android:paddingTop="5dip">
-    <EditText android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_toLeftOf="@+id/btnStartLocation" android:text="My Location" android:id="@+id/tbStartLocation" android:selectAllOnFocus="true"></EditText>
-    <ImageButton android:layout_height="wrap_content" android:layout_alignParentRight="true" android:id="@+id/btnStartLocation" android:src="@android:drawable/ic_input_get" android:layout_width="40dip" android:scaleType="center"></ImageButton>
-</RelativeLayout>
+	<RelativeLayout android:id="@+id/relativeLayout4"
+		android:layout_width="fill_parent" android:layout_height="wrap_content">
+		<org.osmdroid.views.MapView android:id="@+id/mapview"
+			android:layout_width="fill_parent" android:layout_height="fill_parent"
+			android:enabled="true" android:clickable="true" />
+		<ImageView android:id="@+id/drag" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:src="@drawable/icon"
+			android:visibility="gone" />
+	</RelativeLayout>
 
-<RelativeLayout android:layout_width="fill_parent" android:id="@+id/relativeLayout2" android:layout_height="wrap_content" android:gravity="left" android:layout_below="@+id/relativeLayout1">
-    <EditText android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_toLeftOf="@+id/btnEndLocation" android:text="End Location" android:id="@+id/tbEndLocation" android:selectAllOnFocus="true"></EditText>
-    <ImageButton android:layout_height="wrap_content" android:layout_alignParentRight="true" android:id="@+id/btnEndLocation" android:src="@android:drawable/ic_input_get" android:layout_width="40dip" android:scaleType="centerCrop"></ImageButton>
-</RelativeLayout>
+	<org.miscwidgets.widget.Panel
+		android:layout_width="fill_parent" android:id="@+id/slidingDrawer1"
+		android:layout_height="wrap_content"  
+		panel:handle="@+id/panelHandle" panel:content="@+id/panelContent" panel:position="top"
+		panel:animationDuration="1000" panel:linearFlying="true"
+		panel:openedHandle="@android:drawable/ic_menu_myplaces"
+        panel:closedHandle="@android:drawable/ic_menu_myplaces"
+        android:orientation="vertical">
+		<Button android:id="@+id/panelHandle" 
+                    android:layout_width="wrap_content" 
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"/>
+		<RelativeLayout android:id="@+id/panelContent"
+			android:layout_width="fill_parent" android:layout_height="wrap_content" 
+			android:background="#000000">
 
-<RelativeLayout android:id="@+id/relativeLayout3" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@+id/relativeLayout2" android:gravity="center">
-    <Spinner android:layout_height="wrap_content" android:entries="@array/travel_mode" android:prompt="@string/choose_mode" android:id="@+id/ddlMode" android:layout_width="125dip"></Spinner>
-    <Spinner android:id="@+id/ddlOptimization" android:layout_height="wrap_content" android:layout_toRightOf="@+id/ddlMode" android:prompt="@string/choose_optimization" android:entries="@array/optimization" android:layout_width="125dip"></Spinner>
-    <Button android:text="Plan Trip" android:layout_height="wrap_content" android:layout_toRightOf="@+id/ddlOptimization" android:id="@+id/btnPlanTrip" android:layout_width="75dip"></Button>
-</RelativeLayout>
+			<RelativeLayout android:layout_width="fill_parent"
+				android:id="@+id/relativeLayout1" android:layout_height="wrap_content"
+				android:gravity="left" android:paddingTop="5dip"
+				android:orientation="vertical">
+				<EditText android:layout_height="wrap_content"
+					android:layout_width="fill_parent" android:layout_toLeftOf="@+id/btnStartLocation"
+					android:text="My Location" android:id="@+id/tbStartLocation"
+					android:selectAllOnFocus="true"></EditText>
+				<ImageButton android:layout_height="wrap_content"
+					android:layout_alignParentRight="true" android:id="@+id/btnStartLocation"
+					android:src="@android:drawable/ic_input_get" android:layout_width="40dip"
+					android:scaleType="center"></ImageButton>
+			</RelativeLayout>
 
-<RelativeLayout android:id="@+id/relativeLayout4" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@+id/relativeLayout3">
+			<RelativeLayout android:layout_width="fill_parent"
+				android:id="@+id/relativeLayout2" android:layout_height="wrap_content"
+				android:gravity="left" android:layout_below="@+id/relativeLayout1">
+				<EditText android:layout_height="wrap_content"
+					android:layout_width="fill_parent" android:layout_toLeftOf="@+id/btnEndLocation"
+					android:text="End Location" android:id="@+id/tbEndLocation"
+					android:selectAllOnFocus="true"></EditText>
+				<ImageButton android:layout_height="wrap_content"
+					android:layout_alignParentRight="true" android:id="@+id/btnEndLocation"
+					android:src="@android:drawable/ic_input_get" android:layout_width="40dip"
+					android:scaleType="centerCrop"></ImageButton>
+			</RelativeLayout>
 
-<org.osmdroid.views.MapView
-android:id="@+id/mapview"
-android:layout_width="fill_parent" 
-android:layout_height="fill_parent"
-android:enabled="true"
-android:clickable="true"
-/>
-<ImageView android:id="@+id/drag"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:src="@drawable/icon"
-android:visibility="gone"
-/> 
-</RelativeLayout>
-</RelativeLayout>
+			<LinearLayout android:id="@+id/relativeLayout3" android:orientation="horizontal"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:layout_below="@+id/relativeLayout2" android:gravity="center">
+				<Spinner android:layout_height="wrap_content"
+					android:entries="@array/travel_mode" android:prompt="@string/choose_mode"
+					android:layout_width="125dip"></Spinner>
+    			<Spinner android:id="@+id/ddlOptimization"
+					android:layout_height="wrap_content"
+					android:prompt="@string/choose_optimization" android:entries="@array/optimization"
+					android:layout_width="125dip"></Spinner>
+				<Button android:text="Plan Trip" android:layout_height="wrap_content"
+					android:id="@+id/btnPlanTrip"
+					android:layout_width="75dip"></Button>
+			</LinearLayout>
+
+		</RelativeLayout>
+	</org.miscwidgets.widget.Panel>
+
+        <org.miscwidgets.widget.Panel
+            android:layout_width="wrap_content" 
+            android:layout_height="fill_parent" 
+            android:id="@+id/rightPanel3"
+            android:layout_gravity="right"
+            panel:handle="@+id/panelHandle"
+            panel:content="@+id/panelContent"
+            panel:position="right"
+            panel:animationDuration="500"
+            panel:openedHandle="@android:drawable/ic_menu_directions"
+            panel:closedHandle="@android:drawable/ic_menu_directions"
+            panel:weight="75%p"
+            panel:linearFlying="true">
+                <Button
+                        android:id="@+id/panelHandle" 
+                    android:layout_width="wrap_content" 
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="20dip"
+                />
+                <TextView
+                        android:id="@+id/panelContent" 
+                    android:layout_width="wrap_content" 
+                    android:layout_height="fill_parent" 
+                    android:gravity="center"
+                    android:padding="4dip"
+                    android:text="Directions will go here!"
+                    android:textSize="16dip"
+                    android:textColor="#eee"
+                    android:textStyle="bold"
+                    android:background="#000000"
+                />
+        </org.miscwidgets.widget.Panel>
+
+</FrameLayout>

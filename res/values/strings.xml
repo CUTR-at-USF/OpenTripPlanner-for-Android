@@ -23,4 +23,11 @@
     <string name="my_location">My Location</string>
     <string name="settings">Settings</string>
     <string name="exit">Exit</string>
+    <string name="wheelchair_accessible">Wheelchair Accessible</string>
+    <string name="wheelchair_accessibility_description">Request wheelchair accessible routes</string>
+    <string name="maximum_walk">Maximum Walk</string>
+    <string name="maximum_walk_description">Maximum walking distance in meters</string>
+    <string name="routing_options">Routing Options</string>
+    <string name="map_options">Map Options</string>
+    <string name="map_tile_provider">Map Tile Provider</string>
 </resources>

@@ -9,12 +9,16 @@ import java.util.List;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.miscwidgets.widget.Panel;
+import org.opentripplanner.android.contacts.ContactAPI;
+import org.opentripplanner.android.contacts.ContactList;
 import org.opentripplanner.api.model.EncodedPolylineBean;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.ws.Request;
 import org.opentripplanner.api.ws.Response;
 import org.opentripplanner.routing.core.OptimizeType;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
@@ -33,6 +37,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -71,7 +76,7 @@ import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
 import de.mastacode.http.Http;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements OnSharedPreferenceChangeListener {
 
 	private MapView mv;
 	private MapController mc;
@@ -87,6 +92,8 @@ public class MainActivity extends Activity {
 
 	private EditText tbStartLocation;
 	private EditText tbEndLocation;
+	
+	private Panel tripPanel;
 	
 	//MapItemizedOverlay itemizedoverlay;
 	
@@ -115,7 +122,7 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.main);
 		
 		prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		
+		prefs.registerOnSharedPreferenceChangeListener(this);
 
 		locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
@@ -124,7 +131,9 @@ public class MainActivity extends Activity {
 		tbStartLocation = (EditText) findViewById(R.id.tbStartLocation);
 		tbEndLocation = (EditText) findViewById(R.id.tbEndLocation);
 		btnPlanTrip = (Button) findViewById(R.id.btnPlanTrip);
+		tripPanel = (Panel) findViewById(R.id.slidingDrawer1);
 		
+		tripPanel.setOpen(true, true);
 		
 		//Intent svc = new Intent(this, NavigationService.class);
 		//startService(svc);
@@ -158,8 +167,18 @@ public class MainActivity extends Activity {
 				        	}
 				        } else if(items[item].equals("Contact Address")) {
 				        	//TODO
-				        	Intent intent = new Intent(Intent.ACTION_PICK, People.CONTENT_URI);
+//				        	Intent intent = new Intent(Intent.ACTION_PICK, People.CONTENT_URI);
+//				        	startActivityForResult(intent, CHOOSE_CONTACT);
+				        	
+				        	ContactList cl = new ContactList();
+				        	ContactAPI api = ContactAPI.getAPI();
+				        	api.setCr(getContentResolver());
+				        	api.setCur(managedQuery(People.CONTENT_URI, null, null, null, null));
+				        	cl = api.newContactList();
+				        	
+				        	Intent intent = api.getContactIntent();
 				        	startActivityForResult(intent, CHOOSE_CONTACT);
+				        	
 				        } else { //Point on Map
 				        	if(buttonID == R.id.btnStartLocation) {
 				        		tbStartLocation.setText(startMarker.getLocationFormatedString());
@@ -179,6 +198,7 @@ public class MainActivity extends Activity {
 		
 		tbStartLocation.setImeOptions(EditorInfo.IME_ACTION_NEXT);
 		tbEndLocation.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		tbEndLocation.requestFocus();
 		tbEndLocation.setOnEditorActionListener(new OnEditorActionListener() {
 			
 			@Override
@@ -260,6 +280,9 @@ public class MainActivity extends Activity {
 		
 		/*String Url = "https://spreadsheets.google.com/ccc?key=0AgWy8ujaGosCdDhxTC04cUZNeHo0eGFBQTBpU2dxN0E&hl=en&authkey=CK-H__IP";
 		Url = "https://spreadsheets.google.com/pub?hl=en&hl=en&key=0AgWy8ujaGosCdDhxTC04cUZNeHo0eGFBQTBpU2dxN0E&single=true&gid=0&output=csv";
+		
+		// NEW
+		//https://spreadsheets.google.com/spreadsheet/pub?hl=en_US&hl=en_US&key=0AgWy8ujaGosCdDhxTC04cUZNeHo0eGFBQTBpU2dxN0E&single=true&gid=0&output=csv
 		
 		HttpClient client = new DefaultHttpClient();
 		String result = "";
@@ -382,60 +405,60 @@ public class MainActivity extends Activity {
 		});
 	}
 	
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		
-		switch(requestCode) {
-			case (CHOOSE_CONTACT):
-				if(resultCode == Activity.RESULT_OK) {
-					Uri contactData = data.getData();
-					Cursor c = managedQuery(contactData, null, null, null, null);
-					if(c.moveToFirst()) {
-						Log.d(TAG, "Contact: " + c.getString(c.getColumnIndexOrThrow(People.DISPLAY_NAME)));
-						
-						String id = c.getString(c.getColumnIndexOrThrow(ContactsContract.Contacts._ID));
-						
-//						Cursor postals = getContentResolver().query(ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_URI, null, ContactsContract.CommonDataKinds.StructuredPostal.CONTACT_ID + 
-//								" = " + contactId, null, null);
-//						int postFormattedNdx = postals.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS);
-//						int postTypeNdx = postals.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.TYPE);
-//						int postStreetNdx = postals.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.STREET);
-//						while (postals.moveToNext()) {
-//							String postalData = postals.getString(postFormattedNdx);
-//							postalCat = postalCat+ postalData+ ", [";
-//							postalData = String.valueOf(postals.getInt(postTypeNdx));
-//							postalCat = postalCat+ postalData+ "], ";
-//							postalData = postals.getString(postStreetNdx);
-//							postalCat = postalCat+ postalData+ " ";         
-//						}
-//						postals.close();
-						
-						String where= ContactsContract.Data.CONTACT_ID
-							+ " = "
-							+ id
-							+ " AND ContactsContract.Data.MIMETYPE = '"
-							+ ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE
-							+ "'";
-							String[] projection = new String[] {
-							StructuredPostal.STREET, StructuredPostal.CITY,
-							StructuredPostal.POSTCODE, StructuredPostal.STREET,
-							StructuredPostal.REGION, StructuredPostal.COUNTRY,};
-							
-
-							Cursor cur = getContentResolver().query(
-							ContactsContract.Data.CONTENT_URI, projection, where, null,
-							StructuredPostal.COUNTRY + " asc");
-							
-							if(cur.moveToFirst()) {
-								Log.d(TAG, "Address? " + cur.getString(0));
-							}
-
-					}
-				}
-				break;
-		}
-	}
+//	@Override
+//	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//		super.onActivityResult(requestCode, resultCode, data);
+//		
+//		switch(requestCode) {
+//			case (CHOOSE_CONTACT):
+//				if(resultCode == Activity.RESULT_OK) {
+//					Uri contactData = data.getData();
+//					Cursor c = managedQuery(contactData, null, null, null, null);
+//					if(c.moveToFirst()) {
+//						Log.d(TAG, "Contact: " + c.getString(c.getColumnIndexOrThrow(People.DISPLAY_NAME)));
+//						
+//						String id = c.getString(c.getColumnIndexOrThrow(ContactsContract.Contacts._ID));
+//						
+////						Cursor postals = getContentResolver().query(ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_URI, null, ContactsContract.CommonDataKinds.StructuredPostal.CONTACT_ID + 
+////								" = " + contactId, null, null);
+////						int postFormattedNdx = postals.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS);
+////						int postTypeNdx = postals.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.TYPE);
+////						int postStreetNdx = postals.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.STREET);
+////						while (postals.moveToNext()) {
+////							String postalData = postals.getString(postFormattedNdx);
+////							postalCat = postalCat+ postalData+ ", [";
+////							postalData = String.valueOf(postals.getInt(postTypeNdx));
+////							postalCat = postalCat+ postalData+ "], ";
+////							postalData = postals.getString(postStreetNdx);
+////							postalCat = postalCat+ postalData+ " ";         
+////						}
+////						postals.close();
+//						
+//						String where= ContactsContract.Data.CONTACT_ID
+//							+ " = "
+//							+ id
+//							+ " AND ContactsContract.Data.MIMETYPE = '"
+//							+ ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE
+//							+ "'";
+//							String[] projection = new String[] {
+//							StructuredPostal.STREET, StructuredPostal.CITY,
+//							StructuredPostal.POSTCODE, StructuredPostal.STREET,
+//							StructuredPostal.REGION, StructuredPostal.COUNTRY,};
+//							
+//
+//							Cursor cur = getContentResolver().query(
+//							ContactsContract.Data.CONTENT_URI, projection, where, null,
+//							StructuredPostal.COUNTRY + " asc");
+//							
+//							if(cur.moveToFirst()) {
+//								Log.d(TAG, "Address? " + cur.getString(0));
+//							}
+//
+//					}
+//				}
+//				break;
+//		}
+//	}
 	
 	private NavigationService mBoundService;
 	private Boolean mIsBound;
@@ -517,7 +540,7 @@ public class MainActivity extends Activity {
 		mExit = pMenu.add(0, EXIT_ID, Menu.NONE, R.string.exit);
 		mGPS.setIcon(android.R.drawable.ic_menu_compass);
 		mMyLocation.setIcon(android.R.drawable.ic_menu_mylocation);
-		mSettings.setIcon(android.R.drawable.ic_menu_preferences);
+		mSettings.setIcon(android.R.drawable.ic_menu_manage);
 		mExit.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
 		return true;
 	}
@@ -1135,5 +1158,18 @@ public class MainActivity extends Activity {
 		}
 
 	}
+
+@Override
+public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+		String key) {
+	if(key == null) {
+		return;
+	}
+	Log.v(TAG, "A preference was changed: " + key );
+	if (key.equals("map_tile_source")) {
+		mv.setTileSource(TileSourceFactory.getTileSource(prefs.getString("map_tile_source", "Mapnik")));
+	}
+	
+}
 	
 }
