@@ -4,20 +4,20 @@ import android.app.Application;
 
 public class OTPApp extends Application {
 	
-	private String serverURL;
+	private Server selectedServer;
 
 	/**
-	 * @param serverURL the serverURL to set
+	 * @param selectedServer the selected OTP server
 	 */
-	public void setServerURL(String serverURL) {
-		this.serverURL = serverURL;
+	public void setSelectedServer(Server selectedServer) {
+		this.selectedServer = selectedServer;
 	}
 
 	/**
-	 * @return the serverURL
+	 * @return the selected OTP server
 	 */
-	public String getServerURL() {
-		return serverURL;
+	public Server getSelectedServer() {
+		return selectedServer;
 	}
 	
 }
