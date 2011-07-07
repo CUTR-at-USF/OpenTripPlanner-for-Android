@@ -35,7 +35,7 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 
 	protected void onPreExecute() {
 		progressDialog = ProgressDialog.show(activity, "",
-				" Generating trip. Please wait ... ", true);
+				"Generating trip. Please wait... ", true);
 	}
 
 	protected Long doInBackground(Request... reqs) {
@@ -116,6 +116,7 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 		Server server = app.getSelectedServer();
 		if (server == null) {
 			//TODO - handle error for no server selected
+			return null;
 		}
 		String u = server.getBaseURL() + "/opentripplanner-api-webapp/ws/plan" + params;
 		
@@ -127,7 +128,9 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 			result = Http.get(u).use(client).header("Accept", "application/xml").header("Keep-Alive","timeout=60, max=100").charset("UTF-8").followRedirects(true).asString();
 			Log.d(TAG, "Result: " + result);
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
 		}
 		
 		Serializer serializer = new Persister();
@@ -138,6 +141,7 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
 		}
 		//TODO - handle errors and error responses
 		if(plan == null) {

@@ -1,22 +1,11 @@
 package org.opentripplanner.android;
 
-import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.miscwidgets.widget.Panel;
 import org.opentripplanner.android.contacts.ContactAPI;
 import org.opentripplanner.android.contacts.ContactList;
-import org.opentripplanner.api.model.EncodedPolylineBean;
-import org.opentripplanner.api.model.Leg;
-import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.ws.Request;
-import org.opentripplanner.api.ws.Response;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
@@ -25,12 +14,8 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.MapView.Projection;
 import org.osmdroid.views.overlay.MyLocationOverlay;
 import org.osmdroid.views.overlay.PathOverlay;
-import org.simpleframework.xml.Serializer;
-import org.simpleframework.xml.core.Persister;
-
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -38,7 +23,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -48,19 +32,16 @@ import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.provider.ContactsContract;
-import android.provider.Settings;
 import android.provider.Contacts.People;
-import android.provider.ContactsContract.CommonDataKinds.StructuredPostal;
+import android.provider.Settings;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -72,9 +53,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
-import de.mastacode.http.Http;
+import android.widget.Toast;
 
 public class MainActivity extends Activity implements OnSharedPreferenceChangeListener {
 
@@ -82,9 +62,11 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	private MapController mc;
 	private MyLocationOverlay mlo;
 	private MenuItem mGPS;
-	private MenuItem mMyLocation;
-	private MenuItem mSettings;
-	private MenuItem mExit;
+//	private MenuItem mMyLocation;
+//	private MenuItem mSettings;
+//	private MenuItem mFeedback;
+//	private MenuItem mServerInfo;
+//	private MenuItem mExit;
 	
 	private ImageButton btnStartLocation;
 	private ImageButton btnEndLocation;
@@ -95,23 +77,21 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	
 	private Panel tripPanel;
 	
-	//MapItemizedOverlay itemizedoverlay;
-	
-	//OverlayItem startMarker;
-	//OverlayItem endMarker;
-	
 	MapOverlay startMarker;
 	MapOverlay endMarker;
 	PathOverlay routeOverlay;
 	
 	private SharedPreferences prefs;
+	private OTPApp app;
 	
 	private static LocationManager locationManager;
-	private static final int EXIT_ID = 1;
-	private static final int GPS_ID = 2;
-	private static final int SETTINGS_ID = 3;
-	private static final int MY_LOC_ID = 4;
-	private static final int CHOOSE_CONTACT = 5;
+//	private static final int EXIT_ID = 1;
+//	private static final int GPS_ID = 2;
+//	private static final int SETTINGS_ID = 3;
+//	private static final int MY_LOC_ID = 4;
+//	private static final int FEEDBACK_ID = 5;
+//	private static final int SERVER_INFO_ID = 6;
+	private static final int CHOOSE_CONTACT = 7;
 	
 	private static final String TAG = "OTP";
 
@@ -124,6 +104,8 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		prefs.registerOnSharedPreferenceChangeListener(this);
 
+		app = ((OTPApp) this.getApplication());
+				
 		locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
 		btnStartLocation = (ImageButton) findViewById(R.id.btnStartLocation);
@@ -139,8 +121,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		//startService(svc);
 		
 		GeoPoint currentLocation = getLastLocation();
-		
-		
+				
 		OnClickListener ocl = new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -166,9 +147,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 				        		endMarker.setLocation(getLastLocation());
 				        	}
 				        } else if(items[item].equals("Contact Address")) {
-				        	//TODO
-//				        	Intent intent = new Intent(Intent.ACTION_PICK, People.CONTENT_URI);
-//				        	startActivityForResult(intent, CHOOSE_CONTACT);
+				        	//TODO - fix contacts selector
 				        	
 				        	ContactList cl = new ContactList();
 				        	ContactAPI api = ContactAPI.getAPI();
@@ -206,7 +185,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 				if(actionId == EditorInfo.IME_ACTION_DONE || event.getAction() == KeyEvent.ACTION_DOWN && 
 						event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
 					Log.d(TAG, "Finished inputting - plan trip now!");
-					//TODO = call to plan trip button here?
+					//TODO - call to plan trip button here?
 				}
 				return false;
 			}
@@ -267,20 +246,22 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		
 		routeOverlay = new PathOverlay(Color.DKGRAY, this);
 		Paint paint = new Paint();
-        paint.setColor(Color.DKGRAY);
+        paint.setColor(Color.GREEN);
         paint.setStrokeWidth(5.0f);
         paint.setStyle(Paint.Style.STROKE); 
         paint.setAlpha(200);
         routeOverlay.setPaint(paint);
         mv.getOverlays().add(routeOverlay);
 		
-		//SitesOverlay so = new SitesOverlay(getResources().getDrawable(R.drawable.icon));
-		//so.addOverlayItem(overlayitem);
-		//mv.getOverlays().add(so);
-		
-		new ServerSelector(this).execute(currentLocation);
-		
-		
+        //TODO - fix below?
+        if (prefs.getBoolean("auto_detect_server", true)) {
+//	        if (app.getSelectedServer() != null) {
+	        	new ServerSelector(this).execute(currentLocation);
+//	        } else {
+//	        	Log.v(TAG, "Already selected a server!!");
+//	        }
+        }
+        
 /*		String u = "http://go.cutr.usf.edu:8083/opentripplanner-api-webapp/ws/metadata";
 		HttpClient client = new DefaultHttpClient();
 		String result = "";
@@ -314,13 +295,11 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 			public void onClick(View v) {
 				
 				Request request = new Request();
-				//request.setFrom("28.066192823902,-82.416927819827");
-				//request.setTo("28.064072155861,-82.41109133301");
 				request.setFrom(URLEncoder.encode(startMarker.getLocationFormatedString()));
 				request.setTo(URLEncoder.encode(endMarker.getLocationFormatedString()));
 				request.setArriveBy(false);
 				request.setOptimize(OptimizeType.QUICK);
-				
+				//TODO - set mode and optimize type
 				
 				try{
 					Double maxWalk = Double.parseDouble(prefs.getString("max_walking_distance", "7600"));
@@ -331,43 +310,10 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 				
 				request.setWheelchair(prefs.getBoolean("wheelchair_accessible", false));
 				
-				//request.setDateTime("06/07/2011", URLEncoder.encode("11:34 am"));
 				request.setDateTime(DateFormat.format("MM/dd/yy", System.currentTimeMillis()).toString(), 
 						DateFormat.format("hh:mmaa", System.currentTimeMillis()).toString());
 				
 				new TripRequest(MainActivity.this).execute(request);
-				
-				
-				/*String u = "http://go.cutr.usf.edu:8083/opentripplanner-api-webapp/ws/plan?fromPlace=28.066192823902,-82.416927819827&toPlace=28.064072155861,-82.41109133301&arr=Depart&min=QUICK&maxWalkDistance=7600&mode=WALK&itinID=1&submit&date=06/07/2011&time=11:34%20am";
-				
-				HttpClient client = new DefaultHttpClient();
-				String result = "";
-				try {
-					result = Http.get(u).use(client).header("Accept", "application/json").charset("UTF-8").followRedirects(true).asString();
-					Log.d(TAG, "Result: " + result);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				
-				GsonBuilder gsonb = new GsonBuilder();
-				//DateDeserializer ds = new DateDeserializer();
-				//gsonb.registerTypeAdapter(Date.class, ds);
-				Gson gson = gsonb.create();
-				 
-				JSONObject j;
-				Response plan = null;
-				 
-				try
-				{
-				    j = new JSONObject(result);
-				    plan = gson.fromJson(j.toString(), Response.class);
-				}
-				catch(Exception e)
-				{
-				    e.printStackTrace();
-				}
-				Log.d(TAG, "TripPlan: " + plan.getPlan().from.lat + " time: " + plan.getPlan().date);
-				*/
 			}
 		});
 	}
@@ -500,16 +446,31 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	}
 
 	@Override
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+			String key) {
+		if(key == null) {
+			return;
+		}
+		Log.v(TAG, "A preference was changed: " + key );
+		if (key.equals("map_tile_source")) {
+			mv.setTileSource(TileSourceFactory.getTileSource(prefs.getString("map_tile_source", "Mapnik")));
+		} else if (key.equals("custom_server_url")) {
+			String baseURL = prefs.getString("custom_server_url", "");
+			if(baseURL.length() > 5) {
+				app.setSelectedServer(new Server(baseURL));
+				Log.v(TAG, "Now using custom OTP server: " + baseURL);
+			} else {
+				//TODO - handle issue when field is cleared/blank
+			}
+		}
+	}
+	
+	@Override
 	public boolean onCreateOptionsMenu(final Menu pMenu) {
-		mGPS = pMenu.add(0, GPS_ID, Menu.NONE, R.string.enable_gps);
-		mMyLocation = pMenu.add(0, MY_LOC_ID, Menu.NONE, R.string.my_location);
-		mSettings = pMenu.add(0, SETTINGS_ID, Menu.NONE, R.string.settings);
-		mExit = pMenu.add(0, EXIT_ID, Menu.NONE, R.string.exit);
-		mGPS.setIcon(android.R.drawable.ic_menu_compass);
-		mMyLocation.setIcon(android.R.drawable.ic_menu_mylocation);
-		mSettings.setIcon(android.R.drawable.ic_menu_manage);
-		mExit.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
-		return true;
+		MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.menu, pMenu);
+	    mGPS = pMenu.getItem(0);
+	    return true;
 	}
 
 	public boolean onPrepareOptionsMenu(final Menu pMenu) {
@@ -522,19 +483,30 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	}
 
 	public boolean onOptionsItemSelected(final MenuItem pItem) {
-		if (pItem == mExit) {
+		switch (pItem.getItemId()) {
+		case R.id.exit:
 			this.finish();
 			return true;
-		} else if (pItem == mGPS) {
+		case R.id.gps_settings:
 			Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 			startActivity(myIntent);
-		} else if(pItem == mMyLocation) {
+			break;
+		case R.id.my_location:
 			zoomToCurrentLocation();
-		} else if (pItem == mSettings) {
-			//TODO - settings activity
+			break;
+		case R.id.settings:
 			startActivity(new Intent(this, SettingsActivity.class));
+			break;
+		case R.id.feedback:
+			//TODO - feedback activity
+			break;
+		case R.id.server_info:
+			//TODO - server info activity
+			break;
+		default:
+			break;
 		}
-
+		
 		return false;
 	}
 
@@ -578,7 +550,11 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	private void zoomToCurrentLocation() {
 		mc.animateTo(getLastLocation());
 	}
-
+	
+	private GeoPoint getPoint(double lat, double lon) {
+		return (new GeoPoint((int) (lat * 1000000.0), (int) (lon * 1000000.0)));
+	}
+	
 	class MapOverlay extends org.osmdroid.views.overlay.Overlay {
 
 		private GeoPoint location;
@@ -757,267 +733,4 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		}
 	}
 
-/*	class MapItemizedOverlay extends org.osmdroid.views.overlay.ItemizedOverlay<OverlayItem> {
-
-		private ArrayList<OverlayItem> mOverlays = new ArrayList<OverlayItem>();
-		private Context mContext;
-		
-		public MapItemizedOverlay(Drawable defaultMarker,
-				ResourceProxy resourceProxy) {
-			super(defaultMarker, resourceProxy);
-		}
-		
-		public MapItemizedOverlay(Drawable defaultMarker, ResourceProxy resourceProxy, Context context) {
-			  super(defaultMarker, resourceProxy);
-			  mContext = context;
-		}
-
-		@Override
-		protected OverlayItem createItem(int i) {
-		  return mOverlays.get(i);
-		}
-
-		@Override
-		public int size() {
-		  return mOverlays.size();
-		}
-
-		@Override
-		public boolean onSnapToItem(int arg0, int arg1, Point arg2, MapView arg3) {
-			// TODO Auto-generated method stub
-			Log.d(TAG, "SnapToItem!");
-			return false;
-		}
-		
-		public void addOverlayItem(OverlayItem overlay) {
-		    mOverlays.add(overlay);
-		    populate();
-		}
-		
-		protected boolean onTap(int index) {
-		  OverlayItem item = mOverlays.get(index);
-		  AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
-		  dialog.setTitle(item.getTitle());
-		  dialog.setMessage(item.getSnippet());
-		  dialog.show();
-		  return true;
-		}
-		
-		@Override
-		public boolean onLongPress(MotionEvent e, MapView mv) {
-			Log.d(TAG, "LONG PRESS! " + e.getX() + " " + e.getY());
-			
-			final CharSequence[] items = {"Start Location", "End Location"};
-
-			AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-			builder.setTitle("Choose Location Type");
-			builder.setItems(items, new DialogInterface.OnClickListener() {
-			    public void onClick(DialogInterface dialog, int item) {
-			        Toast.makeText(getApplicationContext(), items[item], Toast.LENGTH_SHORT).show();
-			    }
-			});
-			AlertDialog alert = builder.create();
-			alert.show();
-			
-			GeoPoint point = mv.getProjection().fromPixels(e.getX(),
-					e.getY());//new GeoPoint((double)e.getX(), (double)e.getY());
-			OverlayItem overlayitem = new OverlayItem("Title!", "Description!",
-			point);
-			itemizedoverlay.addOverlayItem(overlayitem);
-			mv.invalidate();
-			
-			//drawAt(new Canvas(), getResources().getDrawable(R.drawable.icon), (int)e.getX(), (int)e.getY(), true);
-			return true;
-		}
-	}*/
-
-	private GeoPoint getPoint(double lat, double lon) {
-		return (new GeoPoint((int) (lat * 1000000.0), (int) (lon * 1000000.0)));
-	}
-	
-/*	private class SitesOverlay extends ItemizedOverlay<OverlayItem> {
-		private List<OverlayItem> items=new ArrayList<OverlayItem>();
-		private Drawable marker=null;
-		private OverlayItem inDrag=null;
-		private ImageView dragImage=null;
-		private int xDragImageOffset=0;
-		private int yDragImageOffset=0;
-		private int xDragTouchOffset=0;
-		private int yDragTouchOffset=0;
-		private Point t = new Point(0, 0);
-		private Point p = new Point(0, 0);
-		
-		public SitesOverlay(Drawable marker) {
-			super(marker, new DefaultResourceProxyImpl(getApplicationContext()));
-		//super(i, marker, marker, Color.BLACK, null, new DefaultResourceProxyImpl(getApplicationContext()));
-		this.marker=marker;
-
-		dragImage=(ImageView)findViewById(R.id.drag);
-		//dragImage.setImageDrawable(getResources().getDrawable(R.drawable.start));
-		
-		dragImage.setImageDrawable(marker);
-		
-		xDragImageOffset=dragImage.getDrawable().getIntrinsicWidth()/2;
-		yDragImageOffset=dragImage.getDrawable().getIntrinsicHeight();
-
-//		items.add(new OverlayItem("UN", "United Nations", getPoint(40.748963847316034,
-//				-73.96807193756104)));
-//		items.add(new OverlayItem("Lincoln Center",
-//		"Home of Jazz at Lincoln Center", getPoint(40.76866299974387,
-//				-73.98268461227417)));
-//		items.add(new OverlayItem("Carnegie Hall",
-//		"Where you go with practice, practice, practice", getPoint(40.765136435316755,
-//				-73.97989511489868)));
-//		items.add(new OverlayItem("The Downtown Club",
-//		"Original home of the Heisman Trophy", getPoint(40.70686417491799,
-//				-74.01572942733765)));
-//
-//		populate();
-		}
-
-		@Override
-		protected OverlayItem createItem(int i) {
-		return(items.get(i));
-		}
-
-		public void addOverlayItem(OverlayItem overlay) {
-		    items.add(overlay);
-		    populate();
-		}
-		
-		@Override
-		public void draw(Canvas canvas, MapView mapView,
-		boolean shadow) {
-		super.draw(canvas, mapView, shadow);
-		
-		//boundCenterBottom(marker);
-		}
-		 
-		@Override
-		public int size() {
-			if(items == null) {
-				return 0;
-			}
-		return(items.size());
-		}
-
-		@Override
-		public boolean onTouchEvent(MotionEvent event, MapView mapView) {
-			final int action = event.getAction();
-			final int x = (int) event.getX();
-			final int y = (int) event.getY();
-			final Projection pj = mapView.getProjection();
-			
-			boolean result = false;
-
-			if (action == MotionEvent.ACTION_DOWN) {
-				for (OverlayItem item : items) {
-
-					pj.fromMapPixels(x, y, t);
-					pj.toPixels(item.getPoint(), p);
-
-                    if (hitTest(item, marker, t.x - p.x, t.y - p.y)) {
-						result = true;
-						inDrag = item;
-						items.remove(inDrag);
-						populate();
-
-						xDragTouchOffset = 0;
-						yDragTouchOffset = 0;
-
-						setDragImagePosition(x, y);
-						dragImage.setVisibility(View.VISIBLE);
-
-						xDragTouchOffset = t.x - p.x;
-						yDragTouchOffset = t.y - p.y;
-
-						break;
-					}
-				}
-			} else if (action == MotionEvent.ACTION_MOVE && inDrag != null) {
-				dragImage.setVisibility(View.VISIBLE);
-				setDragImagePosition(x, y);
-				result = true;
-			} else if (action == MotionEvent.ACTION_UP && inDrag != null) {
-				dragImage.setVisibility(View.GONE);
-
-				GeoPoint pt = pj.fromPixels(x - xDragTouchOffset, y - yDragTouchOffset);
-				OverlayItem toDrop = new OverlayItem(inDrag.getTitle(),
-						inDrag.getSnippet(), pt);
-
-				items.add(toDrop);
-				populate();
-				inDrag = null;
-				result = true;
-				
-				pj.fromMapPixels(x, y, t);
-				
-				if((t.x - p.x) == xDragTouchOffset && (t.y - p.y) == yDragTouchOffset){
-					Log.d(TAG, "Do something here if desired because we didn't move item " + toDrop.getTitle());
-					tbEndLocation.setText(new StringBuilder().append(toDrop.getPoint().getLatitudeE6() / 1E6).append(", ")
-			                .append(toDrop.getPoint().getLongitudeE6() / 1E6));
-				}
-			}
-
-			return (result || super.onTouchEvent(event, mapView));
-		}
-		
-		private void setDragImagePosition(int x, int y) {
-		RelativeLayout.LayoutParams lp=
-		(RelativeLayout.LayoutParams)dragImage.getLayoutParams();
-
-		lp.setMargins(x-xDragImageOffset-xDragTouchOffset,
-		y-yDragImageOffset-yDragTouchOffset, 0, 0);
-		dragImage.setLayoutParams(lp);
-		}
-
-		@Override
-		public boolean onSnapToItem(int arg0, int arg1, Point arg2, MapView arg3) {
-			// TODO Auto-generated method stub
-			return false;
-		}
-		
-		@Override
-		public boolean onLongPress(MotionEvent e, MapView mv) {
-			Log.d(TAG, "LONG PRESS! " + e.getX() + " " + e.getY());
-			
-			final CharSequence[] items = {"Start Location", "End Location"};
-
-			AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-			builder.setTitle("Choose Location Type");
-			builder.setItems(items, new DialogInterface.OnClickListener() {
-			    public void onClick(DialogInterface dialog, int item) {
-			        Toast.makeText(getApplicationContext(), items[item], Toast.LENGTH_SHORT).show();
-			    }
-			});
-			AlertDialog alert = builder.create();
-			alert.show();
-			
-			GeoPoint point = mv.getProjection().fromPixels(e.getX(),
-					e.getY());//new GeoPoint((double)e.getX(), (double)e.getY());
-			OverlayItem overlayitem = new OverlayItem("Title!", "Description!",
-			point);
-			//itemizedoverlay.addOverlayItem(overlayitem);
-			
-			addOverlayItem(overlayitem);
-			mv.invalidate();
-			
-			//drawAt(new Canvas(), getResources().getDrawable(R.drawable.icon), (int)e.getX(), (int)e.getY(), true);
-			return true;
-		}
-	}	*/
-	
-@Override
-public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
-		String key) {
-	if(key == null) {
-		return;
-	}
-	Log.v(TAG, "A preference was changed: " + key );
-	if (key.equals("map_tile_source")) {
-		mv.setTileSource(TileSourceFactory.getTileSource(prefs.getString("map_tile_source", "Mapnik")));
-	}
-	
-}
-	
 }

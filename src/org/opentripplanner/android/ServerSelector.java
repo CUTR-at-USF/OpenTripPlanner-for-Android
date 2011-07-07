@@ -7,14 +7,21 @@ import java.util.List;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.osmdroid.util.GeoPoint;
-import de.mastacode.http.Http;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.EditText;
 import au.com.bytecode.opencsv.CSVReader;
+import de.mastacode.http.Http;
 
 public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 		private Server selectedServer;
+		private static List<Server> knownServers;
 		private static final String TAG = "OTP";
 		private ProgressDialog progressDialog;
 		private MainActivity activity;
@@ -26,7 +33,7 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 
 		protected void onPreExecute() {
 			progressDialog = ProgressDialog.show(activity, "",
-					"Determining optimal server. Please wait ... ", true);
+					"Detecting optimal server. Please wait...", true);
 		}
 
 		protected Long doInBackground(GeoPoint... currentLocation) {
@@ -55,14 +62,69 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 			if (selectedServer != null) {
 				OTPApp app = ((OTPApp) activity.getApplication());
 				app.setSelectedServer(selectedServer);
-				Log.v(TAG, "Selected server: " + selectedServer.getRegion());
+				Log.v(TAG, "Automatically selected server: " + selectedServer.getRegion());
+			} else if (knownServers != null && knownServers.size() > 1){
+				Log.w(TAG, "No server automatically selected!");
+				
+				List<String> serverNames = new ArrayList<String>();
+				for (Server server : knownServers) {
+					serverNames.add(server.getRegion());
+				}
+				serverNames.add("Custom Server");
+				
+				final CharSequence[] items = serverNames.toArray(new CharSequence[serverNames.size()]);
+				
+				AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+				builder.setTitle("Choose OpenTripPlanner Server");
+				builder.setItems(items, new DialogInterface.OnClickListener() {
+				    
+					public void onClick(DialogInterface dialog, int item) {
+				        
+				        if(items[item].equals("Custom Server")) {
+				        	final EditText tbBaseURL = new EditText(activity);
+
+				        	AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+				        	builder.setTitle("Enter a custom OTP server domain");
+				        	builder.setView(tbBaseURL);
+				        	builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				        		public void onClick(DialogInterface dialog, int whichButton) {
+				        			String value = tbBaseURL.getText().toString().trim();
+				        			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
+				        			Editor e = prefs.edit();
+				        			e.putBoolean("auto_detect_server", false);
+				        			e.putString("custom_server_url", value);
+				        			e.commit();
+				        		}
+				        	});
+
+				        } else { 
+				        	//TODO - set server URL here - app wise as well?
+					        for (Server server : knownServers) {
+								if (server.getRegion().equals(items[item])) {
+									selectedServer = server;
+									OTPApp app = ((OTPApp) activity.getApplication());
+									app.setSelectedServer(selectedServer);
+									break;
+								}
+							}
+					        //TODO - clear custom url pref here?
+				        }
+				        Log.v(TAG, "Chosen: " + items[item]);
+				    }
+				});
+				AlertDialog alert = builder.create();
+				alert.show();
 			} else {
-				// TODO - handle errors here - prompt for manual sever entry?
-				Log.e(TAG, "No server selected!");
+				//TODO - handle error here that server list cannot be loaded
+				Log.e(TAG, "Server list could not be downloaded!!");
 			}
 		}
 		 
-		private List<Server> getServerList() {
+		private void getServerList() {
+			if(knownServers != null && knownServers.size() > 1) {
+				Log.v(TAG, "KnownServers was already populated previously.");
+				return;
+			}
 			//TODO - check if servers are stored in SQLite?
 			
 			//if severs are not stored, download list from the Google Spreadsheet
@@ -82,33 +144,44 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 				Log.d(TAG, "Spreadsheet: " + result);
 			} catch (IOException e) {
 				Log.e(TAG, "Unable to download spreadsheet with server list: " + e.getMessage());
-				return null;
+				return;
 			}
 			
-			List<Server> knownServers = new ArrayList<Server>();
+			List<Server> serverList = new ArrayList<Server>();
 			
 			CSVReader reader = new CSVReader(new StringReader(result));
 			try {
 				List<String[]> entries = reader.readAll();
 				for (String[] e : entries) {
-					if(e[0] == "Region") {
+					if(e[0].equalsIgnoreCase("Region")) {
 						continue; //Ignore the first line of the file
 					}
 					Server s = new Server(e[0], e[1], e[2], e[3], e[4], e[5]);
-					knownServers.add(s);
+					serverList.add(s);
 				}
 			} catch (IOException e) {
 				Log.e(TAG, "Problem reading CSV server file: " + e.getMessage());
-				return null;
+				return;
 			}
 			
-			Log.d(TAG, "Servers: " + knownServers.size());
+			Log.d(TAG, "Servers: " + serverList.size());
 			
-			return knownServers;
+			if (knownServers != null) {
+				knownServers.clear();
+				knownServers.addAll(serverList);
+			} else {
+				knownServers = serverList;
+			}
+			
+			return;
 		}
 		
 		private Server findOptimalSever(GeoPoint currentLocation) {
-			List<Server> knownServers = getServerList();
+			if(selectedServer != null) {
+				return selectedServer;
+			}
+			
+			getServerList();
 			
 			if (knownServers == null || knownServers.size() < 1) {
 				return null;
@@ -117,7 +190,7 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 			for (Server server : knownServers) {
 				//server.getBounds()
 				//TODO - check bounds here to find server
-				if (server.getRegion().equalsIgnoreCase("Tampa")) {
+				if (server.getRegion().equalsIgnoreCase("Tampa1")) {
 					return server;
 				}
 			}

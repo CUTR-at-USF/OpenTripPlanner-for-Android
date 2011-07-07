@@ -23,6 +23,17 @@ public class Server {
 		this.contact = contact;
 		this.contactEmail = contactEmail;
 	}
+	
+	public Server(String baseURL) {
+		super();
+		this.baseURL = baseURL;
+
+		this.region = "Custom Region";
+		this.bounds = "Uknown bounds";
+		this.language = "Custom Language";
+		this.contact = "Unknown Contact";
+		this.contactEmail = "Unknown Email";
+	}
 
 	public String getRegion() {
 		return region;
@@ -70,5 +81,9 @@ public class Server {
 
 	public void setContactEmail(String contactEmail) {
 		this.contactEmail = contactEmail;
-	}	
+	}
+	
+	public String toString() {
+		return region;
+	}
 }
