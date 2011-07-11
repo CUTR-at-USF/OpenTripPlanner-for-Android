@@ -7,6 +7,8 @@ import org.opentripplanner.android.contacts.ContactAPI;
 import org.opentripplanner.android.contacts.ContactList;
 import org.opentripplanner.api.ws.Request;
 import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
@@ -300,8 +302,11 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 				request.setFrom(URLEncoder.encode(startMarker.getLocationFormatedString()));
 				request.setTo(URLEncoder.encode(endMarker.getLocationFormatedString()));
 				request.setArriveBy(false);
+				
+				//TODO - set mode and optimize type properly
 				request.setOptimize(OptimizeType.QUICK);
-				//TODO - set mode and optimize type
+				request.setModes(new TraverseModeSet(TraverseMode.WALK));
+				
 				
 				try{
 					Double maxWalk = Double.parseDouble(prefs.getString("max_walking_distance", "7600"));

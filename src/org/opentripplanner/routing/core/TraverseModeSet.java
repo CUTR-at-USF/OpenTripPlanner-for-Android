@@ -320,7 +320,7 @@ public class TraverseModeSet implements Cloneable {
                 out += mode;
             }
         }
-        return "TraverseMode (" + out + ")";
+        return out; //"TraverseMode (" + out + ")";
     }
     
     @Override
