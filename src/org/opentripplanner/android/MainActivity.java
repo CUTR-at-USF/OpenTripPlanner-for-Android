@@ -2,6 +2,7 @@ package org.opentripplanner.android;
 
 import java.net.URLEncoder;
 import java.util.List;
+
 import org.miscwidgets.widget.Panel;
 import org.opentripplanner.android.contacts.ContactAPI;
 import org.opentripplanner.android.contacts.ContactList;
@@ -16,6 +17,7 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.MapView.Projection;
 import org.osmdroid.views.overlay.MyLocationOverlay;
 import org.osmdroid.views.overlay.PathOverlay;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
@@ -37,8 +39,8 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.provider.Contacts.People;
 import android.provider.Settings;
+import android.provider.Contacts.People;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -49,14 +51,16 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
+import android.widget.TextView.OnEditorActionListener;
 
 public class MainActivity extends Activity implements OnSharedPreferenceChangeListener {
 
@@ -64,19 +68,15 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	private MapController mc;
 	private MyLocationOverlay mlo;
 	private MenuItem mGPS;
-//	private MenuItem mMyLocation;
-//	private MenuItem mSettings;
-//	private MenuItem mFeedback;
-//	private MenuItem mServerInfo;
-//	private MenuItem mExit;
-	
-	private ImageButton btnStartLocation;
-	private ImageButton btnEndLocation;
-	private Button btnPlanTrip;
 
 	private EditText tbStartLocation;
 	private EditText tbEndLocation;
-	
+	private ImageButton btnStartLocation;
+	private ImageButton btnEndLocation;
+	private Spinner ddlOptimization;
+	private Spinner ddlTravelMode;
+	private Button btnPlanTrip;
+
 	private Panel tripPanel;
 	
 	MapOverlay startMarker;
@@ -88,14 +88,8 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	private static LocationManager locationManager;
 
 	private Boolean needToRunAutoDetect = false;
-	
-//	private static final int EXIT_ID = 1;
-//	private static final int GPS_ID = 2;
-//	private static final int SETTINGS_ID = 3;
-//	private static final int MY_LOC_ID = 4;
-//	private static final int FEEDBACK_ID = 5;
-//	private static final int SERVER_INFO_ID = 6;
-	private static final int CHOOSE_CONTACT = 7;
+
+	private static final int CHOOSE_CONTACT = 1;
 	
 	private static final String TAG = "OTP";
 
@@ -118,9 +112,21 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		tbEndLocation = (EditText) findViewById(R.id.tbEndLocation);
 		btnPlanTrip = (Button) findViewById(R.id.btnPlanTrip);
 		tripPanel = (Panel) findViewById(R.id.slidingDrawer1);
+		ddlOptimization = (Spinner) findViewById(R.id.spinOptimization);
+		ddlTravelMode = (Spinner) findViewById(R.id.spinTravelMode);
 		
 		tripPanel.setOpen(true, true);
 		
+		ArrayAdapter optimizationAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, new OptimizeSpinnerItem[] {
+				new OptimizeSpinnerItem("Quickest", OptimizeType.QUICK),
+				new OptimizeSpinnerItem("Safest", OptimizeType.SAFE),
+				new OptimizeSpinnerItem("Fewest Transfers", OptimizeType.TRANSFERS)
+		});
+		
+		optimizationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		ddlOptimization.setAdapter(optimizationAdapter);
+		
+
 		//Intent svc = new Intent(this, NavigationService.class);
 		//startService(svc);
 		
@@ -304,7 +310,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 				request.setArriveBy(false);
 				
 				//TODO - set mode and optimize type properly
-				request.setOptimize(OptimizeType.QUICK);
+				request.setOptimize(((OptimizeSpinnerItem)ddlOptimization.getSelectedItem()).getOptimizeType());
 				request.setModes(new TraverseModeSet(TraverseMode.WALK));
 				
 				
@@ -433,7 +439,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		mlo.enableMyLocation();
 		// mlo.enableFollowLocation();
 		mlo.enableCompass();
-		doBindService();
+		//doBindService();
 		
 		if(needToRunAutoDetect) {
 			GeoPoint currentLoc = getLastLocation();
@@ -449,7 +455,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		mlo.disableMyLocation();
 		// mlo.disableFollowLocation();
 		mlo.disableCompass();
-		doUnbindService();
+		//doUnbindService();
 	}
 	
 	@Override
