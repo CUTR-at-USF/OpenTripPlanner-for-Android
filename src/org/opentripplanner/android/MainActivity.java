@@ -83,8 +83,10 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	
 	private SharedPreferences prefs;
 	private OTPApp app;
-	
 	private static LocationManager locationManager;
+
+	private Boolean needToRunAutoDetect = false;
+	
 //	private static final int EXIT_ID = 1;
 //	private static final int GPS_ID = 2;
 //	private static final int SETTINGS_ID = 3;
@@ -427,6 +429,13 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		// mlo.enableFollowLocation();
 		mlo.enableCompass();
 		doBindService();
+		
+		if(needToRunAutoDetect) {
+			GeoPoint currentLoc = getLastLocation();
+			Log.v(TAG, "Relaunching auto detection for server");
+        	new ServerSelector(this).execute(currentLoc);
+        	needToRunAutoDetect = false;
+		}
 	}
 
 	@Override
@@ -462,6 +471,11 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 			} else {
 				//TODO - handle issue when field is cleared/blank
 			}
+		} else if(key.equals("auto_detect_server")) {
+			if (prefs.getBoolean("auto_detect_server", true)) {
+					//TODO - fix this not displaying!!
+				needToRunAutoDetect = true;
+	        }
 		}
 	}
 	

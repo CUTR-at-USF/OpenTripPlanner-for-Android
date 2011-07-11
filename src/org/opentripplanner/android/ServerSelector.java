@@ -83,10 +83,10 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 				        if(items[item].equals("Custom Server")) {
 				        	final EditText tbBaseURL = new EditText(activity);
 
-				        	AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-				        	builder.setTitle("Enter a custom OTP server domain");
-				        	builder.setView(tbBaseURL);
-				        	builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				        	AlertDialog.Builder urlAlert = new AlertDialog.Builder(activity);
+				        	urlAlert.setTitle("Enter a custom OTP server domain");
+				        	urlAlert.setView(tbBaseURL);
+				        	urlAlert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 				        		public void onClick(DialogInterface dialog, int whichButton) {
 				        			String value = tbBaseURL.getText().toString().trim();
 				        			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
@@ -96,6 +96,7 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 				        			e.commit();
 				        		}
 				        	});
+				        	urlAlert.create().show();
 
 				        } else { 
 				        	//TODO - set server URL here - app wise as well?

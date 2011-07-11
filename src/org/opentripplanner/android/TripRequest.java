@@ -118,7 +118,13 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 			//TODO - handle error for no server selected
 			return null;
 		}
-		String u = server.getBaseURL() + "/opentripplanner-api-webapp/ws/plan" + params;
+		String u = server.getBaseURL() + params;
+		
+		//Below fixes a bug where the New York OTP server will whine
+		//if doesn't get the parameter for intermediate places
+		if(server.getRegion().equalsIgnoreCase("New York")) {
+			u += "&intermediatePlaces=";
+		}
 		
 		Log.d(TAG, "URL: " + u);
 		
