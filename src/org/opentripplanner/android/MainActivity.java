@@ -135,7 +135,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		OnClickListener ocl = new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				mBoundService.updateNotification();
+				//mBoundService.updateNotification();
 				
 				final int buttonID = v.getId();
 				
@@ -146,7 +146,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 				builder.setItems(items, new DialogInterface.OnClickListener() {
 				    
 					public void onClick(DialogInterface dialog, int item) {
-				        Toast.makeText(getApplicationContext(), items[item], Toast.LENGTH_SHORT).show();
+				        //Toast.makeText(getApplicationContext(), items[item], Toast.LENGTH_SHORT).show();
 				        
 				        if(items[item].equals("Current Location")) {
 				        	if(buttonID == R.id.btnStartLocation) {

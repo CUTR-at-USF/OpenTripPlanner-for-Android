@@ -13,11 +13,6 @@
     	<item>Transit and Bicycle</item>
     </string-array>
     <string name="choose_optimization">Choose an optimization</string>
-    <string-array name="optimization">
-        <item>Quickest</item>
-        <item>Safest</item>
-        <item>Fewest Transfers</item>
-    </string-array>
     <string name="enable_gps">Enable GPS</string>
     <string name="disable_gps">Disable GPS</string>
     <string name="my_location">My Location</string>
@@ -33,7 +28,8 @@
     <string name="map_options">Map Options</string>
     <string name="map_tile_provider">Map Tile Provider</string>
     <string name="custom_server_url">Custom Server URL</string>
-    <string name="custom_server_url_description">"Domain name for the OpenTripPlanner server to use for routing (e.g. http://opentripplanner.usf.edu")"</string>
+    <string name="custom_server_url_description">"Full URL to an OpenTripPlanner server API's plan method to use for routing"</string>
     <string name="auto_detect_server">Auto Detect OTP Server</string>
-    <string name="auto_detect_server_description">Automatically choose OpenTripPlanner server based on current location</string>
+    <string name="auto_detect_server_description">Automatically choose an OpenTripPlanner server based on current location</string>
+    <string name="map_tile_provider_description">Choose a tile provider (Note: some may not work properly)</string>
 </resources>

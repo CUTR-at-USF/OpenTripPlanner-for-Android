@@ -8,7 +8,7 @@
         
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/map_options" android:key="map_options">
-        <ListPreference android:title="@string/map_tile_provider" android:key="map_tile_source"></ListPreference>
+        <ListPreference android:title="@string/map_tile_provider" android:key="map_tile_source" android:summary="@string/map_tile_provider_description"></ListPreference>
     </PreferenceCategory>    
 </PreferenceScreen>
     
