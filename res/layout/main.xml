@@ -62,7 +62,7 @@
 				android:layout_width="fill_parent" android:layout_height="wrap_content"
 				android:layout_below="@+id/relativeLayout2" android:gravity="center">
 				<Spinner android:id="@+id/spinTravelMode" android:layout_height="wrap_content"
-					android:entries="@array/travel_mode" android:prompt="@string/choose_mode"
+					android:prompt="@string/choose_mode"
 					android:layout_width="125dip"></Spinner>
     			<Spinner android:id="@+id/spinOptimization"
 					android:layout_height="wrap_content"

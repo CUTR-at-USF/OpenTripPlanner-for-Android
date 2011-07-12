@@ -20,6 +20,7 @@ import java.util.List;
 //import javax.xml.bind.annotation.XmlRootElement;
 
 import org.opentripplanner.api.model.TripPlan;
+import org.opentripplanner.api.model.error.PlannerError;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
@@ -38,7 +39,8 @@ public class Response {
 	@Element(required=false)
     private TripPlan plan;
 
-	//    private PlannerError error = null;
+	@Element(required=false)
+    private PlannerError error = null;
 
 	public static class Entry {
 		@Element(required=false)
@@ -87,12 +89,11 @@ public class Response {
     /**
      * The error (if any) that this response raised.
      */
-    //@XmlElement(required=false)
-    //public PlannerError getError() {
-    //    return error;
-    //}
+    public PlannerError getError() {
+        return error;
+    }
 
-    //public void setError(PlannerError error) {
-    //    this.error = error;
-   // }
+    public void setError(PlannerError error) {
+        this.error = error;
+    }
 }

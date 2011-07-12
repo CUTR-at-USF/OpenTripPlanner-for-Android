@@ -28,9 +28,9 @@ public class Server {
 		super();
 		this.baseURL = baseURL;
 
-		this.region = "Custom Region";
-		this.bounds = "Uknown bounds";
-		this.language = "Custom Language";
+		this.region = "Unknown Region";
+		this.bounds = "Unknown Bounds";
+		this.language = "Unknown Language";
 		this.contact = "Unknown Contact";
 		this.contactEmail = "Unknown Email";
 	}

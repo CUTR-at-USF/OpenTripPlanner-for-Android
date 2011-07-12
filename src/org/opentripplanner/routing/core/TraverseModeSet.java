@@ -315,7 +315,7 @@ public class TraverseModeSet implements Cloneable {
         for (TraverseMode mode : TraverseMode.values()) {
             if ((modes & getMaskForMode(mode)) != 0) {
                 if (out != "") {
-                    out += ", ";
+                    out += ","; //removed space!!!
                 }
                 out += mode;
             }

@@ -1,8 +1,11 @@
 package org.opentripplanner.android;
 
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.List;
 
+import org.apache.http.HttpStatus;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.miscwidgets.widget.Panel;
 import org.opentripplanner.android.contacts.ContactAPI;
 import org.opentripplanner.android.contacts.ContactList;
@@ -18,8 +21,11 @@ import org.osmdroid.views.MapView.Projection;
 import org.osmdroid.views.overlay.MyLocationOverlay;
 import org.osmdroid.views.overlay.PathOverlay;
 
+import de.mastacode.http.Http;
+
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -126,7 +132,19 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		optimizationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		ddlOptimization.setAdapter(optimizationAdapter);
 		
+		ArrayAdapter traverseModeAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, new TraverseModeSpinnerItem[] {
+				new TraverseModeSpinnerItem("Transit", new TraverseModeSet(TraverseMode.TRANSIT, TraverseMode.WALK)),
+		    	new TraverseModeSpinnerItem("Bus and Train", new TraverseModeSet(TraverseMode.BUSISH, TraverseMode.TRAINISH, TraverseMode.WALK)),
+		    	new TraverseModeSpinnerItem("Bus Only", new TraverseModeSet(TraverseMode.BUSISH, TraverseMode.WALK)),
+		    	new TraverseModeSpinnerItem("Train Only", new TraverseModeSet(TraverseMode.TRAINISH, TraverseMode.WALK)), //not sure
+		    	new TraverseModeSpinnerItem("Walk Only", new TraverseModeSet(TraverseMode.WALK)),
+		    	new TraverseModeSpinnerItem("Bicycle", new TraverseModeSet(TraverseMode.BICYCLE)),
+		    	new TraverseModeSpinnerItem("Transit and Bicycle", new TraverseModeSet(TraverseMode.TRANSIT, TraverseMode.BICYCLE))
+		});
 
+		traverseModeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		ddlTravelMode.setAdapter(traverseModeAdapter);
+		
 		//Intent svc = new Intent(this, NavigationService.class);
 		//startService(svc);
 		
@@ -265,11 +283,19 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		
         //TODO - fix below?
         if (prefs.getBoolean("auto_detect_server", true)) {
-//	        if (app.getSelectedServer() != null) {
+	        if (app.getSelectedServer() == null) {
 	        	new ServerSelector(this).execute(currentLocation);
-//	        } else {
-//	        	Log.v(TAG, "Already selected a server!!");
-//	        }
+	        } else {
+	        	Log.v(TAG, "Already selected a server!!");
+	        }
+        } else {
+        	String baseURL = prefs.getString("custom_server_url", "");
+			if(baseURL.length() > 5) {
+				app.setSelectedServer(new Server(baseURL));
+				Log.v(TAG, "Now using custom OTP server: " + baseURL);
+			} else {
+				//TODO - handle issue when field is cleared/blank
+			}
         }
         
 /*		String u = "http://go.cutr.usf.edu:8083/opentripplanner-api-webapp/ws/metadata";
@@ -309,10 +335,8 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 				request.setTo(URLEncoder.encode(endMarker.getLocationFormatedString()));
 				request.setArriveBy(false);
 				
-				//TODO - set mode and optimize type properly
 				request.setOptimize(((OptimizeSpinnerItem)ddlOptimization.getSelectedItem()).getOptimizeType());
-				request.setModes(new TraverseModeSet(TraverseMode.WALK));
-				
+				request.setModes(((TraverseModeSpinnerItem)ddlTravelMode.getSelectedItem()).getTraverseModeSet());
 				
 				try{
 					Double maxWalk = Double.parseDouble(prefs.getString("max_walking_distance", "7600"));
@@ -524,9 +548,47 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 			break;
 		case R.id.feedback:
 			//TODO - feedback activity
+			AlertDialog.Builder feedback = new AlertDialog.Builder(this);
+			feedback.setTitle("Not Yet Implemented");
+			feedback.setMessage("The feedback feature is not yet implemented.");
+			feedback.setNeutralButton("OK", null);
+			feedback.create().show();
 			break;
 		case R.id.server_info:
-			//TODO - server info activity
+			Server server = app.getSelectedServer();
+			if(server == null){
+				Log.w(TAG, "Tried to get server info when no server was selected");
+				break;
+			}
+			StringBuilder message = new StringBuilder("Region:  " + server.getRegion());
+			message.append("\nLanguage:  " + server.getLanguage());
+			message.append("\nContact:  " + server.getContact() + " (" + server.getContactEmail() + ")");
+			message.append("\nURL:  " + server.getBaseURL());
+			
+			//TODO - fix server info bounds
+			//message.append("\nBounds: " + server.getBounds());
+			
+			message.append("\nCurrently reachable: ");
+			
+			int status = 0;
+			try {
+				status = Http.get(server.getBaseURL()).use(new DefaultHttpClient()).asResponse().getStatusLine().getStatusCode();
+			} catch (IOException e) {
+				Log.e(TAG, "Unable to reach server: " + e.getMessage());
+			}
+			
+			if(status == HttpStatus.SC_OK) {
+				message.append("Yes");
+			} else {
+				message.append("No");
+			}
+			
+			
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+			dialog.setTitle("OpenTripPlanner Server Info");
+			dialog.setMessage(message);
+			dialog.setNeutralButton("OK", null);
+			dialog.create().show();
 			break;
 		default:
 			break;

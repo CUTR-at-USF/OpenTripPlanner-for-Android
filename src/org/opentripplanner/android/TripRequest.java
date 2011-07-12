@@ -17,13 +17,14 @@ import org.osmdroid.util.GeoPoint;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.util.Log;
 import de.mastacode.http.Http;
 
 public class TripRequest extends AsyncTask<Request, Integer, Long> {
-	private TripPlan plan;
+	private Response response;
 	private static final String TAG = "OTP";
 	private ProgressDialog progressDialog;
 	private MainActivity activity;
@@ -43,7 +44,7 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 		long totalSize = 0;
 		for (int i = 0; i < count; i++) {
 			// totalSize += Downloader.downloadFile(reqs[i]);
-			plan = requestPlan(reqs[i]);
+			response = requestPlan(reqs[i]);
 			// publishProgress((int) ((i / (float) count) * 100));
 		}
 		return totalSize;
@@ -60,9 +61,9 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 		if (progressDialog.isShowing()) {
 			progressDialog.dismiss();
 		}
-
-		if (plan != null && plan.itinerary.get(0) != null) {
-			List<Leg> legs = plan.itinerary.get(0).legs;
+		
+		if (response != null && response.getPlan() != null && response.getPlan().itinerary.get(0) != null) {
+			List<Leg> legs = response.getPlan().itinerary.get(0).legs;
 			if (!legs.isEmpty()) {
 				for (Leg leg : legs) {
 					List<GeoPoint> points = EncodedPolylineBean
@@ -75,12 +76,20 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 			}
 		} else {
 			// TODO - handle errors here?
+			if(response != null && response.getError() != null) {
+				String msg = response.getError().getMsg();
+				AlertDialog.Builder feedback = new AlertDialog.Builder(activity);
+				feedback.setTitle("Error Planning Trip");
+				feedback.setMessage(msg);
+				feedback.setNeutralButton("OK", null);
+				feedback.create().show();
+			}
 			Log.e(TAG, "No route to display!");
 		}
 	}
 	 
 
-	private TripPlan requestPlan(Request requestParams) {
+	private Response requestPlan(Request requestParams) {
 		HashMap<String, String> tmp = requestParams.getParameters();
 
 		Collection c = tmp.entrySet();
@@ -154,6 +163,6 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 			Log.d(TAG, "No response?");
 			return null;
 		}
-		return plan.getPlan();
+		return plan;
 	}
 }

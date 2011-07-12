@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.opentripplanner.routing.core.Fare;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 
@@ -99,7 +100,8 @@ public class Itinerary {
     /**
      * The cost of this trip
      */
-    //public Fare fare = new Fare();
+	@Element(required=false)
+    public Fare fare = new Fare();
 
     /**
      * A list of Legs. Each Leg is either a walking (cycling, car) portion of the trip, or a transit
