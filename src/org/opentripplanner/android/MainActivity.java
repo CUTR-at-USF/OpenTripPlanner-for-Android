@@ -150,7 +150,6 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		
 		ArrayAdapter traverseModeAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, new TraverseModeSpinnerItem[] {
 				new TraverseModeSpinnerItem("Transit", new TraverseModeSet(TraverseMode.TRANSIT, TraverseMode.WALK)),
-		    	new TraverseModeSpinnerItem("Bus and Train", new TraverseModeSet(TraverseMode.BUSISH, TraverseMode.TRAINISH, TraverseMode.WALK)),
 		    	new TraverseModeSpinnerItem("Bus Only", new TraverseModeSet(TraverseMode.BUSISH, TraverseMode.WALK)),
 		    	new TraverseModeSpinnerItem("Train Only", new TraverseModeSet(TraverseMode.TRAINISH, TraverseMode.WALK)), //not sure
 		    	new TraverseModeSpinnerItem("Walk Only", new TraverseModeSet(TraverseMode.WALK)),
