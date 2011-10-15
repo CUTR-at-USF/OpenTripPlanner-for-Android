@@ -113,6 +113,11 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 
 	private static final int CHOOSE_CONTACT = 1;
 	
+	/**
+	 * Amount of time that a location is considered valid for that we will still use it as a starting location and snap the map to this location
+	 */
+	private static final int STALE_LOCATION_THRESHOLD = 60 * 60 * 1000;  //60 minutes
+	
 	private static final String TAG = "OTP";
 
 	/** Called when the activity is first created. */
@@ -180,12 +185,19 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 				    
 					public void onClick(DialogInterface dialog, int item) {
 				        if(items[item].equals("Current Location")) {
+				        	GeoPoint p = getLastLocation();
+				        	
 				        	if(buttonID == R.id.btnStartLocation) {
 				        		tbStartLocation.setText("My Location");
-				        		startMarker.setLocation(getLastLocation());
+				        		
+				        		if(p != null){
+				        			startMarker.setLocation(p);
+				        		}
 				        	} else if(buttonID == R.id.btnEndLocation) {
 				        		tbEndLocation.setText("My Location");
-				        		endMarker.setLocation(getLastLocation());
+				        		if(p != null){
+				        			endMarker.setLocation(p);
+				        		}
 				        	}
 				        } else if(items[item].equals("Contact Address")) {
 				        	//TODO - fix contacts selector
@@ -238,13 +250,13 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 
 		mc = mv.getController();
 		mc.setZoom(12);
-		mc.setCenter(currentLocation);
+		
+		if(currentLocation != null){
+			mc.setCenter(currentLocation);
+		}
 		
 		//Handle rotations                  final Object[] data = (Object[]) getLastNonConfigurationInstance();                  if ((data != null) && ((Boolean) data[0])) {                          mOsmv.getController().setZoom(16);                          showStep();                  } 
 		
-		
-		
-
 		mlo = new MyLocationOverlay(this, mv);
 		// mlo.enableCompass();
 		mv.getOverlays().add(mlo);
@@ -465,8 +477,10 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		
 		if(needToRunAutoDetect) {
 			GeoPoint currentLoc = getLastLocation();
-			Log.v(TAG, "Relaunching auto detection for server");
-        	new ServerSelector(this).execute(currentLoc);
+			if(currentLoc != null){
+				Log.v(TAG, "Relaunching auto detection for server");
+				new ServerSelector(this).execute(currentLoc);
+			}
         	needToRunAutoDetect = false;
 		}
 	}
@@ -596,9 +610,10 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	}
 
 	/*
-	 * Get the last location the phone was at Based off example at
-	 * http://www.androidsnippets
-	 * .com/get-the-phones-last-known-location-using-locationmanager
+	 * Get the last location the phone was at
+	 *  Based off example at http://www.androidsnippets.com/get-the-phones-last-known-location-using-locationmanager
+	 * 
+	 * @return GeoPoint of last location, or null if a location hasn't been acquired in the last STALE_LOCATION_THRESHOLD amount of time
 	 */
 	private GeoPoint getLastLocation() {
 		LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -607,12 +622,12 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 
 		for (int i = providers.size() - 1; i >= 0; i--) {
 			l = lm.getLastKnownLocation(providers.get(i));
-			if (l != null)
+			if (l != null && l.getProvider().equalsIgnoreCase(LocationManager.GPS_PROVIDER))  //Only break if we have a GPS fix location, since this will be the most accurate location provider.  We want to make sure we loop through all of them to find GPS if available
 				break;
 		}
-
-		if (l == null) {
-			return new GeoPoint(0, 0);
+		
+		if (l == null  || (Math.abs((System.currentTimeMillis() - l.getTime())) > STALE_LOCATION_THRESHOLD)) {  //Check to make sure the location is recent (use ABS() to allow for small time sync differences between GPS clock and system clock)
+			return null; //return null if no location was found in the last STALE_LOCATION_THRESHOLD amount of time
 		}
 
 		return new GeoPoint(l);
@@ -633,7 +648,11 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	}
 
 	private void zoomToCurrentLocation() {
-		mc.animateTo(getLastLocation());
+		GeoPoint p = getLastLocation();
+		
+		if(p !=null){
+			mc.animateTo(p);
+		}
 	}
 	
 	private GeoPoint getPoint(double lat, double lon) {
