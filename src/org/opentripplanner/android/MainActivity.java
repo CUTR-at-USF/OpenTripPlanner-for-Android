@@ -37,11 +37,8 @@ import org.osmdroid.views.MapView.Projection;
 import org.osmdroid.views.overlay.MyLocationOverlay;
 import org.osmdroid.views.overlay.PathOverlay;
 
-import de.mastacode.http.Http;
-
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -61,8 +58,8 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.provider.Contacts.People;
+import android.provider.Settings;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -81,8 +78,9 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
+import android.widget.Toast;
+import de.mastacode.http.Http;
 
 public class MainActivity extends Activity implements OnSharedPreferenceChangeListener {
 
@@ -169,6 +167,11 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		//startService(svc);
 		
 		GeoPoint currentLocation = getLastLocation();
+		
+		//TODO set a proper currentLocation when getLastLocation() return null 
+		if(currentLocation==null){
+			currentLocation = new GeoPoint(0,0);
+		}
 				
 		OnClickListener ocl = new OnClickListener() {
 			@Override

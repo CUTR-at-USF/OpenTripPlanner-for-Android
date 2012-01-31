@@ -33,7 +33,6 @@
     
     <uses-sdk android:minSdkVersion="3" />
     <supports-screens
-          android:xlargeScreens="true"
           android:largeScreens="true"
           android:normalScreens="true"
           android:smallScreens="true"

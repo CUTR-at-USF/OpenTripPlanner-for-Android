@@ -17,5 +17,6 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/opentripplanner-android/lib/onebusaway-gtfs-1.1.10-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
