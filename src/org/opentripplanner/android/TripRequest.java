@@ -77,6 +77,10 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 			progressDialog.dismiss();
 		}
 		
+//		Log.v(TAG, "res: "+response.toString());
+//		Log.v(TAG, "plan: "+response.getPlan().toString());
+//		Log.v(TAG, "itinerary: "+response.getPlan().itinerary.get(0).toString());
+		
 		if (response != null && response.getPlan() != null && response.getPlan().itinerary.get(0) != null) {
 			List<Leg> legs = response.getPlan().itinerary.get(0).legs;
 			if (!legs.isEmpty()) {
@@ -170,6 +174,7 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 			plan = serializer.read(Response.class, result);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
+			Log.e(TAG, e.getMessage());
 			e.printStackTrace();
 			return null;
 		}

@@ -13,12 +13,17 @@
 
 package org.opentripplanner.api.model;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.opentripplanner.util.DateConstants;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
+
+import android.util.Log;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -28,13 +33,35 @@ import com.google.gson.annotations.SerializedName;
  * A TripPlan is a set of ways to get from point A to point B at time T.
  */
 public class TripPlan {
-
+	
+	private static final String TAG = "OTP";
+	
     /** 
      * The time and date of travel 
      */
 	//TODO - fix datedeserializer
-	@Element
-    public String date = null;
+//	@Element
+//    public String date = null;
+	public String date;
+	public Date formatted_date;
+    @Element
+    public void setDate(String d){
+    	SimpleDateFormat parser = 
+    			new SimpleDateFormat(DateConstants.ISO_DATETIME_TIME_ZONE_FORMAT);
+    	Log.v(TAG, "setDate TripPlan");
+    	try {
+    		Log.v(TAG, d);
+    		formatted_date = parser.parse(d);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}  
+    }
+    @Element
+    public String getDate(){
+    	Log.v(TAG, "getDate TripPlan");
+    	return date;
+    }
     /**
      * The origin
      */

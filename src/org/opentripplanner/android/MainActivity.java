@@ -170,7 +170,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		
 		//TODO set a proper currentLocation when getLastLocation() return null 
 		if(currentLocation==null){
-			currentLocation = new GeoPoint(0,0);
+			currentLocation = new GeoPoint(28.065467, -82.419004);
 		}
 				
 		OnClickListener ocl = new OnClickListener() {
@@ -293,11 +293,12 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		
 		startMarker = new MapOverlay(this, R.drawable.start);
 		startMarker.setLocation(currentLocation);
+//		startMarker.setLocation(getPoint(28.066531327775138,-82.40525321904555));
 		mv.getOverlays().add(startMarker);
 		
 		endMarker = new MapOverlay(this, R.drawable.end);
-		//endMarker.setLocation(getPoint(28.062286, -82.417717));
 		endMarker.setLocation(currentLocation);
+//		endMarker.setLocation(getPoint(28.0576685,-82.4198807));
 		mv.getOverlays().add(endMarker);
 		
 		routeOverlay = new PathOverlay(Color.DKGRAY, this);

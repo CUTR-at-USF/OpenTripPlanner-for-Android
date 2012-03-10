@@ -13,10 +13,16 @@
 
 package org.opentripplanner.api.model; 
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Logger; 
 
 import org.opentripplanner.util.Constants;
+import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
+
+import android.util.Log;
 
 //import org.onebusaway.gtfs.model.AgencyAndId;
 //import org.opentripplanner.util.Constants; 
@@ -26,6 +32,8 @@ import org.simpleframework.xml.Element;
 */ 
 public class Place {
     protected static final Logger LOGGER = Logger.getLogger(Place.class.getCanonicalName());
+    
+    private static final String TAG = "OTP";
 
     /** 
      * For transit stops, the name of the stop.  For points of interest, the name of the POI.
@@ -39,6 +47,13 @@ public class Place {
      */
     @Element(required=false)
     public AgencyAndId stopId = null;
+    
+    /** 
+     * The "code" of the stop. Depending on the transit agency, this is often
+     * something that users care about.
+     */
+    @Element(required=false)
+    public String stopCode = null;
 
     /**
      * The longitude of the place.
@@ -51,6 +66,59 @@ public class Place {
      */
     @Element(required=false)
     public Double lat = null;
+    
+    /**
+     * The time the rider will arrive at the place.
+     */
+    @Element(required=false)
+    public String arrival = null;
+//    public Date arrival = null;
+//    @Element(required=false)
+//    public void setArrival(Date entry){
+//    	SimpleDateFormat parser = 
+//    			new SimpleDateFormat("yyyy-MM-d'T'HH:mm:ssZ");
+//    	Log.v(TAG, "setArrival Place");
+//    	try {
+//    		arrival = parser.parse(entry.toString());
+//		} catch (ParseException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}  
+//    }
+//    @Element(required=false)
+//    public Date getArrival(){
+//    	return arrival;
+//    }
+    /**
+     * The time the rider will depart the place.
+     */
+    @Element(required=false)
+    public String departure = null;
+//    public Date departure = null;
+//    @Element(required=false)
+//    public void setDeparture(Date d){
+//    	SimpleDateFormat parser = 
+//    			new SimpleDateFormat("yyyy-MM-d'T'HH:mm:ssZ");
+//    	try {
+//			departure = parser.parse(d.toString());
+//		} catch (ParseException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}  
+//    }
+//    @Element(required=false)
+//    public Date getDeparture(){
+//    	return departure;
+//    }
+
+//    @XmlAttribute
+    @Attribute(required=false)
+    public String orig;
+
+//    @XmlAttribute
+    @Attribute(required=false)
+    public String zoneId;
+
 
     /**
      * Returns the geometry in GeoJSON format
@@ -80,4 +148,9 @@ public class Place {
         this.stopId = stopId;
     }
 
+    public Place(Double lon, Double lat, String name, Date time) {
+        this(lon, lat, name);
+//        this.arrival = departure = time;
+        this.arrival = departure = time.toString();
+    }
 }

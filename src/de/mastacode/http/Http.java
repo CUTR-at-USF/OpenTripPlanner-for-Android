@@ -42,6 +42,8 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
+import android.util.Log;
+
 /**
  * Fluent builder for the {@linkplain HttpClient} to simplify its usage.
  *
@@ -121,6 +123,8 @@ public final class Http {
 	 * 
 	 * @see {@link HttpRequestBuilder#customize(RequestCustomizer)}
 	 */
+	private static final String TAG = "OTP";
+	
 	public static interface RequestCustomizer {
 
 		/**
@@ -359,6 +363,7 @@ public final class Http {
 			
 			final HttpResponse response = client.execute(request);
 
+			Log.v(TAG, "res= "+response);
 			return response;
 		}
 

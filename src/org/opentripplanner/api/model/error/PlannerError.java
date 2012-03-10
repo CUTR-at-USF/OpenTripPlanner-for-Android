@@ -14,6 +14,7 @@
 
 package org.opentripplanner.api.model.error;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.opentripplanner.api.ws.Message;
@@ -32,7 +33,7 @@ public class PlannerError {
     private String msg;
 
 	@Element(required=false)
-    private List<String> missing = null;
+    private List<String> missing = new ArrayList<String>();
 
 	@Element(required=false)
     private boolean noPath = false;

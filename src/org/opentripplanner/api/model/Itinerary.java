@@ -12,6 +12,8 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.api.model;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -48,12 +50,44 @@ public class Itinerary {
      */
 	//TODO - fix date parsing
 	@Element(required=false)
-    public String startTime = null;
+	public String startTime = null;
+//    public Date startTime = null;
+//    @Element(required=false)
+//    public void setStartTime(Date entry){
+//    	SimpleDateFormat parser = 
+//    			new SimpleDateFormat("yyyy-MM-d'T'HH:mm:ssZ");
+//    	try {
+//    		startTime = parser.parse(entry.toString());
+//		} catch (ParseException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}  
+//    }
+//    @Element(required=false)
+//    public Date getStartTime(){
+//    	return startTime;
+//    }
     /**
      * Time that the trip arrives.
      */
 	@Element(required=false)
     public String endTime = null;
+//    public Date endTime = null;
+//    @Element(required=false)
+//    public void setEndTime(Date entry){
+//    	SimpleDateFormat parser = 
+//    			new SimpleDateFormat("yyyy-MM-d'T'HH:mm:ssZ");
+//    	try {
+//    		endTime = parser.parse(entry.toString());
+//		} catch (ParseException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}  
+//    }
+//    @Element(required=false)
+//    public Date getEndTime(){
+//    	return endTime;
+//    }
 
     /**
      * How much time is spent walking, in milliseconds.
