@@ -83,11 +83,15 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 		
 		if (response != null && response.getPlan() != null && response.getPlan().itinerary.get(0) != null) {
 			List<Leg> legs = response.getPlan().itinerary.get(0).legs;
+			Log.v(TAG, "(TripRequest) legs size = "+Integer.toString(legs.size()));
 			if (!legs.isEmpty()) {
+				activity.routeOverlay.clearPath();
 				for (Leg leg : legs) {
 					List<GeoPoint> points = EncodedPolylineBean
 							.decodePoly(leg.legGeometry.getPoints());
-					activity.routeOverlay.clearPath();
+					Log.v(TAG, "(TripRequest) points size = "+Integer.toString(points.size())
+								+ " mode = "+leg.mode+" agencyId = "+leg.agencyId);
+//					activity.routeOverlay.clearPath();
 					for (GeoPoint geoPoint : points) {
 						activity.routeOverlay.addPoint(geoPoint);
 					}
