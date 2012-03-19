@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.opentripplanner.api.ws.Message;
 import org.simpleframework.xml.Element;
+import org.simpleframework.xml.ElementList;
 
 /**
  * This represents an error in trip planning.
@@ -32,7 +33,7 @@ public class PlannerError {
 	@Element(required=false)
     private String msg;
 
-	@Element(required=false)
+	@ElementList(required=false)
     private List<String> missing = new ArrayList<String>();
 
 	@Element(required=false)

@@ -98,10 +98,11 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	private Button btnPlanTrip;
 
 	private Panel tripPanel;
+	Panel directionPanel;
 	
 	MapOverlay startMarker;
 	MapOverlay endMarker;
-	PathOverlay routeOverlay;
+	OTPPathOverlay routeOverlay;
 	
 	private SharedPreferences prefs;
 	private OTPApp app;
@@ -137,6 +138,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		tbEndLocation = (EditText) findViewById(R.id.tbEndLocation);
 		btnPlanTrip = (Button) findViewById(R.id.btnPlanTrip);
 		tripPanel = (Panel) findViewById(R.id.slidingDrawer1);
+		directionPanel = (Panel) findViewById(R.id.rightPanel3);
 		ddlOptimization = (Spinner) findViewById(R.id.spinOptimization);
 		ddlTravelMode = (Spinner) findViewById(R.id.spinTravelMode);
 		
@@ -294,21 +296,26 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		startMarker = new MapOverlay(this, R.drawable.start);
 		startMarker.setLocation(currentLocation);
 //		startMarker.setLocation(getPoint(28.066531327775138,-82.40525321904555));
+//		startMarker.setLocation(getPoint(35.151354,33.353805));
 		mv.getOverlays().add(startMarker);
 		
 		endMarker = new MapOverlay(this, R.drawable.end);
 		endMarker.setLocation(currentLocation);
 //		endMarker.setLocation(getPoint(28.0576685,-82.4198807));
+//		endMarker.setLocation(getPoint(35.168756, 33.372688));
 		mv.getOverlays().add(endMarker);
 		
-		routeOverlay = new PathOverlay(Color.DKGRAY, this);
-		Paint paint = new Paint();
-        paint.setColor(Color.GREEN);
-        paint.setStrokeWidth(5.0f);
-        paint.setStyle(Paint.Style.STROKE); 
-        paint.setAlpha(200);
-        routeOverlay.setPaint(paint);
-        mv.getOverlays().add(routeOverlay);
+//		routeOverlay = new PathOverlay(Color.DKGRAY, this);
+//		Paint paint = new Paint();
+//        paint.setColor(Color.GREEN);
+//        paint.setStrokeWidth(5.0f);
+//        paint.setStyle(Paint.Style.STROKE); 
+//        paint.setAlpha(200);
+//        routeOverlay.setPaint(paint);
+//		mv.getOverlays().add(routeOverlay);
+		
+		routeOverlay = new OTPPathOverlay(Color.DKGRAY, this);
+		mv.getOverlays().add(routeOverlay);
 		
         //TODO - fix below?
         if (prefs.getBoolean("auto_detect_server", true)) {

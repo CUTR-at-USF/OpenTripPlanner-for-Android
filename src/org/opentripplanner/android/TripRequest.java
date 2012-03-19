@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.miscwidgets.widget.Panel;
 import org.opentripplanner.api.model.EncodedPolylineBean;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.ws.Request;
@@ -34,8 +35,11 @@ import org.simpleframework.xml.core.Persister;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.TextView;
 import de.mastacode.http.Http;
 
 public class TripRequest extends AsyncTask<Request, Integer, Long> {
@@ -43,6 +47,7 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 	private static final String TAG = "OTP";
 	private ProgressDialog progressDialog;
 	private MainActivity activity;
+	private Panel directionPanel;
 
 	public TripRequest(MainActivity activity) {
 		this.activity = activity;
@@ -77,25 +82,27 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 			progressDialog.dismiss();
 		}
 		
-//		Log.v(TAG, "res: "+response.toString());
-//		Log.v(TAG, "plan: "+response.getPlan().toString());
-//		Log.v(TAG, "itinerary: "+response.getPlan().itinerary.get(0).toString());
-		
 		if (response != null && response.getPlan() != null && response.getPlan().itinerary.get(0) != null) {
 			List<Leg> legs = response.getPlan().itinerary.get(0).legs;
 			Log.v(TAG, "(TripRequest) legs size = "+Integer.toString(legs.size()));
 			if (!legs.isEmpty()) {
-				activity.routeOverlay.clearPath();
+				OTPPathOverlay otpPath = activity.routeOverlay;
+				otpPath.removeAllPath();
+				int index = 0;
 				for (Leg leg : legs) {
+					int pathColor = getPathColor(leg.mode);
+					otpPath.addPath(pathColor);
 					List<GeoPoint> points = EncodedPolylineBean
 							.decodePoly(leg.legGeometry.getPoints());
-					Log.v(TAG, "(TripRequest) points size = "+Integer.toString(points.size())
-								+ " mode = "+leg.mode+" agencyId = "+leg.agencyId);
-//					activity.routeOverlay.clearPath();
+//					Log.v(TAG, "(TripRequest) points size = "+Integer.toString(points.size())
+//								+ " mode = "+leg.mode+" agencyId = "+leg.agencyId);
 					for (GeoPoint geoPoint : points) {
-						activity.routeOverlay.addPoint(geoPoint);
+						otpPath.addPoint(index, geoPoint);
 					}
+					index++;
 				}
+				
+				showDirectionText(legs);
 			}
 		} else {
 			// TODO - handle errors here?
@@ -110,8 +117,32 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 			Log.e(TAG, "No route to display!");
 		}
 	}
-	 
-
+	
+	private int getPathColor(String mode){
+		if(mode.equalsIgnoreCase("WALK")){
+			return Color.DKGRAY;
+		} else if(mode.equalsIgnoreCase("BUS")){
+			return Color.RED;
+		} else if(mode.equalsIgnoreCase("TRAIN")) {
+			return Color.YELLOW;
+		} else if(mode.equalsIgnoreCase("BICYCLE")){
+			return Color.BLUE;
+		}
+		return Color.WHITE;
+	}
+	
+	private void showDirectionText(List<Leg> legs){
+		directionPanel = activity.directionPanel;
+		TextView tv = (TextView) directionPanel.getContent();
+		String directionText = "";
+		
+		for(Leg leg: legs){
+			directionText+=leg.mode+"\n";
+		}
+		
+		tv.setText(directionText);
+	}
+	
 	private Response requestPlan(Request requestParams) {
 		HashMap<String, String> tmp = requestParams.getParameters();
 
