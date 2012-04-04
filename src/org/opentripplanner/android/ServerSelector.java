@@ -77,7 +77,7 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 
 			if (selectedServer != null) {
 				OTPApp app = ((OTPApp) activity.getApplication());
-				app.setSelectedServer(selectedServer);
+				app.setSelectedServer(selectedServer, activity);
 				Log.v(TAG, "Automatically selected server: " + selectedServer.getRegion());
 			} else if (knownServers != null && knownServers.size() > 1){
 				Log.w(TAG, "No server automatically selected!");
@@ -120,7 +120,7 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 								if (server.getRegion().equals(items[item])) {
 									selectedServer = server;
 									OTPApp app = ((OTPApp) activity.getApplication());
-									app.setSelectedServer(selectedServer);
+									app.setSelectedServer(selectedServer, activity);
 									break;
 								}
 							}

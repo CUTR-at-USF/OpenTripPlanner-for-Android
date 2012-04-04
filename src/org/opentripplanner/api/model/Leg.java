@@ -246,6 +246,8 @@ public class Leg {
 //    public long getDuration() {
 //        return 0;//endTime.getTime() - startTime.getTime();
 //    }
+    @Element
+    public long duration;
     
     public void addNote(Notes note) {
     	Log.v(TAG, note.text);
@@ -298,15 +300,4 @@ public class Leg {
 //        }
         return retVal;
     }
-    
-    /** 
-     * The leg's duration in milliseconds
-     */
-    //@XmlElement
-//    public long getDuration() {
-//        return endTime.getTime() - startTime.getTime();
-//    }
-    //TODO - fix
-    @Element
-    public long duration;
 }

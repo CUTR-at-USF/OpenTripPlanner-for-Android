@@ -20,6 +20,7 @@
     <string name="choose_optimization">Choose an optimization</string>
     <string name="enable_gps">Enable GPS</string>
     <string name="disable_gps">Disable GPS</string>
+    <string name="no_gps_signal">Sorry, no GPS signal detected</string>
     <string name="my_location">My Location</string>
     <string name="settings">Settings</string>
     <string name="feedback">Feedback</string>
@@ -37,4 +38,7 @@
     <string name="auto_detect_server">Auto Detect OTP Server</string>
     <string name="auto_detect_server_description">Automatically choose an OpenTripPlanner server based on current location</string>
     <string name="map_tile_provider_description">Choose a tile provider (Note: some may not work properly)</string>
+    <string name="choose_geocoder">Select the address</string>
+    <string name="geocoder_results_title">Geocoder Results</string>
+    <string name="geocoder_no_results_message">Sorry, the address returns no geographical location</string>
 </resources>

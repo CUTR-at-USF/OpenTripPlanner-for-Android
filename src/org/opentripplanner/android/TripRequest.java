@@ -174,14 +174,15 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 		//String u = "http://go.cutr.usf.edu:8083/opentripplanner-api-webapp/ws/plan?fromPlace=28.066192823902,-82.416927819827&toPlace=28.064072155861,-82.41109133301&arr=Depart&min=QUICK&maxWalkDistance=7600&mode=WALK&itinID=1&submit&date=06/07/2011&time=11:34%20am";
 		//String u = "http://go.cutr.usf.edu:8083/opentripplanner-api-webapp/ws/plan" + params;
 		
-
+		String res = "/plan";
+		
 		OTPApp app = ((OTPApp) activity.getApplication());
 		Server server = app.getSelectedServer();
 		if (server == null) {
 			//TODO - handle error for no server selected
 			return null;
 		}
-		String u = server.getBaseURL() + params;
+		String u = server.getBaseURL() + res + params;
 		
 		//Below fixes a bug where the New York OTP server will whine
 		//if doesn't get the parameter for intermediate places

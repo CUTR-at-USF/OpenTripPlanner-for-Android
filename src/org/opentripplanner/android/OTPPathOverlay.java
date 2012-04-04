@@ -151,6 +151,8 @@ public class OTPPathOverlay extends Overlay {
 	  * @author Viesturs Zarins
 	  *
 	  *         This method draws a path line in given color.
+	  *         
+	  *  Modified by Khoa Tran
 	  */
 	 /**
 	  * This method draws the line. Note - highly optimized to handle long paths, proceed with care.
@@ -174,11 +176,9 @@ public class OTPPathOverlay extends Overlay {
 
 		 // precompute new points to the intermediate projection.
 		 final int size = tempPoints.size();
-//		 Log.v(TAG, "size = " + Integer.toString(size)+" drawPathOverlay OTPPathOverlay");
 		 
 		 Integer mPointsPrecomputed = new Integer(mPointsPrecomputedArray.get(index));
 		 while (mPointsPrecomputed < size) {
-//			 Log.v(TAG, "mPointsPrecomputed = " + Integer.toString(mPointsPrecomputed)+" drawPathOverlay OTPPathOverlay");
 			 final Point inPt = tempPoints.get(mPointsPrecomputed);
 			 Point outPt = new Point();
 			 pj.toMapPixelsProjected(inPt.x, inPt.y, outPt);
@@ -202,22 +202,13 @@ public class OTPPathOverlay extends Overlay {
          mPath.rewind();
          projectedPoint0 = mPoints.get(size - 1);
          mLineBounds.set(projectedPoint0.x, projectedPoint0.y, projectedPoint0.x, projectedPoint0.y);
-//         Log.v("Test", "[size="+Integer.toString(size)+"] 0 linebounds "+Integer.toString(mLineBounds.top)+","+Integer.toString(mLineBounds.left)+","+Integer.toString(mLineBounds.bottom)+","+Integer.toString(mLineBounds.right)+" drawPathOverlay OTPPathOverlay");
-//         Log.v("Test", "projectedPoint0 = "+Integer.toString(projectedPoint0.x)+","+Integer.toString(projectedPoint0.y) );
          
-//		 Log.v(TAG, "size = "+Integer.toString(size)+" drawPathOverlay OTPPathOverlay");
 		 for (int i = size - 2; i >= 0; i--) {
 			 // compute next points
 			 projectedPoint1 = mPoints.get(i);
-//			 Log.v(TAG, "0' projectedPoint1 "+Integer.toString(projectedPoint1.x)+","+Integer.toString(projectedPoint1.y)+" drawPathOverlay OTPPathOverlay");
 			 mLineBounds.union(projectedPoint1.x, projectedPoint1.y);
 			 
-//			 Log.v(TAG, "1 i = "+Integer.toString(i)+" drawPathOverlay OTPPathOverlay");
-//			 Log.v(TAG, "1 clipbounds "+Integer.toString(clipBounds.top)+","+Integer.toString(clipBounds.left)+","+Integer.toString(clipBounds.bottom)+","+Integer.toString(clipBounds.right)+" drawPathOverlay OTPPathOverlay");
-//			 Log.v(TAG, "1 linebounds "+Integer.toString(mLineBounds.top)+","+Integer.toString(mLineBounds.left)+","+Integer.toString(mLineBounds.bottom)+","+Integer.toString(mLineBounds.right)+" drawPathOverlay OTPPathOverlay");
-//			 Log.v(TAG, "intersect index="+Integer.toString(index));
 			 if (!Rect.intersects(clipBounds, mLineBounds)) {
-//				 Log.v(TAG, "Why");
 				 // skip this line, move to next point
 				 projectedPoint0 = projectedPoint1;
 				 screenPoint0 = null;
@@ -233,19 +224,23 @@ public class OTPPathOverlay extends Overlay {
 
 			 screenPoint1 = pj.toMapPixelsTranslated(projectedPoint1, mTempPoint2);
 
-//			 Log.v(TAG, "2 i = "+Integer.toString(i)+" drawPathOverlay OTPPathOverlay");
 			 // skip this point, too close to previous point
 			 if (Math.abs(screenPoint1.x - screenPoint0.x)
 					 + Math.abs(screenPoint1.y - screenPoint0.y) <= 1) {
 				 continue;
 			 }
 			 
-//			 Log.v(TAG, "3 i = "+Integer.toString(i)+" drawPathOverlay OTPPathOverlay");
 			 mPath.lineTo(screenPoint1.x, screenPoint1.y);
 		 }
-//		 Log.v(TAG, "drawPath index="+Integer.toString(index));
-		 canvas.drawPath(mPath, mPaint);
 
-//		 Log.v(TAG, "buffercount = "+Integer.toString(bufferCount)+" drawPathOverlay OTPPathOverlay");
+		 canvas.drawPath(mPath, mPaint);
+		 
+		 Paint firstPointPaint = new Paint();
+		 firstPointPaint.setColor(Color.CYAN);
+		 firstPointPaint.setStrokeWidth(12.0f);
+		 firstPointPaint.setStyle(Paint.Style.STROKE);
+		 firstPointPaint.setAlpha(200);
+		 if(screenPoint1!=null)
+			 canvas.drawPoint(screenPoint1.x, screenPoint1.y, firstPointPaint);
 	 }
 }

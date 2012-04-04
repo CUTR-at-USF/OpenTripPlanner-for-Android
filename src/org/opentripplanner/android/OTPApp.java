@@ -21,12 +21,15 @@ import android.app.Application;
 public class OTPApp extends Application {
 	
 	private Server selectedServer;
+	
+	private double lowerLeftLatitude, lowerLeftLongitude, upperRightLatitude, upperRightLongitude;
 
 	/**
 	 * @param selectedServer the selected OTP server
 	 */
-	public void setSelectedServer(Server selectedServer) {
+	public void setSelectedServer(Server selectedServer, MainActivity activity) {
 		this.selectedServer = selectedServer;
+		new MetadataRequest(activity).execute("");
 	}
 
 	/**
@@ -34,6 +37,62 @@ public class OTPApp extends Application {
 	 */
 	public Server getSelectedServer() {
 		return selectedServer;
+	}
+
+	/**
+	 * @return the lowerLeftLatitude
+	 */
+	public double getLowerLeftLatitude() {
+		return lowerLeftLatitude;
+	}
+
+	/**
+	 * @param lowerLeftLatitude the lowerLeftLatitude to set
+	 */
+	public void setLowerLeftLatitude(double lowerLeftLatitude) {
+		this.lowerLeftLatitude = lowerLeftLatitude;
+	}
+
+	/**
+	 * @return the lowerLeftLongitude
+	 */
+	public double getLowerLeftLongitude() {
+		return lowerLeftLongitude;
+	}
+
+	/**
+	 * @param lowerLeftLongitude the lowerLeftLongitude to set
+	 */
+	public void setLowerLeftLongitude(double lowerLeftLongitude) {
+		this.lowerLeftLongitude = lowerLeftLongitude;
+	}
+
+	/**
+	 * @return the upperRightLatitude
+	 */
+	public double getUpperRightLatitude() {
+		return upperRightLatitude;
+	}
+
+	/**
+	 * @param upperRightLatitude the upperRightLatitude to set
+	 */
+	public void setUpperRightLatitude(double upperRightLatitude) {
+		this.upperRightLatitude = upperRightLatitude;
+	}
+
+	/**
+	 * @return the upperRightLongitude
+	 */
+	public double getUpperRightLongitude() {
+		return upperRightLongitude;
+	}
+
+	/**
+	 * @param upperRightLongitude the upperRightLongitude to set
+	 */
+	public void setUpperRightLongitude(double upperRightLongitude) {
+		this.upperRightLongitude = upperRightLongitude;
 	}
 	
 }

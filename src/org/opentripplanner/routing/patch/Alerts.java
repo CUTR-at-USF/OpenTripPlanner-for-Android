@@ -37,7 +37,7 @@ public class Alerts implements Serializable {
 
     //null means unknown
     @Element(required=false)
-    public Date effectiveStartDate;
+    public String effectiveStartDate;
 
     public static HashSet<Alerts> newSimpleAlertSet(String text) {
         Alerts note = createSimpleAlerts(text);
