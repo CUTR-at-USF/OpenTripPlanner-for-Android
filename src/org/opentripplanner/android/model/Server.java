@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.opentripplanner.android;
+package org.opentripplanner.android.model;
 
 public class Server {
 

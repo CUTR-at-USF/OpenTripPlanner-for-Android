@@ -16,6 +16,10 @@
 
 package org.opentripplanner.android;
 
+
+import org.opentripplanner.android.model.Server;
+import org.opentripplanner.android.tasks.MetadataRequest;
+
 import android.app.Application;
 
 public class OTPApp extends Application {
@@ -27,7 +31,7 @@ public class OTPApp extends Application {
 	/**
 	 * @param selectedServer the selected OTP server
 	 */
-	public void setSelectedServer(Server selectedServer, MainActivity activity) {
+	public void setSelectedServer(Server selectedServer, MyActivity activity) {
 		this.selectedServer = selectedServer;
 		new MetadataRequest(activity).execute("");
 	}

@@ -15,34 +15,47 @@
  the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="org.opentripplanner.android"
-      android:versionCode="1"
-      android:versionName="1.0">
+    package="org.opentripplanner.android"
+    android:versionCode="1"
+    android:versionName="1.0" >
 
-    <application android:name="org.opentripplanner.android.OTPApp" android:icon="@drawable/ic_launcher_opentripplanner" android:label="@string/app_name">
-        <activity android:name=".MainActivity"
-                  android:label="@string/app_name" android:theme="@android:style/Theme.NoTitleBar" android:launchMode="singleTop">
+    <application
+        android:name=".OTPApp" 
+        android:icon="@drawable/ic_launcher_opentripplanner"
+        android:label="@string/app_name">
+        <activity
+            android:configChanges="keyboardHidden|orientation"
+            android:name=".MyActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTop"
+            android:theme="@android:style/Theme.NoTitleBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".SettingsActivity" />
+        <activity android:name=".DirectionActivity" >
+        </activity>
+
         <service android:name=".NavigationService" />
     </application>
-    
+
     <uses-sdk android:minSdkVersion="3" />
+
     <supports-screens
-          android:largeScreens="true"
-          android:normalScreens="true"
-          android:smallScreens="true"
-          android:anyDensity="true" />
-    
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/> 
-	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-	<uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-	<uses-permission android:name="android.permission.READ_CONTACTS" />
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="true" />
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
 </manifest>

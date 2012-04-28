@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.opentripplanner.android;
+package org.opentripplanner.android.tasks;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.opentripplanner.android.MyActivity;
+import org.opentripplanner.android.OTPApp;
+import org.opentripplanner.android.model.Server;
 import org.osmdroid.util.GeoPoint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -40,9 +43,9 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 		private static List<Server> knownServers;
 		private static final String TAG = "OTP";
 		private ProgressDialog progressDialog;
-		private MainActivity activity;
+		private MyActivity activity;
 
-		public ServerSelector(MainActivity activity) {
+		public ServerSelector(MyActivity activity) {
 			this.activity = activity;
 			progressDialog = new ProgressDialog(activity);
 		}

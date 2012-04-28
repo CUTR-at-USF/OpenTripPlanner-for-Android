@@ -14,9 +14,10 @@
  * the License.
  */
 
-package org.opentripplanner.android;
+package org.opentripplanner.android.tasks;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,7 +26,12 @@ import java.util.List;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.miscwidgets.widget.Panel;
+import org.opentripplanner.android.OTPApp;
+import org.opentripplanner.android.fragments.MainFragment;
+import org.opentripplanner.android.model.Server;
+import org.opentripplanner.android.util.ItineraryDecrypt;
 import org.opentripplanner.api.model.EncodedPolylineBean;
+import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.ws.Request;
 import org.opentripplanner.api.ws.Response;
@@ -33,12 +39,14 @@ import org.osmdroid.util.GeoPoint;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import de.mastacode.http.Http;
 
@@ -46,16 +54,16 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 	private Response response;
 	private static final String TAG = "OTP";
 	private ProgressDialog progressDialog;
-	private MainActivity activity;
+	private MainFragment mainFragment;
 	private Panel directionPanel;
 
-	public TripRequest(MainActivity activity) {
-		this.activity = activity;
-		progressDialog = new ProgressDialog(activity);
+	public TripRequest(MainFragment mainFragment) {
+		this.mainFragment = mainFragment;
+		progressDialog = new ProgressDialog(mainFragment.getActivity());
 	}
 
 	protected void onPreExecute() {
-		progressDialog = ProgressDialog.show(activity, "",
+		progressDialog = ProgressDialog.show(mainFragment.getActivity(), "",
 				"Generating trip. Please wait... ", true);
 	}
 
@@ -83,32 +91,19 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 		}
 		
 		if (response != null && response.getPlan() != null && response.getPlan().itinerary.get(0) != null) {
+			
+			List<Itinerary> itineraries = response.getPlan().itinerary;
+			
+//			mainFragment.setItineraries(itineraries);
+			
 			List<Leg> legs = response.getPlan().itinerary.get(0).legs;
-			Log.v(TAG, "(TripRequest) legs size = "+Integer.toString(legs.size()));
-			if (!legs.isEmpty()) {
-				OTPPathOverlay otpPath = activity.routeOverlay;
-				otpPath.removeAllPath();
-				int index = 0;
-				for (Leg leg : legs) {
-					int pathColor = getPathColor(leg.mode);
-					otpPath.addPath(pathColor);
-					List<GeoPoint> points = EncodedPolylineBean
-							.decodePoly(leg.legGeometry.getPoints());
-//					Log.v(TAG, "(TripRequest) points size = "+Integer.toString(points.size())
-//								+ " mode = "+leg.mode+" agencyId = "+leg.agencyId);
-					for (GeoPoint geoPoint : points) {
-						otpPath.addPoint(index, geoPoint);
-					}
-					index++;
-				}
-				
-				showDirectionText(legs);
-			}
+			mainFragment.showRouteOnMap(legs);
+			mainFragment.getFragmentListener().onItinerarySelected(legs);
 		} else {
 			// TODO - handle errors here?
 			if(response != null && response.getError() != null) {
 				String msg = response.getError().getMsg();
-				AlertDialog.Builder feedback = new AlertDialog.Builder(activity);
+				AlertDialog.Builder feedback = new AlertDialog.Builder(mainFragment.getActivity());
 				feedback.setTitle("Error Planning Trip");
 				feedback.setMessage(msg);
 				feedback.setNeutralButton("OK", null);
@@ -116,31 +111,6 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 			}
 			Log.e(TAG, "No route to display!");
 		}
-	}
-	
-	private int getPathColor(String mode){
-		if(mode.equalsIgnoreCase("WALK")){
-			return Color.DKGRAY;
-		} else if(mode.equalsIgnoreCase("BUS")){
-			return Color.RED;
-		} else if(mode.equalsIgnoreCase("TRAIN")) {
-			return Color.YELLOW;
-		} else if(mode.equalsIgnoreCase("BICYCLE")){
-			return Color.BLUE;
-		}
-		return Color.WHITE;
-	}
-	
-	private void showDirectionText(List<Leg> legs){
-		directionPanel = activity.directionPanel;
-		TextView tv = (TextView) directionPanel.getContent();
-		String directionText = "";
-		
-		for(Leg leg: legs){
-			directionText+=leg.mode+"\n";
-		}
-		
-		tv.setText(directionText);
 	}
 	
 	private Response requestPlan(Request requestParams) {
@@ -176,7 +146,7 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 		
 		String res = "/plan";
 		
-		OTPApp app = ((OTPApp) activity.getApplication());
+		OTPApp app = ((OTPApp) mainFragment.getActivity().getApplication());
 		Server server = app.getSelectedServer();
 		if (server == null) {
 			//TODO - handle error for no server selected

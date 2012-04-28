@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.opentripplanner.android;
+package org.opentripplanner.android.tasks;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -25,6 +25,9 @@ import java.util.List;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.miscwidgets.widget.Panel;
+import org.opentripplanner.android.MyActivity;
+import org.opentripplanner.android.OTPApp;
+import org.opentripplanner.android.model.Server;
 import org.opentripplanner.api.model.EncodedPolylineBean;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.ws.GraphMetadata;
@@ -47,9 +50,9 @@ public class MetadataRequest extends AsyncTask<String, Integer, Long> {
 	private GraphMetadata metadata;
 	private static final String TAG = "OTP";
 	private ProgressDialog progressDialog;
-	private MainActivity activity;
+	private MyActivity activity;
 
-	public MetadataRequest(MainActivity activity) {
+	public MetadataRequest(MyActivity activity) {
 		this.activity = activity;
 		progressDialog = new ProgressDialog(activity);
 	}

@@ -1,4 +1,4 @@
-package org.opentripplanner.android;
+package org.opentripplanner.android.model;
 
 import java.util.ArrayList;
 

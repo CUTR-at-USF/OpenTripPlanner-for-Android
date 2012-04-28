@@ -14,28 +14,28 @@
  * the License.
  */
 
-package org.opentripplanner.android;
+package org.opentripplanner.android.model;
 
-import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.TraverseModeSet;
 
-public class OptimizeSpinnerItem {
+public class TraverseModeSpinnerItem {
 
 	private String displayName;
-	private OptimizeType optimizeType;
+	private TraverseModeSet traverseModeSet;
 	
-	public OptimizeSpinnerItem () {
-		
-	}
-	
-	public OptimizeSpinnerItem(String displayName, OptimizeType optimizeType){
-		this.displayName = displayName;
-		this.optimizeType = optimizeType;
-	}
-	
-	public String toString(){
-		return displayName;
+	public TraverseModeSpinnerItem() {
 	}
 
+	public TraverseModeSpinnerItem(String displayName,
+			TraverseModeSet traverseModeSet) {
+		super();
+		this.displayName = displayName;
+		this.traverseModeSet = traverseModeSet;
+	}
+	
+	public String toString() {
+		return displayName;
+	}
 	public String getDisplayName() {
 		return displayName;
 	}
@@ -44,11 +44,12 @@ public class OptimizeSpinnerItem {
 		this.displayName = displayName;
 	}
 
-	public OptimizeType getOptimizeType() {
-		return optimizeType;
+	public TraverseModeSet getTraverseModeSet() {
+		return traverseModeSet;
 	}
 
-	public void setOptimizeType(OptimizeType optimizeType) {
-		this.optimizeType = optimizeType;
+	public void setTraverseModeSet(TraverseModeSet traverseModeSet) {
+		this.traverseModeSet = traverseModeSet;
 	}
+
 }

@@ -14,6 +14,8 @@
  License for the specific language governing permissions and limitations under
  the License.
 -->
+	
+
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:panel="http://schemas.android.com/apk/res/org.opentripplanner.android"
     android:layout_width="fill_parent"
@@ -38,6 +40,15 @@
             android:layout_height="wrap_content"
             android:src="@drawable/icon"
             android:visibility="gone" />
+
+        <ImageButton
+            android:id="@+id/btnDisplayDirection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:background="@null"
+            android:src="@android:drawable/ic_menu_directions" />
     </RelativeLayout>
 
     <org.miscwidgets.widget.Panel
@@ -150,40 +161,6 @@
                 </Button>
             </LinearLayout>
         </RelativeLayout>
-    </org.miscwidgets.widget.Panel>
-
-    <org.miscwidgets.widget.Panel
-        android:id="@+id/rightPanel3"
-        android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
-        android:layout_gravity="right"
-        panel:animationDuration="500"
-        panel:closedHandle="@android:drawable/ic_menu_directions"
-        panel:content="@+id/panelContent"
-        panel:handle="@+id/panelHandle"
-        panel:linearFlying="true"
-        panel:openedHandle="@android:drawable/ic_menu_directions"
-        panel:position="right"
-        panel:weight="75%p" >
-
-        <Button
-            android:id="@+id/panelHandle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginBottom="20dip" />
-
-        <TextView
-            android:id="@+id/panelContent"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:background="#000000"
-            android:gravity="center"
-            android:padding="4dip"
-            android:text="Directions will go here!"
-            android:textColor="#eee"
-            android:textSize="16dip"
-            android:textStyle="bold" />
     </org.miscwidgets.widget.Panel>
 
 </FrameLayout>
