@@ -268,7 +268,7 @@ public class ItineraryDecrypt {
 		
 		totalTimeTraveled = 0;
 		if (startTime!=null && endTime!=null) {
-			totalTimeTraveled = (startTime.getTime() - endTime.getTime()) / 1000;
+			totalTimeTraveled = (endTime.getTime() - startTime.getTime()) / 1000;
 		}
 		
 		return totalTimeTraveled;
