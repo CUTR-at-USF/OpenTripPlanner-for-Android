@@ -6,29 +6,31 @@ import org.opentripplanner.android.OnFragmentListener;
 import org.opentripplanner.android.R;
 import org.opentripplanner.android.model.Direction;
 import org.opentripplanner.android.model.OTPBundle;
-import org.opentripplanner.android.util.DirectionListAdapter;
+import org.opentripplanner.android.util.ExpandableListFragment;
 import org.opentripplanner.android.util.ItineraryDecrypt;
+import org.opentripplanner.android.util.DirectionExpandableListAdapter;
 import org.opentripplanner.api.model.Leg;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.widget.ArrayAdapter;
+import android.widget.ExpandableListView;
 import android.widget.ImageButton;
-import android.widget.ListView;
+
 import android.widget.TextView;
 
-public class DirectionListFragment extends ListFragment {
+public class DirectionListFragment extends ExpandableListFragment {
 
 	View header = null;
 
 	private OnFragmentListener fragmentListener;
 
 	private static final String TAG = "OTP";
+	
+	private ExpandableListView elv;
 
 	@Override
 	public void onAttach(Activity activity) {
@@ -87,20 +89,25 @@ public class DirectionListFragment extends ListFragment {
 		timeTraveledHeader.setText(getFormattedDuration(d.intValue()));
 		
 		// Populate list with our static array of titles.
-		ListView listView1 = getListView();
+		elv = getExpandableListView();
 
 		Direction direction_data[] = directions.toArray(new Direction[directions.size()]);
 
-		DirectionListAdapter adapter = new DirectionListAdapter(this.getActivity(), 
+//		DirectionListAdapter adapter = new DirectionListAdapter(this.getActivity(), 
+//				R.layout.list_direction_item, direction_data);
+		
+		DirectionExpandableListAdapter adapter = new DirectionExpandableListAdapter(this.getActivity(), 
 				R.layout.list_direction_item, direction_data);
 
-		listView1.addHeaderView(header);
+		elv.addHeaderView(header);
 
-		listView1.setAdapter(adapter);
+		elv.setAdapter(adapter);
+		
+		elv.setGroupIndicator(null); // Get rid of the down arrow
 	}
 
 	@Override
-	public void onListItemClick(ListView l, View v, int pos, long id) {
+	public void onListItemClick(ExpandableListView l, View v, int pos, long id) {
 		showDetails(pos);
 	}
 

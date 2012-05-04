@@ -6,7 +6,7 @@ public class Direction {
 	
 	private int icon;
     private String directionText;
-    private ArrayList<Direction> nonTransitSubDirection = null; //for non-transit direction
+    private ArrayList<Direction> subDirections = null;
     private double distanceTraveled;
     
     public Direction(){
@@ -47,19 +47,6 @@ public class Direction {
 		this.directionText = directionText;
 	}
 
-	/**
-	 * @return the nonTransitSubDirection
-	 */
-	public ArrayList<Direction> getNonTransitSubDirection() {
-		return nonTransitSubDirection;
-	}
-
-	/**
-	 * @param nonTransitSubDirection the nonTransitSubDirection to set
-	 */
-	public void setNonTransitSubDirection(ArrayList<Direction> nonTransitSubDirection) {
-		this.nonTransitSubDirection = nonTransitSubDirection;
-	}
 
 	/**
 	 * @return the distanceTraveled
@@ -73,6 +60,20 @@ public class Direction {
 	 */
 	public void setDistanceTraveled(double distanceTraveled) {
 		this.distanceTraveled = distanceTraveled;
+	}
+
+	/**
+	 * @return the subDirections
+	 */
+	public ArrayList<Direction> getSubDirections() {
+		return subDirections;
+	}
+
+	/**
+	 * @param subDirections the subDirections to set
+	 */
+	public void setSubDirections(ArrayList<Direction> subDirections) {
+		this.subDirections = subDirections;
 	}
 
 }

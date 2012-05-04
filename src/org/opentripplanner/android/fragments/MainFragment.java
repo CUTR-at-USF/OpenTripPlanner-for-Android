@@ -158,7 +158,6 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		
 		View mainView = inflater.inflate(R.layout.main, container, false); 
-		
 		final Activity activity = this.getActivity();
 		
 		prefs = PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
@@ -414,16 +413,18 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 				request.setModes(((TraverseModeSpinnerItem)ddlTravelMode.getSelectedItem()).getTraverseModeSet());
 
 				try{
-					Double maxWalk = Double.parseDouble(prefs.getString("max_walking_distance", "7600"));
+					Double maxWalk = Double.parseDouble(prefs.getString("max_walking_distance", "1600"));
 					request.setMaxWalkDistance(maxWalk);
 				} catch (NumberFormatException ex) {
-					request.setMaxWalkDistance(new Double("7600"));
+					request.setMaxWalkDistance(new Double("1600"));
 				}
 
 				request.setWheelchair(prefs.getBoolean("wheelchair_accessible", false));
 
 				request.setDateTime(DateFormat.format("MM/dd/yy", System.currentTimeMillis()).toString(), 
 						DateFormat.format("hh:mmaa", System.currentTimeMillis()).toString());
+				
+				request.setShowIntermediateStops(Boolean.TRUE);
 
 				new TripRequest(MainFragment.this).execute(request);
 			}

@@ -183,7 +183,7 @@ public class Leg {
     //@XmlElementWrapper(name = "intermediateStops")
     //@SerializedName("intermediateStops")
     @ElementList(name="intermediateStops",required=false)
-    public List<Place> stop;
+    public List<Place> stops;
     
     /**
      * The leg's geometry.

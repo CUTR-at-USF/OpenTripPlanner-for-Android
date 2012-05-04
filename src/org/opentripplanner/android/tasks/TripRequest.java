@@ -55,7 +55,7 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 	private static final String TAG = "OTP";
 	private ProgressDialog progressDialog;
 	private MainFragment mainFragment;
-	private Panel directionPanel;
+//	private Panel directionPanel;
 
 	public TripRequest(MainFragment mainFragment) {
 		this.mainFragment = mainFragment;
@@ -140,6 +140,8 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 		//&submit
 		//&date=06/07/2011
 		//&time=11:34%20am
+		
+		//&showIntermediateStops=TRUE
 		
 		//String u = "http://go.cutr.usf.edu:8083/opentripplanner-api-webapp/ws/plan?fromPlace=28.066192823902,-82.416927819827&toPlace=28.064072155861,-82.41109133301&arr=Depart&min=QUICK&maxWalkDistance=7600&mode=WALK&itinID=1&submit&date=06/07/2011&time=11:34%20am";
 		//String u = "http://go.cutr.usf.edu:8083/opentripplanner-api-webapp/ws/plan" + params;

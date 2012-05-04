@@ -21,16 +21,16 @@ import org.opentripplanner.routing.patch.Alerts;
 
 public class ItineraryDecrypt {
 	private List<Leg> legs = new ArrayList<Leg>();
-	
+
 	private ArrayList<Direction> directions = new ArrayList<Direction>();
-	
+
 	private double totalDistance = 0;
-	
+
 	private double totalTimeTraveled = 0;
-	
+
 	public ItineraryDecrypt(List<Leg> legs){
 		this.legs.addAll(legs);
-		
+
 		convertToDirectionList();
 	}
 
@@ -47,77 +47,95 @@ public class ItineraryDecrypt {
 	public void setDirections(ArrayList<Direction> directions) {
 		this.directions = directions;
 	}
-	
+
 	public void addDirection(Direction dir){
 		if(directions==null){
 			directions = new ArrayList<Direction>();
 		}
-		
+
 		directions.add(dir);
 	}
-	
+
 	private void convertToDirectionList(){
 		for(Leg leg: legs){
 			setTotalDistance(getTotalDistance() + leg.distance);
-			Direction dir;
-			
+
 			TraverseMode traverseMode = TraverseMode.valueOf((String) leg.mode);
 			if(traverseMode.isOnStreetNonTransit()){
-				dir = decryptNonTransit(leg);
+				Direction dir = decryptNonTransit(leg);
+				if(dir == null){
+					continue;
+				}
+				addDirection(dir);
 			} else{
-				dir = decryptTransit(leg);
+				ArrayList<Direction> directions = decryptTransit(leg);
+				if(directions == null){
+					continue;
+				}
+
+				if(directions.get(0)!=null){
+					addDirection(directions.get(0));
+				}
+
+				if(directions.get(1)!=null){
+					addDirection(directions.get(1));
+				}
 			}
-			
-			if(dir == null){
-				continue;
-			}
-			
-			addDirection(dir);
-//			directionText+=leg.mode+"\n";
+
+			//			directionText+=leg.mode+"\n";
 		}
 	}
-	
+
 	private Direction decryptNonTransit(Leg leg){
 		Direction direction = new Direction();
-		
-//		http://opentripplanner.usf.edu/opentripplanner-api-webapp/ws/plan?optimize=QUICK&time=09:24pm&arriveBy=false&wheelchair=false&maxWalkDistance=7600.0&fromPlace=28.033389%2C+-82.521034&toPlace=28.064709%2C+-82.471618&date=03/07/12&mode=WALK,TRAM,SUBWAY,RAIL,BUS,FERRY,CABLE_CAR,GONDOLA,FUNICULAR,TRANSIT,TRAINISH,BUSISH
-		
+
+		//		http://opentripplanner.usf.edu/opentripplanner-api-webapp/ws/plan?optimize=QUICK&time=09:24pm&arriveBy=false&wheelchair=false&maxWalkDistance=7600.0&fromPlace=28.033389%2C+-82.521034&toPlace=28.064709%2C+-82.471618&date=03/07/12&mode=WALK,TRAM,SUBWAY,RAIL,BUS,FERRY,CABLE_CAR,GONDOLA,FUNICULAR,TRANSIT,TRAINISH,BUSISH
+
 		// Get appropriate action and icon
-		String action = null;
+		String action = "Walk";
+		int icon = R.drawable.mode_walk;
 		TraverseMode mode = TraverseMode.valueOf((String) leg.mode);
-		if(mode.compareTo(TraverseMode.WALK)==0){
-			action = "Walk";
-			direction.setIcon(R.drawable.mode_walk);
-		} else if(mode.compareTo(TraverseMode.BICYCLE)==0){
+		if(mode.compareTo(TraverseMode.BICYCLE)==0){
 			action = "Bike";
-			direction.setIcon(R.drawable.mode_bicycle);
+			icon = R.drawable.mode_bicycle;
 		} else if(mode.compareTo(TraverseMode.CAR)==0){
 			action = "Drive";
-			direction.setIcon(R.drawable.icon);
+			icon = R.drawable.icon;
 		}
-		
-//		Main direction
+
+		direction.setIcon(icon);
+
+		//		Main direction
 		Place fromPlace = leg.from;
 		Place toPlace = leg.to;
 		String mainDirectionText = action;
 		mainDirectionText += fromPlace.name==null ? "" : " from " + fromPlace.name;
 		mainDirectionText += toPlace.name==null ? "" : " to " + toPlace.name;
 		mainDirectionText += toPlace.stopId==null ? "" : " (" + toPlace.stopId.getAgencyId() + " " + toPlace.stopId.getId() + ")";
-		
+//		double duration = DateTimeConversion.getDuration(leg.startTime, leg.endTime);
+		double totalDistance = leg.distance;
+		DecimalFormat twoDForm = new DecimalFormat("#.##");
+		totalDistance = Double.valueOf(twoDForm.format(totalDistance));
+		mainDirectionText += "\n[" + totalDistance + "meters ]";// Double.toString(duration);
+
 		direction.setDirectionText(mainDirectionText);
-		
-//		Sub-direction
+
+		//		Sub-direction
 		List<WalkStep> walkSteps = leg.walkSteps;
-		
+
 		if(walkSteps==null) return direction;
-		
+
 		ArrayList<Direction> subDirections = new ArrayList<Direction>(walkSteps.size());
-		
+
 		for(WalkStep step: walkSteps){
 			Direction dir = new Direction();
 			String subDirectionText = "";
-			
+
 			double distance = step.distance;
+			// Distance traveled [distance]
+			distance = Double.valueOf(twoDForm.format(distance));
+			dir.setDistanceTraveled(distance);
+
 			RelativeDirection relativeDir = step.relativeDirection;
 			String streetName = step.streetName;
 			AbsoluteDirection absoluteDir = step.absoluteDirection;
@@ -128,7 +146,7 @@ public class ItineraryDecrypt {
 			double lat = step.lat;
 			String elevation = step.elevation;
 			List<Alerts> alert = step.alerts;
-			
+
 			// Walk East
 			if(relativeDir==null){
 				subDirectionText += action + " ";
@@ -137,55 +155,69 @@ public class ItineraryDecrypt {
 			// (Turn left)/(Continue) 
 			else {
 				if(!isStayOn) {
-					subDirectionText += "Turn " + relativeDir.name() + " ";
+					RelativeDirection rDir = RelativeDirection.valueOf(relativeDir.name());
+
+					// Do not need TURN Continue
+					if( rDir.compareTo(RelativeDirection.CONTINUE) != 0 &&
+							rDir.compareTo(RelativeDirection.CIRCLE_CLOCKWISE) !=0 &&
+							rDir.compareTo(RelativeDirection.CIRCLE_COUNTERCLOCKWISE) != 0){
+						subDirectionText += "Turn ";
+					}
+
+					subDirectionText += relativeDir.name() + " ";
 				} else {
 					subDirectionText += relativeDir.name() + " ";
 				}
 			}
-			
+
 			// (on ABC)
-			if(!isBogusName) {
-				subDirectionText += "on "+ streetName + " ";
-			}
-			
-			// Distance traveled [distance]
-			DecimalFormat twoDForm = new DecimalFormat("#.##");
-	        distance = Double.valueOf(twoDForm.format(distance));
-	        dir.setDistanceTraveled(distance);
-			
+			//			if(!isBogusName) {
+			//				subDirectionText += "on "+ streetName + " ";
+			//			}
+
+			subDirectionText += "on "+ streetName + " ";
+
+			subDirectionText += "\n[" + Double.toString(distance) + "meters ]";
+
+			dir.setDirectionText(subDirectionText);
+
+			dir.setIcon(icon);
+
 			// Add new sub-direction
 			subDirections.add(dir);
 		}
-		
-		direction.setNonTransitSubDirection(subDirections);
-		
+
+		direction.setSubDirections(subDirections);
+
 		return direction;
 	}
-	
-	private Direction decryptTransit(Leg leg){
-		Direction direction = new Direction();
-		
-//		set icon
+
+	private ArrayList<Direction> decryptTransit(Leg leg){
+		ArrayList<Direction> directions = new ArrayList<Direction>(2);
+		Direction onDirection = new Direction();
+		Direction offDirection = new Direction(); 
+
+		//		set icon
 		TraverseMode mode = TraverseMode.valueOf((String) leg.mode);
-		if(mode.compareTo(TraverseMode.BUS)==0){
-			direction.setIcon(R.drawable.mode_bus);
-		} else if(mode.compareTo(TraverseMode.RAIL)==0){
-			direction.setIcon(R.drawable.mode_rail);
+		int icon = R.drawable.mode_bus;
+		if(mode.compareTo(TraverseMode.RAIL)==0){
+			icon = R.drawable.mode_rail;
 		} else if(mode.compareTo(TraverseMode.FERRY)==0){
-			direction.setIcon(R.drawable.mode_ferry);
+			icon = R.drawable.mode_ferry;
 		} else if(mode.compareTo(TraverseMode.GONDOLA)==0){
-			direction.setIcon(R.drawable.mode_gondola);
+			icon = R.drawable.mode_gondola;
 		} else if(mode.compareTo(TraverseMode.SUBWAY)==0){
-			direction.setIcon(R.drawable.mode_subway);
+			icon = R.drawable.mode_subway;
 		} else if(mode.compareTo(TraverseMode.TRAM)==0){
-			direction.setIcon(R.drawable.mode_tram);
-		} else {
-			direction.setIcon(R.drawable.icon);
+			icon = R.drawable.mode_tram;
 		}
-		
-//		set direction text
-		String mainDirectionText = "";
-		
+
+		onDirection.setIcon(icon);
+
+		//		set direction text
+		String onDirectionText = "";
+		String offDirectionText = "";
+
 		String route = leg.route;
 		String agencyName = leg.agencyName;
 		String agencyUrl = leg.agencyId;
@@ -199,33 +231,62 @@ public class ItineraryDecrypt {
 		String routeLongName = leg.routeLongName;
 		String boardRule = leg.boardRule;
 		String alignRule = leg.alightRule;
-		
+
+		ArrayList<Place> stopsInBetween = new ArrayList<Place>();
+		if(leg.stops!=null)
+			stopsInBetween.addAll(leg.stops);
+
 		double distance = leg.distance;
 		Place from = leg.from;
 		AgencyAndId agencyAndIdFrom = from.stopId;
 		Place to = leg.to;
 		AgencyAndId agencyAndIdTo = to.stopId;
 		long duration = leg.duration;
-		
+
 		// Get on HART BUS 6
 		String serviceName = agencyName;
 		if(serviceName==null)
 			serviceName = agencyId;
 
-		mainDirectionText += "At " + from.name + " (" + agencyAndIdFrom.getAgencyId() + " " + agencyAndIdFrom.getId() + "), ";
-		mainDirectionText += "Get on " + serviceName + " " + mode + " " + route + "\n\n";
+		offDirectionText += "Get off " + serviceName + " " + mode + " " + route + "\n";
+		offDirectionText += "At " + to.name + " (" + agencyAndIdTo.getAgencyId() + " " + agencyAndIdTo.getId() + ")";
+		offDirection.setDirectionText(offDirectionText);
+		offDirection.setIcon(icon);
 
-		mainDirectionText += "At " + to.name + " (" + agencyAndIdTo.getAgencyId() + " " + agencyAndIdTo.getId() + "), ";
-		mainDirectionText += "Get off " + serviceName + " " + mode + " " + route;
-		
-		direction.setDirectionText(mainDirectionText);
+		// Only onDirection has subdirection (list of stops in between)
+		onDirectionText += "Get on " + serviceName + " " + mode + " " + route + "\n";
+		onDirectionText += "At " + from.name + " (" + agencyAndIdFrom.getAgencyId() + " " + agencyAndIdFrom.getId() + ")\n";
+		onDirectionText += stopsInBetween.size() + " stops in between";
+		onDirection.setDirectionText(onDirectionText);
+		onDirection.setIcon(icon);
+
+		// sub-direction
+		ArrayList<Direction> subDirections = new ArrayList<Direction>();
+		for(int i=0; i<stopsInBetween.size(); i++){
+			Direction subDirection = new Direction();
+
+			Place stop = stopsInBetween.get(i);
+			AgencyAndId agencyAndIdStop = stop.stopId;
+			String subDirectionText = 	Integer.toString(i) + ". " +stop.name + " (" + 
+					agencyAndIdStop.getAgencyId() + " " + 
+					agencyAndIdStop.getId() + ")";
+
+			subDirection.setDirectionText(subDirectionText);
+			subDirection.setIcon(icon);
+
+			subDirections.add(subDirection);
+		}
+		onDirection.setSubDirections(subDirections);
 
 		// Distance traveled [distance]
 		DecimalFormat twoDForm = new DecimalFormat("#.##");
 		distance = Double.valueOf(twoDForm.format(distance));
-		direction.setDistanceTraveled(distance);
-		
-		return direction;
+		onDirection.setDistanceTraveled(distance);
+
+		directions.add(onDirection);
+		directions.add(offDirection);
+
+		return directions;
 	}
 
 	/**
@@ -249,29 +310,15 @@ public class ItineraryDecrypt {
 	 */
 	public double getTotalTimeTraveled() {
 		if(legs.isEmpty()) return 0;
-		
+
 		Leg legStart = legs.get(0);
 		String startTimeText = legStart.startTime;
 		Leg legEnd = legs.get(legs.size()-1);
 		String endTimeText = legEnd.endTime;
-		DateFormat formatter ; 
-		Date startTime=null, endTime=null; 
-//		2012-03-09T22:46:00-05:00
-		formatter = new SimpleDateFormat("yyyy-MM-dd\'T\'HH:mm:ssZZ");
-		try {
-			startTime = (Date)formatter.parse(startTimeText);
-			endTime = (Date)formatter.parse(endTimeText);
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		totalTimeTraveled = 0;
-		if (startTime!=null && endTime!=null) {
-			totalTimeTraveled = (endTime.getTime() - startTime.getTime()) / 1000;
-		}
-		
+
+		totalTimeTraveled = DateTimeConversion.getDuration(startTimeText, endTimeText);
+
 		return totalTimeTraveled;
 	}
-	
+
 }
