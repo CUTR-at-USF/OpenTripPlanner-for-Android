@@ -1,50 +1,41 @@
 /*
- * Copyright 2011 Marcy Gordon
+ * Copyright 2012 University of South Florida
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  * 
- * http://www.apache.org/licenses/LICENSE-2.0
+ *        http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
  */
 
 package org.opentripplanner.android.tasks;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.miscwidgets.widget.Panel;
 import org.opentripplanner.android.MyActivity;
 import org.opentripplanner.android.OTPApp;
 import org.opentripplanner.android.model.Server;
-import org.opentripplanner.api.model.EncodedPolylineBean;
-import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.ws.GraphMetadata;
-import org.opentripplanner.api.ws.Request;
-import org.opentripplanner.api.ws.Response;
-import org.osmdroid.util.GeoPoint;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.TextView;
 import de.mastacode.http.Http;
+
+/**
+ * @author Khoa Tran
+ *
+ */
 
 public class MetadataRequest extends AsyncTask<String, Integer, Long> {
 	private GraphMetadata metadata;

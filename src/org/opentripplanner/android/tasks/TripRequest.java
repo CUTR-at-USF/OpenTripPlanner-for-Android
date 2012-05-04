@@ -17,7 +17,6 @@
 package org.opentripplanner.android.tasks;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,30 +24,26 @@ import java.util.List;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.miscwidgets.widget.Panel;
 import org.opentripplanner.android.OTPApp;
 import org.opentripplanner.android.fragments.MainFragment;
 import org.opentripplanner.android.model.Server;
-import org.opentripplanner.android.util.ItineraryDecrypt;
-import org.opentripplanner.api.model.EncodedPolylineBean;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.ws.Request;
 import org.opentripplanner.api.ws.Response;
-import org.osmdroid.util.GeoPoint;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
 import de.mastacode.http.Http;
+
+/**
+ * Modified by Khoa Tran
+ *
+ */
 
 public class TripRequest extends AsyncTask<Request, Integer, Long> {
 	private Response response;

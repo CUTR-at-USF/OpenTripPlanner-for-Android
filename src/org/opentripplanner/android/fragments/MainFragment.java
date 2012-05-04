@@ -1,3 +1,19 @@
+/*
+ * Copyright 2012 University of South Florida
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+
 package org.opentripplanner.android.fragments;
 
 import java.io.IOException;
@@ -21,9 +37,7 @@ import org.opentripplanner.android.model.Server;
 import org.opentripplanner.android.model.TraverseModeSpinnerItem;
 import org.opentripplanner.android.tasks.ServerSelector;
 import org.opentripplanner.android.tasks.TripRequest;
-import org.opentripplanner.android.util.ItineraryDecrypt;
 import org.opentripplanner.api.model.EncodedPolylineBean;
-import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.ws.Request;
 import org.opentripplanner.routing.core.OptimizeType;
@@ -40,11 +54,9 @@ import de.mastacode.http.Http;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.Bitmap;
@@ -58,20 +70,16 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.os.Parcel;
+
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.provider.Contacts.People;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.Loader;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -89,6 +97,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
+
+/**
+ * @author Khoa Tran
+ *
+ */
 
 public class MainFragment extends Fragment implements OnSharedPreferenceChangeListener{
 	
@@ -872,7 +885,7 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 			builder.setItems(items, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
 					Toast.makeText(getActivity().getApplicationContext(), items[item], Toast.LENGTH_SHORT).show();
-					GeoPoint point = mv.getProjection().fromPixels(e.getX(), e.getY());
+					GeoPoint point = (GeoPoint) mv.getProjection().fromPixels(e.getX(), e.getY());
 					if(items[item].equals("Start Location")) {
 						moveMarker(true, point, null);
 					} else {
@@ -929,7 +942,7 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 			} else if (action == MotionEvent.ACTION_UP && inDrag != false) {
 				dragImage.setVisibility(View.GONE);
 
-				GeoPoint pt = pj.fromPixels(x - xDragTouchOffset, y - yDragTouchOffset);
+				GeoPoint pt = (GeoPoint) pj.fromPixels(x - xDragTouchOffset, y - yDragTouchOffset);
 				//OverlayItem toDrop = new OverlayItem(inDrag.getTitle(),
 				//		inDrag.getSnippet(), pt);
 

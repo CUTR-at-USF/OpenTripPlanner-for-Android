@@ -16,7 +16,6 @@
 
 package org.opentripplanner.android;
 
-
 import org.opentripplanner.android.model.Server;
 import org.opentripplanner.android.tasks.MetadataRequest;
 
