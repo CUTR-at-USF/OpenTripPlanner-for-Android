@@ -28,6 +28,7 @@ import org.opentripplanner.android.MyActivity;
 import org.opentripplanner.android.OTPApp;
 import org.opentripplanner.android.OnFragmentListener;
 import org.opentripplanner.android.R;
+import org.opentripplanner.android.SettingsActivity;
 import org.opentripplanner.android.contacts.ContactAPI;
 import org.opentripplanner.android.contacts.ContactList;
 import org.opentripplanner.android.model.OTPBundle;
@@ -35,6 +36,7 @@ import org.opentripplanner.android.model.OTPPathOverlay;
 import org.opentripplanner.android.model.OptimizeSpinnerItem;
 import org.opentripplanner.android.model.Server;
 import org.opentripplanner.android.model.TraverseModeSpinnerItem;
+import org.opentripplanner.android.sqlite.ServersDataSource;
 import org.opentripplanner.android.tasks.ServerSelector;
 import org.opentripplanner.android.tasks.TripRequest;
 import org.opentripplanner.api.model.EncodedPolylineBean;
@@ -80,6 +82,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -158,12 +161,14 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement OnFragmentListener");
         }
+        
+        
     }
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
-	    
+	    setHasOptionsMenu(true);
 //	    setRetainInstance(true);
 	}
 	
@@ -172,6 +177,16 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 		
 		View mainView = inflater.inflate(R.layout.main, container, false); 
 		final Activity activity = this.getActivity();
+		
+		final OnFragmentListener ofl = this.getFragmentListener();
+		ServersDataSource datasource = ofl.getDatasource();
+		datasource.open();
+		List<Server> values = datasource.getAllServers();
+		String shown = "";
+		for(int i=0; i<values.size(); i++){
+			shown += values.get(i).getRegion() +"\n";
+		}	
+		Toast.makeText(getActivity().getApplicationContext(), shown, Toast.LENGTH_SHORT).show();
 		
 		prefs = PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
 		prefs.registerOnSharedPreferenceChangeListener(this);
@@ -443,11 +458,12 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 			}
 		});
 		
-		final OnFragmentListener ofl = this.getFragmentListener();
-		
 		OnClickListener oclDisplayDirection = new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
+//				Save states before leaving
+				saveOTPBundle();
+				
 				ofl.onDirectionFragmentSwitched();
 			}
 		};
@@ -682,12 +698,12 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 	}
 
 	@Override
-//	public boolean onCreateOptionsMenu(final Menu pMenu) {
+	public void onCreateOptionsMenu(Menu pMenu, MenuInflater inflater) {
 //		MenuInflater inflater = getMenuInflater();
-//		inflater.inflate(R.menu.menu, pMenu);
-//		mGPS = pMenu.getItem(0);
-//		return true;
-//	}
+		super.onCreateOptionsMenu(pMenu, inflater);
+		inflater.inflate(R.menu.menu, pMenu);
+		mGPS = pMenu.getItem(0);
+	}
 
 	public void onPrepareOptionsMenu(final Menu pMenu) {
 		if (isGPSEnabled()) {
@@ -711,7 +727,7 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 			zoomToCurrentLocation();
 			break;
 		case R.id.settings:
-//			startActivity(new Intent(this, SettingsActivity.class));
+			startActivity(new Intent(this.getActivity(), SettingsActivity.class));
 			break;
 		case R.id.feedback:
 			//TODO - feedback activity

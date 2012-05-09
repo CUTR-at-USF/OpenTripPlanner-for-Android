@@ -29,6 +29,7 @@ import org.opentripplanner.api.model.Leg;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -79,16 +80,19 @@ public class DirectionListFragment extends ExpandableListFragment {
 		
 		ImageButton btnDisplayMap = (ImageButton)header.findViewById(R.id.btnDisplayMap);
 		final OnFragmentListener ofl = this.getFragmentListener();
+		final DirectionListFragment dlf = this;
 		OnClickListener oclDisplayDirection = new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				ofl.onMainFragmentSwitched();
+				ofl.onMainFragmentSwitched(dlf);
 			}
 		};
 		btnDisplayMap.setOnClickListener(oclDisplayDirection);
 		
 		OTPBundle otpBundle = fragmentListener.getOTPBundle();
 		TextView fromHeader = (TextView)header.findViewById(R.id.fromHeader);
+		if(fromHeader==null) Log.v(TAG, "null fromheader");
+		if(otpBundle==null) Log.v(TAG, "null otpBundle");
 		fromHeader.setText(otpBundle.getFromText());
 		TextView toHeader = (TextView)header.findViewById(R.id.toHeader);
 		toHeader.setText(otpBundle.getToText());

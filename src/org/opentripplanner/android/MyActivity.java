@@ -22,6 +22,7 @@ import java.util.List;
 import org.opentripplanner.android.fragments.DirectionListFragment;
 import org.opentripplanner.android.fragments.MainFragment;
 import org.opentripplanner.android.model.OTPBundle;
+import org.opentripplanner.android.sqlite.ServersDataSource;
 import org.opentripplanner.api.model.Leg;
 
 import android.os.Bundle;
@@ -39,7 +40,11 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 
 	private List<Leg> currentItinerary = null;
 	
-	private OTPBundle bundle;
+	private OTPBundle bundle = null;
+	
+	private MainFragment mainFragment;
+	
+	private ServersDataSource datasource;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -51,10 +56,12 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 		if(savedInstanceState==null){
 			setContentView(R.layout.activity);
 			FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-			Fragment mainFragment = new MainFragment();
+			mainFragment = new MainFragment();
 			fragmentTransaction.replace(R.id.mainFragment, mainFragment);
 			fragmentTransaction.commit();
 		}
+		
+		setDatasource(new ServersDataSource(this));
 	}
 
 	@Override
@@ -74,10 +81,14 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 		// TODO Auto-generated method stub
 		FragmentManager fm = getSupportFragmentManager();
 		FragmentTransaction transaction = fm.beginTransaction();
+		
+		transaction.hide(mainFragment);
+		
 		Fragment directionFragment = new DirectionListFragment();
-		transaction.replace(R.id.mainFragment, directionFragment);
-		transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-		transaction.addToBackStack(null);
+		transaction.add(R.id.mainFragment, directionFragment);
+//		transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+//		transaction.addToBackStack(null);
+		
 		transaction.commit();
 	}
 
@@ -95,15 +106,32 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 	}
 
 	@Override
-	public void onMainFragmentSwitched() {
+	public void onMainFragmentSwitched(Fragment f) {
 		// TODO Auto-generated method stub
 		FragmentManager fm = getSupportFragmentManager();
 		FragmentTransaction transaction = fm.beginTransaction();
-		fm.popBackStack();
-		Fragment mainFragment = new MainFragment();
-		transaction.add(R.id.mainFragment, mainFragment);
-		transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+//		fm.popBackStack();
+//		Fragment mainFragment = new MainFragment();
+//		transaction.add(R.id.mainFragment, mainFragment);
+//		transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+//		transaction.detach(f);
+		transaction.remove(f);
+		transaction.show(mainFragment);
 		transaction.commit();
+	}
+
+	/**
+	 * @return the datasource
+	 */
+	public ServersDataSource getDatasource() {
+		return datasource;
+	}
+
+	/**
+	 * @param datasource the datasource to set
+	 */
+	public void setDatasource(ServersDataSource datasource) {
+		this.datasource = datasource;
 	}
 	
 //	@Override

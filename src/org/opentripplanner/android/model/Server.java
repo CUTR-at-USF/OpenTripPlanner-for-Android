@@ -16,8 +16,17 @@
 
 package org.opentripplanner.android.model;
 
+import java.sql.Date;
+
+/**
+ * Modified by Khoa Tran
+ *
+ */
+
 public class Server {
 
+	private long id;
+	private Date date;
 	private String region;
 	private String baseURL;
 	private String bounds;
@@ -104,5 +113,33 @@ public class Server {
 	
 	public String toString() {
 		return region;
+	}
+
+	/**
+	 * @return the id
+	 */
+	public long getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	/**
+	 * @return the date
+	 */
+	public Date getDate() {
+		return date;
+	}
+
+	/**
+	 * @param date the date to set
+	 */
+	public void setDate(Date date) {
+		this.date = date;
 	}
 }

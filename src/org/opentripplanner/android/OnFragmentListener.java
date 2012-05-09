@@ -19,7 +19,10 @@ package org.opentripplanner.android;
 import java.util.List;
 
 import org.opentripplanner.android.model.OTPBundle;
+import org.opentripplanner.android.sqlite.ServersDataSource;
 import org.opentripplanner.api.model.Leg;
+
+import android.support.v4.app.Fragment;
 
 /**
  * @author Khoa Tran
@@ -33,10 +36,14 @@ public interface OnFragmentListener {
 	
 	public void onDirectionFragmentSwitched();
 	
-	public void onMainFragmentSwitched();
+	public void onMainFragmentSwitched(Fragment f);
 	
 	public OTPBundle getOTPBundle();
 	
 	public void setOTPBundle(OTPBundle b);
+	
+	public ServersDataSource getDatasource();
+
+	public void setDatasource(ServersDataSource datasource);
 	
 }
