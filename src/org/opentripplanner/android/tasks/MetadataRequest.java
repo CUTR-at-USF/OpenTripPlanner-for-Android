@@ -87,7 +87,8 @@ public class MetadataRequest extends AsyncTask<String, Integer, Long> {
 			if(metadata.getUpperRightLongitude()!=0) 
 				app.setUpperRightLongitude(upperRightLongitude);
 			
-			Log.e(TAG, Double.toString(lowerLeftLatitude)+","+Double.toString(lowerLeftLongitude));
+			Log.v(TAG, "LowerLeft: " + Double.toString(lowerLeftLatitude)+","+Double.toString(lowerLeftLongitude));
+			Log.v(TAG, "UpperRight" + Double.toString(upperRightLatitude)+","+Double.toString(upperRightLongitude));
 		} else {
 			// TODO - handle errors here?
 //			String msg = "No metadata";

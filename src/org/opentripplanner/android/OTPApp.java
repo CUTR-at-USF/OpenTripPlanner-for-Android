@@ -20,12 +20,21 @@ import org.opentripplanner.android.model.Server;
 import org.opentripplanner.android.tasks.MetadataRequest;
 
 import android.app.Application;
+import android.location.Location;
+
+/*
+ * Modified by Khoa Tran
+ */
 
 public class OTPApp extends Application {
 	
 	private Server selectedServer;
 	
 	private double lowerLeftLatitude, lowerLeftLongitude, upperRightLatitude, upperRightLongitude;
+	
+	private double centerLatitude, centerLongitude;  //for Google Places
+	
+	private double radius;
 
 	/**
 	 * @param selectedServer the selected OTP server
@@ -96,6 +105,31 @@ public class OTPApp extends Application {
 	 */
 	public void setUpperRightLongitude(double upperRightLongitude) {
 		this.upperRightLongitude = upperRightLongitude;
+	}
+
+	/**
+	 * @return the radius
+	 */
+	public double getRadius() {
+		float[] results = new float[3];
+		Location.distanceBetween(centerLatitude, centerLongitude, lowerLeftLatitude, lowerLeftLongitude, results);
+		return results[0];
+	}
+
+	/**
+	 * @return the centerLatitude
+	 */
+	public double getCenterLatitude() {
+		centerLatitude = (lowerLeftLatitude + upperRightLatitude)/2;
+		return centerLatitude;
+	}
+
+	/**
+	 * @return the centerLongitude
+	 */
+	public double getCenterLongitude() {
+		centerLongitude = (lowerLeftLongitude + upperRightLongitude)/2;
+		return centerLongitude;
 	}
 	
 }

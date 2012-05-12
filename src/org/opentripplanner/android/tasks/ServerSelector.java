@@ -92,55 +92,55 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 			} else if (knownServers != null && knownServers.size() > 1){
 				Log.w(TAG, "No server automatically selected!");
 				
-//				List<String> serverNames = new ArrayList<String>();
-//				for (Server server : knownServers) {
-//					serverNames.add(server.getRegion());
-//				}
-//				serverNames.add("Custom Server");
-//				
-//				final CharSequence[] items = serverNames.toArray(new CharSequence[serverNames.size()]);
-//				
-//				AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-//				builder.setTitle("Choose OpenTripPlanner Server");
-//				builder.setItems(items, new DialogInterface.OnClickListener() {
-//				    
-//					public void onClick(DialogInterface dialog, int item) {
-//				        
-//				        if(items[item].equals("Custom Server")) {
-//				        	final EditText tbBaseURL = new EditText(activity);
-//
-//				        	AlertDialog.Builder urlAlert = new AlertDialog.Builder(activity);
-//				        	urlAlert.setTitle("Enter a custom OTP server domain");
-//				        	urlAlert.setView(tbBaseURL);
-//				        	urlAlert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//				        		public void onClick(DialogInterface dialog, int whichButton) {
-//				        			String value = tbBaseURL.getText().toString().trim();
-//				        			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
-//				        			Editor e = prefs.edit();
-//				        			e.putBoolean("auto_detect_server", false);
-//				        			e.putString("custom_server_url", value);
-//				        			e.commit();
-//				        		}
-//				        	});
-//				        	urlAlert.create().show();
-//
-//				        } else { 
-//				        	//TODO - set server URL here - app wise as well?
-//					        for (Server server : knownServers) {
-//								if (server.getRegion().equals(items[item])) {
-//									selectedServer = server;
-//									OTPApp app = ((OTPApp) activity.getApplication());
-//									app.setSelectedServer(selectedServer, activity);
-//									break;
-//								}
-//							}
-//					        //TODO - clear custom url pref here?
-//				        }
-//				        Log.v(TAG, "Chosen: " + items[item]);
-//				    }
-//				});
-//				AlertDialog alert = builder.create();
-//				alert.show();
+				List<String> serverNames = new ArrayList<String>();
+				for (Server server : knownServers) {
+					serverNames.add(server.getRegion());
+				}
+				serverNames.add("Custom Server");
+				
+				final CharSequence[] items = serverNames.toArray(new CharSequence[serverNames.size()]);
+				
+				AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+				builder.setTitle("Choose OpenTripPlanner Server");
+				builder.setItems(items, new DialogInterface.OnClickListener() {
+				    
+					public void onClick(DialogInterface dialog, int item) {
+				        
+				        if(items[item].equals("Custom Server")) {
+				        	final EditText tbBaseURL = new EditText(activity);
+
+				        	AlertDialog.Builder urlAlert = new AlertDialog.Builder(activity);
+				        	urlAlert.setTitle("Enter a custom OTP server domain");
+				        	urlAlert.setView(tbBaseURL);
+				        	urlAlert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				        		public void onClick(DialogInterface dialog, int whichButton) {
+				        			String value = tbBaseURL.getText().toString().trim();
+				        			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
+				        			Editor e = prefs.edit();
+				        			e.putBoolean("auto_detect_server", false);
+				        			e.putString("custom_server_url", value);
+				        			e.commit();
+				        		}
+				        	});
+				        	urlAlert.create().show();
+
+				        } else { 
+				        	//TODO - set server URL here - app wise as well?
+					        for (Server server : knownServers) {
+								if (server.getRegion().equals(items[item])) {
+									selectedServer = server;
+									OTPApp app = ((OTPApp) activity.getApplication());
+									app.setSelectedServer(selectedServer, activity);
+									break;
+								}
+							}
+					        //TODO - clear custom url pref here?
+				        }
+				        Log.v(TAG, "Chosen: " + items[item]);
+				    }
+				});
+				AlertDialog alert = builder.create();
+				alert.show();
 				
 			} else {
 				//TODO - handle error here that server list cannot be loaded

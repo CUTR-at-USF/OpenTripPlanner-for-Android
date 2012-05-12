@@ -19,7 +19,9 @@ package org.opentripplanner.android.fragments;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -36,6 +38,10 @@ import org.opentripplanner.android.model.OTPPathOverlay;
 import org.opentripplanner.android.model.OptimizeSpinnerItem;
 import org.opentripplanner.android.model.Server;
 import org.opentripplanner.android.model.TraverseModeSpinnerItem;
+import org.opentripplanner.android.pois.GooglePlaces;
+import org.opentripplanner.android.pois.Nominatim;
+import org.opentripplanner.android.pois.POI;
+import org.opentripplanner.android.pois.Places;
 import org.opentripplanner.android.sqlite.ServersDataSource;
 import org.opentripplanner.android.tasks.ServerSelector;
 import org.opentripplanner.android.tasks.TripRequest;
@@ -325,22 +331,23 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 		
 		tbEndLocation.setOnEditorActionListener(tbLocationOnEditorActionListener);
 
-		OnFocusChangeListener tbLocationOnFocusChangeListener = new OnFocusChangeListener(){
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				// TODO Auto-generated method stub
-				TextView tv = (TextView) v;
-				if(!hasFocus){
-					if(v.getId()==R.id.tbStartLocation) {
-						processAddress(true, tv.getText().toString());
-					} else if(v.getId()==R.id.tbEndLocation){
-						processAddress(false, tv.getText().toString());
-					}
-				}
-			}
-		};
-		tbStartLocation.setOnFocusChangeListener(tbLocationOnFocusChangeListener);
-		tbEndLocation.setOnFocusChangeListener(tbLocationOnFocusChangeListener);
+//		Need to consider this case again
+//		OnFocusChangeListener tbLocationOnFocusChangeListener = new OnFocusChangeListener(){
+//			@Override
+//			public void onFocusChange(View v, boolean hasFocus) {
+//				// TODO Auto-generated method stub
+//				TextView tv = (TextView) v;
+//				if(!hasFocus){
+//					if(v.getId()==R.id.tbStartLocation) {
+//						processAddress(true, tv.getText().toString());
+//					} else if(v.getId()==R.id.tbEndLocation){
+//						processAddress(false, tv.getText().toString());
+//					}
+//				}
+//			}
+//		};
+//		tbStartLocation.setOnFocusChangeListener(tbLocationOnFocusChangeListener);
+//		tbEndLocation.setOnFocusChangeListener(tbLocationOnFocusChangeListener);
 
 		mv = (MapView) mainView.findViewById(R.id.mapview);
 		mv.setBuiltInZoomControls(true);
@@ -517,6 +524,38 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 		super.onActivityCreated(savedInstanceState);
 	}
 	
+	private ArrayList<Address> searchPlaces(String name){
+		HashMap<String, String> params = new HashMap<String, String>();
+//		params.put(GooglePlaces.PARAM_LOCATION, Double.toString(app.getCenterLatitude()) + "," + Double.toString(app.getCenterLongitude()));
+//		params.put(GooglePlaces.PARAM_RADIUS, Double.toString(app.getRadius()));
+//		params.put(GooglePlaces.PARAM_NAME, address);
+		params.put(Nominatim.PARAM_NAME, name);
+		
+//		String apiKey = "AIzaSyANO_4l0aroh4NuC6naYfk-vsPS12z2wco";
+//		Places p = new GooglePlaces(apiKey);
+		Places p = new Nominatim(app.getLowerLeftLongitude(), 
+								 app.getLowerLeftLatitude(),
+								 app.getUpperRightLongitude(), 
+								 app.getUpperRightLatitude());
+		ArrayList<POI> pois = new ArrayList<POI>();
+		pois.addAll(p.getPlaces(params));
+		
+		ArrayList<Address> addresses = new ArrayList<Address>();
+		
+		for(int i=0; i<pois.size(); i++){
+			POI poi = pois.get(i);
+			Log.v(TAG, poi.getName() + " " + poi.getLatitude() + "," + poi.getLongitude());
+			Address addr = new Address(Locale.US);
+			addr.setLatitude(poi.getLatitude());
+			addr.setLongitude(poi.getLongitude());
+			String addressLine = poi.getAddress()==null ? poi.getName() : poi.getAddress();
+			addr.setAddressLine(0,addressLine); 
+			addresses.add(addr);
+		}
+		
+		return addresses;
+	}
+	
 	private void processAddress(final boolean isStartTextBox, String address){
 		AlertDialog.Builder geocoderAlert = new AlertDialog.Builder(this.getActivity());
 		geocoderAlert.setTitle(R.string.geocoder_results_title)
@@ -562,9 +601,12 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 		}
 
 		if(addresses==null || addresses.isEmpty()){
-			AlertDialog alert = geocoderAlert.create();
-			alert.show();
-			return;
+			addresses = searchPlaces(address);
+			if(addresses==null || addresses.isEmpty()){
+				AlertDialog alert = geocoderAlert.create();
+				alert.show();
+				return;
+			}
 		}
 		
 		final CharSequence[] addressesText = new CharSequence[addresses.size()];

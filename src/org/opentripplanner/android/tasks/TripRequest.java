@@ -50,7 +50,6 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 	private static final String TAG = "OTP";
 	private ProgressDialog progressDialog;
 	private MainFragment mainFragment;
-//	private Panel directionPanel;
 
 	public TripRequest(MainFragment mainFragment) {
 		this.mainFragment = mainFragment;
