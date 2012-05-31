@@ -686,8 +686,6 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 	}
 	
 	public void processServerSelector(GeoPoint currentLoc, boolean mustRefreshServerList){
-		if(!needToRunAutoDetect)
-			return;
 		MyActivity ma = (MyActivity)this.getActivity();
 		ServerSelector selector = new ServerSelector(ma, mustRefreshServerList);
 		if(currentLoc == null){
