@@ -24,7 +24,7 @@
 
 package org.miscwidgets.widget;
 
-import org.opentripplanner.android.R;
+import edu.usf.cutr.opentripplanner.android.R;
 
 import android.content.Context;
 import android.content.res.TypedArray;

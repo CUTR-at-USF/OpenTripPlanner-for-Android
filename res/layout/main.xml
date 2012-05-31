@@ -17,7 +17,7 @@
 	
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:panel="http://schemas.android.com/apk/res/org.opentripplanner.android"
+    xmlns:panel="http://schemas.android.com/apk/res/edu.usf.cutr.opentripplanner.android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
