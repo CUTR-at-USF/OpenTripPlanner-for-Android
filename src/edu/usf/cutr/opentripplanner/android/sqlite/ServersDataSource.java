@@ -66,6 +66,9 @@ public class ServersDataSource {
 
 	public Server createServer(Server s) {
 		ContentValues values = new ContentValues();
+		if(s.getDate()!=null){
+			values.put(MySQLiteHelper.COLUMN_DATE, s.getDate().toString());
+		}
 		values.put(MySQLiteHelper.COLUMN_REGION, s.getRegion());
 		values.put(MySQLiteHelper.COLUMN_BASEURL, s.getBaseURL());
 		values.put(MySQLiteHelper.COLUMN_BOUNDS, s.getBounds());
@@ -146,7 +149,7 @@ public class ServersDataSource {
 		server.setId(cursor.getLong(0));
 
 		String dateString = cursor.getString(1);
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
 		Date addedOn = null;
 		try {
 			addedOn = dateFormat.parse(dateString);

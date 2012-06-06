@@ -6,7 +6,7 @@ import java.util.List;
 import org.osmdroid.util.GeoPoint;
 
 import edu.usf.cutr.opentripplanner.android.MyActivity;
-import edu.usf.cutr.opentripplanner.android.model.OTPLocationListener;
+import edu.usf.cutr.opentripplanner.android.listeners.OTPLocationListener;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -63,14 +63,19 @@ public class OTPGetCurrentLocation extends AsyncTask<String, Integer, String> {
     protected void onPostExecute(String result) {
         pDialog.dismiss();
 
-        Toast.makeText(activity,
-                "LATITUDE :" + currentLat + " LONGITUDE :" + currentLon,
-                Toast.LENGTH_LONG).show();
-        
+//        Toast.makeText(activity,
+//                "LATITUDE :" + currentLat + " LONGITUDE :" + currentLon,
+//                Toast.LENGTH_LONG).show();
+//        
         GeoPoint gp = new GeoPoint((int)(currentLat*1E6), (int)(currentLon*1E6));
-        activity.setScreenCenterTo(gp);
+//        activity.set.setScreenCenterTo(gp);
         
-        activity.setLookingForCurrentLocation(false, gp);
+        for (int i=0; i<providers.size(); i++) {
+			OTPLocationListener otpLocationListener = otpLocationListenerList.get(i);
+			otpLocationListener = null;
+		}
+        
+//        activity.setLookingForCurrentLocation(false, gp);
     }
 
     @Override

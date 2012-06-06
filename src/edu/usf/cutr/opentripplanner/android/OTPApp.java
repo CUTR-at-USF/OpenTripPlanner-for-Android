@@ -39,7 +39,7 @@ public class OTPApp extends Application {
 	/**
 	 * @param selectedServer the selected OTP server
 	 */
-	public void setSelectedServer(Server sServer, MyActivity activity) {
+	public void setSelectedServer(Server sServer) {
 		selectedServer = sServer;
 //		new MetadataRequest(activity).execute("");
 	}

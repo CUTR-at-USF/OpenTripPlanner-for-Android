@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import edu.usf.cutr.opentripplanner.android.R;
 import org.opentripplanner.api.model.Leg;
 
-import edu.usf.cutr.opentripplanner.android.OnFragmentListener;
+import edu.usf.cutr.opentripplanner.android.listeners.OnFragmentListener;
 import edu.usf.cutr.opentripplanner.android.model.Direction;
 import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
 import edu.usf.cutr.opentripplanner.android.util.DirectionExpandableListAdapter;

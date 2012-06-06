@@ -29,6 +29,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.miscwidgets.widget.Panel;
 import org.opentripplanner.api.model.EncodedPolylineBean;
+import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.ws.Request;
 import org.opentripplanner.routing.core.OptimizeType;
@@ -45,15 +46,18 @@ import de.mastacode.http.Http;
 import edu.usf.cutr.opentripplanner.android.R;
 import edu.usf.cutr.opentripplanner.android.MyActivity;
 import edu.usf.cutr.opentripplanner.android.OTPApp;
-import edu.usf.cutr.opentripplanner.android.OnFragmentListener;
 import edu.usf.cutr.opentripplanner.android.SettingsActivity;
 import edu.usf.cutr.opentripplanner.android.contacts.ContactAPI;
 import edu.usf.cutr.opentripplanner.android.contacts.ContactList;
+import edu.usf.cutr.opentripplanner.android.listeners.OnFragmentListener;
+import edu.usf.cutr.opentripplanner.android.listeners.ServerSelectorCompleteListener;
+import edu.usf.cutr.opentripplanner.android.listeners.TripRequestCompleteListener;
 import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
-import edu.usf.cutr.opentripplanner.android.model.OTPPathOverlay;
 import edu.usf.cutr.opentripplanner.android.model.OptimizeSpinnerItem;
 import edu.usf.cutr.opentripplanner.android.model.Server;
 import edu.usf.cutr.opentripplanner.android.model.TraverseModeSpinnerItem;
+import edu.usf.cutr.opentripplanner.android.overlays.MapOverlay;
+import edu.usf.cutr.opentripplanner.android.overlays.OTPPathOverlay;
 import edu.usf.cutr.opentripplanner.android.pois.GooglePlaces;
 import edu.usf.cutr.opentripplanner.android.pois.Nominatim;
 import edu.usf.cutr.opentripplanner.android.pois.POI;
@@ -66,9 +70,11 @@ import edu.usf.cutr.opentripplanner.android.tasks.TripRequest;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.Bitmap;
@@ -83,6 +89,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 
 import android.preference.PreferenceManager;
 import android.provider.Settings;
@@ -118,8 +125,11 @@ import android.widget.TextView.OnEditorActionListener;
  *
  */
 
-public class MainFragment extends Fragment implements OnSharedPreferenceChangeListener{
-	
+public class MainFragment extends Fragment 
+							implements OnSharedPreferenceChangeListener,
+									   ServerSelectorCompleteListener,
+									   TripRequestCompleteListener{
+
 	private MapView mv;
 	private MapController mc;
 	private MyLocationOverlay mlo;
@@ -137,7 +147,7 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 
 	private Panel tripPanel;
 	Panel directionPanel;
-	
+
 	private ImageButton btnDisplayDirection;
 
 	MapOverlay startMarker;
@@ -147,19 +157,19 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 	private SharedPreferences prefs;
 	private OTPApp app;
 	private static LocationManager locationManager;
-	
-//	private List<Itinerary> itineraries = null;
-	
+
+	//	private List<Itinerary> itineraries = null;
+
 	ArrayList<String> directionText = new ArrayList<String>();
 
 	private Boolean needToRunAutoDetect = false;
-	
+
 	private OnFragmentListener fragmentListener;
-	
+
 	private final GeoPoint defaultCenterLocation = new GeoPoint(40.5, -100);
-	
+
 	private final int defaultInitialZoomLevel = 12;
-	
+
 	private boolean isRealLostFocus = true;
 
 	/**
@@ -168,34 +178,34 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 	private static final int STALE_LOCATION_THRESHOLD = 60 * 60 * 1000;  //60 minutes
 
 	private static final String TAG = "OTP";
-	
+
 	@Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-        	setFragmentListener((OnFragmentListener) activity);
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement OnFragmentListener");
-        }
-        
-        
-    }
-	
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		try {
+			setFragmentListener((OnFragmentListener) activity);
+		} catch (ClassCastException e) {
+			throw new ClassCastException(activity.toString() + " must implement OnFragmentListener");
+		}
+
+
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-	    super.onCreate(savedInstanceState);
-	    setHasOptionsMenu(true);
+		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		
+
 		View mainView = inflater.inflate(R.layout.main, container, false); 
 		final Activity activity = this.getActivity();
 		MyActivity myActivity = (MyActivity)activity;
-		
+
 		final OnFragmentListener ofl = this.getFragmentListener();
-		
+
 		prefs = PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
 		prefs.registerOnSharedPreferenceChangeListener(this);
 
@@ -211,11 +221,11 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 		tripPanel = (Panel) mainView.findViewById(R.id.slidingDrawer1);
 		ddlOptimization = (Spinner) mainView.findViewById(R.id.spinOptimization);
 		ddlTravelMode = (Spinner) mainView.findViewById(R.id.spinTravelMode);
-		
+
 		btnDisplayDirection = (ImageButton) mainView.findViewById(R.id.btnDisplayDirection);
 
 		tripPanel.setOpen(true, true);
-		
+
 		tripPanel.setFocusable(true);
 		tripPanel.setFocusableInTouchMode(true);
 
@@ -240,20 +250,11 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 		traverseModeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		ddlTravelMode.setAdapter(traverseModeAdapter);
 
-		//Intent svc = new Intent(this, NavigationService.class);
-		//startService(svc);
-
 		GeoPoint currentLocation = getLastLocation();
 
 		// if currentLocation is null
 		if(currentLocation==null){
 			currentLocation = defaultCenterLocation;
-			
-			myActivity.setLookingForCurrentLocation(true, null);
-			
-			OTPGetCurrentLocation otpGetCurrentLocation = new OTPGetCurrentLocation((MyActivity)this.getActivity());
-			otpGetCurrentLocation.execute();
-			
 		}
 
 		OnClickListener ocl = new OnClickListener() {
@@ -317,7 +318,7 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 		tbStartLocation.setImeOptions(EditorInfo.IME_ACTION_NEXT);
 		tbEndLocation.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		tbEndLocation.requestFocus();
-	    OnEditorActionListener tbLocationOnEditorActionListener = new OnEditorActionListener() {
+		OnEditorActionListener tbLocationOnEditorActionListener = new OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 				if(v.getId()==R.id.tbStartLocation && 
@@ -336,11 +337,11 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 				return false;
 			}
 		};
-		
+
 		tbStartLocation.setOnEditorActionListener(tbLocationOnEditorActionListener);
 		tbEndLocation.setOnEditorActionListener(tbLocationOnEditorActionListener);
 
-//		Need to consider this case again
+		//		Need to consider this case again
 		OnFocusChangeListener tbLocationOnFocusChangeListener = new OnFocusChangeListener(){
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
@@ -376,84 +377,45 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 		// mlo.enableCompass();
 		mv.getOverlays().add(mlo);
 
-		//itemizedoverlay = new MapItemizedOverlay(getResources().getDrawable(R.drawable.arrow), new DefaultResourceProxyImpl(this), this);
-
-		//startMarker = new OverlayItem("Start", "Starting location", currentLocation);
-		//endMarker = new OverlayItem("End", "Ending location", getPoint(28.062286, -82.417717));
-
-		//itemizedoverlay.addOverlayItem(overlayitem);
-		//mv.getOverlays().add(itemizedoverlay);
-
-		//Drawable marker = getResources().getDrawable(R.drawable.start);
-		//marker.setBounds(0, 0, marker.getIntrinsicWidth(), marker.getIntrinsicHeight());
-		//SitesOverlay so = new SitesOverlay(marker);
-		//so.setFocusItemsOnTap(true);
-		//so.setFocusedItem(0);
-		//so.addOverlayItem(startMarker);
-		//so.addOverlayItem(endMarker);
-		//mv.getOverlays().add(so);
-
-
-		//Drawable marker1 = getResources().getDrawable(R.drawable.end);
-		//marker1.setBounds(0, 0, marker1.getIntrinsicWidth(), marker1.getIntrinsicHeight());
-		//SitesOverlay so1 = new SitesOverlay(marker1);
-		//so.setFocusItemsOnTap(true);
-		//so.setFocusedItem(0);
-		//so1.addOverlayItem(endMarker);
-		//so.addOverlayItem(endMarker);
-		//mv.getOverlays().add(so1);
-		
 		startMarker = new MapOverlay(this, R.drawable.start, mainView);
 		startMarker.setLocation(currentLocation);
-		//		startMarker.setLocation(getPoint(28.066531327775138,-82.40525321904555));
-		//		startMarker.setLocation(getPoint(35.151354,33.353805));
 		mv.getOverlays().add(startMarker);
 
 		endMarker = new MapOverlay(this, R.drawable.end, mainView);
 		endMarker.setLocation(currentLocation);
-		//		endMarker.setLocation(getPoint(28.0576685,-82.4198807));
-		//		endMarker.setLocation(getPoint(35.168756, 33.372688));
 		mv.getOverlays().add(endMarker);
-
-		//		routeOverlay = new PathOverlay(Color.DKGRAY, this);
-		//		Paint paint = new Paint();
-		//        paint.setColor(Color.GREEN);
-		//        paint.setStrokeWidth(5.0f);
-		//        paint.setStyle(Paint.Style.STROKE); 
-		//        paint.setAlpha(200);
-		//        routeOverlay.setPaint(paint);
-		//		mv.getOverlays().add(routeOverlay);
 
 		routeOverlay = new OTPPathOverlay(Color.DKGRAY, activity);
 		mv.getOverlays().add(routeOverlay);
 
 		//TODO - fix below?
 		if (prefs.getBoolean("auto_detect_server", true)) {
-			if (app.getSelectedServer() == null && !myActivity.isLookingForCurrentLocation()) {
-				processServerSelector(currentLocation, false);
-//				new ServerSelector((MyActivity)activity).execute(currentLocation);
+			if (app.getSelectedServer() == null) {
+				processServerSelector(currentLocation, false, true);
+				//				new ServerSelector((MyActivity)activity).execute(currentLocation);
 			} else {
 				Log.v(TAG, "Already selected a server!!");
 			}
 		} else {
 			String baseURL = prefs.getString("custom_server_url", "");
 			if(baseURL.length() > 5) {
-				app.setSelectedServer(new Server(baseURL), (MyActivity)activity);
+				app.setSelectedServer(new Server(baseURL));
 				Log.v(TAG, "Now using custom OTP server: " + baseURL);
 			} else {
 				//TODO - handle issue when field is cleared/blank
 			}
 		}
 
-//		btnPlanTrip.setFocusable(true);
-//		btnPlanTrip.setFocusableInTouchMode(true);
+		//		btnPlanTrip.setFocusable(true);
+		//		btnPlanTrip.setFocusableInTouchMode(true);
+		 
 		btnPlanTrip.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				
+
 				tripPanel.setOpen(false, true);
-				
+
 				Request request = new Request();
 				request.setFrom(URLEncoder.encode(startMarker.getLocationFormatedString()));
 				request.setTo(URLEncoder.encode(endMarker.getLocationFormatedString()));
@@ -473,46 +435,46 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 
 				request.setDateTime(DateFormat.format("MM/dd/yy", System.currentTimeMillis()).toString(), 
 						DateFormat.format("hh:mmaa", System.currentTimeMillis()).toString());
-				
+
 				request.setShowIntermediateStops(Boolean.TRUE);
 
-				new TripRequest(MainFragment.this).execute(request);
-				
+				new TripRequest(MainFragment.this.getActivity(), app.getSelectedServer(), MainFragment.this).execute(request);
+
 				InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 				imm.hideSoftInputFromWindow(tbEndLocation.getWindowToken(), 0);
 				imm.hideSoftInputFromWindow(tbStartLocation.getWindowToken(), 0);
 			}
 		});
-		
+
 		OnClickListener oclDisplayDirection = new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-//				Save states before leaving
+				//				Save states before leaving
 				saveOTPBundle();
-				
+
 				ofl.onDirectionFragmentSwitched();
 			}
 		};
 		btnDisplayDirection.setOnClickListener(oclDisplayDirection);
-		
-//		Do NOT show direction icon if there is no direction yet
+
+		// Do NOT show direction icon if there is no direction yet
 		if(ofl.getCurrentItinerary()==null){
 			btnDisplayDirection.setVisibility(View.INVISIBLE);
 		} else {
 			btnDisplayDirection.setVisibility(View.VISIBLE);
 		}
-		
-//		get previous state if already exist
+
+		// get previous state if already exist
 		OTPBundle otpBundle = ofl.getOTPBundle();
 		if(otpBundle!=null){
 			retrievePreviousState(otpBundle);
 		}
-		
+
 		Log.v(TAG, "finish onStart()");
-		
+
 		return mainView;
 	}
-	
+
 	private void retrievePreviousState(OTPBundle bundle){
 		tbStartLocation.setText(bundle.getFromText());
 		tbEndLocation.setText(bundle.getToText());
@@ -520,11 +482,10 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 		endMarker.setLocation(bundle.getEndLocation());
 		ddlOptimization.setSelection(bundle.getOptimization());
 		ddlTravelMode.setSelection(bundle.getTravelMode());
-		
+
 		this.showRouteOnMap(bundle.getCurrentItinerary());
-//		asd
 	}
-	
+
 	private void saveOTPBundle(){
 		OTPBundle bundle = new OTPBundle();
 		bundle.setFromText(tbStartLocation.getText().toString());
@@ -533,35 +494,35 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 		bundle.setEndLocation(endMarker.getLocation());
 		bundle.setOptimization(ddlOptimization.getSelectedItemPosition());
 		bundle.setTravelMode(ddlTravelMode.getSelectedItemPosition());
-		
+
 		this.getFragmentListener().setOTPBundle(bundle);
 	}
-	
+
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		Log.v(TAG,"onActivityCreated");
 		super.onActivityCreated(savedInstanceState);
 	}
-	
+
 	private ArrayList<Address> searchPlaces(String name){
 		HashMap<String, String> params = new HashMap<String, String>();
-//		params.put(GooglePlaces.PARAM_LOCATION, Double.toString(app.getCenterLatitude()) + "," + Double.toString(app.getCenterLongitude()));
-//		params.put(GooglePlaces.PARAM_RADIUS, Double.toString(app.getRadius()));
-//		params.put(GooglePlaces.PARAM_NAME, address);
+		//		params.put(GooglePlaces.PARAM_LOCATION, Double.toString(app.getCenterLatitude()) + "," + Double.toString(app.getCenterLongitude()));
+		//		params.put(GooglePlaces.PARAM_RADIUS, Double.toString(app.getRadius()));
+		//		params.put(GooglePlaces.PARAM_NAME, address);
 		params.put(Nominatim.PARAM_NAME, name);
-		
-//		String apiKey = "AIzaSyANO_4l0aroh4NuC6naYfk-vsPS12z2wco";
-//		Places p = new GooglePlaces(apiKey);
+
+		//		String apiKey = "AIzaSyANO_4l0aroh4NuC6naYfk-vsPS12z2wco";
+		//		Places p = new GooglePlaces(apiKey);
 		Server selectedServer = app.getSelectedServer();
 		Places p = new Nominatim(selectedServer.getLowerLeftLongitude(), 
-								 selectedServer.getLowerLeftLatitude(),
-								 selectedServer.getUpperRightLongitude(), 
-								 selectedServer.getUpperRightLatitude());
+				selectedServer.getLowerLeftLatitude(),
+				selectedServer.getUpperRightLongitude(), 
+				selectedServer.getUpperRightLatitude());
 		ArrayList<POI> pois = new ArrayList<POI>();
 		pois.addAll(p.getPlaces(params));
-		
+
 		ArrayList<Address> addresses = new ArrayList<Address>();
-		
+
 		for(int i=0; i<pois.size(); i++){
 			POI poi = pois.get(i);
 			Log.v(TAG, poi.getName() + " " + poi.getLatitude() + "," + poi.getLongitude());
@@ -572,27 +533,27 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 			addr.setAddressLine(0,addressLine); 
 			addresses.add(addr);
 		}
-		
+
 		return addresses;
 	}
-	
+
 	private void processAddress(final boolean isStartTextBox, String address){
 		AlertDialog.Builder geocoderAlert = new AlertDialog.Builder(this.getActivity());
 		geocoderAlert.setTitle(R.string.geocoder_results_title)
-					 .setMessage(R.string.geocoder_no_results_message)
-					 .setCancelable(false)
-					 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-						 public void onClick(DialogInterface dialog, int id) {
-						 }
-					  });
-		
+		.setMessage(R.string.geocoder_no_results_message)
+		.setCancelable(false)
+		.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+			}
+		});
+
 		if(address==null || 
-			address.equalsIgnoreCase("")) {
+				address.equalsIgnoreCase("")) {
 			AlertDialog alert = geocoderAlert.create();
 			alert.show();
 			return;
 		}
-		
+
 		if(address.equalsIgnoreCase(getString(R.string.my_location))) {
 			GeoPoint currentLocation = getLastLocation();
 			if(currentLocation==null){
@@ -601,21 +562,21 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 				alert.show();
 				return;
 			}
-			
+
 			moveMarker(isStartTextBox, currentLocation, getString(R.string.my_location));
 			return;
 		}
-		
+
 		Geocoder gc = new Geocoder(this.getActivity());
 		ArrayList<Address> addresses = null;
 		try {
 			Server selectedServer = app.getSelectedServer();
 			addresses = (ArrayList<Address>)gc.getFromLocationName(address, 
-															R.integer.geocoder_max_results, 
-															selectedServer.getLowerLeftLatitude(), 
-															selectedServer.getLowerLeftLongitude(), 
-															selectedServer.getUpperRightLatitude(), 
-															selectedServer.getUpperRightLongitude());
+					R.integer.geocoder_max_results, 
+					selectedServer.getLowerLeftLatitude(), 
+					selectedServer.getLowerLeftLongitude(), 
+					selectedServer.getUpperRightLatitude(), 
+					selectedServer.getUpperRightLongitude());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -629,7 +590,7 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 				return;
 			}
 		}
-		
+
 		final CharSequence[] addressesText = new CharSequence[addresses.size()];
 		for(int i=0; i<addresses.size(); i++){
 			Address addr = addresses.get(i);
@@ -640,9 +601,9 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 					((addr.getCountryName()!=null) ? addr.getCountryName() : "");
 			Log.v("Test", addressesText[i].toString());
 		}
-		
+
 		isRealLostFocus = false;
-		
+
 		if(addresses.size()==1){
 			Address addr = addresses.get(0);
 			moveMarker(isStartTextBox, new GeoPoint(addr.getLatitude(), addr.getLongitude()), addressesText[0].toString());
@@ -653,7 +614,7 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 
 		AlertDialog.Builder geocoderSelector = new AlertDialog.Builder(this.getActivity());
 		geocoderSelector.setTitle(R.string.choose_geocoder);
-		
+
 		final ArrayList<Address> addressesTemp = addresses;
 		geocoderSelector.setItems(addressesText, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int item) {
@@ -667,7 +628,7 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 		alertGeocoder.show();
 
 	}
-	
+
 	private void adjustFocusAfterSelectAddress(boolean isStartTextBox){
 		isRealLostFocus = false;
 		if(isStartTextBox){
@@ -685,68 +646,34 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 		}
 	}
 	
-	public void processServerSelector(GeoPoint currentLoc, boolean mustRefreshServerList){
-		MyActivity ma = (MyActivity)this.getActivity();
-		ServerSelector selector = new ServerSelector(ma, mustRefreshServerList);
+	public void processServerSelector(boolean mustRefreshServerList){
+		boolean isAutoDetectEnabled = prefs.getBoolean("auto_detect_server", true);
+		GeoPoint currentLoc = getLastLocation();
+		
+		processServerSelector(currentLoc, mustRefreshServerList, isAutoDetectEnabled);
+	}
+
+	public void processServerSelector(GeoPoint currentLoc, boolean mustRefreshServerList, boolean isAutoDetectEnabled){
+		MyActivity myActivity = (MyActivity)this.getActivity();
+		ServerSelector selector = new ServerSelector(myActivity, myActivity.getDatasource(), this, mustRefreshServerList, isAutoDetectEnabled);
 		if(currentLoc == null){
 			currentLoc = getLastLocation();
 		}
+		
 		selector.execute(currentLoc);
 	}
-	
-	public void setScreenToPoint(GeoPoint gp){
-		mc.animateTo(gp);
-		startMarker.setLocation(gp);
-		endMarker.setLocation(gp);
-	}
-
-	
-
-//	private NavigationService mBoundService;
-//	private Boolean mIsBound;
-//
-//	private ServiceConnection mConnection = new ServiceConnection() {
-//		public void onServiceConnected(ComponentName className, IBinder service) {
-//			mBoundService = ((NavigationService.LocalBinder)service).getService();
-//
-//			Toast.makeText(getActivity(), "Connected service!",
-//					Toast.LENGTH_SHORT).show();
-//		}
-//
-//		public void onServiceDisconnected(ComponentName className) {
-//			mBoundService = null;
-//			Toast.makeText(getActivity(), "Disconnected service!",
-//					Toast.LENGTH_SHORT).show();
-//		}
-//	};
-//
-//	void doBindService() {
-//		bindService(new Intent(this.getActivity(), 
-//				NavigationService.class), mConnection, Context.BIND_AUTO_CREATE);
-//		mIsBound = true;
-//	}
-//
-//	void doUnbindService() {
-//		if (mIsBound) {
-//			unbindService(mConnection);
-//			mIsBound = false;
-//		}
-//	}
-
 
 	@Override
 	public void onResume() {
 		super.onResume();
 		mlo.enableMyLocation();
-		// mlo.enableFollowLocation();
 		mlo.enableCompass();
-		//doBindService();
 
 		if(needToRunAutoDetect) {
 			GeoPoint currentLoc = getLastLocation();
 			if(currentLoc != null){
 				Log.v(TAG, "Relaunching auto detection for server");
-				processServerSelector(currentLoc, false);
+				processServerSelector(currentLoc, false, true);
 			}
 			needToRunAutoDetect = false;
 		}
@@ -756,19 +683,15 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 	public void onPause() {
 		super.onPause();
 		mlo.disableMyLocation();
-		// mlo.disableFollowLocation();
 		mlo.disableCompass();
-		//doUnbindService();
-		
-//		Save states before leaving
+
+		// Save states before leaving
 		this.saveOTPBundle();
 	}
 
 	@Override
 	public void onDestroy(){
 		super.onDestroy();
-		//Intent svc = new Intent(this, NavigationService.class);
-		//stopService(svc);
 	}
 
 	@Override
@@ -784,7 +707,7 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 			String baseURL = prefs.getString("custom_server_url", "");
 			MyActivity myActivity= (MyActivity)this.getActivity();
 			if(baseURL.length() > 5) {
-				app.setSelectedServer(new Server(baseURL), myActivity);
+				app.setSelectedServer(new Server(baseURL));
 				Log.v(TAG, "Now using custom OTP server: " + baseURL);
 				MetadataRequest metaRequest = new MetadataRequest(myActivity);
 				metaRequest.execute("");
@@ -803,7 +726,7 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 
 	@Override
 	public void onCreateOptionsMenu(Menu pMenu, MenuInflater inflater) {
-//		MenuInflater inflater = getMenuInflater();
+		//		MenuInflater inflater = getMenuInflater();
 		super.onCreateOptionsMenu(pMenu, inflater);
 		inflater.inflate(R.menu.menu, pMenu);
 		mGPS = pMenu.getItem(0);
@@ -832,37 +755,36 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 			zoomToCurrentLocation();
 			break;
 		case R.id.settings:
-//			startActivity(new Intent(this.getActivity(), SettingsActivity.class));
 			this.getActivity().startActivityForResult(new Intent(this.getActivity(), SettingsActivity.class), OTPApp.REFRESH_SERVER_LIST_REQUEST_CODE);
 			break;
 		case R.id.feedback:
-        	Server selectedServer = app.getSelectedServer();
-        	
-        	String[] recipients = {selectedServer.getContactEmail(), 
-    				getString(R.string.email_otp_android_developer)};
-        	
-        	String uriText = "mailto:";
-        	for(int i=0; i<recipients.length; i++){
-        		uriText+=recipients[i]+";"; 
-        	}
-        	
-        	String subject = "";
-            subject += "Android OTP user report OTP trip ";
-            Calendar c = Calendar.getInstance(); 
-            Date d = c.getTime();
-            subject += "[" + d.toGMTString() + "]";
-            uriText += "?subject=" + subject;
-            		
-            MyActivity myActivity = (MyActivity)this.getActivity();
-            String content = myActivity.getCurrentRequestString();
-            uriText += "&body="+URLEncoder.encode(content);
+			Server selectedServer = app.getSelectedServer();
 
-        	Uri uri = Uri.parse(uriText);
+			String[] recipients = {selectedServer.getContactEmail(), 
+					getString(R.string.email_otp_android_developer)};
 
-        	Intent sendIntent = new Intent(Intent.ACTION_SENDTO);
-        	sendIntent.setData(uri);
-        	startActivity(Intent.createChooser(sendIntent, "Send email")); 
-			
+			String uriText = "mailto:";
+			for(int i=0; i<recipients.length; i++){
+				uriText+=recipients[i]+";"; 
+			}
+
+			String subject = "";
+			subject += "Android OTP user report OTP trip ";
+			Calendar c = Calendar.getInstance(); 
+			Date d = c.getTime();
+			subject += "[" + d.toGMTString() + "]";
+			uriText += "?subject=" + subject;
+
+			MyActivity myActivity = (MyActivity)this.getActivity();
+			String content = myActivity.getCurrentRequestString();
+			uriText += "&body="+URLEncoder.encode(content);
+
+			Uri uri = Uri.parse(uriText);
+
+			Intent sendIntent = new Intent(Intent.ACTION_SENDTO);
+			sendIntent.setData(uri);
+			startActivity(Intent.createChooser(sendIntent, "Send email")); 
+
 			break;
 		case R.id.server_info:
 			Server server = app.getSelectedServer();
@@ -882,7 +804,7 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 
 			int status = 0;
 			try {
-				status = Http.get(server.getBaseURL()).use(new DefaultHttpClient()).asResponse().getStatusLine().getStatusCode();
+				status = Http.get(server.getBaseURL()+"/plan").use(new DefaultHttpClient()).asResponse().getStatusLine().getStatusCode();
 			} catch (IOException e) {
 				Log.e(TAG, "Unable to reach server: " + e.getMessage());
 			}
@@ -925,7 +847,7 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 		}
 
 		if (l == null  || (Math.abs((System.currentTimeMillis() - l.getTime())) > STALE_LOCATION_THRESHOLD)) {  //Check to make sure the location is recent (use ABS() to allow for small time sync differences between GPS clock and system clock)
-			
+
 			return null; //return null if no location was found in the last STALE_LOCATION_THRESHOLD amount of time
 		}
 
@@ -936,7 +858,7 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 		return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 	}
 
-	private void moveMarker(Boolean start, GeoPoint point, String text) {
+	public void moveMarker(Boolean start, GeoPoint point, String text) {
 		if(start) {
 			startMarker.setLocation(point);
 			if (text==null) {
@@ -952,14 +874,38 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 				tbEndLocation.setText(text);
 			}
 		}
-		
+
 	}
 
-	private void zoomToCurrentLocation() {
+	public void zoomToCurrentLocation() {
 		GeoPoint p = getLastLocation();
 
 		if(p !=null){
 			mc.animateTo(p);
+		}
+	}
+	
+	public void zoomToLocation(GeoPoint p) {
+		if(p !=null){
+			mc.animateTo(p);
+		}
+	}
+	
+	public void setMarker(GeoPoint p, boolean isStartMarker){
+		if(p == null)
+			return;
+		if(isStartMarker){
+			startMarker.setLocation(p);
+		} else {
+			endMarker.setLocation(p);
+		}
+	}
+	
+	public void setTextBoxLocation(String text, boolean isStartTextBox){
+		if(isStartTextBox){
+			tbStartLocation.setText(text);
+		} else {
+			tbEndLocation.setText(text);
 		}
 	}
 
@@ -967,188 +913,6 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 		return (new GeoPoint((int) (lat * 1000000.0), (int) (lon * 1000000.0)));
 	}
 
-	class MapOverlay extends org.osmdroid.views.overlay.Overlay {
-
-		private GeoPoint location;
-		private int markerID = R.drawable.start;
-
-		private Drawable marker = getResources().getDrawable(R.drawable.start);
-		private boolean inDrag = false;
-		private ImageView dragImage = null;
-		private int xDragImageOffset = 0;
-		private int yDragImageOffset = 0;
-		private int xDragTouchOffset = 0;
-		private int yDragTouchOffset = 0;
-		private Point t = new Point(0, 0);
-		private Point p = new Point(0, 0);
-
-		public MapOverlay(Context ctx, int markerID, View view) {
-			super(ctx);
-			setMarker(markerID, view);
-		}
-
-		public MapOverlay(MainFragment mainFragment, int markerID, View view) {
-			super(mainFragment.getActivity());
-			setMarker(markerID, view);
-		}
-		
-		public void setMarker(int markerID, View view){
-			this.markerID = markerID;
-			this.marker = getResources().getDrawable(markerID);
-
-			dragImage=(ImageView)view.findViewById(R.id.drag);
-
-
-			xDragImageOffset=dragImage.getDrawable().getIntrinsicWidth()/2;
-			yDragImageOffset=dragImage.getDrawable().getIntrinsicHeight();
-
-			marker.setBounds(0, 0, marker.getIntrinsicWidth(), marker.getIntrinsicHeight());
-		}
-
-		@Override
-		protected void draw(final Canvas c, final MapView osmv, final boolean shadow) {
-			// super.draw(c, osmv, shadow);
-
-			Point screenPts = new Point();
-			osmv.getProjection().toPixels(location, screenPts);
-
-			Bitmap bmp = BitmapFactory.decodeResource(getResources(), markerID);
-			c.drawBitmap(bmp, screenPts.x, screenPts.y, null);
-			return;
-		}
-
-		@Override
-		public boolean onLongPress(final MotionEvent e, final MapView mv) {
-			Log.d(TAG, "LONG PRESS!");
-
-			final CharSequence[] items = {"Start Location", "End Location"};
-
-			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-			builder.setTitle("Choose Type for Point");
-			builder.setItems(items, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int item) {
-					Toast.makeText(getActivity().getApplicationContext(), items[item], Toast.LENGTH_SHORT).show();
-					GeoPoint point = (GeoPoint) mv.getProjection().fromPixels(e.getX(), e.getY());
-					if(items[item].equals("Start Location")) {
-						moveMarker(true, point, null);
-					} else {
-						moveMarker(false, point, null);
-					}
-				}
-			});
-			AlertDialog alert = builder.create();
-			alert.show();
-
-			return true;
-		}
-
-		@Override
-		public boolean onTouchEvent(MotionEvent event, MapView mapView) {
-			final int action = event.getAction();
-			final int x = (int) event.getX();
-			final int y = (int) event.getY();
-			final Projection pj = mapView.getProjection();
-
-			boolean result = false;
-
-			if (action == MotionEvent.ACTION_DOWN) {
-				//Log.d(TAG, "Touch down!");
-				//for (OverlayItem item : items) {
-
-				pj.fromMapPixels(x, y, t);
-				pj.toPixels(this.getLocation(), p);
-
-				if (marker.getBounds().contains(t.x - p.x, t.y - p.y)) {
-					result = true;
-					inDrag = true;
-					this.setEnabled(false);
-					//items.remove(inDrag);
-					//populate();
-
-					xDragTouchOffset = 0;
-					yDragTouchOffset = 0;
-
-					setDragImagePosition(x, y);
-					dragImage.setVisibility(View.VISIBLE);
-
-					xDragTouchOffset = t.x - p.x;
-					yDragTouchOffset = t.y - p.y;
-
-					dragImage.setImageDrawable(marker);
-					//break;
-				}
-				//}
-			} else if (action == MotionEvent.ACTION_MOVE && inDrag != false) {
-				dragImage.setVisibility(View.VISIBLE);
-				setDragImagePosition(x, y);
-				result = true;
-			} else if (action == MotionEvent.ACTION_UP && inDrag != false) {
-				dragImage.setVisibility(View.GONE);
-
-				GeoPoint pt = (GeoPoint) pj.fromPixels(x - xDragTouchOffset, y - yDragTouchOffset);
-				//OverlayItem toDrop = new OverlayItem(inDrag.getTitle(),
-				//		inDrag.getSnippet(), pt);
-
-				this.setLocation(pt);
-				this.setEnabled(true);
-				//items.add(toDrop);
-				//populate();
-				inDrag = false;
-				result = true;
-
-				//pj.fromMapPixels(x, y, t);
-
-				//if((t.x - p.x) == xDragTouchOffset && (t.y - p.y) == yDragTouchOffset){
-				//Log.d(TAG, "Do something here if desired because we didn't move item " + toDrop.getTitle());
-
-				StringBuilder coords = new StringBuilder().append(pt.getLatitudeE6() / 1E6).append(", ").append(pt.getLongitudeE6() / 1E6);
-				if(markerID == R.drawable.start) {
-					tbStartLocation.setText(coords);
-				} else {
-					tbEndLocation.setText(coords);
-				}
-				//}
-			}
-
-			return (result || super.onTouchEvent(event, mapView));
-		}
-
-		/*@Override
-		public boolean onSingleTapConfirmed(final MotionEvent e, final MapView mapView) {
-			Log.d(TAG, "SINGLE TAP CONFIRMED!");
-			return false;
-		}*/
-
-		public GeoPoint getLocation() {
-			return location;
-		}
-
-		public void setLocation(GeoPoint location) {
-			this.location = location;
-		}
-
-		public int getMarkerID() {
-			return markerID;
-		}
-
-		public void setMarkerID(int markerID) {
-			this.markerID = markerID;
-		}
-
-		private void setDragImagePosition(int x, int y) {
-			RelativeLayout.LayoutParams lp=
-					(RelativeLayout.LayoutParams)dragImage.getLayoutParams();
-
-			lp.setMargins(x-xDragImageOffset-xDragTouchOffset,
-					y-yDragImageOffset-yDragTouchOffset, 0, 0);
-			dragImage.setLayoutParams(lp);
-		}
-
-		public String getLocationFormatedString() {
-			return new StringBuilder().append(location.getLatitudeE6() / 1E6).append(", ").append(location.getLongitudeE6() / 1E6).toString();
-		}
-	}
-	
 	public void showRouteOnMap(List<Leg> itinerary){
 		Log.v(TAG, "(TripRequest) legs size = "+Integer.toString(itinerary.size()));
 		if (!itinerary.isEmpty()) {
@@ -1160,8 +924,6 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 				routeOverlay.addPath(pathColor);
 				List<GeoPoint> points = EncodedPolylineBean
 						.decodePoly(leg.legGeometry.getPoints());
-//				Log.v(TAG, "(TripRequest) points size = "+Integer.toString(points.size())
-//							+ " mode = "+leg.mode+" agencyId = "+leg.agencyId);
 				for (GeoPoint geoPoint : points) {
 					routeOverlay.addPoint(index, geoPoint);
 				}
@@ -1195,5 +957,27 @@ public class MainFragment extends Fragment implements OnSharedPreferenceChangeLi
 	 */
 	public void setFragmentListener(OnFragmentListener fragmentListener) {
 		this.fragmentListener = fragmentListener;
+	}
+
+	@Override
+	public void onServerSelectorComplete(GeoPoint point, Server server) {
+		// TODO Auto-generated method stub
+		app.setSelectedServer(server);
+		Log.v(TAG, "Automatically selected server: " + server.getRegion());
+		MyActivity activity = (MyActivity)this.getActivity();
+		
+		activity.zoomToLocation(point);
+		activity.setMarker(point, true);
+		activity.setMarker(point, false);
+	}
+
+	@Override
+	public void onTripRequestComplete(List<Itinerary> itineraries, String currentRequestString) {
+		// TODO Auto-generated method stub
+		List<Leg> legs = itineraries.get(0).legs;
+		showRouteOnMap(legs);
+		getFragmentListener().onItinerarySelected(legs);
+		MyActivity myActivity = (MyActivity)this.getActivity();
+		myActivity.setCurrentRequestString(currentRequestString);
 	}
 }

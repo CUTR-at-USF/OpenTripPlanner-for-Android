@@ -33,12 +33,14 @@ import org.simpleframework.xml.core.Persister;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import de.mastacode.http.Http;
 import edu.usf.cutr.opentripplanner.android.MyActivity;
 import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.fragments.MainFragment;
+import edu.usf.cutr.opentripplanner.android.listeners.TripRequestCompleteListener;
 import edu.usf.cutr.opentripplanner.android.model.Server;
 
 /**
@@ -50,15 +52,21 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 	private Response response;
 	private static final String TAG = "OTP";
 	private ProgressDialog progressDialog;
-	private MainFragment mainFragment;
+//	private MainFragment mainFragment;
+	private Context context;
+	private String currentRequestString = "";
+	private Server selectedServer;
+	private TripRequestCompleteListener callback;
 
-	public TripRequest(MainFragment mainFragment) {
-		this.mainFragment = mainFragment;
-		progressDialog = new ProgressDialog(mainFragment.getActivity());
+	public TripRequest(Context context, Server selectedServer, TripRequestCompleteListener callback) {
+		this.context = context;
+		this.selectedServer = selectedServer;
+		this.callback = callback;
+		progressDialog = new ProgressDialog(context);
 	}
 
 	protected void onPreExecute() {
-		progressDialog = ProgressDialog.show(mainFragment.getActivity(), "",
+		progressDialog = ProgressDialog.show(context, "",
 				"Generating trip. Please wait... ", true);
 	}
 
@@ -82,14 +90,14 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 			
 //			mainFragment.setItineraries(itineraries);
 			
-			List<Leg> legs = response.getPlan().itinerary.get(0).legs;
-			mainFragment.showRouteOnMap(legs);
-			mainFragment.getFragmentListener().onItinerarySelected(legs);
+//			List<Leg> legs = response.getPlan().itinerary.get(0).legs;
+			
+			callback.onTripRequestComplete(itineraries, currentRequestString);
 		} else {
 			// TODO - handle errors here?
 			if(response != null && response.getError() != null) {
 				String msg = response.getError().getMsg();
-				AlertDialog.Builder feedback = new AlertDialog.Builder(mainFragment.getActivity());
+				AlertDialog.Builder feedback = new AlertDialog.Builder(context);
 				feedback.setTitle("Error Planning Trip");
 				feedback.setMessage(msg);
 				feedback.setNeutralButton("OK", null);
@@ -134,24 +142,21 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 		
 		String res = "/plan";
 		
-		OTPApp app = ((OTPApp) mainFragment.getActivity().getApplication());
-		Server server = app.getSelectedServer();
-		if (server == null) {
+		if (selectedServer == null) {
 			//TODO - handle error for no server selected
 			return null;
 		}
-		String u = server.getBaseURL() + res + params;
+		String u = selectedServer.getBaseURL() + res + params;
 		
 		//Below fixes a bug where the New York OTP server will whine
 		//if doesn't get the parameter for intermediate places
-		if(server.getRegion().equalsIgnoreCase("New York")) {
+		if(selectedServer.getRegion().equalsIgnoreCase("New York")) {
 			u += "&intermediatePlaces=";
 		}
 		
 		Log.d(TAG, "URL: " + u);
 		
-		MyActivity myActivity = (MyActivity)mainFragment.getActivity();
-		myActivity.setCurrentRequestString(u);
+		currentRequestString = u;
 		
 		HttpClient client = new DefaultHttpClient();
 		String result = "";

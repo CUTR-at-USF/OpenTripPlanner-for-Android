@@ -25,6 +25,7 @@ import org.osmdroid.util.GeoPoint;
 
 import edu.usf.cutr.opentripplanner.android.fragments.DirectionListFragment;
 import edu.usf.cutr.opentripplanner.android.fragments.MainFragment;
+import edu.usf.cutr.opentripplanner.android.listeners.OnFragmentListener;
 import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
 import edu.usf.cutr.opentripplanner.android.sqlite.ServersDataSource;
 
@@ -53,8 +54,6 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 	private ServersDataSource datasource;
 
 	private String TAG = "OTP";
-
-	private boolean isLookingForCurrentLocation = false;
 	
 	private String currentRequestString="";
 
@@ -85,7 +84,7 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 				boolean shouldRefresh = data.getBooleanExtra(OTPApp.REFRESH_SERVER_RETURN_KEY, false);
 				Toast.makeText(this, "Should server list refresh? " + shouldRefresh, Toast.LENGTH_LONG).show();
 				if(shouldRefresh){
-					mainFragment.processServerSelector(null, true);
+					mainFragment.processServerSelector(true);
 				}
 				break;
 			}
@@ -109,8 +108,6 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 		// TODO Auto-generated method stub
 		FragmentManager fm = getSupportFragmentManager();
 		FragmentTransaction transaction = fm.beginTransaction();
-
-		//		transaction.hide(mainFragment);
 
 		Fragment directionFragment = new DirectionListFragment();
 		transaction.add(R.id.mainFragment, directionFragment);
@@ -159,32 +156,6 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 	}
 
 	@Override
-	public void setScreenCenterTo(GeoPoint gp) {
-		// TODO Auto-generated method stub
-		mainFragment.setScreenToPoint(gp);
-		//		GeoPoint gp = new GeoPoint(selectedServer.getCenterLatitude()*1E6, selectedServer.getCenterLongitude()*1E6);
-	}
-
-	/**
-	 * @return the isLookingForCurrentLocation
-	 */
-	public boolean isLookingForCurrentLocation() {
-		return isLookingForCurrentLocation;
-	}
-
-	/**
-	 * @param isLookingForCurrentLocation the isLookingForCurrentLocation to set
-	 */
-	@Override
-	public void setLookingForCurrentLocation(boolean isLookingInput, GeoPoint currentLocation) {
-		this.isLookingForCurrentLocation = isLookingInput;
-
-		if(!isLookingInput){
-			mainFragment.processServerSelector(currentLocation, false);
-		}
-	}
-
-	@Override
 	public void setCurrentRequestString(String url) {
 		currentRequestString = url;
 	}
@@ -192,5 +163,15 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 	@Override
 	public String getCurrentRequestString() {
 		return currentRequestString;
+	}
+	
+	@Override
+	public void zoomToLocation(GeoPoint location){
+		mainFragment.zoomToLocation(location);
+	}
+	
+	@Override
+	public void setMarker(GeoPoint location, boolean isStartMarker){
+		mainFragment.setMarker(location, isStartMarker);
 	}
 }
