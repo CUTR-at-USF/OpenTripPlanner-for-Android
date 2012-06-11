@@ -8,6 +8,9 @@
 package edu.usf.cutr.opentripplanner.android;
 
 public final class R {
+    public static final class array {
+        public static final int available_geocoder_providers=0x7f080000;
+    }
     public static final class attr {
         /**  Defines panel animation duration in ms. 
          <p>Must be an integer value, such as "<code>100</code>".
@@ -147,45 +150,44 @@ containing a value of this type.
     }
     public static final class id {
         public static final int bottom=0x7f050001;
-        public static final int btnDisplayDirection=0x7f050014;
+        public static final int btnDisplayDirection=0x7f050013;
         public static final int btnDisplayMap=0x7f050009;
-        public static final int btnEndLocation=0x7f05001d;
-        public static final int btnPlanTrip=0x7f050021;
-        public static final int btnStartLocation=0x7f05001a;
+        public static final int btnEndLocation=0x7f05001c;
+        public static final int btnPlanTrip=0x7f050020;
+        public static final int btnStartLocation=0x7f050019;
         public static final int buttonLine=0x7f050008;
-        public static final int directionText=0x7f050010;
-        public static final int drag=0x7f050013;
-        public static final int exit=0x7f050027;
-        public static final int feedback=0x7f050025;
+        public static final int directionText=0x7f05000f;
+        public static final int drag=0x7f050012;
+        public static final int exit=0x7f050026;
+        public static final int feedback=0x7f050024;
         public static final int fromHeader=0x7f05000b;
-        public static final int gps_settings=0x7f050022;
+        public static final int gps_settings=0x7f050021;
         public static final int iconLine=0x7f050006;
-        public static final int imgIcon=0x7f05000f;
+        public static final int imgIcon=0x7f05000e;
+        public static final int itinerarySelection=0x7f05000d;
         public static final int left=0x7f050002;
         public static final int lineItem=0x7f050005;
         public static final int mainFragment=0x7f050004;
-        public static final int mapview=0x7f050012;
-        public static final int my_location=0x7f050023;
-        public static final int panelContent=0x7f050016;
-        public static final int panelHandle=0x7f050017;
-        public static final int relativeLayout1=0x7f050018;
-        public static final int relativeLayout2=0x7f05001b;
-        public static final int relativeLayout3=0x7f05001e;
-        public static final int relativeLayout4=0x7f050011;
+        public static final int mapview=0x7f050011;
+        public static final int my_location=0x7f050022;
+        public static final int panelContent=0x7f050015;
+        public static final int panelHandle=0x7f050016;
+        public static final int relativeLayout1=0x7f050017;
+        public static final int relativeLayout2=0x7f05001a;
+        public static final int relativeLayout3=0x7f05001d;
+        public static final int relativeLayout4=0x7f050010;
         public static final int right=0x7f050003;
-        public static final int server_info=0x7f050026;
-        public static final int settings=0x7f050024;
-        public static final int slidingDrawer1=0x7f050015;
-        public static final int spinOptimization=0x7f050020;
-        public static final int spinTravelMode=0x7f05001f;
-        public static final int tbEndLocation=0x7f05001c;
-        public static final int tbStartLocation=0x7f050019;
+        public static final int server_info=0x7f050025;
+        public static final int settings=0x7f050023;
+        public static final int slidingDrawer1=0x7f050014;
+        public static final int spinOptimization=0x7f05001f;
+        public static final int spinTravelMode=0x7f05001e;
+        public static final int tbEndLocation=0x7f05001b;
+        public static final int tbStartLocation=0x7f050018;
         public static final int textLine=0x7f050007;
-        public static final int timeTraveledHeader=0x7f05000e;
         public static final int titleHeader=0x7f05000a;
         public static final int toHeader=0x7f05000c;
         public static final int top=0x7f050000;
-        public static final int totalDistanceHeader=0x7f05000d;
     }
     public static final class integer {
         public static final int geocoder_max_results=0x7f060000;
@@ -200,9 +202,10 @@ containing a value of this type.
         public static final int main=0x7f030005;
     }
     public static final class menu {
-        public static final int menu=0x7f080000;
+        public static final int menu=0x7f090000;
     }
     public static final class string {
+        public static final int alternative_routes=0x7f07001d;
         public static final int app_name=0x7f070000;
         public static final int auto_detect_server=0x7f070014;
         public static final int auto_detect_server_description=0x7f070015;
@@ -218,6 +221,8 @@ containing a value of this type.
         public static final int feedback=0x7f070008;
         public static final int feedback_android_developer=0x7f07001b;
         public static final int geocoder_no_results_message=0x7f070019;
+        public static final int geocoder_preference_provider_summary=0x7f07001f;
+        public static final int geocoder_preference_provider_title=0x7f07001e;
         public static final int geocoder_results_title=0x7f070018;
         public static final int map_options=0x7f070010;
         public static final int map_tile_provider=0x7f070011;

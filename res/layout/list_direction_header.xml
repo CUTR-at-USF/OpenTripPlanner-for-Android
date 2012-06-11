@@ -38,7 +38,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:orientation="horizontal" >
-        
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -47,11 +47,11 @@
             android:layout_marginLeft="5dp"
             android:gravity="center_vertical"
             android:padding="10dp"
+            android:text="From"
             android:textColor="#C0C0C0"
             android:textSize="18dp"
-            android:textStyle="bold" 
-            android:text="From" />
-        
+            android:textStyle="bold" />
+
         <TextView
             android:id="@+id/fromHeader"
             android:layout_width="fill_parent"
@@ -71,7 +71,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:orientation="horizontal" >
-        
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -80,10 +80,10 @@
             android:layout_marginLeft="5dp"
             android:gravity="center_vertical"
             android:padding="10dp"
+            android:text="To"
             android:textColor="#C0C0C0"
             android:textSize="18dp"
-            android:textStyle="bold" 
-            android:text="To" />
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/toHeader"
@@ -98,40 +98,49 @@
             android:textSize="18dp"
             android:textStyle="bold" />
     </LinearLayout>
-    
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_gravity="center_vertical"
-        android:orientation="horizontal" >
-        
-        <TextView
-            android:id="@+id/totalDistanceHeader"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="5dp"
-            android:gravity="center_vertical"
-            android:padding="10dp"
-            android:textColor="#000000"
-            android:textSize="22dp"
-            android:textStyle="bold" 
-            android:text="To" />
 
-        <TextView
-            android:id="@+id/timeTraveledHeader"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="5dp"
-            android:gravity="center_vertical"
-            android:padding="10dp"
-            android:textColor="#000000"
-            android:textSize="22dp"
-            android:textStyle="bold" />
-    </LinearLayout>
+    <Spinner
+        android:id="@+id/itinerarySelection"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:prompt="@string/alternative_routes" >
+    </Spinner>
+
+    <!-- <LinearLayout -->
+    <!-- xmlns:android="http://schemas.android.com/apk/res/android" -->
+    <!-- android:layout_width="fill_parent" -->
+    <!-- android:layout_height="fill_parent" -->
+    <!-- android:layout_gravity="center_vertical" -->
+    <!-- android:orientation="horizontal" > -->
+
+
+    <!-- <TextView -->
+    <!-- android:id="@+id/totalDistanceHeader" -->
+    <!-- android:layout_width="wrap_content" -->
+    <!-- android:layout_height="wrap_content" -->
+    <!-- android:layout_alignParentBottom="true" -->
+    <!-- android:layout_alignParentTop="true" -->
+    <!-- android:layout_marginLeft="5dp" -->
+    <!-- android:gravity="center_vertical" -->
+    <!-- android:padding="10dp" -->
+    <!-- android:textColor="#000000" -->
+    <!-- android:textSize="22dp" -->
+    <!-- android:textStyle="bold" -->
+    <!-- android:text="To" /> -->
+
+
+    <!-- <TextView -->
+    <!-- android:id="@+id/timeTraveledHeader" -->
+    <!-- android:layout_width="fill_parent" -->
+    <!-- android:layout_height="fill_parent" -->
+    <!-- android:layout_alignParentBottom="true" -->
+    <!-- android:layout_alignParentTop="true" -->
+    <!-- android:layout_marginLeft="5dp" -->
+    <!-- android:gravity="center_vertical" -->
+    <!-- android:padding="10dp" -->
+    <!-- android:textColor="#000000" -->
+    <!-- android:textSize="22dp" -->
+    <!-- android:textStyle="bold" /> -->
+    <!-- </LinearLayout> -->
 
 </LinearLayout>

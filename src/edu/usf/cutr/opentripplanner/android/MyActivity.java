@@ -16,10 +16,13 @@
 
 package edu.usf.cutr.opentripplanner.android;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
 import edu.usf.cutr.opentripplanner.android.R;
+
+import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.osmdroid.util.GeoPoint;
 
@@ -30,7 +33,11 @@ import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
 import edu.usf.cutr.opentripplanner.android.sqlite.ServersDataSource;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Contacts;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -45,7 +52,11 @@ import android.widget.Toast;
 
 public class MyActivity extends FragmentActivity implements OnFragmentListener{
 
-	private List<Leg> currentItinerary = null;
+	private List<Leg> currentItinerary = new ArrayList<Leg>();
+	
+	private List<Itinerary> currentItineraryList = new ArrayList<Itinerary>();
+	
+	private int currentItineraryIndex = -1;
 
 	private OTPBundle bundle = null;
 
@@ -56,6 +67,8 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 	private String TAG = "OTP";
 	
 	private String currentRequestString="";
+	
+	private boolean isButtonStartLocation = false;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -82,19 +95,43 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 		case OTPApp.REFRESH_SERVER_LIST_REQUEST_CODE: 
 			if (resultCode == RESULT_OK) {
 				boolean shouldRefresh = data.getBooleanExtra(OTPApp.REFRESH_SERVER_RETURN_KEY, false);
-				Toast.makeText(this, "Should server list refresh? " + shouldRefresh, Toast.LENGTH_LONG).show();
+				//				Toast.makeText(this, "Should server list refresh? " + shouldRefresh, Toast.LENGTH_LONG).show();
 				if(shouldRefresh){
 					mainFragment.processServerSelector(true);
 				}
 				break;
 			}
+		case OTPApp.CHOOSE_CONTACT_REQUEST_CODE:
+			if(resultCode == RESULT_OK){
+//				Log.v(TAG, "CHOOSE CONTACT RESULT OK");
+				
+				Uri contactData = data.getData();
+				Cursor c =  managedQuery(contactData, null, null, null, null);
+				if (c.moveToFirst()) {
+				    String address = c.getString(c.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS));
+				    mainFragment.setTextBoxLocation(address, isButtonStartLocation);
+				    mainFragment.processAddress(isButtonStartLocation, address);
+				}
+				
+				break;
+			}
 		}
+	}
+	
+	@Override
+	public void onItinerariesLoaded(List<Itinerary> itineraries) {
+		// TODO Auto-generated method stub
+		currentItineraryList.addAll(itineraries);
 	}
 
 	@Override
-	public void onItinerarySelected(List<Leg> l) {
+	public void onItinerarySelected(int i) {
 		// TODO Auto-generated method stub
-		currentItinerary = l;
+		if(i >= currentItineraryList.size()) return;
+		
+		currentItineraryIndex = i;
+		currentItinerary.clear();
+		currentItinerary.addAll(currentItineraryList.get(i).legs);
 	}
 
 	@Override
@@ -104,7 +141,7 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 	}
 
 	@Override
-	public void onDirectionFragmentSwitched() {
+	public void onSwitchedToDirectionFragment() {
 		// TODO Auto-generated method stub
 		FragmentManager fm = getSupportFragmentManager();
 		FragmentTransaction transaction = fm.beginTransaction();
@@ -127,11 +164,12 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 	public void setOTPBundle(OTPBundle b) {
 		// TODO Auto-generated method stub
 		this.bundle = b;
-		this.bundle.setCurrentItinerary(currentItinerary);
+		this.bundle.setCurrentItineraryIndex(currentItineraryIndex);
+		this.bundle.setItineraryList(currentItineraryList);
 	}
 
 	@Override
-	public void onMainFragmentSwitched(Fragment f) {
+	public void onSwitchedToMainFragment(Fragment f) {
 		// TODO Auto-generated method stub
 		FragmentManager fm = getSupportFragmentManager();
 		FragmentTransaction transaction = fm.beginTransaction();
@@ -139,6 +177,8 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 		transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
 		fm.popBackStack();
 		transaction.commit();
+		
+		mainFragment.showRouteOnMap(currentItinerary);
 	}
 
 	/**
@@ -173,5 +213,31 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 	@Override
 	public void setMarker(GeoPoint location, boolean isStartMarker){
 		mainFragment.setMarker(location, isStartMarker);
+	}
+
+	@Override
+	public List<Itinerary> getCurrentItineraryList() {
+		// TODO Auto-generated method stub
+		return currentItineraryList;
+	}
+
+	@Override
+	public int getCurrentItineraryIndex() {
+		// TODO Auto-generated method stub
+		return currentItineraryIndex;
+	}
+
+	/**
+	 * @return the isButtonStartLocation
+	 */
+	public boolean isButtonStartLocation() {
+		return isButtonStartLocation;
+	}
+
+	/**
+	 * @param isButtonStartLocation the isButtonStartLocation to set
+	 */
+	public void setButtonStartLocation(boolean isButtonStartLocation) {
+		this.isButtonStartLocation = isButtonStartLocation;
 	}
 }

@@ -54,6 +54,7 @@ public class SettingsActivity extends PreferenceActivity {
 	private EditTextPreference customServerURL;
 	private Preference providerFeedbackButton;
 	private Preference serverRefreshButton;
+	private ListPreference geocoderProvider;
 	
 	private ServersDataSource datasource;
 
@@ -68,6 +69,7 @@ public class SettingsActivity extends PreferenceActivity {
 		addPreferencesFromResource(R.xml.preferences);
 
 		mapTileProvider = (ListPreference) findPreference("map_tile_source");
+		geocoderProvider = (ListPreference) findPreference("geocoder_provider");
 		routingOptions = (PreferenceCategory) findPreference("routing_options");
 		autoDetectServer = (CheckBoxPreference) findPreference("auto_detect_server");
 		customServerURL = (EditTextPreference) findPreference("custom_server_url");
@@ -82,6 +84,11 @@ public class SettingsActivity extends PreferenceActivity {
 		mapTileProvider.setEntries(names.toArray(new CharSequence[names.size()]));
 		mapTileProvider.setEntryValues(names.toArray(new CharSequence[names.size()]));
 		mapTileProvider.setDefaultValue("Mapnik");
+		
+		String[] availableGeocoderProviders = getResources().getStringArray(R.array.available_geocoder_providers);
+		geocoderProvider.setEntries(availableGeocoderProviders);
+		geocoderProvider.setEntryValues(availableGeocoderProviders);
+		geocoderProvider.setDefaultValue(availableGeocoderProviders[0]);
 
 		hideCustomURLPref(autoDetectServer.isChecked());
 
@@ -106,9 +113,8 @@ public class SettingsActivity extends PreferenceActivity {
 	        	
 	        	String subject = "";
 	            subject += "Android OTP user report problem(s) ";
-	            Calendar c = Calendar.getInstance(); 
-	            Date d = c.getTime();
-	            subject += "[" + d.toGMTString() + "]";
+	            Date d = Calendar.getInstance().getTime(); 
+	            subject += "[" + d.toString() + "]";
 	            uriText += "?subject=" + subject;
 
 	        	Uri uri = Uri.parse(uriText);

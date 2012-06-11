@@ -49,6 +49,8 @@ import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.SettingsActivity;
 import edu.usf.cutr.opentripplanner.android.contacts.ContactAPI;
 import edu.usf.cutr.opentripplanner.android.contacts.ContactList;
+import edu.usf.cutr.opentripplanner.android.listeners.OTPGeocodingListener;
+import edu.usf.cutr.opentripplanner.android.listeners.OTPGetCurrentLocationListener;
 import edu.usf.cutr.opentripplanner.android.listeners.OnFragmentListener;
 import edu.usf.cutr.opentripplanner.android.listeners.ServerSelectorCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.TripRequestCompleteListener;
@@ -64,9 +66,11 @@ import edu.usf.cutr.opentripplanner.android.pois.POI;
 import edu.usf.cutr.opentripplanner.android.pois.Places;
 import edu.usf.cutr.opentripplanner.android.sqlite.ServersDataSource;
 import edu.usf.cutr.opentripplanner.android.tasks.MetadataRequest;
+import edu.usf.cutr.opentripplanner.android.tasks.OTPGeocoding;
 import edu.usf.cutr.opentripplanner.android.tasks.OTPGetCurrentLocation;
 import edu.usf.cutr.opentripplanner.android.tasks.ServerSelector;
 import edu.usf.cutr.opentripplanner.android.tasks.TripRequest;
+import edu.usf.cutr.opentripplanner.android.util.LocationUtil;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -77,6 +81,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -92,6 +97,8 @@ import android.os.Bundle;
 import android.os.IBinder;
 
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
+import android.provider.ContactsContract.Contacts;
 import android.provider.Settings;
 import android.provider.Contacts.People;
 import android.support.v4.app.Fragment;
@@ -126,9 +133,11 @@ import android.widget.TextView.OnEditorActionListener;
  */
 
 public class MainFragment extends Fragment 
-							implements OnSharedPreferenceChangeListener,
-									   ServerSelectorCompleteListener,
-									   TripRequestCompleteListener{
+implements OnSharedPreferenceChangeListener,
+ServerSelectorCompleteListener,
+TripRequestCompleteListener,
+OTPGetCurrentLocationListener,
+OTPGeocodingListener{
 
 	private MapView mv;
 	private MapController mc;
@@ -172,11 +181,6 @@ public class MainFragment extends Fragment
 
 	private boolean isRealLostFocus = true;
 
-	/**
-	 * Amount of time that a location is considered valid for that we will still use it as a starting location and snap the map to this location
-	 */
-	private static final int STALE_LOCATION_THRESHOLD = 60 * 60 * 1000;  //60 minutes
-
 	private static final String TAG = "OTP";
 
 	@Override
@@ -202,7 +206,6 @@ public class MainFragment extends Fragment
 
 		View mainView = inflater.inflate(R.layout.main, container, false); 
 		final Activity activity = this.getActivity();
-		MyActivity myActivity = (MyActivity)activity;
 
 		final OnFragmentListener ofl = this.getFragmentListener();
 
@@ -211,7 +214,7 @@ public class MainFragment extends Fragment
 
 		app = ((OTPApp) activity.getApplication());
 
-		locationManager = (LocationManager) activity.getSystemService(activity.LOCATION_SERVICE);
+		locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
 
 		btnStartLocation = (ImageButton) mainView.findViewById(R.id.btnStartLocation);
 		btnEndLocation = (ImageButton) mainView.findViewById(R.id.btnEndLocation);
@@ -229,7 +232,7 @@ public class MainFragment extends Fragment
 		tripPanel.setFocusable(true);
 		tripPanel.setFocusableInTouchMode(true);
 
-		ArrayAdapter optimizationAdapter = new ArrayAdapter(activity, android.R.layout.simple_spinner_item, new OptimizeSpinnerItem[] {
+		ArrayAdapter<OptimizeSpinnerItem> optimizationAdapter = new ArrayAdapter<OptimizeSpinnerItem>(activity, android.R.layout.simple_spinner_item, new OptimizeSpinnerItem[] {
 				new OptimizeSpinnerItem("Quickest", OptimizeType.QUICK),
 				new OptimizeSpinnerItem("Safest", OptimizeType.SAFE),
 				new OptimizeSpinnerItem("Fewest Transfers", OptimizeType.TRANSFERS)
@@ -238,7 +241,7 @@ public class MainFragment extends Fragment
 		optimizationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		ddlOptimization.setAdapter(optimizationAdapter);
 
-		ArrayAdapter traverseModeAdapter = new ArrayAdapter(activity, android.R.layout.simple_spinner_item, new TraverseModeSpinnerItem[] {
+		ArrayAdapter<TraverseModeSpinnerItem> traverseModeAdapter = new ArrayAdapter<TraverseModeSpinnerItem>(activity, android.R.layout.simple_spinner_item, new TraverseModeSpinnerItem[] {
 				new TraverseModeSpinnerItem("Transit", new TraverseModeSet(TraverseMode.TRANSIT, TraverseMode.WALK)),
 				new TraverseModeSpinnerItem("Bus Only", new TraverseModeSet(TraverseMode.BUSISH, TraverseMode.WALK)),
 				new TraverseModeSpinnerItem("Train Only", new TraverseModeSet(TraverseMode.TRAINISH, TraverseMode.WALK)), //not sure
@@ -250,13 +253,13 @@ public class MainFragment extends Fragment
 		traverseModeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		ddlTravelMode.setAdapter(traverseModeAdapter);
 
-		GeoPoint currentLocation = getLastLocation();
+		GeoPoint currentLocation = LocationUtil.getLastLocation(activity);
 
 		// if currentLocation is null
 		if(currentLocation==null){
 			currentLocation = defaultCenterLocation;
 		}
-
+		
 		OnClickListener ocl = new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -272,7 +275,7 @@ public class MainFragment extends Fragment
 
 					public void onClick(DialogInterface dialog, int item) {
 						if(items[item].equals("Current Location")) {
-							GeoPoint p = getLastLocation();
+							GeoPoint p = LocationUtil.getLastLocation(activity);
 
 							if(buttonID == R.id.btnStartLocation) {
 								tbStartLocation.setText("My Location");
@@ -286,18 +289,17 @@ public class MainFragment extends Fragment
 									endMarker.setLocation(p);
 								}
 							}
-						} else if(items[item].equals("Contact Address")) {
-							//TODO - fix contacts selector
-
-							ContactList cl = new ContactList();
-							ContactAPI api = ContactAPI.getAPI();
-							api.setCr(activity.getContentResolver());
-							api.setCur(activity.managedQuery(People.CONTENT_URI, null, null, null, null));
-							cl = api.newContactList();
-
-							Intent intent = api.getContactIntent();
+						} else if(items[item].equals("Contact Address")) {							
+							Intent intent = new Intent(Intent.ACTION_PICK);
+							intent.setType(ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_TYPE);
+							MyActivity myActivity = (MyActivity) activity;
+							if(buttonID == R.id.btnStartLocation) {
+								myActivity.setButtonStartLocation(true);
+							} else if(buttonID == R.id.btnEndLocation) {
+								myActivity.setButtonStartLocation(false);
+							}
 							activity.startActivityForResult(intent, OTPApp.CHOOSE_CONTACT_REQUEST_CODE);
-
+							
 						} else { //Point on Map
 							if(buttonID == R.id.btnStartLocation) {
 								tbStartLocation.setText(startMarker.getLocationFormatedString());
@@ -326,12 +328,14 @@ public class MainFragment extends Fragment
 						(event!=null && 
 						event.getAction() == KeyEvent.ACTION_DOWN && 
 						event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
+					isRealLostFocus = false;
 					processAddress(true, v.getText().toString());
 				} else if(v.getId()==R.id.tbEndLocation && 
 						actionId == EditorInfo.IME_ACTION_DONE || 
 						(event!=null &&
 						event.getAction() == KeyEvent.ACTION_DOWN && 
 						event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
+					isRealLostFocus = false;
 					processAddress(false, v.getText().toString());
 				}
 				return false;
@@ -408,7 +412,7 @@ public class MainFragment extends Fragment
 
 		//		btnPlanTrip.setFocusable(true);
 		//		btnPlanTrip.setFocusableInTouchMode(true);
-		 
+
 		btnPlanTrip.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -452,7 +456,7 @@ public class MainFragment extends Fragment
 				//				Save states before leaving
 				saveOTPBundle();
 
-				ofl.onDirectionFragmentSwitched();
+				ofl.onSwitchedToDirectionFragment();
 			}
 		};
 		btnDisplayDirection.setOnClickListener(oclDisplayDirection);
@@ -504,129 +508,10 @@ public class MainFragment extends Fragment
 		super.onActivityCreated(savedInstanceState);
 	}
 
-	private ArrayList<Address> searchPlaces(String name){
-		HashMap<String, String> params = new HashMap<String, String>();
-		//		params.put(GooglePlaces.PARAM_LOCATION, Double.toString(app.getCenterLatitude()) + "," + Double.toString(app.getCenterLongitude()));
-		//		params.put(GooglePlaces.PARAM_RADIUS, Double.toString(app.getRadius()));
-		//		params.put(GooglePlaces.PARAM_NAME, address);
-		params.put(Nominatim.PARAM_NAME, name);
-
-		//		String apiKey = "AIzaSyANO_4l0aroh4NuC6naYfk-vsPS12z2wco";
-		//		Places p = new GooglePlaces(apiKey);
-		Server selectedServer = app.getSelectedServer();
-		Places p = new Nominatim(selectedServer.getLowerLeftLongitude(), 
-				selectedServer.getLowerLeftLatitude(),
-				selectedServer.getUpperRightLongitude(), 
-				selectedServer.getUpperRightLatitude());
-		ArrayList<POI> pois = new ArrayList<POI>();
-		pois.addAll(p.getPlaces(params));
-
-		ArrayList<Address> addresses = new ArrayList<Address>();
-
-		for(int i=0; i<pois.size(); i++){
-			POI poi = pois.get(i);
-			Log.v(TAG, poi.getName() + " " + poi.getLatitude() + "," + poi.getLongitude());
-			Address addr = new Address(Locale.US);
-			addr.setLatitude(poi.getLatitude());
-			addr.setLongitude(poi.getLongitude());
-			String addressLine = poi.getAddress()==null ? poi.getName() : poi.getAddress();
-			addr.setAddressLine(0,addressLine); 
-			addresses.add(addr);
-		}
-
-		return addresses;
-	}
-
-	private void processAddress(final boolean isStartTextBox, String address){
-		AlertDialog.Builder geocoderAlert = new AlertDialog.Builder(this.getActivity());
-		geocoderAlert.setTitle(R.string.geocoder_results_title)
-		.setMessage(R.string.geocoder_no_results_message)
-		.setCancelable(false)
-		.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-			}
-		});
-
-		if(address==null || 
-				address.equalsIgnoreCase("")) {
-			AlertDialog alert = geocoderAlert.create();
-			alert.show();
-			return;
-		}
-
-		if(address.equalsIgnoreCase(getString(R.string.my_location))) {
-			GeoPoint currentLocation = getLastLocation();
-			if(currentLocation==null){
-				geocoderAlert.setMessage(R.string.no_gps_signal);
-				AlertDialog alert = geocoderAlert.create();
-				alert.show();
-				return;
-			}
-
-			moveMarker(isStartTextBox, currentLocation, getString(R.string.my_location));
-			return;
-		}
-
-		Geocoder gc = new Geocoder(this.getActivity());
-		ArrayList<Address> addresses = null;
-		try {
-			Server selectedServer = app.getSelectedServer();
-			addresses = (ArrayList<Address>)gc.getFromLocationName(address, 
-					R.integer.geocoder_max_results, 
-					selectedServer.getLowerLeftLatitude(), 
-					selectedServer.getLowerLeftLongitude(), 
-					selectedServer.getUpperRightLatitude(), 
-					selectedServer.getUpperRightLongitude());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		if(addresses==null || addresses.isEmpty()){
-			addresses = searchPlaces(address);
-			if(addresses==null || addresses.isEmpty()){
-				AlertDialog alert = geocoderAlert.create();
-				alert.show();
-				return;
-			}
-		}
-
-		final CharSequence[] addressesText = new CharSequence[addresses.size()];
-		for(int i=0; i<addresses.size(); i++){
-			Address addr = addresses.get(i);
-			addressesText[i] =  addr.getAddressLine(0)+"\n"+
-					((addr.getSubAdminArea()!=null) ? addr.getSubAdminArea()+", " : "")+
-					((addr.getAdminArea()!=null) ? addr.getAdminArea()+" " : "")+
-					((addr.getPostalCode()!=null) ? addr.getPostalCode()+" " : "")+
-					((addr.getCountryName()!=null) ? addr.getCountryName() : "");
-			Log.v("Test", addressesText[i].toString());
-		}
-
-		isRealLostFocus = false;
-
-		if(addresses.size()==1){
-			Address addr = addresses.get(0);
-			moveMarker(isStartTextBox, new GeoPoint(addr.getLatitude(), addr.getLongitude()), addressesText[0].toString());
-			Log.v(TAG, "Chosen: " + addressesText[0]);
-			adjustFocusAfterSelectAddress(isStartTextBox);
-			return;
-		}
-
-		AlertDialog.Builder geocoderSelector = new AlertDialog.Builder(this.getActivity());
-		geocoderSelector.setTitle(R.string.choose_geocoder);
-
-		final ArrayList<Address> addressesTemp = addresses;
-		geocoderSelector.setItems(addressesText, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int item) {
-				Address addr = addressesTemp.get(item);
-				moveMarker(isStartTextBox, new GeoPoint(addr.getLatitude(), addr.getLongitude()), addressesText[item].toString());
-				Log.v(TAG, "Chosen: " + addressesText[item]);
-				adjustFocusAfterSelectAddress(isStartTextBox);
-			}
-		});
-		AlertDialog alertGeocoder = geocoderSelector.create();
-		alertGeocoder.show();
-
+	public void processAddress(final boolean isStartTextBox, String address){
+		String[] availableGeocoderProviders = getResources().getStringArray(R.array.available_geocoder_providers);
+		OTPGeocoding geocodingTask = new OTPGeocoding(this.getActivity(), isStartTextBox, app.getSelectedServer(), prefs.getString("geocoder_provider", availableGeocoderProviders[0]), this);
+		geocodingTask.execute(address);
 	}
 
 	private void adjustFocusAfterSelectAddress(boolean isStartTextBox){
@@ -645,11 +530,11 @@ public class MainFragment extends Fragment
 			}
 		}
 	}
-	
+
 	public void processServerSelector(boolean mustRefreshServerList){
 		boolean isAutoDetectEnabled = prefs.getBoolean("auto_detect_server", true);
-		GeoPoint currentLoc = getLastLocation();
-		
+		GeoPoint currentLoc = LocationUtil.getLastLocation(this.getActivity());
+
 		processServerSelector(currentLoc, mustRefreshServerList, isAutoDetectEnabled);
 	}
 
@@ -657,9 +542,9 @@ public class MainFragment extends Fragment
 		MyActivity myActivity = (MyActivity)this.getActivity();
 		ServerSelector selector = new ServerSelector(myActivity, myActivity.getDatasource(), this, mustRefreshServerList, isAutoDetectEnabled);
 		if(currentLoc == null){
-			currentLoc = getLastLocation();
+			currentLoc = LocationUtil.getLastLocation(this.getActivity());
 		}
-		
+
 		selector.execute(currentLoc);
 	}
 
@@ -670,7 +555,7 @@ public class MainFragment extends Fragment
 		mlo.enableCompass();
 
 		if(needToRunAutoDetect) {
-			GeoPoint currentLoc = getLastLocation();
+			GeoPoint currentLoc = LocationUtil.getLastLocation(this.getActivity());
 			if(currentLoc != null){
 				Log.v(TAG, "Relaunching auto detection for server");
 				processServerSelector(currentLoc, false, true);
@@ -752,7 +637,8 @@ public class MainFragment extends Fragment
 			startActivity(myIntent);
 			break;
 		case R.id.my_location:
-			zoomToCurrentLocation();
+			OTPGetCurrentLocation getCurrentLocation = new OTPGetCurrentLocation(this.getActivity(), this);
+			getCurrentLocation.execute("");
 			break;
 		case R.id.settings:
 			this.getActivity().startActivityForResult(new Intent(this.getActivity(), SettingsActivity.class), OTPApp.REFRESH_SERVER_LIST_REQUEST_CODE);
@@ -770,9 +656,8 @@ public class MainFragment extends Fragment
 
 			String subject = "";
 			subject += "Android OTP user report OTP trip ";
-			Calendar c = Calendar.getInstance(); 
-			Date d = c.getTime();
-			subject += "[" + d.toGMTString() + "]";
+			Date d = Calendar.getInstance().getTime(); 
+			subject += "[" + d.toString() + "]";
 			uriText += "?subject=" + subject;
 
 			MyActivity myActivity = (MyActivity)this.getActivity();
@@ -829,68 +714,36 @@ public class MainFragment extends Fragment
 		return false;
 	}
 
-	/*
-	 * Get the last location the phone was at
-	 *  Based off example at http://www.androidsnippets.com/get-the-phones-last-known-location-using-locationmanager
-	 * 
-	 * @return GeoPoint of last location, or null if a location hasn't been acquired in the last STALE_LOCATION_THRESHOLD amount of time
-	 */
-	private GeoPoint getLastLocation() {
-		LocationManager lm = (LocationManager) this.getActivity().getSystemService(Context.LOCATION_SERVICE);
-		List<String> providers = lm.getProviders(true);
-		Location l = null;
-
-		for (int i = providers.size() - 1; i >= 0; i--) {
-			l = lm.getLastKnownLocation(providers.get(i));
-			if (l != null && l.getProvider().equalsIgnoreCase(LocationManager.GPS_PROVIDER))  //Only break if we have a GPS fix location, since this will be the most accurate location provider.  We want to make sure we loop through all of them to find GPS if available
-				break;
-		}
-
-		if (l == null  || (Math.abs((System.currentTimeMillis() - l.getTime())) > STALE_LOCATION_THRESHOLD)) {  //Check to make sure the location is recent (use ABS() to allow for small time sync differences between GPS clock and system clock)
-
-			return null; //return null if no location was found in the last STALE_LOCATION_THRESHOLD amount of time
-		}
-
-		return new GeoPoint(l);
-	}
-
 	private Boolean isGPSEnabled() {
 		return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 	}
 
-	public void moveMarker(Boolean start, GeoPoint point, String text) {
+	public void moveMarker(Boolean start, Address addr) {
+		GeoPoint point = new GeoPoint(addr.getLatitude(), addr.getLongitude());
 		if(start) {
 			startMarker.setLocation(point);
-			if (text==null) {
-				tbStartLocation.setText(startMarker.getLocationFormatedString());
-			} else {
-				tbStartLocation.setText(text);
-			}
+			tbStartLocation.setText(addr.getAddressLine(addr.getMaxAddressLineIndex()));
 		} else {
 			endMarker.setLocation(point);
-			if (text==null) {
-				tbEndLocation.setText(endMarker.getLocationFormatedString());
-			} else {
-				tbEndLocation.setText(text);
-			}
+			tbEndLocation.setText(addr.getAddressLine(addr.getMaxAddressLineIndex()));
 		}
 
 	}
 
 	public void zoomToCurrentLocation() {
-		GeoPoint p = getLastLocation();
+		GeoPoint p = LocationUtil.getLastLocation(this.getActivity());
 
 		if(p !=null){
 			mc.animateTo(p);
 		}
 	}
-	
+
 	public void zoomToLocation(GeoPoint p) {
 		if(p !=null){
 			mc.animateTo(p);
 		}
 	}
-	
+
 	public void setMarker(GeoPoint p, boolean isStartMarker){
 		if(p == null)
 			return;
@@ -900,7 +753,7 @@ public class MainFragment extends Fragment
 			endMarker.setLocation(p);
 		}
 	}
-	
+
 	public void setTextBoxLocation(String text, boolean isStartTextBox){
 		if(isStartTextBox){
 			tbStartLocation.setText(text);
@@ -908,10 +761,10 @@ public class MainFragment extends Fragment
 			tbEndLocation.setText(text);
 		}
 	}
-
-	private GeoPoint getPoint(double lat, double lon) {
-		return (new GeoPoint((int) (lat * 1000000.0), (int) (lon * 1000000.0)));
-	}
+	//
+	//	private GeoPoint getPoint(double lat, double lon) {
+	//		return (new GeoPoint((int) (lat * 1000000.0), (int) (lon * 1000000.0)));
+	//	}
 
 	public void showRouteOnMap(List<Leg> itinerary){
 		Log.v(TAG, "(TripRequest) legs size = "+Integer.toString(itinerary.size()));
@@ -965,7 +818,7 @@ public class MainFragment extends Fragment
 		app.setSelectedServer(server);
 		Log.v(TAG, "Automatically selected server: " + server.getRegion());
 		MyActivity activity = (MyActivity)this.getActivity();
-		
+
 		activity.zoomToLocation(point);
 		activity.setMarker(point, true);
 		activity.setMarker(point, false);
@@ -974,10 +827,80 @@ public class MainFragment extends Fragment
 	@Override
 	public void onTripRequestComplete(List<Itinerary> itineraries, String currentRequestString) {
 		// TODO Auto-generated method stub
-		List<Leg> legs = itineraries.get(0).legs;
-		showRouteOnMap(legs);
-		getFragmentListener().onItinerarySelected(legs);
+		showRouteOnMap(itineraries.get(0).legs);
+		OnFragmentListener ofl = getFragmentListener();
+
+		//onItinerariesLoaded must be invoked before onItinerarySelected(0)
+		ofl.onItinerariesLoaded(itineraries);
+		ofl.onItinerarySelected(0);
 		MyActivity myActivity = (MyActivity)this.getActivity();
 		myActivity.setCurrentRequestString(currentRequestString);
+	}
+
+	@Override
+	public void onOTPGetCurrentLocationComplete(GeoPoint point) {
+		// TODO Auto-generated method stub
+		zoomToLocation(point);
+	}
+
+	@Override
+	public void onOTPGeocodingComplete(final boolean isStartTextbox, ArrayList<Address> addressesReturn) {
+		// TODO Auto-generated method stub
+//		isRealLostFocus = false;
+		
+		AlertDialog.Builder geocoderAlert = new AlertDialog.Builder(this.getActivity());
+		geocoderAlert.setTitle(R.string.geocoder_results_title)
+		.setMessage(R.string.geocoder_no_results_message)
+		.setCancelable(false)
+		.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+			}
+		});
+
+		if(addressesReturn.isEmpty()){
+			AlertDialog alert = geocoderAlert.create();
+			alert.show();
+			return;
+		} else if(addressesReturn.size() == 1) {
+			moveMarker(isStartTextbox, addressesReturn.get(0));
+			return;
+		}
+
+		adjustFocusAfterSelectAddress(isStartTextbox);
+
+		AlertDialog.Builder geocoderSelector = new AlertDialog.Builder(this.getActivity());
+		geocoderSelector.setTitle(R.string.choose_geocoder);
+
+		final CharSequence[] addressesText = new CharSequence[addressesReturn.size()];
+		for(int i=0; i<addressesReturn.size(); i++){
+			Address addr = addressesReturn.get(i);
+			addressesText[i] =  addr.getAddressLine(0)+"\n"+
+								addr.getAddressLine(1)+
+								((addr.getAddressLine(2)!=null) ? ", "+addr.getAddressLine(2) : "");
+//			addressesText[i] =  addr.getAddressLine(0)+"\n"+
+//					((addr.getSubAdminArea()!=null) ? addr.getSubAdminArea()+", " : "")+
+//					((addr.getAdminArea()!=null) ? addr.getAdminArea()+" " : "")+
+//					((addr.getPostalCode()!=null) ? addr.getPostalCode()+" " : "")+
+//					((addr.getCountryName()!=null) ? addr.getCountryName() : "");
+			Log.v(TAG, addressesText[i].toString());
+		}
+
+
+		final ArrayList<Address> addressesTemp = addressesReturn;
+		geocoderSelector.setItems(addressesText, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int item) {
+				Address addr = addressesTemp.get(item);
+				String addressLine = addr.getAddressLine(0)+"\n"+
+									 addr.getAddressLine(1)+
+									 ((addr.getAddressLine(2)!=null) ? ", "+addr.getAddressLine(2) : "");
+				addr.setAddressLine(addr.getMaxAddressLineIndex()+1, addressLine);
+				moveMarker(isStartTextbox, addr);
+				Log.v(TAG, "Chosen: " + addressesText[item]);
+				adjustFocusAfterSelectAddress(isStartTextbox);
+			}
+		});
+		AlertDialog alertGeocoder = geocoderSelector.create();
+		alertGeocoder.show();
+
 	}
 }

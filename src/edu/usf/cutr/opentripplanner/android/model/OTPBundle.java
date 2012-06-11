@@ -19,6 +19,7 @@ package edu.usf.cutr.opentripplanner.android.model;
 import java.io.Serializable;
 import java.util.List;
 
+import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.osmdroid.util.GeoPoint;
 
@@ -32,6 +33,9 @@ public class OTPBundle implements Serializable{
 	private int optimization, travelMode;
 	private GeoPoint startLocation, endLocation;
 	private List<Leg> currentItinerary;
+	private List<Itinerary> itineraryList;
+	private int currentItineraryIndex;
+	
 	public OTPBundle(){
 		
 	}
@@ -118,5 +122,29 @@ public class OTPBundle implements Serializable{
 	 */
 	public void setCurrentItinerary(List<Leg> currentItinerary) {
 		this.currentItinerary = currentItinerary;
+	}
+	/**
+	 * @return the itineraryList
+	 */
+	public List<Itinerary> getItineraryList() {
+		return itineraryList;
+	}
+	/**
+	 * @param itineraryList the itineraryList to set
+	 */
+	public void setItineraryList(List<Itinerary> itineraryList) {
+		this.itineraryList = itineraryList;
+	}
+	/**
+	 * @return the currentItineraryIndex
+	 */
+	public int getCurrentItineraryIndex() {
+		return currentItineraryIndex;
+	}
+	/**
+	 * @param currentItineraryIndex the currentItineraryIndex to set
+	 */
+	public void setCurrentItineraryIndex(int currentItineraryIndex) {
+		this.currentItineraryIndex = currentItineraryIndex;
 	}
 }

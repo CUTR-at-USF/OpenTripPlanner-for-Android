@@ -1,5 +1,7 @@
 package edu.usf.cutr.opentripplanner.android.overlays;
 
+import java.util.Locale;
+
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.MapView.Projection;
@@ -12,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -86,14 +89,19 @@ public class MapOverlay extends org.osmdroid.views.overlay.Overlay {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(mainFragment.getActivity());
 		builder.setTitle("Choose Type for Point");
+		final MapOverlay mo = this;
 		builder.setItems(items, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int item) {
 				Toast.makeText(mainFragment.getActivity().getApplicationContext(), items[item], Toast.LENGTH_SHORT).show();
 				GeoPoint point = (GeoPoint) mv.getProjection().fromPixels(e.getX(), e.getY());
+				Address addr = new Address(Locale.US);
+				addr.setLatitude(point.getLatitudeE6()/1E6);
+				addr.setLongitude(point.getLongitudeE6()/1E6);
+				addr.setAddressLine(addr.getMaxAddressLineIndex()+1, mo.getLocationFormatedString());
 				if(items[item].equals("Start Location")) {
-					mainFragment.moveMarker(true, point, null);
+					mainFragment.moveMarker(true, addr);
 				} else {
-					mainFragment.moveMarker(false, point, null);
+					mainFragment.moveMarker(false, addr);
 				}
 			}
 		});

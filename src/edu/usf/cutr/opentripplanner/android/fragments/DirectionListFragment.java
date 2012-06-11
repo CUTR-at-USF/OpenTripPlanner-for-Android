@@ -19,11 +19,16 @@ package edu.usf.cutr.opentripplanner.android.fragments;
 import java.util.ArrayList;
 
 import edu.usf.cutr.opentripplanner.android.R;
+
+import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
+import org.opentripplanner.routing.core.OptimizeType;
 
 import edu.usf.cutr.opentripplanner.android.listeners.OnFragmentListener;
 import edu.usf.cutr.opentripplanner.android.model.Direction;
 import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
+import edu.usf.cutr.opentripplanner.android.model.OptimizeSpinnerItem;
+import edu.usf.cutr.opentripplanner.android.util.DateTimeConversion;
 import edu.usf.cutr.opentripplanner.android.util.DirectionExpandableListAdapter;
 import edu.usf.cutr.opentripplanner.android.util.ExpandableListFragment;
 import edu.usf.cutr.opentripplanner.android.util.ItineraryDecrypt;
@@ -35,8 +40,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 import android.widget.TextView;
 
@@ -54,6 +63,8 @@ public class DirectionListFragment extends ExpandableListFragment {
 	private static final String TAG = "OTP";
 	
 	private ExpandableListView elv;
+	
+	private boolean isFragmentFirstLoaded = true;
 
 	@Override
 	public void onAttach(Activity activity) {
@@ -85,21 +96,22 @@ public class DirectionListFragment extends ExpandableListFragment {
 		OnClickListener oclDisplayDirection = new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				ofl.onMainFragmentSwitched(dlf);
+				ofl.onSwitchedToMainFragment(dlf);
 			}
 		};
 		btnDisplayMap.setOnClickListener(oclDisplayDirection);
 		
 		OTPBundle otpBundle = fragmentListener.getOTPBundle();
 		TextView fromHeader = (TextView)header.findViewById(R.id.fromHeader);
-		if(fromHeader==null) Log.v(TAG, "null fromheader");
-		if(otpBundle==null) Log.v(TAG, "null otpBundle");
 		fromHeader.setText(otpBundle.getFromText());
 		TextView toHeader = (TextView)header.findViewById(R.id.toHeader);
 		toHeader.setText(otpBundle.getToText());
-
+		
 		ArrayList<Leg> currentItinerary = new ArrayList<Leg>();
 		currentItinerary.addAll(fragmentListener.getCurrentItinerary());
+		ArrayList<Itinerary> itineraryList = new ArrayList<Itinerary>();
+		itineraryList.addAll(fragmentListener.getCurrentItineraryList());
+		int currentItineraryIndex = fragmentListener.getCurrentItineraryIndex();
 		
 		ArrayList<Direction> directions = new ArrayList<Direction>();
 		ItineraryDecrypt itDecrypt = new ItineraryDecrypt(currentItinerary);
@@ -108,19 +120,57 @@ public class DirectionListFragment extends ExpandableListFragment {
 			directions.addAll(tempDirections);
 		}
 		
-		TextView totalDistanceHeader = (TextView)header.findViewById(R.id.totalDistanceHeader);
-		totalDistanceHeader.setText(Double.toString(itDecrypt.getTotalDistance()));
-		TextView timeTraveledHeader = (TextView)header.findViewById(R.id.timeTraveledHeader);
-		Double d = itDecrypt.getTotalTimeTraveled();
-		timeTraveledHeader.setText(getFormattedDuration(d.intValue()));
+		
+		final Activity activity = this.getActivity();
+		Spinner itinerarySelectionSpinner = (Spinner) header.findViewById(R.id.itinerarySelection);
+		
+		String[] itinerarySummaryList = new String[itineraryList.size()];
+		for(int i=0; i<itinerarySummaryList.length; i++){
+			Itinerary it = itineraryList.get(i);
+			itinerarySummaryList[i] = Integer.toString(i) + ".   ";
+			itinerarySummaryList[i] += DateTimeConversion.getFormattedDurationText(it.duration/1000);
+			itinerarySummaryList[i] += "   " + Long.toString(it.walkTime) + " meters";
+		}
+		
+		ArrayAdapter<String> itineraryAdapter = new ArrayAdapter<String>(activity, android.R.layout.simple_spinner_item, itinerarySummaryList);
+
+		itineraryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		itinerarySelectionSpinner.setAdapter(itineraryAdapter);
+		
+		AdapterView.OnItemSelectedListener itinerarySpinnerListener = new AdapterView.OnItemSelectedListener() {
+		    @Override
+		    public void  onItemSelected (AdapterView<?> parent, View view, int position, long id){
+//		    	Toast.makeText(parent.getContext(), 
+//		    				   Long.toString(id) + " chosen " +
+//		    				   parent.getItemAtPosition(position).toString(), 
+//		    				   Toast.LENGTH_SHORT).show();
+		    	fragmentListener.onItinerarySelected(position);
+		    	
+		    	if(!isFragmentFirstLoaded){
+		    		ofl.onSwitchedToMainFragment(dlf);
+		    	}
+		    	
+		    	isFragmentFirstLoaded = false;
+		    }
+
+		    @Override
+		    public void onNothingSelected (AdapterView<?> parent) {
+		    	
+		    }
+		};
+		itinerarySelectionSpinner.setSelection(currentItineraryIndex);
+		itinerarySelectionSpinner.setOnItemSelectedListener(itinerarySpinnerListener);
+		
+//		TextView totalDistanceHeader = (TextView)header.findViewById(R.id.totalDistanceHeader);
+//		totalDistanceHeader.setText(Double.toString(itDecrypt.getTotalDistance()));
+//		TextView timeTraveledHeader = (TextView)header.findViewById(R.id.timeTraveledHeader);
+//		Double d = itDecrypt.getTotalTimeTraveled();
+//		timeTraveledHeader.setText(getFormattedDuration(d.intValue()));
 		
 		// Populate list with our static array of titles.
 		elv = getExpandableListView();
 
 		Direction direction_data[] = directions.toArray(new Direction[directions.size()]);
-
-//		DirectionListAdapter adapter = new DirectionListAdapter(this.getActivity(), 
-//				R.layout.list_direction_item, direction_data);
 		
 		DirectionExpandableListAdapter adapter = new DirectionExpandableListAdapter(this.getActivity(), 
 				R.layout.list_direction_item, direction_data);
@@ -157,18 +207,5 @@ public class DirectionListFragment extends ExpandableListFragment {
 	 */
 	public void setFragmentListener(OnFragmentListener fragmentListener) {
 		this.fragmentListener = fragmentListener;
-	}
-	
-	private String getFormattedDuration(int sec){
-		String text = "";
-		int h = sec/3600;
-		if (h>=24)
-			return null;
-		int m = (sec%3600)/60;
-		int s = (sec%3600)%60;
-		text += Integer.toString(h) + "h" + " ";
-		text += Integer.toString(m) + "m" + " ";
-		text += Integer.toString(s) + "s" + " ";
-		return text;
 	}
 }

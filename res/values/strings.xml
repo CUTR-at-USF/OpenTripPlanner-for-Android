@@ -44,4 +44,11 @@
     <string name="email_otp_android_developer">ktran9.lbs@gmail.com</string>
     <string name="feedback_android_developer">Report to OTP Android developer</string>
     <string name="refresh_server_list">Refresh server list</string>
+    <string name="alternative_routes">Select a route</string>
+    <string name="geocoder_preference_provider_title">Geocoder Provider</string>
+    <string name="geocoder_preference_provider_summary">Select a provider for use in geocoder</string>
+    <string-array name="available_geocoder_providers">
+        <item>MapQuest Nominatim</item>
+        <item>Google Places</item>
+    </string-array>
 </resources>

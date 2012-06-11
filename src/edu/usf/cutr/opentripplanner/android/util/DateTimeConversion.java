@@ -47,4 +47,22 @@ public class DateTimeConversion {
 		}
 		return duration;
 	}
+	
+	/**
+	 * 
+	 * @param sec
+	 * @return
+	 */
+	public static String getFormattedDurationText(long sec){
+		String text = "";
+		long h = sec/3600;
+		if (h>=24)
+			return null;
+		long m = (sec%3600)/60;
+		long s = (sec%3600)%60;
+		text += Long.toString(h) + "h" + " ";
+		text += Long.toString(m) + "m" + " ";
+		text += Long.toString(s) + "s" + " ";
+		return text;
+	}
 }

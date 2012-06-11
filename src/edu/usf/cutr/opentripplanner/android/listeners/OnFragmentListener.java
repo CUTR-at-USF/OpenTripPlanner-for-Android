@@ -18,6 +18,7 @@ package edu.usf.cutr.opentripplanner.android.listeners;
 
 import java.util.List;
 
+import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.osmdroid.util.GeoPoint;
 
@@ -32,13 +33,19 @@ import android.support.v4.app.Fragment;
  */
 
 public interface OnFragmentListener {
-	public void onItinerarySelected(List<Leg> l);
+	public void onItinerariesLoaded(List<Itinerary> itineraries);
+	
+	public void onItinerarySelected(int i);
 	
 	public List<Leg> getCurrentItinerary();
 	
-	public void onDirectionFragmentSwitched();
+	public List<Itinerary> getCurrentItineraryList();
 	
-	public void onMainFragmentSwitched(Fragment f);
+	public int getCurrentItineraryIndex();
+	
+	public void onSwitchedToDirectionFragment();
+	
+	public void onSwitchedToMainFragment(Fragment f);
 	
 	public OTPBundle getOTPBundle();
 	
@@ -55,5 +62,7 @@ public interface OnFragmentListener {
 	public void zoomToLocation(GeoPoint p);
 	
 	public void setMarker(GeoPoint p, boolean isStartMarker);
+	
+	public void setButtonStartLocation (boolean isButtonStartLocation);
 	
 }

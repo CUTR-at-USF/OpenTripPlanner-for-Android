@@ -131,6 +131,10 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 	        	}
 	        }
 			currentLocation =new GeoPoint(currentLat, currentLon);
+			
+			for (int i=0; i<providers.size(); i++) {
+				otpLocationListenerList.set(i, null);
+			}
 		} else {
 			currentLocation = currLoc[0];
 		}
