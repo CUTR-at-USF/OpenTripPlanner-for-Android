@@ -249,7 +249,7 @@ OTPGeocodingListener{
 					public void onClick(DialogInterface dialog, int item) {
 						if(items[item].equals("Current Location")) {
 							GeoPoint p = LocationUtil.getLastLocation(activity);
-
+							
 							if(buttonID == R.id.btnStartLocation) {
 								tbStartLocation.setText("My Location");
 

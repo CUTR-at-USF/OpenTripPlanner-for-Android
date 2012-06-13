@@ -121,6 +121,7 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 	@Override
 	public void onItinerariesLoaded(List<Itinerary> itineraries) {
 		// TODO Auto-generated method stub
+		currentItineraryList.clear();
 		currentItineraryList.addAll(itineraries);
 	}
 
