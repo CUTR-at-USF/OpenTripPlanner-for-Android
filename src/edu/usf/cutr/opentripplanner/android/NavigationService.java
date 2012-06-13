@@ -17,7 +17,7 @@
 package edu.usf.cutr.opentripplanner.android;
 
 /*
- * Don't use this class yet
+ * Don't use this class yet - Khoa Tran
  */
 
 import android.app.Notification;

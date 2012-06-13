@@ -52,7 +52,6 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 	private Response response;
 	private static final String TAG = "OTP";
 	private ProgressDialog progressDialog;
-//	private MainFragment mainFragment;
 	private Context context;
 	private String currentRequestString = "";
 	private Server selectedServer;
