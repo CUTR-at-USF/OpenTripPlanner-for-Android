@@ -176,7 +176,8 @@ public class MapOverlay extends org.osmdroid.views.overlay.Overlay {
 		} else if (action == MotionEvent.ACTION_UP && inDrag != false) {
 			dragImage.setVisibility(View.GONE);
 
-			GeoPoint pt = (GeoPoint) pj.fromPixels(x - xDragTouchOffset, y - yDragTouchOffset);
+//			GeoPoint pt = (GeoPoint) pj.fromPixels(x - xDragTouchOffset, y - yDragTouchOffset);
+			GeoPoint pt = (GeoPoint) pj.fromPixels(x-xDragImageOffset-xDragTouchOffset,	y-yDragImageOffset-yDragTouchOffset);
 			//OverlayItem toDrop = new OverlayItem(inDrag.getTitle(),
 			//		inDrag.getSnippet(), pt);
 
