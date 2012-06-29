@@ -96,6 +96,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
@@ -124,6 +125,7 @@ OTPGeocodingListener{
 	private Spinner ddlOptimization;
 	private Spinner ddlTravelMode;
 	private Button btnPlanTrip;
+	private ImageView googlePlacesIcon;
 
 //	private Spinner ddlGeocoder;
 
@@ -199,6 +201,8 @@ OTPGeocodingListener{
 		ddlTravelMode = (Spinner) mainView.findViewById(R.id.spinTravelMode);
 
 		btnDisplayDirection = (ImageButton) mainView.findViewById(R.id.btnDisplayDirection);
+		
+		googlePlacesIcon = (ImageView) mainView.findViewById(R.id.googlePlacesIcon);
 
 		tripPanel.setOpen(true, true);
 
@@ -381,6 +385,12 @@ OTPGeocodingListener{
 			} else {
 				//TODO - handle issue when field is cleared/blank
 			}
+		}
+		
+		if(prefs.getString("geocoder_provider", "Google Places").equals("Google Places")){
+			googlePlacesIcon.setVisibility(View.VISIBLE);
+		} else {
+			googlePlacesIcon.setVisibility(View.INVISIBLE);
 		}
 
 		//		btnPlanTrip.setFocusable(true);
@@ -578,6 +588,13 @@ OTPGeocodingListener{
 				needToRunAutoDetect = true;
 			} else {
 				needToRunAutoDetect = false;
+			}
+		} else if (key.equals("geocoder_provider")){
+			if (prefs.getString("geocoder_provider", "Google Places").equals("Google Places")){
+				googlePlacesIcon.setVisibility(View.VISIBLE);
+			}
+			else {
+				googlePlacesIcon.setVisibility(View.INVISIBLE);
 			}
 		}
 	}

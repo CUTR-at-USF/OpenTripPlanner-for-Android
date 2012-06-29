@@ -150,6 +150,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 
 			String apiKey = "AIzaSyANO_4l0aroh4NuC6naYfk-vsPS12z2wco";
 			p = new GooglePlaces(apiKey);
+			
 			Log.v(TAG, "Using Google Places!");
 		} else {
 			params.put(Nominatim.PARAM_NAME, name);
@@ -157,6 +158,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 					selectedServer.getLowerLeftLatitude(),
 					selectedServer.getUpperRightLongitude(), 
 					selectedServer.getUpperRightLatitude());
+			
 			Log.v(TAG, "Using Nominatim!");
 		}
 

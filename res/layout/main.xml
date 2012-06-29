@@ -14,7 +14,6 @@
  License for the specific language governing permissions and limitations under
  the License.
 -->
-	
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:panel="http://schemas.android.com/apk/res/edu.usf.cutr.opentripplanner.android"
@@ -23,7 +22,7 @@
     android:orientation="vertical" >
 
     <RelativeLayout
-        android:id="@+id/relativeLayout4"
+        android:id="@+id/mapRelativeLayout"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
 
@@ -41,27 +40,43 @@
             android:src="@drawable/icon"
             android:visibility="gone" />
 
-        <ImageButton
-            android:id="@+id/btnDisplayDirection"
+        <LinearLayout
+            android:id="@+id/subMapRelativeLayout"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
+            android:layout_height="wrap_content" 
             android:layout_alignParentLeft="true"
-            android:background="@null"
-            android:src="@android:drawable/ic_menu_directions" />
+            android:layout_alignParentBottom="true"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/btnDisplayDirection"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:src="@android:drawable/ic_menu_directions" />
+
+            <ImageView
+                android:id="@+id/googlePlacesIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:background="@null"
+                android:src="@drawable/powered_by_google_on_white" />
+        </LinearLayout>
     </RelativeLayout>
 
     <org.miscwidgets.widget.Panel
         android:id="@+id/slidingDrawer1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         panel:animationDuration="1000"
         panel:closedHandle="@android:drawable/ic_menu_myplaces"
         panel:content="@+id/panelContent"
         panel:handle="@+id/panelHandle"
         panel:linearFlying="true"
         panel:openedHandle="@android:drawable/ic_menu_myplaces"
-        android:orientation="vertical"
         panel:position="top" >
 
         <Button
@@ -117,8 +132,8 @@
                     android:layout_height="wrap_content"
                     android:layout_toLeftOf="@+id/btnEndLocation"
                     android:hint="End Location"
-                    android:singleLine="true"
-                    android:selectAllOnFocus="true" >
+                    android:selectAllOnFocus="true"
+                    android:singleLine="true" >
                 </EditText>
 
                 <ImageButton
