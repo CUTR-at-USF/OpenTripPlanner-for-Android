@@ -41,7 +41,7 @@
     <string name="choose_geocoder">Select the address</string>
     <string name="geocoder_results_title">Geocoder Results</string>
     <string name="geocoder_no_results_message">Sorry, the address returns no geographical location</string>
-    <string name="email_otp_android_developer">ktran9.lbs@gmail.com</string>
+    <string name="email_otp_android_developer">barbeau@cutr.usf.edu</string>
     <string name="feedback_android_developer">Report to OTP Android developer</string>
     <string name="refresh_server_list">Refresh server list</string>
     <string name="alternative_routes">Select a route</string>

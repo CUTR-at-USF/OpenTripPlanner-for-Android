@@ -16,7 +16,10 @@
 
 package edu.usf.cutr.opentripplanner.android.tasks;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
@@ -32,6 +35,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Resources.NotFoundException;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
@@ -60,9 +64,9 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 	private boolean isStartTextbox;
 	private OTPGeocodingListener callback;
 	private String placesService;
-	
+
 	private ArrayList<Address> addressesReturn = new ArrayList<Address>();
-	
+
 	private Server selectedServer;
 
 	public OTPGeocoding(Context context, boolean isStartTextbox, Server selectedServer, String placesService, OTPGeocodingListener callback) {
@@ -81,9 +85,9 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 
 	protected Long doInBackground(String... reqs) {
 		long count = reqs.length;
-		
+
 		String address = reqs[0];
-		
+
 		if(address==null || address.equalsIgnoreCase("")) {
 			return count;
 		}
@@ -93,14 +97,14 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 			if(currentLocation==null){
 				return count;
 			}
-			
+
 			Address addressReturn = new Address(Locale.US);
 			addressReturn.setLatitude(currentLocation.getLatitudeE6()/1E6);
 			addressReturn.setLongitude(currentLocation.getLongitudeE6()/1E6);
 			addressReturn.setAddressLine(addressReturn.getMaxAddressLineIndex()+1, context.getString(R.string.my_location));
-			
+
 			addressesReturn.add(addressReturn);
-			
+
 			return count;
 		}
 
@@ -133,24 +137,52 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 				addr.setAddressLine(addr.getMaxAddressLineIndex()+1, addressLine);
 			}
 		}
-		
+
 		addressesReturn.addAll(addresses);
-		
+
 		return count;
 	}
-	
+
+	/**
+	 * Try to grab the developer key from an unversioned resource file, if it exists
+	 * @return the developer key from an unversioned resource file, or empty string if it doesn't exist
+	 */
+	private String getKeyFromResource(){
+		String strKey = new String("");
+
+		try {
+			InputStream in = context.getResources().openRawResource(R.raw.googleplaceskey);
+			BufferedReader r = new BufferedReader(new InputStreamReader(in));
+			StringBuilder total = new StringBuilder();
+
+			while ((strKey = r.readLine()) != null) {
+				total.append(strKey);
+			}
+
+			strKey = total.toString();
+
+			strKey.trim(); //Remove any whitespace
+
+		} catch (NotFoundException e) {
+			Log.w(TAG, "Warning - didn't find the google places key file:" + e);
+		} catch (IOException e) {
+			Log.w(TAG, "Error reading the developer key file:" + e);
+		}
+
+		return strKey;
+	}
+
 	private ArrayList<Address> searchPlaces(String name){
 		HashMap<String, String> params = new HashMap<String, String>();
 		Places p;
-		
+
 		if(placesService.equals("Google Places")){
 			params.put(GooglePlaces.PARAM_LOCATION, Double.toString(selectedServer.getCenterLatitude()) + "," + Double.toString(selectedServer.getCenterLongitude()));
 			params.put(GooglePlaces.PARAM_RADIUS, Double.toString(selectedServer.getRadius()));
 			params.put(GooglePlaces.PARAM_NAME, name);
 
-			String apiKey = "AIzaSyANO_4l0aroh4NuC6naYfk-vsPS12z2wco";
-			p = new GooglePlaces(apiKey);
-			
+			p = new GooglePlaces(getKeyFromResource());
+
 			Log.v(TAG, "Using Google Places!");
 		} else {
 			params.put(Nominatim.PARAM_NAME, name);
@@ -158,7 +190,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 					selectedServer.getLowerLeftLatitude(),
 					selectedServer.getUpperRightLongitude(), 
 					selectedServer.getUpperRightLatitude());
-			
+
 			Log.v(TAG, "Using Nominatim!");
 		}
 
@@ -185,7 +217,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 		if (progressDialog.isShowing()) {
 			progressDialog.dismiss();
 		}
-		
+
 		callback.onOTPGeocodingComplete(isStartTextbox, addressesReturn);
 	}
 }
