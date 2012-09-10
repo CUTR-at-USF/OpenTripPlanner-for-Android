@@ -53,6 +53,7 @@ public class OTPGetCurrentLocation extends AsyncTask<String, Integer, String> {
 
     public LocationManager lm;
     public ArrayList<OTPLocationListener> otpLocationListenerList;
+    OTPLocationListener otpLocationListener;
     
     private List<String> providers = new ArrayList<String>();
     
@@ -78,7 +79,7 @@ public class OTPGetCurrentLocation extends AsyncTask<String, Integer, String> {
 		providers.addAll(lm.getProviders(true));
 
 		for (int i=0; i<providers.size(); i++) {
-			OTPLocationListener otpLocationListener = new OTPLocationListener();
+			otpLocationListener = new OTPLocationListener();
 			lm.requestLocationUpdates(providers.get(i), 
 									  0, 
 									  0,
@@ -96,6 +97,12 @@ public class OTPGetCurrentLocation extends AsyncTask<String, Integer, String> {
 		}
         
         GeoPoint gp = new GeoPoint((int)(currentLat*1E6), (int)(currentLon*1E6));
+        
+        //Remove locationlisteners
+		for (int i=0; i<providers.size(); i++) {			
+			lm.removeUpdates(otpLocationListener);			
+		}
+
         
         callback.onOTPGetCurrentLocationComplete(gp);
     }

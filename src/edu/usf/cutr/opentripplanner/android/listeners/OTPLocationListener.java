@@ -29,10 +29,14 @@ import android.util.Log;
 
 public class OTPLocationListener implements LocationListener {
 	
+	private static final String TAG = "OTP";
+	
 	private static double currentLat=0.0, currentLon=0.0;
 
     @Override
     public void onLocationChanged(Location location) {
+    	
+    	Log.i(TAG, "OTPLocationListener.onLocationChanged(), provider = " + location.getProvider());
 
         int lat = (int) location.getLatitude(); // * 1E6);
         int log = (int) location.getLongitude(); // * 1E6);

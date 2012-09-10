@@ -73,7 +73,8 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
     private GeoPoint currentLocation;
 
     public LocationManager lm;
-    public ArrayList<OTPLocationListener> otpLocationListenerList;
+    public ArrayList<OTPLocationListener> otpLocationListenerList;    
+    OTPLocationListener otpLocationListener;
     
     public ServersDataSource dataSource = null;
     
@@ -108,7 +109,7 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 		providers.addAll(lm.getProviders(true));
 
 		for (int i=0; i<providers.size(); i++) {
-			OTPLocationListener otpLocationListener = new OTPLocationListener();
+			otpLocationListener = new OTPLocationListener();
 			lm.requestLocationUpdates(providers.get(i), 
 									  0, 
 									  0,
@@ -315,6 +316,11 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 	protected void onPostExecute(Long result) {
 		if (progressDialog.isShowing()) {
 			progressDialog.dismiss();
+		}
+		
+		//Remove locationlisteners
+		for (int i=0; i<providers.size(); i++) {			
+			lm.removeUpdates(otpLocationListener);			
 		}
 
 		if (selectedServer != null) {

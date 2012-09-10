@@ -548,17 +548,28 @@ OTPGeocodingListener{
 	}
 
 	@Override
-	public void onPause() {
-		super.onPause();
+	public void onPause() {		
 		mlo.disableMyLocation();
 		mlo.disableCompass();
 
 		// Save states before leaving
 		this.saveOTPBundle();
+		
+		super.onPause();
 	}
 
 	@Override
 	public void onDestroy(){
+		//Release all map-related objects to make sure GPS is shut down when the user leaves the app
+		mlo.disableFollowLocation();
+		mlo.disableMyLocation();
+		mlo.disableCompass();
+		mlo = null;		
+		mc = null;		
+		mv = null;
+		
+		Log.d(TAG, "Released all map objects in MainFragment.onDestroy()");
+				
 		super.onDestroy();
 	}
 
@@ -627,8 +638,9 @@ OTPGeocodingListener{
 			startActivity(myIntent);
 			break;
 		case R.id.my_location:
-			OTPGetCurrentLocation getCurrentLocation = new OTPGetCurrentLocation(this.getActivity(), this);
-			getCurrentLocation.execute("");
+//			OTPGetCurrentLocation getCurrentLocation = new OTPGetCurrentLocation(this.getActivity(), this);
+//			getCurrentLocation.execute("");
+			mlo.enableFollowLocation();
 			break;
 		case R.id.settings:
 			this.getActivity().startActivityForResult(new Intent(this.getActivity(), SettingsActivity.class), OTPApp.REFRESH_SERVER_LIST_REQUEST_CODE);

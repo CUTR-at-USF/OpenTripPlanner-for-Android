@@ -119,6 +119,20 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 	}
 	
 	@Override
+	protected void onDestroy() {		
+//		FragmentManager fm = getSupportFragmentManager();
+//		FragmentTransaction transaction = fm.beginTransaction();
+//		transaction.remove(mainFragment);
+//		transaction.commit();
+		
+		mainFragment = null;
+		
+		Log.d(TAG, "Released mainFragment with map in MyActivity.onDestroy()");
+		
+		super.onDestroy();
+	}
+	
+	@Override
 	public void onItinerariesLoaded(List<Itinerary> itineraries) {
 		// TODO Auto-generated method stub
 		currentItineraryList.clear();
