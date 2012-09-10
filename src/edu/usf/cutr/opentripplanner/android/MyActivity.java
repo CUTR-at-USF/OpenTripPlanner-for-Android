@@ -120,10 +120,6 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 	
 	@Override
 	protected void onDestroy() {		
-//		FragmentManager fm = getSupportFragmentManager();
-//		FragmentTransaction transaction = fm.beginTransaction();
-//		transaction.remove(mainFragment);
-//		transaction.commit();
 		
 		mainFragment = null;
 		
