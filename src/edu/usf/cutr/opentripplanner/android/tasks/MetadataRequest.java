@@ -17,17 +17,18 @@
 package edu.usf.cutr.opentripplanner.android.tasks;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.opentripplanner.api.ws.GraphMetadata;
-import org.simpleframework.xml.Serializer;
-import org.simpleframework.xml.core.Persister;
 
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.util.Log;
-import de.mastacode.http.Http;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import edu.usf.cutr.opentripplanner.android.MyActivity;
 import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.model.Server;
@@ -115,34 +116,49 @@ public class MetadataRequest extends AsyncTask<String, Integer, Long> {
 		String u = server.getBaseURL() + res;
 
 		Log.d(TAG, "URL: " + u);
-		
-		HttpClient client = new DefaultHttpClient();
-		String result = "";
-		try {
-			result = Http.get(u).use(client).header("Accept", "application/xml").header("Keep-Alive","timeout=60, max=100").charset("UTF-8").followRedirects(true).asString();
-			Log.d(TAG, "Result: " + result);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-		
-		Serializer serializer = new Persister();
-
+			
+		HttpURLConnection urlConnection = null;
+		URL url = null;
 		GraphMetadata plan = null;
+
 		try {
-			plan = serializer.read(GraphMetadata.class, result);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			Log.e(TAG, e.getMessage());
+
+			url = new URL(u);
+
+			disableConnectionReuseIfNecessary(); // For bugs in HttpURLConnection pre-Froyo
+
+			// Serializer serializer = new Persister();
+			ObjectMapper mapper = new ObjectMapper();
+
+			urlConnection = (HttpURLConnection) url.openConnection();
+			urlConnection.setRequestProperty("Accept", "application/json");
+
+			// plan = serializer.read(Response.class, result);
+			plan = mapper.readValue(urlConnection.getInputStream(),
+					GraphMetadata.class);
+			
+		} catch (IOException e) {
+			Log.e(TAG, "Error fetching JSON or XML: " + e);
 			e.printStackTrace();
-			return null;
+			// Reset timestamps to show there was an error
+			// requestStartTime = 0;
+			// requestEndTime = 0;
+		} finally {
+			if (urlConnection != null) {
+				urlConnection.disconnect();
+			}
 		}
-		//TODO - handle errors and error responses
-		if(plan == null) {
-			Log.d(TAG, "No response for graphmetadata?");
-			return null;
-		}
+
 		return plan;
+	}
+	
+	/**
+	 * Disable HTTP connection reuse which was buggy pre-froyo
+	 */
+	private void disableConnectionReuseIfNecessary() {
+		//if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) {  //Should change to this once we update to Android 4.1 SDK
+		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.ECLAIR_MR1) {
+			System.setProperty("http.keepAlive", "false");
+		}
 	}
 }

@@ -18,38 +18,33 @@ package edu.usf.cutr.opentripplanner.android.fragments;
 
 import java.util.ArrayList;
 
-import edu.usf.cutr.opentripplanner.android.R;
-
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
-import org.opentripplanner.routing.core.OptimizeType;
-
-import edu.usf.cutr.opentripplanner.android.listeners.OnFragmentListener;
-import edu.usf.cutr.opentripplanner.android.model.Direction;
-import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
-import edu.usf.cutr.opentripplanner.android.model.OptimizeSpinnerItem;
-import edu.usf.cutr.opentripplanner.android.util.DateTimeConversion;
-import edu.usf.cutr.opentripplanner.android.util.DirectionExpandableListAdapter;
-import edu.usf.cutr.opentripplanner.android.util.ExpandableListFragment;
-import edu.usf.cutr.opentripplanner.android.util.ItineraryDecrypt;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.Spinner;
-import android.widget.Toast;
-
 import android.widget.TextView;
+import edu.usf.cutr.opentripplanner.android.R;
+import edu.usf.cutr.opentripplanner.android.listeners.OnFragmentListener;
+import edu.usf.cutr.opentripplanner.android.model.Direction;
+import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
+import edu.usf.cutr.opentripplanner.android.util.DateTimeConversion;
+import edu.usf.cutr.opentripplanner.android.util.DirectionExpandableListAdapter;
+import edu.usf.cutr.opentripplanner.android.util.ExpandableListFragment;
+import edu.usf.cutr.opentripplanner.android.util.ItineraryDecrypt;
 
 /**
+ * This fragment shows the list of step-by-step directions for a planned trip
+ * 
  * @author Khoa Tran
  *
  */
@@ -59,9 +54,7 @@ public class DirectionListFragment extends ExpandableListFragment {
 	View header = null;
 
 	private OnFragmentListener fragmentListener;
-
-	private static final String TAG = "OTP";
-	
+		
 	private ExpandableListView elv;
 	
 	private boolean isFragmentFirstLoaded = true;

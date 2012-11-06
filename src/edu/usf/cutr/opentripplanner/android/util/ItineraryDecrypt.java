@@ -139,7 +139,7 @@ public class ItineraryDecrypt {
 		direction.setDirectionText(mainDirectionText);
 
 		//		Sub-direction
-		List<WalkStep> walkSteps = leg.walkSteps;
+		List<WalkStep> walkSteps = leg.getSteps();
 
 		if(walkSteps==null) return direction;
 
@@ -251,8 +251,8 @@ public class ItineraryDecrypt {
 		String alignRule = leg.alightRule;
 
 		ArrayList<Place> stopsInBetween = new ArrayList<Place>();
-		if(leg.stops!=null)
-			stopsInBetween.addAll(leg.stops);
+		if(leg.getIntermediateStops()!=null)
+			stopsInBetween.addAll(leg.getIntermediateStops());
 
 		double distance = leg.distance;
 		Place from = leg.from;

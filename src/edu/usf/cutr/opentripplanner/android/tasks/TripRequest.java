@@ -17,6 +17,8 @@
 package edu.usf.cutr.opentripplanner.android.tasks;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -28,13 +30,12 @@ import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.ws.Request;
 import org.opentripplanner.api.ws.Response;
-import org.simpleframework.xml.Serializer;
-import org.simpleframework.xml.core.Persister;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.util.Log;
 import de.mastacode.http.Http;
 import edu.usf.cutr.opentripplanner.android.MyActivity;
@@ -42,6 +43,7 @@ import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.fragments.MainFragment;
 import edu.usf.cutr.opentripplanner.android.listeners.TripRequestCompleteListener;
 import edu.usf.cutr.opentripplanner.android.model.Server;
+import edu.usf.cutr.opentripplanner.android.util.JacksonConfig;
 
 /**
  * Modified by Khoa Tran
@@ -83,9 +85,9 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 			progressDialog.dismiss();
 		}
 		
-		if (response != null && response.getPlan() != null && response.getPlan().itinerary.get(0) != null) {
+		if (response != null && response.getPlan() != null && response.getPlan().itineraries.get(0) != null) {
 			
-			List<Itinerary> itineraries = response.getPlan().itinerary;
+			List<Itinerary> itineraries = response.getPlan().itineraries;
 			
 //			mainFragment.setItineraries(itineraries);
 			
@@ -95,7 +97,7 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 		} else {
 			// TODO - handle errors here?
 			if(response != null && response.getError() != null) {
-				String msg = response.getError().getMsg();
+				String msg = response.getError().toString();
 				AlertDialog.Builder feedback = new AlertDialog.Builder(context);
 				feedback.setTitle("Error Planning Trip");
 				feedback.setMessage(msg);
@@ -157,33 +159,72 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 		
 		currentRequestString = u;
 		
-		HttpClient client = new DefaultHttpClient();
-		String result = "";
-		try {
-			result = Http.get(u).use(client).header("Accept", "application/xml").header("Keep-Alive","timeout=60, max=100").charset("UTF-8").followRedirects(true).asString();
-			Log.d(TAG, "Result: " + result);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
+//		HttpClient client = new DefaultHttpClient();
+//		String result = "";
+//		try {
+//			result = Http.get(u).use(client).header("Accept", "application/xml").header("Keep-Alive","timeout=60, max=100").charset("UTF-8").followRedirects(true).asString();
+//			Log.d(TAG, "Result: " + result);
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//			return null;
+//		}
 		
-		Serializer serializer = new Persister();
+		//Serializer serializer = new Persister();  //Simple XML
+		
 
+//		Response plan = null;
+//		try {
+//			plan = JacksonConfig.getObjectReaderInstance().readValue(result, Response.class);
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			Log.e(TAG, e.getMessage());
+//			e.printStackTrace();
+//			return null;
+//		}
+//		//TODO - handle errors and error responses
+//		if(plan == null) {
+//			Log.d(TAG, "No response?");
+//			return null;
+//		}
+		
+		HttpURLConnection urlConnection = null;
+		URL url = null;
 		Response plan = null;
+
 		try {
-			plan = serializer.read(Response.class, result);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			Log.e(TAG, e.getMessage());
+
+			url = new URL(u);
+
+			disableConnectionReuseIfNecessary(); // For bugs in HttpURLConnection pre-Froyo
+
+			urlConnection = (HttpURLConnection) url.openConnection();
+			urlConnection.setRequestProperty("Accept", "application/json");
+
+			// plan = serializer.read(Response.class, result);
+			plan = JacksonConfig.getObjectReaderInstance().readValue(urlConnection.getInputStream());
+			
+		} catch (IOException e) {
+			Log.e(TAG, "Error fetching JSON or XML: " + e);
 			e.printStackTrace();
-			return null;
-		}
-		//TODO - handle errors and error responses
-		if(plan == null) {
-			Log.d(TAG, "No response?");
-			return null;
+			// Reset timestamps to show there was an error
+			// requestStartTime = 0;
+			// requestEndTime = 0;
+		} finally {
+			if (urlConnection != null) {
+				urlConnection.disconnect();
+			}
 		}
 		return plan;
+	}
+	
+	/**
+	 * Disable HTTP connection reuse which was buggy pre-froyo
+	 */
+	private void disableConnectionReuseIfNecessary() {
+		//if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) {  //TODO - Should change to this once we update to Android 4.1 SDK
+		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.ECLAIR_MR1) {
+			System.setProperty("http.keepAlive", "false");
+		}
 	}
 }

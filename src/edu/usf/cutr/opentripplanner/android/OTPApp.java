@@ -16,11 +16,8 @@
 
 package edu.usf.cutr.opentripplanner.android;
 
-import edu.usf.cutr.opentripplanner.android.model.Server;
-import edu.usf.cutr.opentripplanner.android.tasks.MetadataRequest;
-
 import android.app.Application;
-import android.location.Location;
+import edu.usf.cutr.opentripplanner.android.model.Server;
 
 /*
  * Modified by Khoa Tran
@@ -35,6 +32,8 @@ public class OTPApp extends Application {
 	public static final String REFRESH_SERVER_RETURN_KEY = "RefreshServer";
 	
 	private static Server selectedServer;
+	
+	public static final String TAG = "OTP";
 
 	/**
 	 * @param selectedServer the selected OTP server
