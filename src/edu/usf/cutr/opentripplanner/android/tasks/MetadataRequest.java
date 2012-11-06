@@ -43,6 +43,8 @@ public class MetadataRequest extends AsyncTask<String, Integer, Long> {
 	private static final String TAG = "OTP";
 	private ProgressDialog progressDialog;
 	private MyActivity activity;
+	
+	private static ObjectMapper mapper = null;
 
 	public MetadataRequest(MyActivity activity) {
 		this.activity = activity;
@@ -128,7 +130,10 @@ public class MetadataRequest extends AsyncTask<String, Integer, Long> {
 			disableConnectionReuseIfNecessary(); // For bugs in HttpURLConnection pre-Froyo
 
 			// Serializer serializer = new Persister();
-			ObjectMapper mapper = new ObjectMapper();
+			
+			if(mapper == null){
+				mapper = new ObjectMapper();
+			}
 
 			urlConnection = (HttpURLConnection) url.openConnection();
 			urlConnection.setRequestProperty("Accept", "application/json");
