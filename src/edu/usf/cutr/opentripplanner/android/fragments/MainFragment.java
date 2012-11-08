@@ -774,7 +774,7 @@ OTPGeocodingListener{
 			for (Leg leg : itinerary) {
 				int pathColor = getPathColor(leg.mode);
 				routeOverlay.addPath(pathColor);
-				List<GeoPoint> points = EncodedPolylineBean
+				List<GeoPoint> points = LocationUtil
 						.decodePoly(leg.legGeometry.getPoints());
 				for (GeoPoint geoPoint : points) {
 					routeOverlay.addPoint(index, geoPoint);

@@ -46,8 +46,10 @@ import android.util.Log;
 import android.widget.Toast;
 
 /**
+ * Main Activity for the OTP for Android app
+ * 
  * @author Khoa Tran
- *
+ * 
  */
 
 public class MyActivity extends FragmentActivity implements OnFragmentListener{
