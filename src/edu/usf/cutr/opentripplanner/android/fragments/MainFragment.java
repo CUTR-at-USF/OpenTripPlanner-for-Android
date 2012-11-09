@@ -26,7 +26,6 @@ import java.util.List;
 import org.apache.http.HttpStatus;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.miscwidgets.widget.Panel;
-import org.opentripplanner.api.model.EncodedPolylineBean;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.ws.Request;
@@ -99,8 +98,9 @@ import edu.usf.cutr.opentripplanner.android.tasks.TripRequest;
 import edu.usf.cutr.opentripplanner.android.util.LocationUtil;
 
 /**
- * @author Khoa Tran
- *
+ * Main UI screen of the app, showing the map.
+ * 
+ * @author Khoa Tran *
  */
 
 public class MainFragment extends Fragment 

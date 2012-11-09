@@ -1,5 +1,7 @@
 package edu.usf.cutr.opentripplanner.android.util;
 
+import static edu.usf.cutr.opentripplanner.android.OTPApp.TAG;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -14,12 +16,8 @@ import org.opentripplanner.api.ws.Response;
 import android.content.Context;
 import android.util.Log;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-
-import static edu.usf.cutr.opentripplanner.android.OTPApp.TAG;
 
 /**
  * This class holds a static instance of a Jackson ObjectMapper and ObjectReader

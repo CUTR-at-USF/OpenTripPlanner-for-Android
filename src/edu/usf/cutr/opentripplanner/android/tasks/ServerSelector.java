@@ -18,16 +18,15 @@ package edu.usf.cutr.opentripplanner.android.tasks;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.osmdroid.util.GeoPoint;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -39,16 +38,12 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
-import android.text.format.Time;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
 import au.com.bytecode.opencsv.CSVReader;
 import de.mastacode.http.Http;
-import edu.usf.cutr.opentripplanner.android.MyActivity;
-import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.listeners.OTPLocationListener;
-import edu.usf.cutr.opentripplanner.android.listeners.OnFragmentListener;
 import edu.usf.cutr.opentripplanner.android.listeners.ServerSelectorCompleteListener;
 import edu.usf.cutr.opentripplanner.android.model.Server;
 import edu.usf.cutr.opentripplanner.android.sqlite.ServersDataSource;

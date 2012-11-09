@@ -24,10 +24,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.opentripplanner.api.model.Itinerary;
-import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.ws.Request;
 import org.opentripplanner.api.ws.Response;
 
@@ -37,17 +34,15 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
-import de.mastacode.http.Http;
-import edu.usf.cutr.opentripplanner.android.MyActivity;
-import edu.usf.cutr.opentripplanner.android.OTPApp;
-import edu.usf.cutr.opentripplanner.android.fragments.MainFragment;
 import edu.usf.cutr.opentripplanner.android.listeners.TripRequestCompleteListener;
 import edu.usf.cutr.opentripplanner.android.model.Server;
 import edu.usf.cutr.opentripplanner.android.util.JacksonConfig;
 
 /**
- * Modified by Khoa Tran
- *
+ * AsyncTask that invokes a trip planning request to the OTP Server
+ * 
+ * @author Khoa Tran
+ * @author Sean Barbeau (conversion to Jackson)
  */
 
 public class TripRequest extends AsyncTask<Request, Integer, Long> {

@@ -21,21 +21,13 @@ import java.util.List;
 
 import org.osmdroid.util.GeoPoint;
 
-import edu.usf.cutr.opentripplanner.android.MyActivity;
-import edu.usf.cutr.opentripplanner.android.listeners.OTPGetCurrentLocationListener;
-import edu.usf.cutr.opentripplanner.android.listeners.OTPLocationListener;
-
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.os.SystemClock;
-import android.util.Log;
-import android.widget.Toast;
+import edu.usf.cutr.opentripplanner.android.listeners.OTPGetCurrentLocationListener;
+import edu.usf.cutr.opentripplanner.android.listeners.OTPLocationListener;
 
 /**
  * 

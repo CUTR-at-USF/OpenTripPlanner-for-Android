@@ -19,36 +19,31 @@ package edu.usf.cutr.opentripplanner.android;
 import java.util.ArrayList;
 import java.util.List;
 
-
-import edu.usf.cutr.opentripplanner.android.R;
-
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.osmdroid.util.GeoPoint;
-
-import edu.usf.cutr.opentripplanner.android.fragments.DirectionListFragment;
-import edu.usf.cutr.opentripplanner.android.fragments.MainFragment;
-import edu.usf.cutr.opentripplanner.android.listeners.OnFragmentListener;
-import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
-import edu.usf.cutr.opentripplanner.android.sqlite.ServersDataSource;
 
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Contacts;
 import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
-import android.widget.Toast;
+import edu.usf.cutr.opentripplanner.android.fragments.DirectionListFragment;
+import edu.usf.cutr.opentripplanner.android.fragments.MainFragment;
+import edu.usf.cutr.opentripplanner.android.listeners.OnFragmentListener;
+import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
+import edu.usf.cutr.opentripplanner.android.sqlite.ServersDataSource;
 
 /**
  * Main Activity for the OTP for Android app
  * 
  * @author Khoa Tran
+ * @author Sean Barbeau (conversion to Jackson)
  * 
  */
 
