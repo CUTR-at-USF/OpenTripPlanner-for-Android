@@ -247,7 +247,24 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 			}
 		} catch (IOException e) {
 			Log.e(TAG, "Problem reading CSV server file: " + e.getMessage());
+			
+			if(reader != null){
+				try {
+					reader.close();
+				} catch (IOException e2) {
+					Log.e(TAG, "Error closing CSVReader file: " + e2);
+				}
+			}
+			
 			return null;
+		}finally{
+			if(reader != null){
+				try {
+					reader.close();
+				} catch (IOException e) {
+					Log.e(TAG, "Error closing CSVReader file: " + e);
+				}
+			}
 		}
 
 		Log.d(TAG, "Servers: " + serverList.size());

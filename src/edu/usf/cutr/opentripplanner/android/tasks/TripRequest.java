@@ -24,9 +24,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.ws.Request;
-import org.opentripplanner.api.ws.Response;
+import org.opentripplanner.v092snapshot.api.model.Itinerary;
+import org.opentripplanner.v092snapshot.api.ws.Response;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -80,9 +80,9 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 			progressDialog.dismiss();
 		}
 		
-		if (response != null && response.getPlan() != null && response.getPlan().itineraries.get(0) != null) {
+		if (response != null && response.getPlan() != null && response.getPlan().getItinerary().get(0) != null) {
 			
-			List<Itinerary> itineraries = response.getPlan().itineraries;
+			List<Itinerary> itineraries = response.getPlan().getItinerary();
 			
 //			mainFragment.setItineraries(itineraries);
 			

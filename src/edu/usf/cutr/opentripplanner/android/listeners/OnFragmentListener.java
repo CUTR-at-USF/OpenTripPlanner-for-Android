@@ -18,8 +18,8 @@ package edu.usf.cutr.opentripplanner.android.listeners;
 
 import java.util.List;
 
-import org.opentripplanner.api.model.Itinerary;
-import org.opentripplanner.api.model.Leg;
+import org.opentripplanner.v092snapshot.api.model.Itinerary;
+import org.opentripplanner.v092snapshot.api.model.Leg;
 import org.osmdroid.util.GeoPoint;
 
 import edu.usf.cutr.opentripplanner.android.model.OTPBundle;

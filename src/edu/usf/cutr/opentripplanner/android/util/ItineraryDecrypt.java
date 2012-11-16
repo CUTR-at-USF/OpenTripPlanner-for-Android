@@ -21,14 +21,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.usf.cutr.opentripplanner.android.R;
-import org.opentripplanner.api.model.AbsoluteDirection;
+
 import org.opentripplanner.api.model.AgencyAndId;
-import org.opentripplanner.api.model.Leg;
-import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.RelativeDirection;
-import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.patch.Alerts;
+import org.opentripplanner.v092snapshot.api.model.AbsoluteDirection;
+import org.opentripplanner.v092snapshot.api.model.Elevation;
+import org.opentripplanner.v092snapshot.api.model.Leg;
+import org.opentripplanner.v092snapshot.api.model.Place;
+import org.opentripplanner.v092snapshot.api.model.WalkStep;
 
 import edu.usf.cutr.opentripplanner.android.model.Direction;
 
@@ -139,7 +141,7 @@ public class ItineraryDecrypt {
 		direction.setDirectionText(mainDirectionText);
 
 		//		Sub-direction
-		List<WalkStep> walkSteps = leg.getSteps();
+		List<WalkStep> walkSteps = leg.getWalkSteps();
 
 		if(walkSteps==null) return direction;
 
@@ -162,7 +164,7 @@ public class ItineraryDecrypt {
 			boolean isBogusName = (step.bogusName==null ? false : step.bogusName);
 			double lon = step.lon;
 			double lat = step.lat;
-			String elevation = step.elevation;
+			Elevation[] elevation = step.getElevation();
 			List<Alerts> alert = step.alerts;
 
 			// Walk East
@@ -251,8 +253,8 @@ public class ItineraryDecrypt {
 		String alignRule = leg.alightRule;
 
 		ArrayList<Place> stopsInBetween = new ArrayList<Place>();
-		if(leg.getIntermediateStops()!=null)
-			stopsInBetween.addAll(leg.getIntermediateStops());
+		if(leg.getStop()!=null)
+			stopsInBetween.addAll(leg.getStop());
 
 		double distance = leg.distance;
 		Place from = leg.from;

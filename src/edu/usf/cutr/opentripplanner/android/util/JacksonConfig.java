@@ -11,7 +11,9 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 
-import org.opentripplanner.api.ws.Response;
+import org.opentripplanner.v092snapshot.api.ws.Response;
+
+
 
 import android.content.Context;
 import android.util.Log;

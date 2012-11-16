@@ -26,12 +26,12 @@ import java.util.List;
 import org.apache.http.HttpStatus;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.miscwidgets.widget.Panel;
-import org.opentripplanner.api.model.Itinerary;
-import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.ws.Request;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.v092snapshot.api.model.Itinerary;
+import org.opentripplanner.v092snapshot.api.model.Leg;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
@@ -103,12 +103,10 @@ import edu.usf.cutr.opentripplanner.android.util.LocationUtil;
  * @author Khoa Tran *
  */
 
-public class MainFragment extends Fragment 
-implements OnSharedPreferenceChangeListener,
-ServerSelectorCompleteListener,
-TripRequestCompleteListener,
-OTPGetCurrentLocationListener,
-OTPGeocodingListener{
+public class MainFragment extends Fragment implements
+		OnSharedPreferenceChangeListener, ServerSelectorCompleteListener,
+		TripRequestCompleteListener, OTPGetCurrentLocationListener,
+		OTPGeocodingListener {
 
 	private MapView mv;
 	private MapController mc;
@@ -124,7 +122,7 @@ OTPGeocodingListener{
 	private Button btnPlanTrip;
 	private ImageView googlePlacesIcon;
 
-//	private Spinner ddlGeocoder;
+	// private Spinner ddlGeocoder;
 
 	private Panel tripPanel;
 	Panel directionPanel;
@@ -139,7 +137,7 @@ OTPGeocodingListener{
 	private OTPApp app;
 	private static LocationManager locationManager;
 
-	//	private List<Itinerary> itineraries = null;
+	// private List<Itinerary> itineraries = null;
 
 	ArrayList<String> directionText = new ArrayList<String>();
 
@@ -161,9 +159,9 @@ OTPGeocodingListener{
 		try {
 			setFragmentListener((OnFragmentListener) activity);
 		} catch (ClassCastException e) {
-			throw new ClassCastException(activity.toString() + " must implement OnFragmentListener");
+			throw new ClassCastException(activity.toString()
+					+ " must implement OnFragmentListener");
 		}
-
 
 	}
 
@@ -174,111 +172,140 @@ OTPGeocodingListener{
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
 
-		View mainView = inflater.inflate(R.layout.main, container, false); 
+		View mainView = inflater.inflate(R.layout.main, container, false);
 		final Activity activity = this.getActivity();
 
 		final OnFragmentListener ofl = this.getFragmentListener();
 
-		prefs = PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
+		prefs = PreferenceManager.getDefaultSharedPreferences(activity
+				.getApplicationContext());
 		prefs.registerOnSharedPreferenceChangeListener(this);
 
 		app = ((OTPApp) activity.getApplication());
 
-		locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
+		locationManager = (LocationManager) activity
+				.getSystemService(Context.LOCATION_SERVICE);
 
-		btnStartLocation = (ImageButton) mainView.findViewById(R.id.btnStartLocation);
-		btnEndLocation = (ImageButton) mainView.findViewById(R.id.btnEndLocation);
-		tbStartLocation = (EditText) mainView.findViewById(R.id.tbStartLocation);
+		btnStartLocation = (ImageButton) mainView
+				.findViewById(R.id.btnStartLocation);
+		btnEndLocation = (ImageButton) mainView
+				.findViewById(R.id.btnEndLocation);
+		tbStartLocation = (EditText) mainView
+				.findViewById(R.id.tbStartLocation);
 		tbEndLocation = (EditText) mainView.findViewById(R.id.tbEndLocation);
 		btnPlanTrip = (Button) mainView.findViewById(R.id.btnPlanTrip);
 		tripPanel = (Panel) mainView.findViewById(R.id.slidingDrawer1);
-		ddlOptimization = (Spinner) mainView.findViewById(R.id.spinOptimization);
+		ddlOptimization = (Spinner) mainView
+				.findViewById(R.id.spinOptimization);
 		ddlTravelMode = (Spinner) mainView.findViewById(R.id.spinTravelMode);
 
-		btnDisplayDirection = (ImageButton) mainView.findViewById(R.id.btnDisplayDirection);
-		
-		googlePlacesIcon = (ImageView) mainView.findViewById(R.id.googlePlacesIcon);
+		btnDisplayDirection = (ImageButton) mainView
+				.findViewById(R.id.btnDisplayDirection);
+
+		googlePlacesIcon = (ImageView) mainView
+				.findViewById(R.id.googlePlacesIcon);
 
 		tripPanel.setOpen(true, true);
 
 		tripPanel.setFocusable(true);
 		tripPanel.setFocusableInTouchMode(true);
 
-		ArrayAdapter<OptimizeSpinnerItem> optimizationAdapter = new ArrayAdapter<OptimizeSpinnerItem>(activity, android.R.layout.simple_spinner_item, new OptimizeSpinnerItem[] {
-				new OptimizeSpinnerItem("Quickest", OptimizeType.QUICK),
-				new OptimizeSpinnerItem("Safest", OptimizeType.SAFE),
-				new OptimizeSpinnerItem("Fewest Transfers", OptimizeType.TRANSFERS)
-		});
+		ArrayAdapter<OptimizeSpinnerItem> optimizationAdapter = new ArrayAdapter<OptimizeSpinnerItem>(
+				activity,
+				android.R.layout.simple_spinner_item,
+				new OptimizeSpinnerItem[] {
+						new OptimizeSpinnerItem("Quickest", OptimizeType.QUICK),
+						new OptimizeSpinnerItem("Safest", OptimizeType.SAFE),
+						new OptimizeSpinnerItem("Fewest Transfers",
+								OptimizeType.TRANSFERS) });
 
-		optimizationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		optimizationAdapter
+				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		ddlOptimization.setAdapter(optimizationAdapter);
 
-		ArrayAdapter<TraverseModeSpinnerItem> traverseModeAdapter = new ArrayAdapter<TraverseModeSpinnerItem>(activity, android.R.layout.simple_spinner_item, new TraverseModeSpinnerItem[] {
-				new TraverseModeSpinnerItem("Transit", new TraverseModeSet(TraverseMode.TRANSIT, TraverseMode.WALK)),
-				new TraverseModeSpinnerItem("Bus Only", new TraverseModeSet(TraverseMode.BUSISH, TraverseMode.WALK)),
-				new TraverseModeSpinnerItem("Train Only", new TraverseModeSet(TraverseMode.TRAINISH, TraverseMode.WALK)), //not sure
-				new TraverseModeSpinnerItem("Walk Only", new TraverseModeSet(TraverseMode.WALK)),
-				new TraverseModeSpinnerItem("Bicycle", new TraverseModeSet(TraverseMode.BICYCLE)),
-				new TraverseModeSpinnerItem("Transit and Bicycle", new TraverseModeSet(TraverseMode.TRANSIT, TraverseMode.BICYCLE))
-		});
+		ArrayAdapter<TraverseModeSpinnerItem> traverseModeAdapter = new ArrayAdapter<TraverseModeSpinnerItem>(
+				activity, android.R.layout.simple_spinner_item,
+				new TraverseModeSpinnerItem[] {
+						new TraverseModeSpinnerItem("Transit",
+								new TraverseModeSet(TraverseMode.TRANSIT,
+										TraverseMode.WALK)),
+						new TraverseModeSpinnerItem("Bus Only",
+								new TraverseModeSet(TraverseMode.BUSISH,
+										TraverseMode.WALK)),
+						new TraverseModeSpinnerItem("Train Only",
+								new TraverseModeSet(TraverseMode.TRAINISH,
+										TraverseMode.WALK)), // not sure
+						new TraverseModeSpinnerItem("Walk Only",
+								new TraverseModeSet(TraverseMode.WALK)),
+						new TraverseModeSpinnerItem("Bicycle",
+								new TraverseModeSet(TraverseMode.BICYCLE)),
+						new TraverseModeSpinnerItem("Transit and Bicycle",
+								new TraverseModeSet(TraverseMode.TRANSIT,
+										TraverseMode.BICYCLE)) });
 
-		traverseModeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		traverseModeAdapter
+				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		ddlTravelMode.setAdapter(traverseModeAdapter);
 
 		GeoPoint currentLocation = LocationUtil.getLastLocation(activity);
 
 		// if currentLocation is null
-		if(currentLocation==null){
+		if (currentLocation == null) {
 			currentLocation = defaultCenterLocation;
 		}
-		
+
 		OnClickListener ocl = new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				//mBoundService.updateNotification();
+				// mBoundService.updateNotification();
 
 				final int buttonID = v.getId();
 
-				final CharSequence[] items = {"Current Location", "Contact Address", "Point on Map"};
+				final CharSequence[] items = { "Current Location",
+						"Contact Address", "Point on Map" };
 
 				AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 				builder.setTitle("Choose Start Location");
 				builder.setItems(items, new DialogInterface.OnClickListener() {
 
 					public void onClick(DialogInterface dialog, int item) {
-						if(items[item].equals("Current Location")) {
+						if (items[item].equals("Current Location")) {
 							GeoPoint p = LocationUtil.getLastLocation(activity);
-							
-							if(buttonID == R.id.btnStartLocation) {
+
+							if (buttonID == R.id.btnStartLocation) {
 								tbStartLocation.setText("My Location");
 
-								if(p != null){
+								if (p != null) {
 									startMarker.setLocation(p);
 								}
-							} else if(buttonID == R.id.btnEndLocation) {
+							} else if (buttonID == R.id.btnEndLocation) {
 								tbEndLocation.setText("My Location");
-								if(p != null){
+								if (p != null) {
 									endMarker.setLocation(p);
 								}
 							}
-						} else if(items[item].equals("Contact Address")) {							
+						} else if (items[item].equals("Contact Address")) {
 							Intent intent = new Intent(Intent.ACTION_PICK);
 							intent.setType(ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_TYPE);
 							MyActivity myActivity = (MyActivity) activity;
-							if(buttonID == R.id.btnStartLocation) {
+							if (buttonID == R.id.btnStartLocation) {
 								myActivity.setButtonStartLocation(true);
-							} else if(buttonID == R.id.btnEndLocation) {
+							} else if (buttonID == R.id.btnEndLocation) {
 								myActivity.setButtonStartLocation(false);
 							}
-							activity.startActivityForResult(intent, OTPApp.CHOOSE_CONTACT_REQUEST_CODE);
-							
-						} else { //Point on Map
-							if(buttonID == R.id.btnStartLocation) {
-								tbStartLocation.setText(startMarker.getLocationFormatedString());
-							} else if(buttonID == R.id.btnEndLocation) {
-								tbEndLocation.setText(endMarker.getLocationFormatedString());
+							activity.startActivityForResult(intent,
+									OTPApp.CHOOSE_CONTACT_REQUEST_CODE);
+
+						} else { // Point on Map
+							if (buttonID == R.id.btnStartLocation) {
+								tbStartLocation.setText(startMarker
+										.getLocationFormatedString());
+							} else if (buttonID == R.id.btnEndLocation) {
+								tbEndLocation.setText(endMarker
+										.getLocationFormatedString());
 							}
 						}
 					}
@@ -296,19 +323,20 @@ OTPGeocodingListener{
 		tbEndLocation.requestFocus();
 		OnEditorActionListener tbLocationOnEditorActionListener = new OnEditorActionListener() {
 			@Override
-			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-				if(v.getId()==R.id.tbStartLocation && 
-						actionId == EditorInfo.IME_ACTION_NEXT || 
-						(event!=null && 
-						event.getAction() == KeyEvent.ACTION_DOWN && 
-						event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
+			public boolean onEditorAction(TextView v, int actionId,
+					KeyEvent event) {
+				if (v.getId() == R.id.tbStartLocation
+						&& actionId == EditorInfo.IME_ACTION_NEXT
+						|| (event != null
+								&& event.getAction() == KeyEvent.ACTION_DOWN && event
+								.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
 					isRealLostFocus = false;
 					processAddress(true, v.getText().toString());
-				} else if(v.getId()==R.id.tbEndLocation && 
-						actionId == EditorInfo.IME_ACTION_DONE || 
-						(event!=null &&
-						event.getAction() == KeyEvent.ACTION_DOWN && 
-						event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
+				} else if (v.getId() == R.id.tbEndLocation
+						&& actionId == EditorInfo.IME_ACTION_DONE
+						|| (event != null
+								&& event.getAction() == KeyEvent.ACTION_DOWN && event
+								.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
 					isRealLostFocus = false;
 					processAddress(false, v.getText().toString());
 				}
@@ -316,28 +344,31 @@ OTPGeocodingListener{
 			}
 		};
 
-		tbStartLocation.setOnEditorActionListener(tbLocationOnEditorActionListener);
-		tbEndLocation.setOnEditorActionListener(tbLocationOnEditorActionListener);
+		tbStartLocation
+				.setOnEditorActionListener(tbLocationOnEditorActionListener);
+		tbEndLocation
+				.setOnEditorActionListener(tbLocationOnEditorActionListener);
 
-		//		Need to consider this case again
-		OnFocusChangeListener tbLocationOnFocusChangeListener = new OnFocusChangeListener(){
+		// Need to consider this case again
+		OnFocusChangeListener tbLocationOnFocusChangeListener = new OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
-				if(!isRealLostFocus) {
+				if (!isRealLostFocus) {
 					isRealLostFocus = true;
 					return;
 				}
 				TextView tv = (TextView) v;
-				if(!hasFocus){
-					if(v.getId()==R.id.tbStartLocation) {
+				if (!hasFocus) {
+					if (v.getId() == R.id.tbStartLocation) {
 						processAddress(true, tv.getText().toString());
-					} else if(v.getId()==R.id.tbEndLocation){
+					} else if (v.getId() == R.id.tbEndLocation) {
 						processAddress(false, tv.getText().toString());
 					}
 				}
 			}
 		};
-		tbStartLocation.setOnFocusChangeListener(tbLocationOnFocusChangeListener);
+		tbStartLocation
+				.setOnFocusChangeListener(tbLocationOnFocusChangeListener);
 		tbEndLocation.setOnFocusChangeListener(tbLocationOnFocusChangeListener);
 
 		mv = (MapView) mainView.findViewById(R.id.mapview);
@@ -347,9 +378,9 @@ OTPGeocodingListener{
 		mc = mv.getController();
 		mc.setZoom(defaultInitialZoomLevel);
 
-		if(currentLocation != null){
+		if (currentLocation != null) {
 			mc.setCenter(currentLocation);
-		} 
+		}
 
 		mlo = new MyLocationOverlay(activity, mv);
 		// mlo.enableCompass();
@@ -366,32 +397,34 @@ OTPGeocodingListener{
 		routeOverlay = new OTPPathOverlay(Color.DKGRAY, activity);
 		mv.getOverlays().add(routeOverlay);
 
-		//TODO - fix below?
+		// TODO - fix below?
 		if (prefs.getBoolean("auto_detect_server", true)) {
 			if (app.getSelectedServer() == null) {
 				processServerSelector(currentLocation, false, true);
-				//				new ServerSelector((MyActivity)activity).execute(currentLocation);
+				// new
+				// ServerSelector((MyActivity)activity).execute(currentLocation);
 			} else {
 				Log.v(TAG, "Already selected a server!!");
 			}
 		} else {
 			String baseURL = prefs.getString("custom_server_url", "");
-			if(baseURL.length() > 5) {
+			if (baseURL.length() > 5) {
 				app.setSelectedServer(new Server(baseURL));
 				Log.v(TAG, "Now using custom OTP server: " + baseURL);
 			} else {
-				//TODO - handle issue when field is cleared/blank
+				// TODO - handle issue when field is cleared/blank
 			}
 		}
-		
-		if(prefs.getString("geocoder_provider", "Google Places").equals("Google Places")){
+
+		if (prefs.getString("geocoder_provider", "Google Places").equals(
+				"Google Places")) {
 			googlePlacesIcon.setVisibility(View.VISIBLE);
 		} else {
 			googlePlacesIcon.setVisibility(View.INVISIBLE);
 		}
 
-		//		btnPlanTrip.setFocusable(true);
-		//		btnPlanTrip.setFocusableInTouchMode(true);
+		// btnPlanTrip.setFocusable(true);
+		// btnPlanTrip.setFocusableInTouchMode(true);
 
 		btnPlanTrip.setOnClickListener(new OnClickListener() {
 
@@ -401,30 +434,43 @@ OTPGeocodingListener{
 				tripPanel.setOpen(false, true);
 
 				Request request = new Request();
-				request.setFrom(URLEncoder.encode(startMarker.getLocationFormatedString()));
-				request.setTo(URLEncoder.encode(endMarker.getLocationFormatedString()));
+				request.setFrom(URLEncoder.encode(startMarker
+						.getLocationFormatedString()));
+				request.setTo(URLEncoder.encode(endMarker
+						.getLocationFormatedString()));
 				request.setArriveBy(false);
 
-				request.setOptimize(((OptimizeSpinnerItem)ddlOptimization.getSelectedItem()).getOptimizeType());
-				request.setModes(((TraverseModeSpinnerItem)ddlTravelMode.getSelectedItem()).getTraverseModeSet());
+				request.setOptimize(((OptimizeSpinnerItem) ddlOptimization
+						.getSelectedItem()).getOptimizeType());
+				request.setModes(((TraverseModeSpinnerItem) ddlTravelMode
+						.getSelectedItem()).getTraverseModeSet());
 
-				try{
-					Double maxWalk = Double.parseDouble(prefs.getString("max_walking_distance", "1600"));
+				try {
+					Double maxWalk = Double.parseDouble(prefs.getString(
+							"max_walking_distance", "1600"));
 					request.setMaxWalkDistance(maxWalk);
 				} catch (NumberFormatException ex) {
 					request.setMaxWalkDistance(new Double("1600"));
 				}
 
-				request.setWheelchair(prefs.getBoolean("wheelchair_accessible", false));
+				request.setWheelchair(prefs.getBoolean("wheelchair_accessible",
+						false));
 
-				request.setDateTime(DateFormat.format("MM/dd/yy", System.currentTimeMillis()).toString(), 
-						DateFormat.format("hh:mmaa", System.currentTimeMillis()).toString());
+				request.setDateTime(
+						DateFormat.format("MM/dd/yy",
+								System.currentTimeMillis()).toString(),
+						DateFormat
+								.format("hh:mmaa", System.currentTimeMillis())
+								.toString());
 
 				request.setShowIntermediateStops(Boolean.TRUE);
 
-				new TripRequest(MainFragment.this.getActivity(), app.getSelectedServer(), MainFragment.this).execute(request);
+				new TripRequest(MainFragment.this.getActivity(), app
+						.getSelectedServer(), MainFragment.this)
+						.execute(request);
 
-				InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+				InputMethodManager imm = (InputMethodManager) activity
+						.getSystemService(Context.INPUT_METHOD_SERVICE);
 				imm.hideSoftInputFromWindow(tbEndLocation.getWindowToken(), 0);
 				imm.hideSoftInputFromWindow(tbStartLocation.getWindowToken(), 0);
 			}
@@ -433,7 +479,7 @@ OTPGeocodingListener{
 		OnClickListener oclDisplayDirection = new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				//				Save states before leaving
+				// Save states before leaving
 				saveOTPBundle();
 
 				ofl.onSwitchedToDirectionFragment();
@@ -442,7 +488,7 @@ OTPGeocodingListener{
 		btnDisplayDirection.setOnClickListener(oclDisplayDirection);
 
 		// Do NOT show direction icon if there is no direction yet
-		if(ofl.getCurrentItinerary()==null){
+		if (ofl.getCurrentItinerary() == null) {
 			btnDisplayDirection.setVisibility(View.INVISIBLE);
 		} else {
 			btnDisplayDirection.setVisibility(View.VISIBLE);
@@ -450,7 +496,7 @@ OTPGeocodingListener{
 
 		// get previous state if already exist
 		OTPBundle otpBundle = ofl.getOTPBundle();
-		if(otpBundle!=null){
+		if (otpBundle != null) {
 			retrievePreviousState(otpBundle);
 		}
 
@@ -459,7 +505,7 @@ OTPGeocodingListener{
 		return mainView;
 	}
 
-	private void retrievePreviousState(OTPBundle bundle){
+	private void retrievePreviousState(OTPBundle bundle) {
 		tbStartLocation.setText(bundle.getFromText());
 		tbEndLocation.setText(bundle.getToText());
 		startMarker.setLocation(bundle.getStartLocation());
@@ -470,7 +516,7 @@ OTPGeocodingListener{
 		this.showRouteOnMap(bundle.getCurrentItinerary());
 	}
 
-	private void saveOTPBundle(){
+	private void saveOTPBundle() {
 		OTPBundle bundle = new OTPBundle();
 		bundle.setFromText(tbStartLocation.getText().toString());
 		bundle.setToText(tbEndLocation.getText().toString());
@@ -484,26 +530,30 @@ OTPGeocodingListener{
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
-		Log.v(TAG,"onActivityCreated");
+		Log.v(TAG, "onActivityCreated");
 		super.onActivityCreated(savedInstanceState);
 	}
 
-	public void processAddress(final boolean isStartTextBox, String address){
-		String[] availableGeocoderProviders = getResources().getStringArray(R.array.available_geocoder_providers);
-		OTPGeocoding geocodingTask = new OTPGeocoding(this.getActivity(), isStartTextBox, app.getSelectedServer(), prefs.getString("geocoder_provider", availableGeocoderProviders[0]), this);
+	public void processAddress(final boolean isStartTextBox, String address) {
+		String[] availableGeocoderProviders = getResources().getStringArray(
+				R.array.available_geocoder_providers);
+		OTPGeocoding geocodingTask = new OTPGeocoding(this.getActivity(),
+				isStartTextBox, app.getSelectedServer(), prefs.getString(
+						"geocoder_provider", availableGeocoderProviders[0]),
+				this);
 		geocodingTask.execute(address);
 	}
 
-	private void adjustFocusAfterSelectAddress(boolean isStartTextBox){
+	private void adjustFocusAfterSelectAddress(boolean isStartTextBox) {
 		isRealLostFocus = false;
-		if(isStartTextBox){
-			if(tbEndLocation.getText().toString().equals("")){
+		if (isStartTextBox) {
+			if (tbEndLocation.getText().toString().equals("")) {
 				tbEndLocation.requestFocus();
 			} else {
 				tripPanel.requestFocus();
 			}
 		} else {
-			if(tbStartLocation.getText().toString().equals("")){
+			if (tbStartLocation.getText().toString().equals("")) {
 				tbStartLocation.requestFocus();
 			} else {
 				tripPanel.requestFocus();
@@ -511,17 +561,22 @@ OTPGeocodingListener{
 		}
 	}
 
-	public void processServerSelector(boolean mustRefreshServerList){
-		boolean isAutoDetectEnabled = prefs.getBoolean("auto_detect_server", true);
+	public void processServerSelector(boolean mustRefreshServerList) {
+		boolean isAutoDetectEnabled = prefs.getBoolean("auto_detect_server",
+				true);
 		GeoPoint currentLoc = LocationUtil.getLastLocation(this.getActivity());
 
-		processServerSelector(currentLoc, mustRefreshServerList, isAutoDetectEnabled);
+		processServerSelector(currentLoc, mustRefreshServerList,
+				isAutoDetectEnabled);
 	}
 
-	public void processServerSelector(GeoPoint currentLoc, boolean mustRefreshServerList, boolean isAutoDetectEnabled){
-		MyActivity myActivity = (MyActivity)this.getActivity();
-		ServerSelector selector = new ServerSelector(myActivity, myActivity.getDatasource(), this, mustRefreshServerList, isAutoDetectEnabled);
-		if(currentLoc == null){
+	public void processServerSelector(GeoPoint currentLoc,
+			boolean mustRefreshServerList, boolean isAutoDetectEnabled) {
+		MyActivity myActivity = (MyActivity) this.getActivity();
+		ServerSelector selector = new ServerSelector(myActivity,
+				myActivity.getDatasource(), this, mustRefreshServerList,
+				isAutoDetectEnabled);
+		if (currentLoc == null) {
 			currentLoc = LocationUtil.getLastLocation(this.getActivity());
 		}
 
@@ -534,9 +589,10 @@ OTPGeocodingListener{
 		mlo.enableMyLocation();
 		mlo.enableCompass();
 
-		if(needToRunAutoDetect) {
-			GeoPoint currentLoc = LocationUtil.getLastLocation(this.getActivity());
-			if(currentLoc != null){
+		if (needToRunAutoDetect) {
+			GeoPoint currentLoc = LocationUtil.getLastLocation(this
+					.getActivity());
+			if (currentLoc != null) {
 				Log.v(TAG, "Relaunching auto detection for server");
 				processServerSelector(currentLoc, false, true);
 			}
@@ -545,63 +601,65 @@ OTPGeocodingListener{
 	}
 
 	@Override
-	public void onPause() {		
+	public void onPause() {
 		mlo.disableMyLocation();
 		mlo.disableCompass();
 
 		// Save states before leaving
 		this.saveOTPBundle();
-		
+
 		super.onPause();
 	}
 
 	@Override
-	public void onDestroy(){
-		//Release all map-related objects to make sure GPS is shut down when the user leaves the app
+	public void onDestroy() {
+		// Release all map-related objects to make sure GPS is shut down when
+		// the user leaves the app
 		mlo.disableFollowLocation();
 		mlo.disableMyLocation();
 		mlo.disableCompass();
-		mlo = null;		
-		mc = null;		
+		mlo = null;
+		mc = null;
 		mv = null;
-		
+
 		Log.d(TAG, "Released all map objects in MainFragment.onDestroy()");
-				
+
 		super.onDestroy();
 	}
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key) {
-		if(key == null) {
+		if (key == null) {
 			return;
 		}
-		Log.v(TAG, "A preference was changed: " + key );
+		Log.v(TAG, "A preference was changed: " + key);
 		if (key.equals("map_tile_source")) {
-			mv.setTileSource(TileSourceFactory.getTileSource(prefs.getString("map_tile_source", "Mapnik")));
+			mv.setTileSource(TileSourceFactory.getTileSource(prefs.getString(
+					"map_tile_source", "Mapnik")));
 		} else if (key.equals("custom_server_url")) {
 			String baseURL = prefs.getString("custom_server_url", "");
-			MyActivity myActivity= (MyActivity)this.getActivity();
-			if(baseURL.length() > 5) {
+			MyActivity myActivity = (MyActivity) this.getActivity();
+			if (baseURL.length() > 5) {
 				app.setSelectedServer(new Server(baseURL));
 				Log.v(TAG, "Now using custom OTP server: " + baseURL);
 				MetadataRequest metaRequest = new MetadataRequest(myActivity);
 				metaRequest.execute("");
 			} else {
-				//TODO - handle issue when field is cleared/blank
+				// TODO - handle issue when field is cleared/blank
 			}
-		} else if(key.equals("auto_detect_server")) {
+		} else if (key.equals("auto_detect_server")) {
 			if (prefs.getBoolean("auto_detect_server", true)) {
-				//TODO - fix this not displaying!!
+				// TODO - fix this not displaying!!
 				needToRunAutoDetect = true;
 			} else {
 				needToRunAutoDetect = false;
 			}
-		} else if (key.equals("geocoder_provider")){
-			if (prefs.getString("geocoder_provider", "Google Places").equals("Google Places")){
+		} else if (key.equals("geocoder_provider")) {
+			if (prefs.getString("geocoder_provider", "Google Places").equals(
+					"Google Places")) {
 				googlePlacesIcon.setVisibility(View.VISIBLE);
-			}
-			else {
+			} else {
 				googlePlacesIcon.setVisibility(View.INVISIBLE);
 			}
 		}
@@ -609,7 +667,7 @@ OTPGeocodingListener{
 
 	@Override
 	public void onCreateOptionsMenu(Menu pMenu, MenuInflater inflater) {
-		//		MenuInflater inflater = getMenuInflater();
+		// MenuInflater inflater = getMenuInflater();
 		super.onCreateOptionsMenu(pMenu, inflater);
 		inflater.inflate(R.menu.menu, pMenu);
 		mGPS = pMenu.getItem(0);
@@ -631,76 +689,85 @@ OTPGeocodingListener{
 			this.getActivity().finish();
 			return true;
 		case R.id.gps_settings:
-			Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+			Intent myIntent = new Intent(
+					Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 			startActivity(myIntent);
 			break;
 		case R.id.my_location:
-//			OTPGetCurrentLocation getCurrentLocation = new OTPGetCurrentLocation(this.getActivity(), this);
-//			getCurrentLocation.execute("");
+			// OTPGetCurrentLocation getCurrentLocation = new
+			// OTPGetCurrentLocation(this.getActivity(), this);
+			// getCurrentLocation.execute("");
 			mlo.enableFollowLocation();
 			break;
 		case R.id.settings:
-			this.getActivity().startActivityForResult(new Intent(this.getActivity(), SettingsActivity.class), OTPApp.REFRESH_SERVER_LIST_REQUEST_CODE);
+			this.getActivity().startActivityForResult(
+					new Intent(this.getActivity(), SettingsActivity.class),
+					OTPApp.REFRESH_SERVER_LIST_REQUEST_CODE);
 			break;
 		case R.id.feedback:
 			Server selectedServer = app.getSelectedServer();
 
-			String[] recipients = {selectedServer.getContactEmail(), 
-					getString(R.string.email_otp_android_developer)};
+			String[] recipients = { selectedServer.getContactEmail(),
+					getString(R.string.email_otp_android_developer) };
 
 			String uriText = "mailto:";
-			for(int i=0; i<recipients.length; i++){
-				uriText+=recipients[i]+";"; 
+			for (int i = 0; i < recipients.length; i++) {
+				uriText += recipients[i] + ";";
 			}
 
 			String subject = "";
 			subject += "Android OTP user report OTP trip ";
-			Date d = Calendar.getInstance().getTime(); 
+			Date d = Calendar.getInstance().getTime();
 			subject += "[" + d.toString() + "]";
 			uriText += "?subject=" + subject;
 
-			MyActivity myActivity = (MyActivity)this.getActivity();
+			MyActivity myActivity = (MyActivity) this.getActivity();
 			String content = myActivity.getCurrentRequestString();
-			uriText += "&body="+URLEncoder.encode(content);
+			uriText += "&body=" + URLEncoder.encode(content);
 
 			Uri uri = Uri.parse(uriText);
 
 			Intent sendIntent = new Intent(Intent.ACTION_SENDTO);
 			sendIntent.setData(uri);
-			startActivity(Intent.createChooser(sendIntent, "Send email")); 
+			startActivity(Intent.createChooser(sendIntent, "Send email"));
 
 			break;
 		case R.id.server_info:
 			Server server = app.getSelectedServer();
-			if(server == null){
-				Log.w(TAG, "Tried to get server info when no server was selected");
+			if (server == null) {
+				Log.w(TAG,
+						"Tried to get server info when no server was selected");
 				break;
 			}
-			StringBuilder message = new StringBuilder("Region:  " + server.getRegion());
+			StringBuilder message = new StringBuilder("Region:  "
+					+ server.getRegion());
 			message.append("\nLanguage:  " + server.getLanguage());
-			message.append("\nContact:  " + server.getContactName() + " (" + server.getContactEmail() + ")");
+			message.append("\nContact:  " + server.getContactName() + " ("
+					+ server.getContactEmail() + ")");
 			message.append("\nURL:  " + server.getBaseURL());
 
-			//TODO - fix server info bounds
-			//message.append("\nBounds: " + server.getBounds());
+			// TODO - fix server info bounds
+			// message.append("\nBounds: " + server.getBounds());
 
 			message.append("\nCurrently reachable: ");
 
 			int status = 0;
 			try {
-				status = Http.get(server.getBaseURL()+"/plan").use(new DefaultHttpClient()).asResponse().getStatusLine().getStatusCode();
+				status = Http.get(server.getBaseURL() + "/plan")
+						.use(new DefaultHttpClient()).asResponse()
+						.getStatusLine().getStatusCode();
 			} catch (IOException e) {
 				Log.e(TAG, "Unable to reach server: " + e.getMessage());
 			}
 
-			if(status == HttpStatus.SC_OK) {
+			if (status == HttpStatus.SC_OK) {
 				message.append("Yes");
 			} else {
 				message.append("No");
 			}
 
-
-			AlertDialog.Builder dialog = new AlertDialog.Builder(this.getActivity());
+			AlertDialog.Builder dialog = new AlertDialog.Builder(
+					this.getActivity());
 			dialog.setTitle("OpenTripPlanner Server Info");
 			dialog.setMessage(message);
 			dialog.setNeutralButton("OK", null);
@@ -719,12 +786,14 @@ OTPGeocodingListener{
 
 	public void moveMarker(Boolean start, Address addr) {
 		GeoPoint point = new GeoPoint(addr.getLatitude(), addr.getLongitude());
-		if(start) {
+		if (start) {
 			startMarker.setLocation(point);
-			tbStartLocation.setText(addr.getAddressLine(addr.getMaxAddressLineIndex()));
+			tbStartLocation.setText(addr.getAddressLine(addr
+					.getMaxAddressLineIndex()));
 		} else {
 			endMarker.setLocation(point);
-			tbEndLocation.setText(addr.getAddressLine(addr.getMaxAddressLineIndex()));
+			tbEndLocation.setText(addr.getAddressLine(addr
+					.getMaxAddressLineIndex()));
 		}
 
 	}
@@ -732,41 +801,44 @@ OTPGeocodingListener{
 	public void zoomToCurrentLocation() {
 		GeoPoint p = LocationUtil.getLastLocation(this.getActivity());
 
-		if(p !=null){
+		if (p != null) {
 			mc.animateTo(p);
 		}
 	}
 
 	public void zoomToLocation(GeoPoint p) {
-		if(p !=null){
+		if (p != null) {
 			mc.animateTo(p);
 		}
 	}
 
-	public void setMarker(GeoPoint p, boolean isStartMarker){
-		if(p == null)
+	public void setMarker(GeoPoint p, boolean isStartMarker) {
+		if (p == null)
 			return;
-		if(isStartMarker){
+		if (isStartMarker) {
 			startMarker.setLocation(p);
 		} else {
 			endMarker.setLocation(p);
 		}
 	}
 
-	public void setTextBoxLocation(String text, boolean isStartTextBox){
-		if(isStartTextBox){
+	public void setTextBoxLocation(String text, boolean isStartTextBox) {
+		if (isStartTextBox) {
 			tbStartLocation.setText(text);
 		} else {
 			tbEndLocation.setText(text);
 		}
 	}
-	//
-	//	private GeoPoint getPoint(double lat, double lon) {
-	//		return (new GeoPoint((int) (lat * 1000000.0), (int) (lon * 1000000.0)));
-	//	}
 
-	public void showRouteOnMap(List<Leg> itinerary){
-		Log.v(TAG, "(TripRequest) legs size = "+Integer.toString(itinerary.size()));
+	//
+	// private GeoPoint getPoint(double lat, double lon) {
+	// return (new GeoPoint((int) (lat * 1000000.0), (int) (lon * 1000000.0)));
+	// }
+
+	public void showRouteOnMap(List<Leg> itinerary) {
+		Log.v(TAG,
+				"(TripRequest) legs size = "
+						+ Integer.toString(itinerary.size()));
 		if (!itinerary.isEmpty()) {
 			btnDisplayDirection.setVisibility(View.VISIBLE);
 			routeOverlay.removeAllPath();
@@ -774,8 +846,8 @@ OTPGeocodingListener{
 			for (Leg leg : itinerary) {
 				int pathColor = getPathColor(leg.mode);
 				routeOverlay.addPath(pathColor);
-				List<GeoPoint> points = LocationUtil
-						.decodePoly(leg.legGeometry.getPoints());
+				List<GeoPoint> points = LocationUtil.decodePoly(leg.legGeometry
+						.getPoints());
 				for (GeoPoint geoPoint : points) {
 					routeOverlay.addPoint(index, geoPoint);
 				}
@@ -784,14 +856,14 @@ OTPGeocodingListener{
 		}
 	}
 
-	private int getPathColor(String mode){
-		if(mode.equalsIgnoreCase("WALK")){
+	private int getPathColor(String mode) {
+		if (mode.equalsIgnoreCase("WALK")) {
 			return Color.DKGRAY;
-		} else if(mode.equalsIgnoreCase("BUS")){
+		} else if (mode.equalsIgnoreCase("BUS")) {
 			return Color.RED;
-		} else if(mode.equalsIgnoreCase("TRAIN")) {
+		} else if (mode.equalsIgnoreCase("TRAIN")) {
 			return Color.YELLOW;
-		} else if(mode.equalsIgnoreCase("BICYCLE")){
+		} else if (mode.equalsIgnoreCase("BICYCLE")) {
 			return Color.BLUE;
 		}
 		return Color.WHITE;
@@ -805,7 +877,8 @@ OTPGeocodingListener{
 	}
 
 	/**
-	 * @param fragmentListener the fragmentListener to set
+	 * @param fragmentListener
+	 *            the fragmentListener to set
 	 */
 	public void setFragmentListener(OnFragmentListener fragmentListener) {
 		this.fragmentListener = fragmentListener;
@@ -816,7 +889,7 @@ OTPGeocodingListener{
 		// TODO Auto-generated method stub
 		app.setSelectedServer(server);
 		Log.v(TAG, "Automatically selected server: " + server.getRegion());
-		MyActivity activity = (MyActivity)this.getActivity();
+		MyActivity activity = (MyActivity) this.getActivity();
 
 		activity.zoomToLocation(point);
 		activity.setMarker(point, true);
@@ -824,15 +897,16 @@ OTPGeocodingListener{
 	}
 
 	@Override
-	public void onTripRequestComplete(List<Itinerary> itineraries, String currentRequestString) {
+	public void onTripRequestComplete(List<Itinerary> itineraries,
+			String currentRequestString) {
 		// TODO Auto-generated method stub
 		showRouteOnMap(itineraries.get(0).legs);
 		OnFragmentListener ofl = getFragmentListener();
 
-		//onItinerariesLoaded must be invoked before onItinerarySelected(0)
+		// onItinerariesLoaded must be invoked before onItinerarySelected(0)
 		ofl.onItinerariesLoaded(itineraries);
 		ofl.onItinerarySelected(0);
-		MyActivity myActivity = (MyActivity)this.getActivity();
+		MyActivity myActivity = (MyActivity) this.getActivity();
 		myActivity.setCurrentRequestString(currentRequestString);
 	}
 
@@ -843,61 +917,71 @@ OTPGeocodingListener{
 	}
 
 	@Override
-	public void onOTPGeocodingComplete(final boolean isStartTextbox, ArrayList<Address> addressesReturn) {
+	public void onOTPGeocodingComplete(final boolean isStartTextbox,
+			ArrayList<Address> addressesReturn) {
 		// TODO Auto-generated method stub
-//		isRealLostFocus = false;
-		
-		AlertDialog.Builder geocoderAlert = new AlertDialog.Builder(this.getActivity());
-		geocoderAlert.setTitle(R.string.geocoder_results_title)
-		.setMessage(R.string.geocoder_no_results_message)
-		.setCancelable(false)
-		.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-			}
-		});
+		// isRealLostFocus = false;
 
-		if(addressesReturn.isEmpty()){
+		AlertDialog.Builder geocoderAlert = new AlertDialog.Builder(
+				this.getActivity());
+		geocoderAlert.setTitle(R.string.geocoder_results_title)
+				.setMessage(R.string.geocoder_no_results_message)
+				.setCancelable(false)
+				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+					}
+				});
+
+		if (addressesReturn.isEmpty()) {
 			AlertDialog alert = geocoderAlert.create();
 			alert.show();
 			return;
-		} else if(addressesReturn.size() == 1) {
+		} else if (addressesReturn.size() == 1) {
 			moveMarker(isStartTextbox, addressesReturn.get(0));
 			return;
 		}
 
 		adjustFocusAfterSelectAddress(isStartTextbox);
 
-		AlertDialog.Builder geocoderSelector = new AlertDialog.Builder(this.getActivity());
+		AlertDialog.Builder geocoderSelector = new AlertDialog.Builder(
+				this.getActivity());
 		geocoderSelector.setTitle(R.string.choose_geocoder);
 
-		final CharSequence[] addressesText = new CharSequence[addressesReturn.size()];
-		for(int i=0; i<addressesReturn.size(); i++){
+		final CharSequence[] addressesText = new CharSequence[addressesReturn
+				.size()];
+		for (int i = 0; i < addressesReturn.size(); i++) {
 			Address addr = addressesReturn.get(i);
-			addressesText[i] =  addr.getAddressLine(0)+"\n"+
-								addr.getAddressLine(1)+
-								((addr.getAddressLine(2)!=null) ? ", "+addr.getAddressLine(2) : "");
-//			addressesText[i] =  addr.getAddressLine(0)+"\n"+
-//					((addr.getSubAdminArea()!=null) ? addr.getSubAdminArea()+", " : "")+
-//					((addr.getAdminArea()!=null) ? addr.getAdminArea()+" " : "")+
-//					((addr.getPostalCode()!=null) ? addr.getPostalCode()+" " : "")+
-//					((addr.getCountryName()!=null) ? addr.getCountryName() : "");
+			addressesText[i] = addr.getAddressLine(0)
+					+ "\n"
+					+ addr.getAddressLine(1)
+					+ ((addr.getAddressLine(2) != null) ? ", "
+							+ addr.getAddressLine(2) : "");
+			// addressesText[i] = addr.getAddressLine(0)+"\n"+
+			// ((addr.getSubAdminArea()!=null) ? addr.getSubAdminArea()+", " :
+			// "")+
+			// ((addr.getAdminArea()!=null) ? addr.getAdminArea()+" " : "")+
+			// ((addr.getPostalCode()!=null) ? addr.getPostalCode()+" " : "")+
+			// ((addr.getCountryName()!=null) ? addr.getCountryName() : "");
 			Log.v(TAG, addressesText[i].toString());
 		}
 
-
 		final ArrayList<Address> addressesTemp = addressesReturn;
-		geocoderSelector.setItems(addressesText, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int item) {
-				Address addr = addressesTemp.get(item);
-				String addressLine = addr.getAddressLine(0)+"\n"+
-									 addr.getAddressLine(1)+
-									 ((addr.getAddressLine(2)!=null) ? ", "+addr.getAddressLine(2) : "");
-				addr.setAddressLine(addr.getMaxAddressLineIndex()+1, addressLine);
-				moveMarker(isStartTextbox, addr);
-				Log.v(TAG, "Chosen: " + addressesText[item]);
-				adjustFocusAfterSelectAddress(isStartTextbox);
-			}
-		});
+		geocoderSelector.setItems(addressesText,
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int item) {
+						Address addr = addressesTemp.get(item);
+						String addressLine = addr.getAddressLine(0)
+								+ "\n"
+								+ addr.getAddressLine(1)
+								+ ((addr.getAddressLine(2) != null) ? ", "
+										+ addr.getAddressLine(2) : "");
+						addr.setAddressLine(addr.getMaxAddressLineIndex() + 1,
+								addressLine);
+						moveMarker(isStartTextbox, addr);
+						Log.v(TAG, "Chosen: " + addressesText[item]);
+						adjustFocusAfterSelectAddress(isStartTextbox);
+					}
+				});
 		AlertDialog alertGeocoder = geocoderSelector.create();
 		alertGeocoder.show();
 

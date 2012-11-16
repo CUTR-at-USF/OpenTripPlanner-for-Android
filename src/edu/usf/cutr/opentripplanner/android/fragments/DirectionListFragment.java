@@ -18,8 +18,8 @@ package edu.usf.cutr.opentripplanner.android.fragments;
 
 import java.util.ArrayList;
 
-import org.opentripplanner.api.model.Itinerary;
-import org.opentripplanner.api.model.Leg;
+import org.opentripplanner.v092snapshot.api.model.Itinerary;
+import org.opentripplanner.v092snapshot.api.model.Leg;
 
 import android.app.Activity;
 import android.os.Bundle;
