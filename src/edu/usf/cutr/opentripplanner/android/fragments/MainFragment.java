@@ -921,69 +921,72 @@ public class MainFragment extends Fragment implements
 			ArrayList<Address> addressesReturn) {
 		// TODO Auto-generated method stub
 		// isRealLostFocus = false;
-
-		AlertDialog.Builder geocoderAlert = new AlertDialog.Builder(
-				this.getActivity());
-		geocoderAlert.setTitle(R.string.geocoder_results_title)
-				.setMessage(R.string.geocoder_no_results_message)
-				.setCancelable(false)
-				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-					}
-				});
-
-		if (addressesReturn.isEmpty()) {
-			AlertDialog alert = geocoderAlert.create();
-			alert.show();
-			return;
-		} else if (addressesReturn.size() == 1) {
-			moveMarker(isStartTextbox, addressesReturn.get(0));
-			return;
+		
+		try{
+			AlertDialog.Builder geocoderAlert = new AlertDialog.Builder(
+					this.getActivity());
+			geocoderAlert.setTitle(R.string.geocoder_results_title)
+					.setMessage(R.string.geocoder_no_results_message)
+					.setCancelable(false)
+					.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+						}
+					});
+	
+			if (addressesReturn.isEmpty()) {
+				AlertDialog alert = geocoderAlert.create();
+				alert.show();
+				return;
+			} else if (addressesReturn.size() == 1) {
+				moveMarker(isStartTextbox, addressesReturn.get(0));
+				return;
+			}
+	
+			adjustFocusAfterSelectAddress(isStartTextbox);
+	
+			AlertDialog.Builder geocoderSelector = new AlertDialog.Builder(
+					this.getActivity());
+			geocoderSelector.setTitle(R.string.choose_geocoder);
+	
+			final CharSequence[] addressesText = new CharSequence[addressesReturn
+					.size()];
+			for (int i = 0; i < addressesReturn.size(); i++) {
+				Address addr = addressesReturn.get(i);
+				addressesText[i] = addr.getAddressLine(0)
+						+ "\n"
+						+ addr.getAddressLine(1)
+						+ ((addr.getAddressLine(2) != null) ? ", "
+								+ addr.getAddressLine(2) : "");
+				// addressesText[i] = addr.getAddressLine(0)+"\n"+
+				// ((addr.getSubAdminArea()!=null) ? addr.getSubAdminArea()+", " :
+				// "")+
+				// ((addr.getAdminArea()!=null) ? addr.getAdminArea()+" " : "")+
+				// ((addr.getPostalCode()!=null) ? addr.getPostalCode()+" " : "")+
+				// ((addr.getCountryName()!=null) ? addr.getCountryName() : "");
+				Log.v(TAG, addressesText[i].toString());
+			}
+	
+			final ArrayList<Address> addressesTemp = addressesReturn;
+			geocoderSelector.setItems(addressesText,
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int item) {
+							Address addr = addressesTemp.get(item);
+							String addressLine = addr.getAddressLine(0)
+									+ "\n"
+									+ addr.getAddressLine(1)
+									+ ((addr.getAddressLine(2) != null) ? ", "
+											+ addr.getAddressLine(2) : "");
+							addr.setAddressLine(addr.getMaxAddressLineIndex() + 1,
+									addressLine);
+							moveMarker(isStartTextbox, addr);
+							Log.v(TAG, "Chosen: " + addressesText[item]);
+							adjustFocusAfterSelectAddress(isStartTextbox);
+						}
+					});
+			AlertDialog alertGeocoder = geocoderSelector.create();
+			alertGeocoder.show();
+		}catch(Exception e){
+			Log.e(TAG, "Error in Main Fragment Geocoding callback: " + e);
 		}
-
-		adjustFocusAfterSelectAddress(isStartTextbox);
-
-		AlertDialog.Builder geocoderSelector = new AlertDialog.Builder(
-				this.getActivity());
-		geocoderSelector.setTitle(R.string.choose_geocoder);
-
-		final CharSequence[] addressesText = new CharSequence[addressesReturn
-				.size()];
-		for (int i = 0; i < addressesReturn.size(); i++) {
-			Address addr = addressesReturn.get(i);
-			addressesText[i] = addr.getAddressLine(0)
-					+ "\n"
-					+ addr.getAddressLine(1)
-					+ ((addr.getAddressLine(2) != null) ? ", "
-							+ addr.getAddressLine(2) : "");
-			// addressesText[i] = addr.getAddressLine(0)+"\n"+
-			// ((addr.getSubAdminArea()!=null) ? addr.getSubAdminArea()+", " :
-			// "")+
-			// ((addr.getAdminArea()!=null) ? addr.getAdminArea()+" " : "")+
-			// ((addr.getPostalCode()!=null) ? addr.getPostalCode()+" " : "")+
-			// ((addr.getCountryName()!=null) ? addr.getCountryName() : "");
-			Log.v(TAG, addressesText[i].toString());
-		}
-
-		final ArrayList<Address> addressesTemp = addressesReturn;
-		geocoderSelector.setItems(addressesText,
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int item) {
-						Address addr = addressesTemp.get(item);
-						String addressLine = addr.getAddressLine(0)
-								+ "\n"
-								+ addr.getAddressLine(1)
-								+ ((addr.getAddressLine(2) != null) ? ", "
-										+ addr.getAddressLine(2) : "");
-						addr.setAddressLine(addr.getMaxAddressLineIndex() + 1,
-								addressLine);
-						moveMarker(isStartTextbox, addr);
-						Log.v(TAG, "Chosen: " + addressesText[item]);
-						adjustFocusAfterSelectAddress(isStartTextbox);
-					}
-				});
-		AlertDialog alertGeocoder = geocoderSelector.create();
-		alertGeocoder.show();
-
 	}
 }

@@ -43,6 +43,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.util.Log;
 import android.widget.Toast;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.*;
 
 /*
  * Modified by Khoa Tran
@@ -68,11 +69,11 @@ public class SettingsActivity extends PreferenceActivity {
 
 		addPreferencesFromResource(R.xml.preferences);
 
-		mapTileProvider = (ListPreference) findPreference("map_tile_source");
-		geocoderProvider = (ListPreference) findPreference("geocoder_provider");
-		routingOptions = (PreferenceCategory) findPreference("routing_options");
-		autoDetectServer = (CheckBoxPreference) findPreference("auto_detect_server");
-		customServerURL = (EditTextPreference) findPreference("custom_server_url");
+		mapTileProvider = (ListPreference) findPreference(PREFERENCE_KEY_MAP_TILE_SOURCE);
+		geocoderProvider = (ListPreference) findPreference(PREFERENCE_KEY_GEOCODER_PROVIDER);
+		routingOptions = (PreferenceCategory) findPreference(PREFERENCE_KEY_ROUTING_OPTIONS);
+		autoDetectServer = (CheckBoxPreference) findPreference(PREFERENCE_KEY_AUTO_DETECT_SERVER);
+		customServerURL = (EditTextPreference) findPreference(PREFERENCE_KEY_CUSTOM_SERVER_URL);
 
 		ArrayList<CharSequence> names = new ArrayList<CharSequence>();
 		ArrayList<ITileSource> tiles = TileSourceFactory.getTileSources();
@@ -102,7 +103,7 @@ public class SettingsActivity extends PreferenceActivity {
 			}
 		});
 
-		providerFeedbackButton = (Preference)findPreference("otp_provider_feedback");
+		providerFeedbackButton = (Preference)findPreference(PREFERENCE_KEY_OTP_PROVIDER_FEEDBACK);
 		providerFeedbackButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 			@Override
 			public boolean onPreferenceClick(Preference arg0) {
@@ -131,7 +132,7 @@ public class SettingsActivity extends PreferenceActivity {
 		datasource.open();
 		Date mostRecentDate = datasource.getMostRecentDate();
 		
-		serverRefreshButton = (Preference)findPreference("refresh_server_list");
+		serverRefreshButton = (Preference)findPreference(PREFERENCE_KEY_REFRESH_SERVER_LIST);
 		serverRefreshButton.setSummary("Server List Downloaded on "+mostRecentDate.toString());
 		
 		serverRefreshButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {

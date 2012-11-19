@@ -47,6 +47,7 @@ import edu.usf.cutr.opentripplanner.android.listeners.OTPLocationListener;
 import edu.usf.cutr.opentripplanner.android.listeners.ServerSelectorCompleteListener;
 import edu.usf.cutr.opentripplanner.android.model.Server;
 import edu.usf.cutr.opentripplanner.android.sqlite.ServersDataSource;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.*;
 
 /**
  * Modified by Khoa Tran
@@ -369,8 +370,8 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 								String value = tbBaseURL.getText().toString().trim();
 								SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 								Editor e = prefs.edit();
-								e.putBoolean("auto_detect_server", false);
-								e.putString("custom_server_url", value);
+								e.putBoolean(PREFERENCE_KEY_AUTO_DETECT_SERVER, false);
+								e.putString(PREFERENCE_KEY_CUSTOM_SERVER_URL, value);
 								e.commit();
 							}
 						});
