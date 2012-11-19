@@ -50,8 +50,12 @@ import edu.usf.cutr.opentripplanner.android.sqlite.ServersDataSource;
 import static edu.usf.cutr.opentripplanner.android.OTPApp.*;
 
 /**
- * Modified by Khoa Tran
- *
+ * A task that retrieves the list of OTP servers from the Google Docs directory,
+ * and if specified, automatically chooses the server based on the geographic bounds
+ * and user current location
+ * 
+ * @author Marcy Gordon
+ * @author Khoa Tran
  */
 
 public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
