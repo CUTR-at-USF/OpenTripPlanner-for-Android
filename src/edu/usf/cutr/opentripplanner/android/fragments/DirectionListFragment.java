@@ -120,7 +120,7 @@ public class DirectionListFragment extends ExpandableListFragment {
 		String[] itinerarySummaryList = new String[itineraryList.size()];
 		for(int i=0; i<itinerarySummaryList.length; i++){
 			Itinerary it = itineraryList.get(i);
-			itinerarySummaryList[i] = Integer.toString(i) + ".   ";
+			itinerarySummaryList[i] = Integer.toString(i+1) + ".   ";//Shown index is i + 1, to use 1-based indexes for the UI instead of 0-based
 			itinerarySummaryList[i] += DateTimeConversion.getFormattedDurationText(it.duration/1000);
 			itinerarySummaryList[i] += "   " + Long.toString(it.walkTime) + " meters";
 		}
