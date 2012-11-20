@@ -53,6 +53,8 @@ public class OTPApp extends Application {
 	public static final String TAG = "OTP";
 
 	/**
+	 * Sets the currently selected OTP server
+	 * 
 	 * @param selectedServer the selected OTP server
 	 */
 	public void setSelectedServer(Server sServer) {
@@ -61,7 +63,9 @@ public class OTPApp extends Application {
 	}
 
 	/**
-	 * @return the selected OTP server
+	 * Gets the currently selected OTP server
+	 * 
+	 * @return the currently selected OTP server
 	 */
 	public Server getSelectedServer() {
 		return selectedServer;

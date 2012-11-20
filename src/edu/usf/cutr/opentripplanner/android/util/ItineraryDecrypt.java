@@ -164,7 +164,7 @@ public class ItineraryDecrypt {
 			boolean isBogusName = (step.bogusName==null ? false : step.bogusName);
 			double lon = step.lon;
 			double lat = step.lat;
-			Elevation[] elevation = step.getElevation();
+			//Elevation[] elevation = step.getElevation();  //Removed elevation for now, since we're not doing anything with it and it causes version issues between OTP server APIs v0.9.1-SNAPSHOT and v0.9.2-SNAPSHOT
 			List<Alerts> alert = step.alerts;
 
 			// Walk East
