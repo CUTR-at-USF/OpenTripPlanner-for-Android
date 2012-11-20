@@ -898,7 +898,7 @@ public class MainFragment extends Fragment implements
 
 	@Override
 	public void onServerSelectorComplete(GeoPoint point, Server server) {
-		// TODO Auto-generated method stub
+		//Update application server
 		app.setSelectedServer(server);
 		Log.v(TAG, "Automatically selected server: " + server.getRegion());
 		MyActivity activity = (MyActivity) this.getActivity();

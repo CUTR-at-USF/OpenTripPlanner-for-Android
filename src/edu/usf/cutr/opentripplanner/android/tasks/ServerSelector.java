@@ -337,6 +337,7 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 
 				public void onClick(DialogInterface dialog, int item) {
 
+					//If the user selected to enter a custom URL, they are shown this EditText box to enter it
 					if(items[item].equals("Custom Server")) {
 						final EditText tbBaseURL = new EditText(context);
 
@@ -356,8 +357,9 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 						urlAlert.create().show();
 
 					} else { 
-						//TODO - set server URL here - app wise as well?
+						//User picked server from the list
 						for (Server server : knownServers) {
+							//If this server region matches what the user picked, then set the server as the selected server
 							if (server.getRegion().equals(items[item])) {
 								selectedServer = server;
 								GeoPoint centerPoint = new GeoPoint(selectedServer.getCenterLatitude(), selectedServer.getCenterLongitude());
