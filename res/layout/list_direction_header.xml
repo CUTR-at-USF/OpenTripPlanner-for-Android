@@ -4,10 +4,12 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/layout1"
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:padding="2dp"
         android:orientation="horizontal" >
 
         <ImageButton
@@ -16,6 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
+            android:padding="5dp"
             android:background="@null"
             android:src="@android:drawable/ic_menu_mapmode" />
 
@@ -23,20 +26,20 @@
             android:id="@+id/titleHeader"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentTop="true"
-            android:gravity="center_vertical"
-            android:padding="10dp"
+            android:layout_toRightOf="@+id/btnDisplayMap"
+            android:gravity="left"      
+            android:padding="5dp"                
             android:text="Directions"
             android:textColor="#000000"
-            android:textSize="22dp"
+            android:textSize="22sp"
             android:textStyle="bold" />
-    </LinearLayout>
+    </RelativeLayout>
 
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:id="@+id/layout1"
         android:orientation="horizontal" >
 
         <TextView
@@ -46,10 +49,10 @@
             android:layout_alignParentTop="true"
             android:layout_marginLeft="5dp"
             android:gravity="center_vertical"
-            android:padding="10dp"
+            android:padding="5dp"
             android:text="From"
             android:textColor="#C0C0C0"
-            android:textSize="18dp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <TextView
@@ -60,9 +63,9 @@
             android:layout_alignParentTop="true"
             android:layout_marginLeft="5dp"
             android:gravity="center_vertical"
-            android:padding="10dp"
+            android:padding="5dp"
             android:textColor="#000000"
-            android:textSize="18dp"
+            android:textSize="18sp"
             android:textStyle="bold" />
     </LinearLayout>
 
@@ -82,7 +85,7 @@
             android:padding="10dp"
             android:text="To"
             android:textColor="#C0C0C0"
-            android:textSize="18dp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <TextView
@@ -95,7 +98,7 @@
             android:gravity="center_vertical"
             android:padding="10dp"
             android:textColor="#000000"
-            android:textSize="18dp"
+            android:textSize="18sp"
             android:textStyle="bold" />
     </LinearLayout>
 
