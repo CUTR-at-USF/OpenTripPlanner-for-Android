@@ -45,6 +45,8 @@ public class OTPApp extends Application {
 	public static final String PREFERENCE_KEY_CUSTOM_SERVER_URL = "custom_server_url";
 	public static final String PREFERENCE_KEY_REFRESH_SERVER_LIST = "refresh_server_list";
 	public static final String PREFERENCE_KEY_OTP_PROVIDER_FEEDBACK = "otp_provider_feedback";
+	public static final String PREFERENCE_KEY_MAX_WALKING_DISTANCE = "max_walking_distance";
+	public static final String PREFERENCE_KEY_WHEEL_ACCESSIBLE = "wheelchair_accessible";
 	
 	private static Server selectedServer;
 	

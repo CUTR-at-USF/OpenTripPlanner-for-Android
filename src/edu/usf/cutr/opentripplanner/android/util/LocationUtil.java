@@ -21,14 +21,16 @@ import java.util.List;
 
 import org.osmdroid.util.GeoPoint;
 
+import edu.usf.cutr.opentripplanner.android.model.Server;
+
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
 
 /**
+ * Various utilities related to location data
  * 
  * @author Khoa Tran
- * 
  */
 
 public class LocationUtil {
@@ -106,8 +108,11 @@ public class LocationUtil {
 	// Borrowed from
 	// http://jeffreysambells.com/posts/2010/05/27/decoding-polylines-from-google-maps-direction-api-with-java/
 	/**
-	 * Decode a set of GeoPoints from an EncodedPolylineBean object from the OTP server project
-	 * @param encoded string from EncodedPolylineBean
+	 * Decode a set of GeoPoints from an EncodedPolylineBean object from the OTP
+	 * server project
+	 * 
+	 * @param encoded
+	 *            string from EncodedPolylineBean
 	 * @return set of GeoPoints represented by the EncodedPolylineBean string
 	 */
 	public static List<GeoPoint> decodePoly(String encoded) {
@@ -142,5 +147,52 @@ public class LocationUtil {
 		}
 
 		return poly;
+	}
+	
+	/**
+	 * Compares the current location of the user against a bounding box for a OTP server
+	 * 
+	 * @param location current location of the user
+	 * @param selectedServer OTP server being compared to the current location
+	 * @param acceptableError the amount of allowed error, in meters
+	 * @return true if the location of the user is within the bounding box of the selectedServer, false if it is not
+	 */
+	public static boolean checkPointInBoundingBox(GeoPoint location, Server selectedServer, int acceptableError){
+		float[] resultLeft = new float[3];
+		float[] resultRight = new float[3];
+		float[] resultUp = new float[3];
+		float[] resultDown = new float[3];
+		float[] resultHorizontal = new float[3];
+		float[] resultVertical = new float[3];
+
+		double locationLat = location.getLatitudeE6()/ 1E6;
+		double locationLon = location.getLongitudeE6()/ 1E6;
+
+		double leftLat = locationLat;
+		double leftLon = selectedServer.getLowerLeftLongitude();
+		double rightLat = locationLat;
+		double rightLon = selectedServer.getUpperRightLongitude();
+
+		Location.distanceBetween(locationLat, locationLon, leftLat, leftLon, resultLeft);
+		Location.distanceBetween(locationLat, locationLon, rightLat, rightLon, resultRight);
+
+		double upLat = selectedServer.getUpperRightLatitude();
+		double upLon = locationLon;
+		double downLat = selectedServer.getLowerLeftLatitude();
+		double downLon = locationLon;
+
+		Location.distanceBetween(locationLat, locationLon, upLat, upLon, resultUp);
+		Location.distanceBetween(locationLat, locationLon, downLat, downLon, resultDown);
+
+		Location.distanceBetween(upLat, leftLon, upLat, rightLon, resultHorizontal);
+		Location.distanceBetween(upLat, leftLon, downLat, leftLon, resultVertical);
+
+		if(resultLeft[0]+resultRight[0]-resultHorizontal[0] > acceptableError){
+			return false;
+		} else if(resultUp[0]+resultDown[0]-resultVertical[0] > acceptableError){
+			return false;
+		}
+
+		return true;
 	}
 }

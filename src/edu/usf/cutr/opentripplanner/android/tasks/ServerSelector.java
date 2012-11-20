@@ -47,6 +47,7 @@ import edu.usf.cutr.opentripplanner.android.listeners.OTPLocationListener;
 import edu.usf.cutr.opentripplanner.android.listeners.ServerSelectorCompleteListener;
 import edu.usf.cutr.opentripplanner.android.model.Server;
 import edu.usf.cutr.opentripplanner.android.sqlite.ServersDataSource;
+import edu.usf.cutr.opentripplanner.android.util.LocationUtil;
 import static edu.usf.cutr.opentripplanner.android.OTPApp.*;
 
 /**
@@ -80,6 +81,14 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
     
     private List<String> providers = new ArrayList<String>();
 
+    /**
+     * Constructs a new ServerSelector
+     * @param context
+     * @param dataSource
+     * @param callback
+     * @param mustRefreshList true if we should download a new list of servers from the Google Doc, false if we should use cached list of servers
+     * @param isAutoDetectEnabled true if we should automatically compare the user's current location to the bounding boxes of OTP servers, false if we should prompt the user to pick the OTP server manually
+     */
 	public ServerSelector(Context context, ServersDataSource dataSource, ServerSelectorCompleteListener callback, boolean mustRefreshList, boolean isAutoDetectEnabled) {
 		this.context = context;
 		this.dataSource = dataSource;
@@ -121,45 +130,9 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 	protected Long doInBackground(GeoPoint... currLoc) {
 		long startMillis = SystemClock.currentThreadTimeMillis();
 		long deltaMillis = startMillis;
-		if(isAutoDetectEnabled){
-			while ((currentLat == 0.0) && deltaMillis < 5000) {
-				deltaMillis = SystemClock.currentThreadTimeMillis() - startMillis;
-	        	for(int i=0; i<providers.size(); i++){
-	        		currentLat = otpLocationListenerList.get(i).getCurrentLat();
-	        		currentLon = otpLocationListenerList.get(i).getCurrentLon();
-	        		if(currentLat!=0.0)
-	        			break;
-	        	}
-	        }
-			currentLocation =new GeoPoint(currentLat, currentLon);
-			
-			for (int i=0; i<providers.size(); i++) {
-				otpLocationListenerList.set(i, null);
-			}
-		} else {
-			currentLocation = currLoc[0];
-		}
-		
-		selectedServer = findOptimalSever(currentLocation);
-		long totalSize = currLoc.length;
-		return totalSize;
-	}
-
-	/**
-	 * @param currLoc
-	 * @return
-	 */
-	private Server findOptimalSever(GeoPoint currLoc) {
-		if(currLoc == null){
-			return null;
-		}
 		
 		List<Server> serverList = null;
 		
-		if(selectedServer != null) {
-			return selectedServer;
-		}
-
 		// If not forced to refresh list
 		if(!mustRefreshList){
 			// Check if servers are stored in SQLite?
@@ -184,24 +157,34 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 			}
 		}
 		
-		
-		
 		knownServers.clear();
 		knownServers.addAll(serverList);
-
-		boolean isInBoundingBox = false;
-		Server server = null;
-		for (int i=0; i<knownServers.size(); i++) {
-			// Check bounds here to find server - acceptable error is set to 1000m = 1km
-			isInBoundingBox = checkPointInBoundingBox(currLoc, knownServers.get(i), 1000);
+		
+		//If we're autodetecting a server, get the location find the optimal server
+		if(isAutoDetectEnabled){
+			while ((currentLat == 0.0) && deltaMillis < 5000) {
+				deltaMillis = SystemClock.currentThreadTimeMillis() - startMillis;
+	        	for(int i=0; i<providers.size(); i++){
+	        		currentLat = otpLocationListenerList.get(i).getCurrentLat();
+	        		currentLon = otpLocationListenerList.get(i).getCurrentLon();
+	        		if(currentLat!=0.0)
+	        			break;
+	        	}
+	        }
+			currentLocation =new GeoPoint(currentLat, currentLon);
 			
-			if(isInBoundingBox){
-				server = knownServers.get(i);
-				break;
+			for (int i=0; i<providers.size(); i++) {
+				otpLocationListenerList.set(i, null);
 			}
+			
+			selectedServer = findOptimalSever(currentLocation);
+			
+		} else {
+			currentLocation = currLoc[0];
 		}
-
-		return server;
+		
+		long totalSize = currLoc.length;
+		return totalSize;
 	}
 
 	private List<Server> getServerFromSQLite(){
@@ -223,6 +206,11 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 		return servers;
 	}
 
+	/**
+	 * Downloads the list of OTP servers from the Google Doc directory
+	 * @param url URL address of the Google Doc
+	 * @return Server a list of OTP servers contained in the Google Doc
+	 */
 	private List<Server> downloadServerList(String url){
 		List<Server> serverList = new ArrayList<Server>();
 
@@ -284,50 +272,35 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 		}
 		dataSource.close();
 	}
-
+	
 	/**
-	 * @param location
-	 * @param selectedServer
-	 * @param acceptableError - in meters
-	 * @return
+	 * Automatically detects the correct OTP server based on the location of the device
+	 * @param currLoc location of the device
+	 * @return Server the OTP server that the location is within
 	 */
-	private boolean checkPointInBoundingBox(GeoPoint location, Server selectedServer, int acceptableError){
-		float[] resultLeft = new float[3];
-		float[] resultRight = new float[3];
-		float[] resultUp = new float[3];
-		float[] resultDown = new float[3];
-		float[] resultHorizontal = new float[3];
-		float[] resultVertical = new float[3];
-
-		double locationLat = location.getLatitudeE6()/ 1E6;
-		double locationLon = location.getLongitudeE6()/ 1E6;
-
-		double leftLat = locationLat;
-		double leftLon = selectedServer.getLowerLeftLongitude();
-		double rightLat = locationLat;
-		double rightLon = selectedServer.getUpperRightLongitude();
-
-		Location.distanceBetween(locationLat, locationLon, leftLat, leftLon, resultLeft);
-		Location.distanceBetween(locationLat, locationLon, rightLat, rightLon, resultRight);
-
-		double upLat = selectedServer.getUpperRightLatitude();
-		double upLon = locationLon;
-		double downLat = selectedServer.getLowerLeftLatitude();
-		double downLon = locationLon;
-
-		Location.distanceBetween(locationLat, locationLon, upLat, upLon, resultUp);
-		Location.distanceBetween(locationLat, locationLon, downLat, downLon, resultDown);
-
-		Location.distanceBetween(upLat, leftLon, upLat, rightLon, resultHorizontal);
-		Location.distanceBetween(upLat, leftLon, downLat, leftLon, resultVertical);
-
-		if(resultLeft[0]+resultRight[0]-resultHorizontal[0] > acceptableError){
-			return false;
-		} else if(resultUp[0]+resultDown[0]-resultVertical[0] > acceptableError){
-			return false;
+	private Server findOptimalSever(GeoPoint currLoc) {
+		if(currLoc == null){
+			return null;
+		}
+		
+		//If we've already selected a server, just return the one we selected
+		if(selectedServer != null) {
+			return selectedServer;
 		}
 
-		return true;
+		boolean isInBoundingBox = false;
+		Server server = null;
+		for (int i=0; i<knownServers.size(); i++) {
+			// Check bounds here to find server - acceptable error is set to 1000m = 1km
+			isInBoundingBox = LocationUtil.checkPointInBoundingBox(currLoc, knownServers.get(i), 1000);
+			
+			if(isInBoundingBox){
+				server = knownServers.get(i);
+				break;
+			}
+		}
+
+		return server;
 	}
 
 	protected void onPostExecute(Long result) {
@@ -341,12 +314,13 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 		}
 
 		if (selectedServer != null) {
+			//We've already auto-selected a server
 			Toast.makeText(context.getApplicationContext(), 
 						   "Detected "+selectedServer.getRegion() + ". Change this manually in Settings", 
 						   Toast.LENGTH_SHORT).show();
 			callback.onServerSelectorComplete(currentLocation, selectedServer);
 		} else if (knownServers != null && !knownServers.isEmpty()){
-			Log.w(TAG, "No server automatically selected!");
+			Log.d(TAG, "No server automatically selected.  User will need to choose the OTP server.");
 			
 			// Create dialog for user to choose
 			List<String> serverNames = new ArrayList<String>();

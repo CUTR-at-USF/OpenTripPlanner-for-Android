@@ -96,11 +96,12 @@ import edu.usf.cutr.opentripplanner.android.tasks.OTPGeocoding;
 import edu.usf.cutr.opentripplanner.android.tasks.ServerSelector;
 import edu.usf.cutr.opentripplanner.android.tasks.TripRequest;
 import edu.usf.cutr.opentripplanner.android.util.LocationUtil;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.*;
 
 /**
  * Main UI screen of the app, showing the map.
  * 
- * @author Khoa Tran *
+ * @author Khoa Tran
  */
 
 public class MainFragment extends Fragment implements
@@ -398,7 +399,7 @@ public class MainFragment extends Fragment implements
 		mv.getOverlays().add(routeOverlay);
 
 		// TODO - fix below?
-		if (prefs.getBoolean("auto_detect_server", true)) {
+		if (prefs.getBoolean(PREFERENCE_KEY_AUTO_DETECT_SERVER, true)) {
 			if (app.getSelectedServer() == null) {
 				processServerSelector(currentLocation, false, true);
 				// new
@@ -407,7 +408,7 @@ public class MainFragment extends Fragment implements
 				Log.v(TAG, "Already selected a server!!");
 			}
 		} else {
-			String baseURL = prefs.getString("custom_server_url", "");
+			String baseURL = prefs.getString(PREFERENCE_KEY_CUSTOM_SERVER_URL, "");
 			if (baseURL.length() > 5) {
 				app.setSelectedServer(new Server(baseURL));
 				Log.v(TAG, "Now using custom OTP server: " + baseURL);
@@ -416,7 +417,7 @@ public class MainFragment extends Fragment implements
 			}
 		}
 
-		if (prefs.getString("geocoder_provider", "Google Places").equals(
+		if (prefs.getString(PREFERENCE_KEY_GEOCODER_PROVIDER, "Google Places").equals(
 				"Google Places")) {
 			googlePlacesIcon.setVisibility(View.VISIBLE);
 		} else {
@@ -447,13 +448,13 @@ public class MainFragment extends Fragment implements
 
 				try {
 					Double maxWalk = Double.parseDouble(prefs.getString(
-							"max_walking_distance", "1600"));
+							PREFERENCE_KEY_MAX_WALKING_DISTANCE, "1600"));
 					request.setMaxWalkDistance(maxWalk);
 				} catch (NumberFormatException ex) {
 					request.setMaxWalkDistance(new Double("1600"));
 				}
 
-				request.setWheelchair(prefs.getBoolean("wheelchair_accessible",
+				request.setWheelchair(prefs.getBoolean(PREFERENCE_KEY_WHEEL_ACCESSIBLE,
 						false));
 
 				request.setDateTime(
@@ -539,7 +540,7 @@ public class MainFragment extends Fragment implements
 				R.array.available_geocoder_providers);
 		OTPGeocoding geocodingTask = new OTPGeocoding(this.getActivity(),
 				isStartTextBox, app.getSelectedServer(), prefs.getString(
-						"geocoder_provider", availableGeocoderProviders[0]),
+						PREFERENCE_KEY_GEOCODER_PROVIDER, availableGeocoderProviders[0]),
 				this);
 		geocodingTask.execute(address);
 	}
@@ -561,8 +562,12 @@ public class MainFragment extends Fragment implements
 		}
 	}
 
+	/**
+	 * Triggers the OTP server selection process.
+	 * @param mustRefreshServerList True if the app should refresh the server list by downloading from the Google Doc, false if it shoudl not
+	 */
 	public void processServerSelector(boolean mustRefreshServerList) {
-		boolean isAutoDetectEnabled = prefs.getBoolean("auto_detect_server",
+		boolean isAutoDetectEnabled = prefs.getBoolean(PREFERENCE_KEY_AUTO_DETECT_SERVER,
 				true);
 		GeoPoint currentLoc = LocationUtil.getLastLocation(this.getActivity());
 
@@ -588,13 +593,17 @@ public class MainFragment extends Fragment implements
 		super.onResume();
 		mlo.enableMyLocation();
 		mlo.enableCompass();
+		
+		Log.v(TAG, "MainFragment onResume");
 
 		if (needToRunAutoDetect) {
 			GeoPoint currentLoc = LocationUtil.getLastLocation(this
 					.getActivity());
 			if (currentLoc != null) {
 				Log.v(TAG, "Relaunching auto detection for server");
-				processServerSelector(currentLoc, false, true);
+					
+				processServerSelector(currentLoc, false, prefs.getBoolean(PREFERENCE_KEY_AUTO_DETECT_SERVER,
+						true));
 			}
 			needToRunAutoDetect = false;
 		}
@@ -634,11 +643,11 @@ public class MainFragment extends Fragment implements
 			return;
 		}
 		Log.v(TAG, "A preference was changed: " + key);
-		if (key.equals("map_tile_source")) {
+		if (key.equals(PREFERENCE_KEY_MAP_TILE_SOURCE)) {
 			mv.setTileSource(TileSourceFactory.getTileSource(prefs.getString(
-					"map_tile_source", "Mapnik")));
-		} else if (key.equals("custom_server_url")) {
-			String baseURL = prefs.getString("custom_server_url", "");
+					PREFERENCE_KEY_MAP_TILE_SOURCE, "Mapnik")));
+		} else if (key.equals(PREFERENCE_KEY_CUSTOM_SERVER_URL)) {
+			String baseURL = prefs.getString(PREFERENCE_KEY_CUSTOM_SERVER_URL, "");
 			MyActivity myActivity = (MyActivity) this.getActivity();
 			if (baseURL.length() > 5) {
 				app.setSelectedServer(new Server(baseURL));
@@ -648,15 +657,18 @@ public class MainFragment extends Fragment implements
 			} else {
 				// TODO - handle issue when field is cleared/blank
 			}
-		} else if (key.equals("auto_detect_server")) {
-			if (prefs.getBoolean("auto_detect_server", true)) {
-				// TODO - fix this not displaying!!
-				needToRunAutoDetect = true;
-			} else {
-				needToRunAutoDetect = false;
-			}
-		} else if (key.equals("geocoder_provider")) {
-			if (prefs.getString("geocoder_provider", "Google Places").equals(
+		} else if (key.equals(PREFERENCE_KEY_AUTO_DETECT_SERVER)) {
+			Log.v(TAG, "Detected change in auto-detect server preference. Value is now: " + prefs.getBoolean(PREFERENCE_KEY_AUTO_DETECT_SERVER, true));
+			
+//			if (prefs.getBoolean(PREFERENCE_KEY_AUTO_DETECT_SERVER, true)) {
+//				// TODO - fix this not displaying!!
+//				needToRunAutoDetect = true;
+//			} else {
+//				needToRunAutoDetect = false;
+//			}
+			needToRunAutoDetect = true;
+		} else if (key.equals(PREFERENCE_KEY_GEOCODER_PROVIDER)) {
+			if (prefs.getString(PREFERENCE_KEY_GEOCODER_PROVIDER, "Google Places").equals(
 					"Google Places")) {
 				googlePlacesIcon.setVisibility(View.VISIBLE);
 			} else {
