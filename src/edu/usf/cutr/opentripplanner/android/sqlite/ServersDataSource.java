@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.model.Server;
 
 import android.content.ContentValues;
@@ -51,6 +52,8 @@ public class ServersDataSource {
 			MySQLiteHelper.COLUMN_CONTACT_EMAIL};
 
 	private static final String TAG = "OTP";
+	
+	private SimpleDateFormat dateFormat = (SimpleDateFormat) SimpleDateFormat.getDateTimeInstance();
 
 	public ServersDataSource(Context context) {
 		dbHelper = new MySQLiteHelper(context);
@@ -66,8 +69,10 @@ public class ServersDataSource {
 
 	public Server createServer(Server s) {
 		ContentValues values = new ContentValues();
-		if(s.getDate()!=null){
-			values.put(MySQLiteHelper.COLUMN_DATE, s.getDate().toString());
+				
+		if(s.getDate()!=null){			
+			values.put(MySQLiteHelper.COLUMN_DATE, dateFormat.format(s.getDate()));
+			Log.d(OTPApp.TAG, "Wrote '" + s.getRegion() + "' server date to SQLLite - " + dateFormat.format(s.getDate()));
 		}
 		values.put(MySQLiteHelper.COLUMN_REGION, s.getRegion());
 		values.put(MySQLiteHelper.COLUMN_BASEURL, s.getBaseURL());
@@ -149,22 +154,25 @@ public class ServersDataSource {
 		server.setId(cursor.getLong(0));
 
 		String dateString = cursor.getString(1);
-		SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+						
 		Date addedOn = null;
-		try {
-			addedOn = dateFormat.parse(dateString);
+		
+		try {			
+			addedOn = dateFormat.parse(dateString);			
 		} catch (ParseException e) {
-			e.printStackTrace();
-			return null;
+			e.printStackTrace();			
 		}
+		
 		server.setDate(addedOn);
-
 		server.setRegion(cursor.getString(2));
 		server.setBaseURL(cursor.getString(3));
 		server.setBounds(cursor.getString(4));
 		server.setLanguage(cursor.getString(5));
 		server.setContactName(cursor.getString(6));
 		server.setContactEmail(cursor.getString(7));
+		
+		Log.d(OTPApp.TAG, "Retrieved '" + server.getRegion() + "' server date from SQLLite - " + dateString);
+		
 		return server;
 	}
 }

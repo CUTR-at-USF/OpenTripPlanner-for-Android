@@ -133,7 +133,12 @@ public class SettingsActivity extends PreferenceActivity {
 		Date mostRecentDate = datasource.getMostRecentDate();
 		
 		serverRefreshButton = (Preference)findPreference(PREFERENCE_KEY_REFRESH_SERVER_LIST);
-		serverRefreshButton.setSummary("Server List Downloaded on "+mostRecentDate.toString());
+		
+		if(mostRecentDate != null){
+			serverRefreshButton.setSummary("Server List Downloaded on "+mostRecentDate.toString());
+		}else{
+			serverRefreshButton.setSummary("Last Server List Download Unknown");
+		}
 		
 		serverRefreshButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 			@Override
