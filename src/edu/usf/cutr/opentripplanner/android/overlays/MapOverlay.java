@@ -119,6 +119,7 @@ public class MapOverlay extends org.osmdroid.views.overlay.Overlay {
 				Address addr = new Address(Locale.US);
 				addr.setLatitude(point.getLatitudeE6()/1E6);
 				addr.setLongitude(point.getLongitudeE6()/1E6);
+				mo.setLocation(point);
 				addr.setAddressLine(addr.getMaxAddressLineIndex()+1, mo.getLocationFormatedString());
 				if(items[item].equals("Start Location")) {
 					mainFragment.moveMarker(true, addr);
