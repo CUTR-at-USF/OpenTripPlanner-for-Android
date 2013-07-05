@@ -26,6 +26,7 @@
     <string name="feedback">Feedback</string>
     <string name="server_info">Server Info</string>
     <string name="exit">Exit</string>
+    <string name="confirmation">OK</string>
     <string name="wheelchair_accessible">Wheelchair Accessible</string>
     <string name="wheelchair_accessibility_description">Request wheelchair accessible routes</string>
     <string name="maximum_walk">Maximum Walk</string>
@@ -41,6 +42,10 @@
     <string name="choose_geocoder">Select the address</string>
     <string name="geocoder_results_title">Geocoder Results</string>
     <string name="geocoder_no_results_message">Sorry, the address returns no geographical location</string>
+    <string name="tripplanner_progress">"Generating trip. Please wait..."</string>   
+    <string name="tripplanner_results_title">Routing Results</string>
+    <string name="tripplanner_no_results_message">Sorry, routing is not possible</string>
+    <string name="walking_time">Walking time </string>
     <string name="email_otp_android_developer">barbeau@cutr.usf.edu</string>
     <string name="feedback_android_developer">Report to OTP Android developer</string>
     <string name="refresh_server_list">Refresh server list</string>

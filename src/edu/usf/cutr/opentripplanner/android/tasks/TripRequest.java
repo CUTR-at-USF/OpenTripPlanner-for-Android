@@ -31,9 +31,11 @@ import org.opentripplanner.v092snapshot.api.ws.Response;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
+import edu.usf.cutr.opentripplanner.android.R;
 import edu.usf.cutr.opentripplanner.android.listeners.TripRequestCompleteListener;
 import edu.usf.cutr.opentripplanner.android.model.Server;
 import edu.usf.cutr.opentripplanner.android.util.JacksonConfig;
@@ -63,7 +65,7 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 
 	protected void onPreExecute() {
 		progressDialog = ProgressDialog.show(context, "",
-				"Generating trip. Please wait... ", true);
+				context.getText(R.string.tripplanner_progress), true);
 	}
 
 	protected Long doInBackground(Request... reqs) {
@@ -74,10 +76,39 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 		}
 		return totalSize;
 	}
+	
+	protected void  onCancelled(Long result){
+
+		try{		
+			if (progressDialog != null && progressDialog.isShowing()) {
+				progressDialog.dismiss();
+			}
+		}catch(Exception e){
+			Log.e(TAG, "Error in TripRequest Cancelled dismissing dialog: " + e);
+		}
+		
+		AlertDialog.Builder geocoderAlert = new AlertDialog.Builder(context);
+		geocoderAlert.setTitle(R.string.tripplanner_results_title)
+				.setMessage(R.string.tripplanner_no_results_message)
+				.setCancelable(false)
+				.setPositiveButton(R.string.confirmation, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+					}
+				});
+
+		AlertDialog alert = geocoderAlert.create();
+		alert.show();
+				
+		Log.e(TAG, "No route to display!");
+	}
 
 	protected void onPostExecute(Long result) {
-		if (progressDialog.isShowing()) {
-			progressDialog.dismiss();
+		try{		
+			if (progressDialog != null && progressDialog.isShowing()) {
+				progressDialog.dismiss();
+			}
+		}catch(Exception e){
+			Log.e(TAG, "Error in TripRequest PostExecute dismissing dialog: " + e);
 		}
 		
 		if (response != null && response.getPlan() != null && response.getPlan().getItinerary().get(0) != null) {
@@ -195,13 +226,20 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 
 			urlConnection = (HttpURLConnection) url.openConnection();
 			urlConnection.setRequestProperty("Accept", "application/json");
-
+			urlConnection.setConnectTimeout(context.getResources().getInteger(R.integer.connection_timeout));
+			urlConnection.setReadTimeout(context.getResources().getInteger(R.integer.socket_timeout));
 			// plan = serializer.read(Response.class, result);
 			plan = JacksonConfig.getObjectReaderInstance().readValue(urlConnection.getInputStream());
+			urlConnection.disconnect();
 			
+		} catch (java.net.SocketTimeoutException e) {
+			Log.e(TAG, "Timeout fetching JSON or XML: " + e);
+			e.printStackTrace();
+			cancel(true);
 		} catch (IOException e) {
 			Log.e(TAG, "Error fetching JSON or XML: " + e);
 			e.printStackTrace();
+			cancel(true);
 			// Reset timestamps to show there was an error
 			// requestStartTime = 0;
 			// requestEndTime = 0;

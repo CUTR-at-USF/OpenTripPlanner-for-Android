@@ -135,7 +135,7 @@ public class ItineraryDecrypt {
 //		double duration = DateTimeConversion.getDuration(leg.startTime, leg.endTime);
 		double totalDistance = leg.distance;
 		DecimalFormat twoDForm = new DecimalFormat("#.##");
-		totalDistance = Double.valueOf(twoDForm.format(totalDistance));
+	//	totalDistance = Double.valueOf(twoDForm.format(totalDistance)); -->VREIXO
 		mainDirectionText += "\n[" + totalDistance + "meters ]";// Double.toString(duration);
 
 		direction.setDirectionText(mainDirectionText);
@@ -153,7 +153,7 @@ public class ItineraryDecrypt {
 
 			double distance = step.distance;
 			// Distance traveled [distance]
-			distance = Double.valueOf(twoDForm.format(distance));
+	//		distance = Double.valueOf(twoDForm.format(distance)); -->VREIXO
 			dir.setDistanceTraveled(distance);
 
 			RelativeDirection relativeDir = step.relativeDirection;
@@ -300,7 +300,7 @@ public class ItineraryDecrypt {
 
 		// Distance traveled [distance]
 		DecimalFormat twoDForm = new DecimalFormat("#.##");
-		distance = Double.valueOf(twoDForm.format(distance));
+	//	distance = Double.valueOf(twoDForm.format(distance)); -->VREIXO
 		onDirection.setDistanceTraveled(distance);
 
 		directions.add(onDirection);
@@ -314,7 +314,7 @@ public class ItineraryDecrypt {
 	 */
 	public double getTotalDistance() {
 		DecimalFormat twoDForm = new DecimalFormat("#.##");
-		totalDistance = Double.valueOf(twoDForm.format(totalDistance));
+	//	totalDistance = Double.valueOf(twoDForm.format(totalDistance));-->VREIXO
 		return totalDistance;
 	}
 

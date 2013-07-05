@@ -124,12 +124,19 @@ public class ServersDataSource {
 		Cursor cursor = database.query(MySQLiteHelper.TABLE_SERVERS,
 				allColumns, whereClause, null, null, null, null);
 
-		cursor.moveToFirst();
+/*		This code creates problems dealing with empty cursors, changed for a simplier version	
+ 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
 			Server s = cursorToServer(cursor);
 			servers.add(s);
 			cursor.moveToNext();
 		}
+*/
+		while(cursor.moveToNext()){
+			Server s = cursorToServer(cursor);
+			servers.add(s);
+		}
+		
 		cursor.close();
 		return servers;
 	}

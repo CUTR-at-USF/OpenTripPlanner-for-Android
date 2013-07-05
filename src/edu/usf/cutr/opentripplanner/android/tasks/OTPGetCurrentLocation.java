@@ -80,7 +80,26 @@ public class OTPGetCurrentLocation extends AsyncTask<String, Integer, String> {
 		}
 
     }
-
+    
+    protected void onPostExecute(String result) {
+        progressDialog.dismiss();
+        
+        if (otpLocationListenerList != null){
+	        for (int i=0; i<otpLocationListenerList.size(); i++) {
+	        	OTPLocationListener listener;
+	        	if ((listener = otpLocationListenerList.get(i)) != null)
+	        		lm.removeUpdates(listener);
+			}
+	        otpLocationListenerList.clear();
+        }
+        
+        GeoPoint gp = new GeoPoint((int)(currentLat*1E6), (int)(currentLon*1E6));
+        
+        
+        callback.onOTPGetCurrentLocationComplete(gp);
+    }
+    
+/* This function does not do what it says --> VREIXO
     protected void onPostExecute(String result) {
         progressDialog.dismiss();
         
@@ -98,7 +117,7 @@ public class OTPGetCurrentLocation extends AsyncTask<String, Integer, String> {
         
         callback.onOTPGetCurrentLocationComplete(gp);
     }
-
+*/
     @Override
     protected String doInBackground(String... params) {
         long startMillis = SystemClock.currentThreadTimeMillis();

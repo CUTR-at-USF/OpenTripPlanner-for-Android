@@ -194,8 +194,10 @@ containing a value of this type.
         public static final int top=0x7f060000;
     }
     public static final class integer {
+        public static final int connection_timeout=0x7f070002;
         public static final int geocoder_max_results=0x7f070000;
         public static final int max_walking_distance=0x7f070001;
+        public static final int socket_timeout=0x7f070003;
     }
     public static final class layout {
         public static final int activity=0x7f030000;
@@ -212,38 +214,43 @@ containing a value of this type.
         public static final int googleplaceskey=0x7f050000;
     }
     public static final class string {
-        public static final int alternative_routes=0x7f08001d;
+        public static final int alternative_routes=0x7f080022;
         public static final int app_name=0x7f080000;
-        public static final int auto_detect_server=0x7f080014;
-        public static final int auto_detect_server_description=0x7f080015;
-        public static final int choose_geocoder=0x7f080017;
+        public static final int auto_detect_server=0x7f080015;
+        public static final int auto_detect_server_description=0x7f080016;
+        public static final int choose_geocoder=0x7f080018;
         public static final int choose_mode=0x7f080001;
         public static final int choose_optimization=0x7f080002;
-        public static final int custom_server_url=0x7f080012;
-        public static final int custom_server_url_description=0x7f080013;
+        public static final int confirmation=0x7f08000b;
+        public static final int custom_server_url=0x7f080013;
+        public static final int custom_server_url_description=0x7f080014;
         public static final int disable_gps=0x7f080004;
-        public static final int email_otp_android_developer=0x7f08001a;
+        public static final int email_otp_android_developer=0x7f08001f;
         public static final int enable_gps=0x7f080003;
         public static final int exit=0x7f08000a;
         public static final int feedback=0x7f080008;
-        public static final int feedback_android_developer=0x7f08001b;
-        public static final int geocoder_no_results_message=0x7f080019;
-        public static final int geocoder_preference_provider_summary=0x7f08001f;
-        public static final int geocoder_preference_provider_title=0x7f08001e;
-        public static final int geocoder_results_title=0x7f080018;
-        public static final int map_options=0x7f080010;
-        public static final int map_tile_provider=0x7f080011;
-        public static final int map_tile_provider_description=0x7f080016;
-        public static final int maximum_walk=0x7f08000d;
-        public static final int maximum_walk_description=0x7f08000e;
+        public static final int feedback_android_developer=0x7f080020;
+        public static final int geocoder_no_results_message=0x7f08001a;
+        public static final int geocoder_preference_provider_summary=0x7f080024;
+        public static final int geocoder_preference_provider_title=0x7f080023;
+        public static final int geocoder_results_title=0x7f080019;
+        public static final int map_options=0x7f080011;
+        public static final int map_tile_provider=0x7f080012;
+        public static final int map_tile_provider_description=0x7f080017;
+        public static final int maximum_walk=0x7f08000e;
+        public static final int maximum_walk_description=0x7f08000f;
         public static final int my_location=0x7f080006;
         public static final int no_gps_signal=0x7f080005;
-        public static final int refresh_server_list=0x7f08001c;
-        public static final int routing_options=0x7f08000f;
+        public static final int refresh_server_list=0x7f080021;
+        public static final int routing_options=0x7f080010;
         public static final int server_info=0x7f080009;
         public static final int settings=0x7f080007;
-        public static final int wheelchair_accessibility_description=0x7f08000c;
-        public static final int wheelchair_accessible=0x7f08000b;
+        public static final int tripplanner_no_results_message=0x7f08001d;
+        public static final int tripplanner_progress=0x7f08001b;
+        public static final int tripplanner_results_title=0x7f08001c;
+        public static final int walking_time=0x7f08001e;
+        public static final int wheelchair_accessibility_description=0x7f08000d;
+        public static final int wheelchair_accessible=0x7f08000c;
     }
     public static final class xml {
         public static final int preferences=0x7f040000;

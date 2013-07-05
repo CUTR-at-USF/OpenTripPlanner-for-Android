@@ -173,9 +173,14 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 	        }
 			currentLocation =new GeoPoint(currentLat, currentLon);
 			
-			for (int i=0; i<providers.size(); i++) {
-				otpLocationListenerList.set(i, null);
-			}
+	        if (otpLocationListenerList != null){
+		        for (int i=0; i<otpLocationListenerList.size(); i++) {
+		        	OTPLocationListener listener;
+		        	if ((listener = otpLocationListenerList.get(i)) != null)
+		        		lm.removeUpdates(listener);
+				}
+		        otpLocationListenerList.clear();
+	        }
 			
 			selectedServer = findOptimalSever(currentLocation);
 			
@@ -309,10 +314,19 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 		}
 		
 		//Remove locationlisteners
-		for (int i=0; i<providers.size(); i++) {			
+	/*	for (int i=0; i<providers.size(); i++) { -->VREIXO			
 			lm.removeUpdates(otpLocationListener);			
 		}
-
+	 */
+        if (otpLocationListenerList != null){
+	        for (int i=0; i<otpLocationListenerList.size(); i++) {
+	        	OTPLocationListener listener;
+	        	if ((listener = otpLocationListenerList.get(i)) != null)
+	        		lm.removeUpdates(listener);
+			}
+	        otpLocationListenerList.clear();
+        }
+        
 		if (selectedServer != null) {
 			//We've already auto-selected a server
 			Toast.makeText(context.getApplicationContext(), 

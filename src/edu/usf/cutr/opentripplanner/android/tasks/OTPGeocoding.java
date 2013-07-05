@@ -26,13 +26,17 @@ import java.util.Locale;
 
 import org.osmdroid.util.GeoPoint;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.content.res.Resources.NotFoundException;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.util.Log;
+import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.R;
 import edu.usf.cutr.opentripplanner.android.listeners.OTPGeocodingListener;
 import edu.usf.cutr.opentripplanner.android.model.Server;
@@ -102,7 +106,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 		ArrayList<Address> addresses = null;
 		try {
 			addresses = (ArrayList<Address>)gc.getFromLocationName(address, 
-					R.integer.geocoder_max_results, 
+					context.getResources().getInteger(R.integer.geocoder_max_results), 
 					selectedServer.getLowerLeftLatitude(), 
 					selectedServer.getLowerLeftLongitude(), 
 					selectedServer.getUpperRightLatitude(), 
@@ -110,6 +114,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			cancel(true);
 		}
 
 		if(addresses==null || addresses.isEmpty()){
@@ -201,6 +206,31 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 		}
 
 		return addresses;
+	}
+	
+	protected void  onCancelled(Long result){
+
+		try{		
+			if (progressDialog != null && progressDialog.isShowing()) {
+				progressDialog.dismiss();
+			}
+		}catch(Exception e){
+			Log.e(TAG, "Error in Geocoding Cancelled dismissing dialog: " + e);
+		}
+		
+		AlertDialog.Builder geocoderAlert = new AlertDialog.Builder(context);
+		geocoderAlert.setTitle(R.string.geocoder_results_title)
+				.setMessage(R.string.geocoder_no_results_message)
+				.setCancelable(false)
+				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+					}
+				});
+
+		AlertDialog alert = geocoderAlert.create();
+		alert.show();
+				
+		Log.e(TAG, "No geocoding processed!");
 	}
 
 	protected void onPostExecute(Long result) {

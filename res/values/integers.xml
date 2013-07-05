@@ -2,4 +2,6 @@
 <resources>
     <integer name="geocoder_max_results">5</integer>
     <integer name="max_walking_distance">1600</integer>
+    <integer name="connection_timeout">15000</integer>
+    <integer name="socket_timeout">15000</integer>
 </resources>

@@ -25,6 +25,9 @@ import java.util.List;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.miscwidgets.widget.Panel;
 import org.opentripplanner.api.ws.Request;
 import org.opentripplanner.routing.core.OptimizeType;
@@ -252,10 +255,17 @@ public class MainFragment extends Fragment implements
 		ddlTravelMode.setAdapter(traverseModeAdapter);
 
 		GeoPoint currentLocation = LocationUtil.getLastLocation(activity);
-
+		
+		Server selectedServer;
 		// if currentLocation is null
 		if (currentLocation == null) {
-			currentLocation = defaultCenterLocation;
+			if ((selectedServer = app.getSelectedServer()) != null){
+				GeoPoint serverCenterLocation = new GeoPoint(selectedServer.getCenterLatitude(), selectedServer.getCenterLongitude());
+				currentLocation = serverCenterLocation;
+			}
+			else{
+				currentLocation = defaultCenterLocation;
+			}
 		}
 
 		OnClickListener ocl = new OnClickListener() {
@@ -378,10 +388,8 @@ public class MainFragment extends Fragment implements
 
 		mc = mv.getController();
 		mc.setZoom(defaultInitialZoomLevel);
-
-		if (currentLocation != null) {
-			mc.setCenter(currentLocation);
-		}
+		
+		mc.setCenter(currentLocation);
 
 		mlo = new MyLocationOverlay(activity, mv);
 		// mlo.enableCompass();
@@ -765,8 +773,13 @@ public class MainFragment extends Fragment implements
 
 			int status = 0;
 			try {
+				HttpParams httpParameters = new BasicHttpParams();
+				int timeoutConnection = getResources().getInteger(R.integer.connection_timeout);
+				HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+				int timeoutSocket = getResources().getInteger(R.integer.socket_timeout);
+				HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
 				status = Http.get(server.getBaseURL() + "/plan")
-						.use(new DefaultHttpClient()).asResponse()
+						.use(new DefaultHttpClient(httpParameters)).asResponse()
 						.getStatusLine().getStatusCode();
 			} catch (IOException e) {
 				Log.e(TAG, "Unable to reach server: " + e.getMessage());
@@ -865,6 +878,7 @@ public class MainFragment extends Fragment implements
 				}
 				index++;
 			}
+			zoomToLocation(LocationUtil.decodePoly(itinerary.get(0).legGeometry.getPoints()).get(0));
 		}
 	}
 

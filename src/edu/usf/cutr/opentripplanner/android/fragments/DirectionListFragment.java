@@ -122,7 +122,8 @@ public class DirectionListFragment extends ExpandableListFragment {
 			Itinerary it = itineraryList.get(i);
 			itinerarySummaryList[i] = Integer.toString(i+1) + ".   ";//Shown index is i + 1, to use 1-based indexes for the UI instead of 0-based
 			itinerarySummaryList[i] += DateTimeConversion.getFormattedDurationText(it.duration/1000);
-			itinerarySummaryList[i] += "   " + Long.toString(it.walkTime) + " meters";
+		//	itinerarySummaryList[i] += "   " + Long.toString(it.walkTime) + " meters";-->VREIXO
+			itinerarySummaryList[i] += "   " + getString(R.string.walking_time) + DateTimeConversion.getFormattedDurationText(it.walkTime);
 		}
 		
 		ArrayAdapter<String> itineraryAdapter = new ArrayAdapter<String>(activity, android.R.layout.simple_spinner_item, itinerarySummaryList);
