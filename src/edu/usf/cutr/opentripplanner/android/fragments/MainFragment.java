@@ -497,7 +497,7 @@ public class MainFragment extends Fragment implements
 		btnDisplayDirection.setOnClickListener(oclDisplayDirection);
 
 		// Do NOT show direction icon if there is no direction yet
-		if (ofl.getCurrentItinerary() == null) {
+		if (ofl.getCurrentItinerary().isEmpty()) {
 			btnDisplayDirection.setVisibility(View.INVISIBLE);
 		} else {
 			btnDisplayDirection.setVisibility(View.VISIBLE);
@@ -836,6 +836,33 @@ public class MainFragment extends Fragment implements
 			mc.animateTo(p);
 		}
 	}
+	
+	public void zoomToRegion(List<GeoPoint> items) {
+		int minLat = Integer.MAX_VALUE;
+		int maxLat = Integer.MIN_VALUE;
+		int minLon = Integer.MAX_VALUE;
+		int maxLon = Integer.MIN_VALUE;
+		
+		if (!items.isEmpty()){
+			for (GeoPoint item : items) 
+			{ 
+
+			      int lat = item.getLatitudeE6();
+			      int lon = item.getLongitudeE6();
+
+			      maxLat = Math.max(lat, maxLat);
+			      minLat = Math.min(lat, minLat);
+			      maxLon = Math.max(lon, maxLon);
+			      minLon = Math.min(lon, minLon);
+			 }
+
+			double fitFactor = 1.1;
+			mc.zoomToSpan((int) (Math.abs(maxLat - minLat) * fitFactor), (int)(Math.abs(maxLon - minLon) * fitFactor));	
+			mc.animateTo(new GeoPoint( (maxLat + minLat)/2, 
+			(maxLon + minLon)/2 )); 
+		}
+		
+	}
 
 	public void setMarker(GeoPoint p, boolean isStartMarker) {
 		if (p == null)
@@ -867,6 +894,7 @@ public class MainFragment extends Fragment implements
 		if (!itinerary.isEmpty()) {
 			btnDisplayDirection.setVisibility(View.VISIBLE);
 			routeOverlay.removeAllPath();
+			List<GeoPoint> allGeoPoints = new ArrayList<GeoPoint>();
 			int index = 0;
 			for (Leg leg : itinerary) {
 				int pathColor = getPathColor(leg.mode);
@@ -877,8 +905,9 @@ public class MainFragment extends Fragment implements
 					routeOverlay.addPoint(index, geoPoint);
 				}
 				index++;
+				allGeoPoints.addAll(points);
 			}
-			zoomToLocation(LocationUtil.decodePoly(itinerary.get(0).legGeometry.getPoints()).get(0));
+			zoomToRegion(allGeoPoints);
 		}
 	}
 

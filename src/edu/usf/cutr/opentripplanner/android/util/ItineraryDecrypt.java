@@ -136,7 +136,7 @@ public class ItineraryDecrypt {
 		double totalDistance = leg.distance;
 		DecimalFormat twoDForm = new DecimalFormat("#.##");
 	//	totalDistance = Double.valueOf(twoDForm.format(totalDistance)); -->VREIXO
-		mainDirectionText += "\n[" + totalDistance + "meters ]";// Double.toString(duration);
+		mainDirectionText += "\n[" + String.format("%.2f", totalDistance) + "meters ]";// Double.toString(duration);
 
 		direction.setDirectionText(mainDirectionText);
 
@@ -197,7 +197,7 @@ public class ItineraryDecrypt {
 
 			subDirectionText += "on "+ streetName + " ";
 
-			subDirectionText += "\n[" + Double.toString(distance) + "meters ]";
+			subDirectionText += "\n[" + String.format("%.2f", distance) + "meters ]";
 
 			dir.setDirectionText(subDirectionText);
 
