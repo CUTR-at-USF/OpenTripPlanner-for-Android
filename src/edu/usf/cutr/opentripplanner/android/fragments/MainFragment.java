@@ -93,6 +93,7 @@ import edu.usf.cutr.opentripplanner.android.model.OptimizeSpinnerItem;
 import edu.usf.cutr.opentripplanner.android.model.Server;
 import edu.usf.cutr.opentripplanner.android.model.TraverseModeSpinnerItem;
 import edu.usf.cutr.opentripplanner.android.overlays.MapOverlay;
+import edu.usf.cutr.opentripplanner.android.overlays.OTPModeOverlay;
 import edu.usf.cutr.opentripplanner.android.overlays.OTPPathOverlay;
 import edu.usf.cutr.opentripplanner.android.tasks.MetadataRequest;
 import edu.usf.cutr.opentripplanner.android.tasks.OTPGeocoding;
@@ -136,6 +137,7 @@ public class MainFragment extends Fragment implements
 	MapOverlay startMarker;
 	MapOverlay endMarker;
 	OTPPathOverlay routeOverlay;
+	OTPModeOverlay modeOverlay;
 
 	private SharedPreferences prefs;
 	private OTPApp app;
@@ -405,6 +407,9 @@ public class MainFragment extends Fragment implements
 
 		routeOverlay = new OTPPathOverlay(Color.DKGRAY, activity);
 		mv.getOverlays().add(routeOverlay);
+		
+		modeOverlay = new OTPModeOverlay(this);
+		mv.getOverlays().add(modeOverlay);
 
 		// TODO - fix below?
 		if (prefs.getBoolean(PREFERENCE_KEY_AUTO_DETECT_SERVER, true)) {
@@ -894,6 +899,7 @@ public class MainFragment extends Fragment implements
 		if (!itinerary.isEmpty()) {
 			btnDisplayDirection.setVisibility(View.VISIBLE);
 			routeOverlay.removeAllPath();
+			modeOverlay.removeAllMode();
 			List<GeoPoint> allGeoPoints = new ArrayList<GeoPoint>();
 			int index = 0;
 			for (Leg leg : itinerary) {
@@ -901,6 +907,7 @@ public class MainFragment extends Fragment implements
 				routeOverlay.addPath(pathColor);
 				List<GeoPoint> points = LocationUtil.decodePoly(leg.legGeometry
 						.getPoints());
+				modeOverlay.addLeg(points.get(0), leg.mode);
 				for (GeoPoint geoPoint : points) {
 					routeOverlay.addPoint(index, geoPoint);
 				}
