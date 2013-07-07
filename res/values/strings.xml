@@ -16,6 +16,7 @@
 -->
 <resources>
     <string name="app_name">OpenTripPlanner</string>
+    <string name="servers_spreadsheet_url"><![CDATA[https://docs.google.com/spreadsheet/ccc?key=0AsoU647elPShdDlCUVNKS0JQUXprX3pQd0ZENW5JMGc&single=true&gid=0&output=csv]]></string>
     <string name="choose_mode">Choose a mode to travel by</string>
     <string name="choose_optimization">Choose an optimization</string>
     <string name="enable_gps">Enable GPS</string>

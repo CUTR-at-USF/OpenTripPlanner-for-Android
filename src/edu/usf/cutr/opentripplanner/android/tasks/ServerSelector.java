@@ -43,6 +43,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 import au.com.bytecode.opencsv.CSVReader;
 import de.mastacode.http.Http;
+import edu.usf.cutr.opentripplanner.android.R;
 import edu.usf.cutr.opentripplanner.android.listeners.OTPLocationListener;
 import edu.usf.cutr.opentripplanner.android.listeners.ServerSelectorCompleteListener;
 import edu.usf.cutr.opentripplanner.android.model.Server;
@@ -144,7 +145,7 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 		// If severs are not stored, download list from the Google Spreadsheet and Insert to database
 		if(serverList == null || serverList.isEmpty() || mustRefreshList){
 			Log.v(TAG, "No data from sqlite. Attempt retrieving servers from google spreadsheet");
-			serverList = downloadServerList("https://spreadsheets.google.com/spreadsheet/pub?hl=en_US&hl=en_US&key=0AgWy8ujaGosCdDhxTC04cUZNeHo0eGFBQTBpU2dxN0E&single=true&gid=0&output=csv");
+			serverList = downloadServerList(context.getResources().getString(R.string.servers_spreadsheet_url));
 
 			// Insert new list to database
 			if(serverList!=null && !serverList.isEmpty()){
