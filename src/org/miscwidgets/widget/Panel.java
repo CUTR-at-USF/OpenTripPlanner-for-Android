@@ -430,7 +430,12 @@ public class Panel extends LinearLayout {
                                         calculatedDuration = (int) (1000 * Math.abs((toYDelta - fromYDelta) / mVelocity));
                                         calculatedDuration = Math.max(calculatedDuration, 20);
                                 } else {
-                                        calculatedDuration = mDuration * Math.abs(toYDelta - fromYDelta) / mContentHeight;
+                                		if (mContentHeight != 0){
+                                			calculatedDuration = mDuration * Math.abs(toYDelta - fromYDelta) / mContentHeight;	
+                                		}
+                                		else{
+                                			calculatedDuration = 20;
+                                		}
                                 }
                         } else {
                                 int width = mContentWidth;
