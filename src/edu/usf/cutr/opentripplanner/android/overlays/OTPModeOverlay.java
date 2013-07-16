@@ -95,7 +95,9 @@ public class OTPModeOverlay extends Overlay {
 			}
 			
 			Bitmap bmp = BitmapFactory.decodeResource(mainFragment.getResources(), icon);
-			c.drawBitmap(bmp, screenPts.x, screenPts.y, null);
+			int verticalPositionCorrection = mainFragment.getActivity().getResources().getInteger(R.integer.mode_icons_position_vertical_correction);
+			int horizontalPositionCorrection = mainFragment.getActivity().getResources().getInteger(R.integer.mode_icons_position_horizontal_correction);
+			c.drawBitmap(bmp, screenPts.x + horizontalPositionCorrection, screenPts.y + verticalPositionCorrection, null);
 				
 		}			
 		
