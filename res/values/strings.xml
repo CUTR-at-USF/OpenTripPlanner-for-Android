@@ -36,7 +36,10 @@
     <string name="map_options">Map Options</string>
     <string name="map_tile_provider">Map Tile Provider</string>
     <string name="custom_server_url">Custom Server URL</string>
-    <string name="custom_server_url_description">"Full URL to an OpenTripPlanner server API's plan method to use for routing"</string>
+    <string name="custom_server_url_description">"URL set to a working OpenTripPlanner server"</string>
+    <string name="custom_server_url_error">"You should write a valid URL"</string>
+    <string name="custom_server_error">"Server at selected URL not working"</string>
+    <string name="custom_server_not_set">"Cumstom server not set: incorrect URL"</string>
     <string name="auto_detect_server">Auto Detect OTP Server</string>
     <string name="auto_detect_server_description">Automatically choose an OpenTripPlanner server based on current location</string>
     <string name="map_tile_provider_description">Choose a tile provider (Note: some may not work properly)</string>
@@ -53,6 +56,13 @@
     <string name="alternative_routes">Select a route</string>
     <string name="geocoder_preference_provider_title">Geocoder Provider</string>
     <string name="geocoder_preference_provider_summary">Select a provider for use in geocoder</string>
+    <string name="info_server_no_server_selected">No server is selected</string>
+    <string name="info_server_error">Not possible to obtain server info</string>
+    <string name="selected_custom_server_title">Use custom server</string>
+    <string name="selected_custom_server_summary_activate">Custom server is in use</string>
+    <string name="selected_custom_server_summary_disactivate">One reference server is in use</string>
+    <string name="selected_custom_server_summary_disabled">You should provide a valid custom server URL</string>
+    <string name="server_down">Not reachable server</string>
     <string-array name="available_geocoder_providers">
         <item>MapQuest Nominatim</item>
         <item>Google Places</item>

@@ -98,6 +98,16 @@ public class ServersDataSource {
 		database.delete(MySQLiteHelper.TABLE_SERVERS, MySQLiteHelper.COLUMN_ID
 				+ " = " + id, null);
 	}
+	
+	public Server getServer(Long id) {
+		Log.v(TAG, "Server deleted with id: " + id);
+		Cursor cursor = database.query(MySQLiteHelper.TABLE_SERVERS, allColumns, MySQLiteHelper.COLUMN_ID + " = " + id, null, null, null, null);
+		cursor.moveToFirst();
+		Server newServer = cursorToServer(cursor);
+		cursor.close();
+		
+		return newServer;
+	}
 
 	public List<Server> getAllServers() {
 		List<Server> servers = new ArrayList<Server>();

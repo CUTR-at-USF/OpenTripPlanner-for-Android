@@ -16,18 +16,20 @@
 
 package edu.usf.cutr.opentripplanner.android.fragments;
 
-import java.io.IOException;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_GEOCODER_PROVIDER;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_MAX_WALKING_DISTANCE;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_WHEEL_ACCESSIBLE;
+
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.http.HttpStatus;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
 import org.miscwidgets.widget.Panel;
 import org.opentripplanner.api.ws.Request;
 import org.opentripplanner.routing.core.OptimizeType;
@@ -78,7 +80,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-import de.mastacode.http.Http;
+import android.widget.Toast;
 import edu.usf.cutr.opentripplanner.android.MyActivity;
 import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.R;
@@ -86,6 +88,7 @@ import edu.usf.cutr.opentripplanner.android.SettingsActivity;
 import edu.usf.cutr.opentripplanner.android.listeners.OTPGeocodingListener;
 import edu.usf.cutr.opentripplanner.android.listeners.OTPGetCurrentLocationListener;
 import edu.usf.cutr.opentripplanner.android.listeners.OnFragmentListener;
+import edu.usf.cutr.opentripplanner.android.listeners.ServerCheckerCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.ServerSelectorCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.TripRequestCompleteListener;
 import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
@@ -95,12 +98,13 @@ import edu.usf.cutr.opentripplanner.android.model.TraverseModeSpinnerItem;
 import edu.usf.cutr.opentripplanner.android.overlays.MapOverlay;
 import edu.usf.cutr.opentripplanner.android.overlays.OTPModeOverlay;
 import edu.usf.cutr.opentripplanner.android.overlays.OTPPathOverlay;
+import edu.usf.cutr.opentripplanner.android.sqlite.ServersDataSource;
 import edu.usf.cutr.opentripplanner.android.tasks.MetadataRequest;
 import edu.usf.cutr.opentripplanner.android.tasks.OTPGeocoding;
+import edu.usf.cutr.opentripplanner.android.tasks.ServerChecker;
 import edu.usf.cutr.opentripplanner.android.tasks.ServerSelector;
 import edu.usf.cutr.opentripplanner.android.tasks.TripRequest;
 import edu.usf.cutr.opentripplanner.android.util.LocationUtil;
-import static edu.usf.cutr.opentripplanner.android.OTPApp.*;
 
 /**
  * Main UI screen of the app, showing the map.
@@ -109,7 +113,7 @@ import static edu.usf.cutr.opentripplanner.android.OTPApp.*;
  */
 
 public class MainFragment extends Fragment implements
-		OnSharedPreferenceChangeListener, ServerSelectorCompleteListener,
+		OnSharedPreferenceChangeListener, ServerSelectorCompleteListener, ServerCheckerCompleteListener,
 		TripRequestCompleteListener, OTPGetCurrentLocationListener,
 		OTPGeocodingListener {
 
@@ -411,22 +415,32 @@ public class MainFragment extends Fragment implements
 		modeOverlay = new OTPModeOverlay(this);
 		mv.getOverlays().add(modeOverlay);
 
-		// TODO - fix below?
 		if (prefs.getBoolean(PREFERENCE_KEY_AUTO_DETECT_SERVER, true)) {
+		
 			if (app.getSelectedServer() == null) {
 				processServerSelector(currentLocation, false, true);
-				// new
-				// ServerSelector((MyActivity)activity).execute(currentLocation);
 			} else {
 				Log.v(TAG, "Already selected a server!!");
 			}
-		} else {
-			String baseURL = prefs.getString(PREFERENCE_KEY_CUSTOM_SERVER_URL, "");
-			if (baseURL.length() > 5) {
+		}
+		else {
+			if (prefs.getBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)){
+				String baseURL = prefs.getString(PREFERENCE_KEY_CUSTOM_SERVER_URL, "");
 				app.setSelectedServer(new Server(baseURL));
 				Log.v(TAG, "Now using custom OTP server: " + baseURL);
-			} else {
-				// TODO - handle issue when field is cleared/blank
+			}
+			else{
+				MyActivity myActivity = (MyActivity) this.getActivity();
+				ServersDataSource dataSource = myActivity.getDatasource();
+				long serverId = prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0);
+				if (serverId != 0){
+					dataSource.open();
+					Server s = new Server(dataSource.getServer(prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)));
+					app.setSelectedServer(s);
+					dataSource.close();
+					Log.v(TAG, "Now using OTP server: " + s.getRegion());
+				}
+				dataSource.close();
 			}
 		}
 
@@ -659,27 +673,35 @@ public class MainFragment extends Fragment implements
 		if (key.equals(PREFERENCE_KEY_MAP_TILE_SOURCE)) {
 			mv.setTileSource(TileSourceFactory.getTileSource(prefs.getString(
 					PREFERENCE_KEY_MAP_TILE_SOURCE, "Mapnik")));
-		} else if (key.equals(PREFERENCE_KEY_CUSTOM_SERVER_URL)) {
-			String baseURL = prefs.getString(PREFERENCE_KEY_CUSTOM_SERVER_URL, "");
+		} else if (key.equals(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER)) {
 			MyActivity myActivity = (MyActivity) this.getActivity();
-			if (baseURL.length() > 5) {
-				app.setSelectedServer(new Server(baseURL));
-				Log.v(TAG, "Now using custom OTP server: " + baseURL);
+
+			if (prefs.getBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)){
+				app.setSelectedServer(new Server(prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, "")));
+				Log.v(TAG, "Now using custom OTP server: " + prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
 				MetadataRequest metaRequest = new MetadataRequest(myActivity);
 				metaRequest.execute("");
-			} else {
-				// TODO - handle issue when field is cleared/blank
 			}
+			else{
+				long serverId = prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0);
+				if (serverId != 0){
+					ServersDataSource dataSource = myActivity.getDatasource();
+					dataSource.open();
+					Server s = new Server(dataSource.getServer(prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)));
+					app.setSelectedServer(s);
+					dataSource.close();
+				}
+			}
+			
 		} else if (key.equals(PREFERENCE_KEY_AUTO_DETECT_SERVER)) {
 			Log.v(TAG, "Detected change in auto-detect server preference. Value is now: " + prefs.getBoolean(PREFERENCE_KEY_AUTO_DETECT_SERVER, true));
 			
-//			if (prefs.getBoolean(PREFERENCE_KEY_AUTO_DETECT_SERVER, true)) {
-//				// TODO - fix this not displaying!!
-//				needToRunAutoDetect = true;
-//			} else {
-//				needToRunAutoDetect = false;
-//			}
-			needToRunAutoDetect = true;
+			if (prefs.getBoolean(PREFERENCE_KEY_AUTO_DETECT_SERVER, true)) {
+				needToRunAutoDetect = true;
+			}
+			else {
+				needToRunAutoDetect = false;
+			}
 		} else if (key.equals(PREFERENCE_KEY_GEOCODER_PROVIDER)) {
 			if (prefs.getString(PREFERENCE_KEY_GEOCODER_PROVIDER, "Google Places").equals(
 					"Google Places")) {
@@ -762,46 +784,14 @@ public class MainFragment extends Fragment implements
 			if (server == null) {
 				Log.w(TAG,
 						"Tried to get server info when no server was selected");
+				Toast.makeText(this.getActivity().getApplicationContext(), this.getActivity().getApplicationContext().getResources().getString(R.string.info_server_no_server_selected), Toast.LENGTH_SHORT).show();
 				break;
 			}
-			StringBuilder message = new StringBuilder("Region:  "
-					+ server.getRegion());
-			message.append("\nLanguage:  " + server.getLanguage());
-			message.append("\nContact:  " + server.getContactName() + " ("
-					+ server.getContactEmail() + ")");
-			message.append("\nURL:  " + server.getBaseURL());
+		
 
-			// TODO - fix server info bounds
-			// message.append("\nBounds: " + server.getBounds());
+			ServerChecker serverChecker = new ServerChecker(this.getActivity().getApplicationContext(), this, true);
+			serverChecker.execute(server);				
 
-			message.append("\nCurrently reachable: ");
-
-			int status = 0;
-			try {
-				HttpParams httpParameters = new BasicHttpParams();
-				int timeoutConnection = getResources().getInteger(R.integer.connection_timeout);
-				HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
-				int timeoutSocket = getResources().getInteger(R.integer.socket_timeout);
-				HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
-				status = Http.get(server.getBaseURL() + "/plan")
-						.use(new DefaultHttpClient(httpParameters)).asResponse()
-						.getStatusLine().getStatusCode();
-			} catch (IOException e) {
-				Log.e(TAG, "Unable to reach server: " + e.getMessage());
-			}
-
-			if (status == HttpStatus.SC_OK) {
-				message.append("Yes");
-			} else {
-				message.append("No");
-			}
-
-			AlertDialog.Builder dialog = new AlertDialog.Builder(
-					this.getActivity());
-			dialog.setTitle("OpenTripPlanner Server Info");
-			dialog.setMessage(message);
-			dialog.setNeutralButton("OK", null);
-			dialog.create().show();
 			break;
 		default:
 			break;
@@ -961,7 +951,6 @@ public class MainFragment extends Fragment implements
 	@Override
 	public void onTripRequestComplete(List<Itinerary> itineraries,
 			String currentRequestString) {
-		// TODO Auto-generated method stub
 		showRouteOnMap(itineraries.get(0).legs);
 		OnFragmentListener ofl = getFragmentListener();
 
@@ -974,14 +963,12 @@ public class MainFragment extends Fragment implements
 
 	@Override
 	public void onOTPGetCurrentLocationComplete(GeoPoint point) {
-		// TODO Auto-generated method stub
 		zoomToLocation(point);
 	}
 
 	@Override
 	public void onOTPGeocodingComplete(final boolean isStartTextbox,
 			ArrayList<Address> addressesReturn) {
-		// TODO Auto-generated method stub
 		// isRealLostFocus = false;
 		
 		try{
@@ -1049,6 +1036,16 @@ public class MainFragment extends Fragment implements
 			alertGeocoder.show();
 		}catch(Exception e){
 			Log.e(TAG, "Error in Main Fragment Geocoding callback: " + e);
+		}
+	}
+	@Override
+	public void onServerCheckerComplete(String result, boolean showMessage, boolean isWorking) {
+		if (showMessage){
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this.getActivity());
+			dialog.setTitle("OpenTripPlanner Server Info");
+			dialog.setMessage(result);
+			dialog.setNeutralButton("OK", null);
+			dialog.create().show();
 		}
 	}
 }

@@ -33,18 +33,19 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.webkit.URLUtil;
 import android.widget.EditText;
 import android.widget.Toast;
 import au.com.bytecode.opencsv.CSVReader;
 import de.mastacode.http.Http;
 import edu.usf.cutr.opentripplanner.android.R;
 import edu.usf.cutr.opentripplanner.android.listeners.OTPLocationListener;
+import edu.usf.cutr.opentripplanner.android.listeners.ServerCheckerCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.ServerSelectorCompleteListener;
 import edu.usf.cutr.opentripplanner.android.model.Server;
 import edu.usf.cutr.opentripplanner.android.sqlite.ServersDataSource;
@@ -60,7 +61,7 @@ import static edu.usf.cutr.opentripplanner.android.OTPApp.*;
  * @author Khoa Tran
  */
 
-public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
+public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> implements ServerCheckerCompleteListener{
 	private Server selectedServer;
 	private static final String TAG = "OTP";
 	private ProgressDialog progressDialog;
@@ -150,6 +151,7 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 			// Insert new list to database
 			if(serverList!=null && !serverList.isEmpty()){
 				insertServerListToDatabase(serverList);
+				serverList = getServerFromSQLite();
 			}
 		
 			// If still null
@@ -202,8 +204,7 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 		for(int i=0; i<values.size(); i++){
 			Server s = values.get(i);
 			shown += s.getRegion() + s.getDate().toString()+"\n";
-			servers.add(new Server(s.getDate(), s.getRegion(), s.getBaseURL(), s.getBounds(),
-								   s.getLanguage(), s.getContactName(), s.getContactEmail()));
+			servers.add(new Server(s));
 		}
 		Log.v(TAG, shown);
 		dataSource.close();
@@ -315,7 +316,7 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 		}
 		
 		//Remove locationlisteners
-	/*	for (int i=0; i<providers.size(); i++) { -->VREIXO			
+	/*	for (int i=0; i<providers.size(); i++) { 			
 			lm.removeUpdates(otpLocationListener);			
 		}
 	 */
@@ -354,7 +355,11 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 
 					//If the user selected to enter a custom URL, they are shown this EditText box to enter it
 					if(items[item].equals("Custom Server")) {
+						SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+
 						final EditText tbBaseURL = new EditText(context);
+						String actualCustomServer = prefs.getString(PREFERENCE_KEY_CUSTOM_SERVER_URL, "");
+						tbBaseURL.setText(actualCustomServer);
 
 						AlertDialog.Builder urlAlert = new AlertDialog.Builder(context);
 						urlAlert.setTitle("Enter a custom OTP server domain");
@@ -362,27 +367,38 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 						urlAlert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {
 								String value = tbBaseURL.getText().toString().trim();
-								SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-								Editor e = prefs.edit();
-								e.putBoolean(PREFERENCE_KEY_AUTO_DETECT_SERVER, false);
-								e.putString(PREFERENCE_KEY_CUSTOM_SERVER_URL, value);
-								e.commit();
+								if (URLUtil.isValidUrl(value)){
+									SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext()).edit();
+									prefsEditor.putString(PREFERENCE_KEY_CUSTOM_SERVER_URL, value);
+									ServerChecker serverChecker = new ServerChecker(context, ServerSelector.this, false);
+									serverChecker.execute(new Server(value));
+									prefsEditor.commit();
+								}
+								else{
+									Toast.makeText(context, context.getResources().getString(R.string.custom_server_url_error), Toast.LENGTH_SHORT).show();
+								}
 							}
 						});
 						urlAlert.create().show();
-
+						String baseURL = prefs.getString(PREFERENCE_KEY_CUSTOM_SERVER_URL, "");
+						selectedServer = new Server(baseURL);
+						callback.onServerSelectorComplete(currentLocation, selectedServer);
 					} else { 
 						//User picked server from the list
 						for (Server server : knownServers) {
 							//If this server region matches what the user picked, then set the server as the selected server
 							if (server.getRegion().equals(items[item])) {
 								selectedServer = server;
+								SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+								Editor e = prefs.edit();
+								e.putLong(PREFERENCE_KEY_SELECTED_SERVER, selectedServer.getId());
+								e.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false);
+								e.commit();
 								GeoPoint centerPoint = new GeoPoint(selectedServer.getCenterLatitude(), selectedServer.getCenterLongitude());
 								callback.onServerSelectorComplete(centerPoint, selectedServer);
 								break;
 							}
 						}
-						//TODO - clear custom url pref here?
 					}
 					Log.v(TAG, "Chosen: " + items[item]);
 				}
@@ -394,5 +410,24 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> {
 			//TODO - handle error here that server list cannot be loaded
 			Log.e(TAG, "Server list could not be downloaded!!");
 		}
+	}
+
+	@Override
+	public void onServerCheckerComplete(String result, boolean showMessage,
+			boolean isWorking) {
+		SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext()).edit();
+
+		if (isWorking){
+			prefsEditor.putBoolean(PREFERENCE_KEY_AUTO_DETECT_SERVER, false);
+			prefsEditor.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, true);
+			prefsEditor.putBoolean(PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, true);
+		}
+		else{
+			prefsEditor.putBoolean(PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, false);
+			prefsEditor.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false);
+			Toast.makeText(context, context.getResources().getString(R.string.custom_server_not_set), Toast.LENGTH_SHORT).show();
+		}	
+		
+		prefsEditor.commit();
 	}
 }

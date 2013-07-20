@@ -16,22 +16,24 @@
 
 package edu.usf.cutr.opentripplanner.android;
 
-import java.net.URLEncoder;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_GEOCODER_PROVIDER;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_OTP_PROVIDER_FEEDBACK;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_REFRESH_SERVER_LIST;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 
-import edu.usf.cutr.opentripplanner.android.R;
-import edu.usf.cutr.opentripplanner.android.model.Server;
-import edu.usf.cutr.opentripplanner.android.sqlite.ServersDataSource;
-
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -40,21 +42,25 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceCategory;
+import android.preference.PreferenceManager;
 import android.util.Log;
+import android.webkit.URLUtil;
 import android.widget.Toast;
-import static edu.usf.cutr.opentripplanner.android.OTPApp.*;
+import edu.usf.cutr.opentripplanner.android.listeners.ServerCheckerCompleteListener;
+import edu.usf.cutr.opentripplanner.android.model.Server;
+import edu.usf.cutr.opentripplanner.android.sqlite.ServersDataSource;
+import edu.usf.cutr.opentripplanner.android.tasks.ServerChecker;
 
 /*
  * Modified by Khoa Tran
  */
-public class SettingsActivity extends PreferenceActivity {
+public class SettingsActivity extends PreferenceActivity implements ServerCheckerCompleteListener{
 	private ListPreference mapTileProvider;
-	private PreferenceCategory routingOptions;
 	private CheckBoxPreference autoDetectServer;
 	private EditTextPreference customServerURL;
 	private Preference providerFeedbackButton;
 	private Preference serverRefreshButton;
+	private CheckBoxPreference selectedCustomServer;
 	private ListPreference geocoderProvider;
 	
 	private ServersDataSource datasource;
@@ -71,9 +77,9 @@ public class SettingsActivity extends PreferenceActivity {
 
 		mapTileProvider = (ListPreference) findPreference(PREFERENCE_KEY_MAP_TILE_SOURCE);
 		geocoderProvider = (ListPreference) findPreference(PREFERENCE_KEY_GEOCODER_PROVIDER);
-		routingOptions = (PreferenceCategory) findPreference(PREFERENCE_KEY_ROUTING_OPTIONS);
 		autoDetectServer = (CheckBoxPreference) findPreference(PREFERENCE_KEY_AUTO_DETECT_SERVER);
 		customServerURL = (EditTextPreference) findPreference(PREFERENCE_KEY_CUSTOM_SERVER_URL);
+		selectedCustomServer = (CheckBoxPreference) findPreference(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER);
 
 		ArrayList<CharSequence> names = new ArrayList<CharSequence>();
 		ArrayList<ITileSource> tiles = TileSourceFactory.getTileSources();
@@ -90,15 +96,91 @@ public class SettingsActivity extends PreferenceActivity {
 		geocoderProvider.setEntries(availableGeocoderProviders);
 		geocoderProvider.setEntryValues(availableGeocoderProviders);
 		geocoderProvider.setDefaultValue(availableGeocoderProviders[0]);
+		
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		if (prefs.getBoolean(PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, false)){
+			if (selectedCustomServer.isChecked()){
+				selectedCustomServer.setSummary(getResources().getString(R.string.selected_custom_server_summary_activate));
+			}
+			else{
+				selectedCustomServer.setSummary(getResources().getString(R.string.selected_custom_server_summary_disactivate));
+			}
+			customServerURL.setSummary(getResources().getString(R.string.custom_server_url_description));
+		}
+		else{
+			selectedCustomServer.setSummary(getResources().getString(R.string.selected_custom_server_summary_disabled));
+			selectedCustomServer.setEnabled(false);
+			customServerURL.setSummary(getResources().getString(R.string.custom_server_url_error));
+		}
+		
+		if (selectedCustomServer.isEnabled() && selectedCustomServer.isChecked()){
+			autoDetectServer.setEnabled(false);
+		}
+		
+		selectedCustomServer.setDependency(PREFERENCE_KEY_CUSTOM_SERVER_URL);
 
-		hideCustomURLPref(autoDetectServer.isChecked());
+		customServerURL.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 
+			@Override
+			public boolean onPreferenceChange(Preference preference, Object newValue) {
+				String value = (String) newValue;
+				
+						
+				if (URLUtil.isValidUrl(value)){		
+					ServerChecker serverChecker = new ServerChecker(getApplicationContext(),SettingsActivity.this, false);
+					serverChecker.execute(new Server(value));
+					return true;
+				}
+				
+				Toast.makeText(SettingsActivity.this.getApplicationContext(), SettingsActivity.this.getApplicationContext().getResources().getString(R.string.custom_server_url_error), Toast.LENGTH_SHORT).show();
+				
+				customServerURL.setSummary(getResources().getString(R.string.custom_server_url_error));
+						
+				Intent returnIntent = new Intent();
+				setResult(RESULT_OK, returnIntent);
+				return false;
+			}
+		});
+
+		selectedCustomServer.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+
+			@Override
+			public boolean onPreferenceChange(Preference preference, Object newValue) {
+				Boolean value = (Boolean) newValue;
+				if (value){
+					autoDetectServer.setChecked(false);
+					autoDetectServer.setEnabled(false);
+					selectedCustomServer.setSummary(getResources().getString(R.string.selected_custom_server_summary_activate));
+				}
+				else{
+					autoDetectServer.setEnabled(true);
+					selectedCustomServer.setSummary(getResources().getString(R.string.selected_custom_server_summary_disactivate));
+				}
+				
+				Log.v(TAG, "Custom server Button clicked");
+				Intent returnIntent = new Intent();
+				setResult(RESULT_OK, returnIntent);
+				
+				return true;
+			}
+		});
+		
 		autoDetectServer.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 
 			@Override
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
 				Boolean value = (Boolean) newValue;
-				hideCustomURLPref(value);
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+				
+				if (value){
+					selectedCustomServer.setEnabled(false);
+				}
+				else{
+					if (prefs.getBoolean(PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, false)){
+						selectedCustomServer.setEnabled(true);
+					}
+				}
+				
 				return true;
 			}
 		});
@@ -155,14 +237,7 @@ public class SettingsActivity extends PreferenceActivity {
 		datasource.close();
 	}
 
-	private void hideCustomURLPref(Boolean hidePref) {
-		if(!hidePref) {
-			routingOptions.addItemFromInflater(customServerURL);
-		} else if (hidePref) {
-			routingOptions.removePreference(customServerURL);
-		}
-	}
-	
+
 	/**
 	 * @return the datasource
 	 */
@@ -175,5 +250,34 @@ public class SettingsActivity extends PreferenceActivity {
 	 */
 	public void setDatasource(ServersDataSource datasource) {
 		this.datasource = datasource;
+	}
+
+	@Override
+	public void onServerCheckerComplete(String result, boolean showMessage, boolean isWorking) {
+		SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+		if (isWorking){
+			selectedCustomServer.setEnabled(true);
+			if (selectedCustomServer.isChecked()){
+				selectedCustomServer.setSummary(getResources().getString(R.string.selected_custom_server_summary_activate));
+				prefsEditor.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, true);
+			}
+			else{
+				selectedCustomServer.setSummary(getResources().getString(R.string.selected_custom_server_summary_disactivate));
+			}
+			customServerURL.setSummary(getResources().getString(R.string.custom_server_url_description));
+			prefsEditor.putBoolean(PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, true);
+		}
+		else{
+			autoDetectServer.setEnabled(true);
+			selectedCustomServer.setChecked(false);
+			selectedCustomServer.setEnabled(false);		
+			selectedCustomServer.setSummary(getResources().getString(R.string.selected_custom_server_summary_disabled));
+			Toast.makeText(SettingsActivity.this.getApplicationContext(), SettingsActivity.this.getApplicationContext().getResources().getString(R.string.custom_server_error), Toast.LENGTH_SHORT).show();
+			customServerURL.setSummary(getResources().getString(R.string.custom_server_error));
+			prefsEditor.putBoolean(PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, false);
+			prefsEditor.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false);
+		}
+		
+		prefsEditor.commit();
 	}
 }

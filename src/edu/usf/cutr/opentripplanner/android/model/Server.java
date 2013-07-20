@@ -43,6 +43,18 @@ public class Server {
 	public Server() {
 		super();
 	}
+	
+	public Server(Server s) {
+		super();
+		setId(s.getId());
+		setDate(s.getDate());
+		setRegion(s.getRegion());
+		setBaseURL(s.getBaseURL());
+		setBounds(s.getBounds());  // do extra string processing to set lowerleft and upperright
+		setLanguage(s.getLanguage());
+		setContactName(s.getContactName());
+		setContactEmail(s.getContactEmail());
+	}
 
 	public Server(Date d, String region, String baseURL, String bounds,
 			String language, String contactName, String contactEmail) {

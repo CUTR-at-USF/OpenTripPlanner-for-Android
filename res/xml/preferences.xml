@@ -4,8 +4,10 @@
     <PreferenceCategory android:title="@string/routing_options" android:key="routing_options">
         <CheckBoxPreference android:key="wheelchair_accessible" android:defaultValue="false" android:summary="@string/wheelchair_accessibility_description" android:title="@string/wheelchair_accessible"></CheckBoxPreference>
         <EditTextPreference android:key="max_walking_distance" android:defaultValue="@integer/max_walking_distance" android:summary="@string/maximum_walk_description" android:title="@string/maximum_walk" android:numeric="integer"></EditTextPreference>
-        <CheckBoxPreference android:title="@string/auto_detect_server" android:key="auto_detect_server" android:summary="@string/auto_detect_server_description" android:defaultValue="true"></CheckBoxPreference><EditTextPreference android:key="custom_server_url" android:title="@string/custom_server_url" android:summary="@string/custom_server_url_description"></EditTextPreference>
+        <CheckBoxPreference android:title="@string/auto_detect_server" android:key="auto_detect_server" android:summary="@string/auto_detect_server_description" android:defaultValue="true"></CheckBoxPreference>
         <Preference android:title="@string/refresh_server_list" android:key="refresh_server_list"/>
+        <CheckBoxPreference android:title="@string/selected_custom_server_title" android:key="selected_custom_server" android:defaultValue="false"></CheckBoxPreference>
+        <EditTextPreference android:key="custom_server_url" android:title="@string/custom_server_url"></EditTextPreference>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/map_options" android:key="map_options">
         <ListPreference android:title="@string/geocoder_preference_provider_title" android:key="geocoder_provider" android:summary="@string/geocoder_preference_provider_summary"></ListPreference>
