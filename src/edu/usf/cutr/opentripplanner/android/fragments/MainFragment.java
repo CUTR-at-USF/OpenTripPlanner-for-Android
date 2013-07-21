@@ -527,12 +527,33 @@ public class MainFragment extends Fragment implements
 		if (otpBundle != null) {
 			retrievePreviousState(otpBundle);
 		}
-
+		
+		if (savedInstanceState != null){
+			tbStartLocation.setText(savedInstanceState.getString("tbStartLocation"));
+			tbEndLocation.setText(savedInstanceState.getString("tbEndLocation"));
+			GeoPoint startMarkerLocation = new GeoPoint(savedInstanceState.getIntArray("startMarkerLocation")[0], savedInstanceState.getIntArray("startMarkerLocation")[1]);  
+			startMarker.setLocation(startMarkerLocation);
+			GeoPoint endMarkerLocation = new GeoPoint(savedInstanceState.getIntArray("endMarkerLocation")[0], savedInstanceState.getIntArray("endMarkerLocation")[1]);  
+			endMarker.setLocation(endMarkerLocation);
+			ddlOptimization.setSelection(savedInstanceState.getInt("ddlOptimization"));
+			ddlTravelMode.setSelection(savedInstanceState.getInt("ddlTravelMode"));
+		}
+		
 		Log.v(TAG, "finish onStart()");
 
 		return mainView;
 	}
-
+	
+	public void onSaveInstanceState(Bundle bundle){
+		super.onSaveInstanceState(bundle);
+		bundle.putString("tbStartLocation", tbStartLocation.getText().toString());
+		bundle.putString("tbEndLocation", tbEndLocation.getText().toString());
+		bundle.putIntArray("startMarkerLocation", new int[]{startMarker.getLocation().getLatitudeE6(), startMarker.getLocation().getLongitudeE6()});
+		bundle.putIntArray("endMarkerLocation", new int[]{endMarker.getLocation().getLatitudeE6(), endMarker.getLocation().getLongitudeE6()});
+		bundle.putInt("ddlOptimization", ddlOptimization.getSelectedItemPosition());
+		bundle.putInt("ddlTravelMode", ddlTravelMode.getSelectedItemPosition());
+	}
+	
 	private void retrievePreviousState(OTPBundle bundle) {
 		tbStartLocation.setText(bundle.getFromText());
 		tbEndLocation.setText(bundle.getToText());
