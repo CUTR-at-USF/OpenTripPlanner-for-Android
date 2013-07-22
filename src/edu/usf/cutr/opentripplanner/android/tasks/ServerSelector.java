@@ -233,7 +233,7 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> implement
 
 		CSVReader reader = new CSVReader(new StringReader(result));
 		try {
-			Date currentTime = Calendar.getInstance().getTime();
+			Long currentTime = Calendar.getInstance().getTime().getTime();
 			
 			List<String[]> entries = reader.readAll();
 			for (String[] e : entries) {

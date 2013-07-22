@@ -71,8 +71,8 @@ public class ServersDataSource {
 		ContentValues values = new ContentValues();
 				
 		if(s.getDate()!=null){			
-			values.put(MySQLiteHelper.COLUMN_DATE, dateFormat.format(s.getDate()));
-			Log.d(OTPApp.TAG, "Wrote '" + s.getRegion() + "' server date to SQLLite - " + dateFormat.format(s.getDate()));
+			values.put(MySQLiteHelper.COLUMN_DATE, s.getDate());
+			Log.d(OTPApp.TAG, "Wrote '" + s.getRegion() + "' server date to SQLLite - " + s.getDate());
 		}
 		values.put(MySQLiteHelper.COLUMN_REGION, s.getRegion());
 		values.put(MySQLiteHelper.COLUMN_BASEURL, s.getBaseURL());
@@ -151,7 +151,7 @@ public class ServersDataSource {
 		return servers;
 	}
 	
-	public Date getMostRecentDate() {
+	public Long getMostRecentDate() {
 		String whereClause = MySQLiteHelper.COLUMN_DATE + " = (SELECT max(" + 
 				MySQLiteHelper.COLUMN_DATE +") FROM "+MySQLiteHelper.TABLE_SERVERS+")";
 
@@ -170,15 +170,8 @@ public class ServersDataSource {
 		Server server = new Server();
 		server.setId(cursor.getLong(0));
 
-		String dateString = cursor.getString(1);
-						
-		Date addedOn = null;
 		
-		try {			
-			addedOn = dateFormat.parse(dateString);			
-		} catch (ParseException e) {
-			e.printStackTrace();			
-		}
+		Long addedOn = cursor.getLong(1);
 		
 		server.setDate(addedOn);
 		server.setRegion(cursor.getString(2));
@@ -188,7 +181,7 @@ public class ServersDataSource {
 		server.setContactName(cursor.getString(6));
 		server.setContactEmail(cursor.getString(7));
 		
-		Log.d(OTPApp.TAG, "Retrieved '" + server.getRegion() + "' server date from SQLLite - " + dateString);
+		Log.d(OTPApp.TAG, "Retrieved '" + server.getRegion() + "' server date from SQLLite - " + addedOn);
 		
 		return server;
 	}

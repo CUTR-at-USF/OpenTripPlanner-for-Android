@@ -212,12 +212,14 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 		
 		ServersDataSource datasource = this.getDatasource();
 		datasource.open();
-		Date mostRecentDate = datasource.getMostRecentDate();
+		Long mostRecentDate = datasource.getMostRecentDate();
 		
 		serverRefreshButton = (Preference)findPreference(PREFERENCE_KEY_REFRESH_SERVER_LIST);
 		
 		if(mostRecentDate != null){
-			serverRefreshButton.setSummary("Server List Downloaded on "+mostRecentDate.toString());
+			Calendar cal = Calendar.getInstance();
+			cal.setTimeInMillis(mostRecentDate);
+			serverRefreshButton.setSummary("Server List Downloaded on "+ cal.getTime());
 		}else{
 			serverRefreshButton.setSummary("Last Server List Download Unknown");
 		}

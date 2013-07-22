@@ -28,7 +28,7 @@ import android.location.Location;
 public class Server {
 
 	private long id;
-	private Date date;
+	private Long date;
 	private String region;
 	private String baseURL;
 	private String bounds;
@@ -56,7 +56,7 @@ public class Server {
 		setContactEmail(s.getContactEmail());
 	}
 
-	public Server(Date d, String region, String baseURL, String bounds,
+	public Server(Long d, String region, String baseURL, String bounds,
 			String language, String contactName, String contactEmail) {
 		super();
 		setDate(d);
@@ -159,14 +159,14 @@ public class Server {
 	/**
 	 * @return the date
 	 */
-	public Date getDate() {
+	public Long getDate() {
 		return date;
 	}
 
 	/**
 	 * @param date the date to set
 	 */
-	public void setDate(Date date) {
+	public void setDate(Long date) {
 		this.date = date;
 	}
 	
