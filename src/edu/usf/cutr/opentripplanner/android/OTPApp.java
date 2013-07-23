@@ -39,6 +39,7 @@ public class OTPApp extends Application {
 	public static final String PREFERENCE_KEY_ROUTING_OPTIONS = "routing_options";
 	public static final String PREFERENCE_KEY_AUTO_DETECT_SERVER = "auto_detect_server";
 	public static final String PREFERENCE_KEY_CUSTOM_SERVER_URL = "custom_server_url";
+	public static final String PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS = "custom_server_bounds";
 	public static final String PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID = "custom_server_url_is_valid";
 	public static final String PREFERENCE_KEY_REFRESH_SERVER_LIST = "refresh_server_list";
 	public static final String PREFERENCE_KEY_OTP_PROVIDER_FEEDBACK = "otp_provider_feedback";

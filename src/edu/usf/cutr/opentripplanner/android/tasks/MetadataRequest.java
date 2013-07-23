@@ -16,6 +16,8 @@
 
 package edu.usf.cutr.opentripplanner.android.tasks;
 
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -23,14 +25,18 @@ import java.net.URL;
 import org.opentripplanner.api.ws.GraphMetadata;
 
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.usf.cutr.opentripplanner.android.MyActivity;
 import edu.usf.cutr.opentripplanner.android.OTPApp;
+import edu.usf.cutr.opentripplanner.android.R;
 import edu.usf.cutr.opentripplanner.android.model.Server;
 
 /**
@@ -38,7 +44,7 @@ import edu.usf.cutr.opentripplanner.android.model.Server;
  *
  */
 
-public class MetadataRequest extends AsyncTask<String, Integer, Long> {
+public class MetadataRequest extends AsyncTask<String, Integer, GraphMetadata> {
 	private GraphMetadata metadata;
 	private static final String TAG = "OTP";
 	private ProgressDialog progressDialog;
@@ -52,44 +58,50 @@ public class MetadataRequest extends AsyncTask<String, Integer, Long> {
 	}
 
 	protected void onPreExecute() {
-		progressDialog = ProgressDialog.show(activity, "",
-				"Getting graph metadata. Please wait... ", true);
+		progressDialog = ProgressDialog.show(activity,"",
+				activity.getResources().getString(R.string.metadata_request_progress), true);
+
 	}
 
-	protected Long doInBackground(String... reqs) {
+	protected GraphMetadata doInBackground(String... reqs) {
 		int count = reqs.length;
 		long totalSize = 0;
 		for (int i = 0; i < count; i++) {
-			metadata = requestMetadata();
+			String serverURL = reqs[0];
+			metadata = requestMetadata(serverURL);
 			// publishProgress((int) ((i / (float) count) * 100));
 		}
-		return totalSize;
+		return metadata;
 	}
 
-	protected void onPostExecute(Long result) {
-		if (progressDialog.isShowing()) {
-			progressDialog.dismiss();
+	protected void onPostExecute(GraphMetadata metadata) {
+		try{
+			if (progressDialog != null && progressDialog.isShowing()) {
+				progressDialog.dismiss();
+			}
+		}catch(Exception e){
+			Log.e(TAG, "Error in Metadata Request PostExecute dismissing dialog: " + e);
 		}
-		
+
+		Toast.makeText(activity, activity.getResources().getString(R.string.metadata_request_successful), Toast.LENGTH_SHORT).show();
+
 		if (metadata != null) {
-			OTPApp app = ((OTPApp) activity.getApplication());
 			double lowerLeftLatitude = metadata.getLowerLeftLatitude();
 			double lowerLeftLongitude = metadata.getLowerLeftLongitude();
 			double upperRightLatitude = metadata.getUpperRightLatitude();
 			double upperRightLongitude = metadata.getUpperRightLongitude();
-			
+			OTPApp app = ((OTPApp) activity.getApplication());
+	
 			Server selectedServer = app.getSelectedServer();
-			if(metadata.getLowerLeftLatitude()!=0) 
-				selectedServer.setLowerLeftLatitude(lowerLeftLatitude);
 			
-			if(metadata.getLowerLeftLongitude()!=0) 
-				selectedServer.setLowerLeftLongitude(lowerLeftLongitude);
+			String bounds = String.valueOf(lowerLeftLongitude) +
+					"," + String.valueOf(lowerLeftLongitude) +
+					"," + String.valueOf(upperRightLatitude) + "," + String.valueOf(upperRightLongitude);
+			selectedServer.setBounds(bounds);
 			
-			if(metadata.getUpperRightLatitude()!=0) 
-				selectedServer.setUpperRightLatitude(upperRightLatitude);
-			
-			if(metadata.getUpperRightLongitude()!=0) 
-				selectedServer.setUpperRightLongitude(upperRightLongitude);
+			SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(activity).edit();
+			prefsEditor.putString(PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS, bounds);
+			prefsEditor.commit();
 			
 			Log.v(TAG, "LowerLeft: " + Double.toString(lowerLeftLatitude)+","+Double.toString(lowerLeftLongitude));
 			Log.v(TAG, "UpperRight" + Double.toString(upperRightLatitude)+","+Double.toString(upperRightLongitude));
@@ -106,16 +118,10 @@ public class MetadataRequest extends AsyncTask<String, Integer, Long> {
 		}
 	}
 	
-	private GraphMetadata requestMetadata() {
-		String res = "/metadata";
-		
-		OTPApp app = ((OTPApp) activity.getApplication());
-		Server server = app.getSelectedServer();
-		if (server == null) {
-			//TODO - handle error for no server selected
-			return null;
-		}
-		String u = server.getBaseURL() + res;
+	private GraphMetadata requestMetadata(String serverURL) {
+		String res = activity.getResources().getString(R.string.metadata_location);
+
+		String u = serverURL + res;
 
 		Log.d(TAG, "URL: " + u);
 			

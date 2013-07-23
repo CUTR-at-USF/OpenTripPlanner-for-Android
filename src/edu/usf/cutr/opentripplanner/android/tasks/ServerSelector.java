@@ -413,8 +413,7 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> implement
 	}
 
 	@Override
-	public void onServerCheckerComplete(String result, boolean showMessage,
-			boolean isWorking) {
+	public void onServerCheckerComplete(String result, boolean isWorking) {
 		SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext()).edit();
 
 		if (isWorking){

@@ -16,14 +16,7 @@
 
 package edu.usf.cutr.opentripplanner.android;
 
-import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER;
-import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL;
-import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID;
-import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_GEOCODER_PROVIDER;
-import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE;
-import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_OTP_PROVIDER_FEEDBACK;
-import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_REFRESH_SERVER_LIST;
-import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.*;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -127,7 +120,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 				
 						
 				if (URLUtil.isValidUrl(value)){		
-					ServerChecker serverChecker = new ServerChecker(getApplicationContext(),SettingsActivity.this, false);
+					ServerChecker serverChecker = new ServerChecker(SettingsActivity.this, SettingsActivity.this, false);
 					serverChecker.execute(new Server(value));
 					return true;
 				}
@@ -229,7 +222,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 			public boolean onPreferenceClick(Preference arg0) {
 				Log.v(TAG, "Server Refresh Button clicked");
 				Intent returnIntent = new Intent();
-				returnIntent.putExtra(OTPApp.REFRESH_SERVER_RETURN_KEY, true);
+				returnIntent.putExtra(REFRESH_SERVER_RETURN_KEY, true);
 				setResult(RESULT_OK, returnIntent);
 				finish();
 				return true;
@@ -255,7 +248,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 	}
 
 	@Override
-	public void onServerCheckerComplete(String result, boolean showMessage, boolean isWorking) {
+	public void onServerCheckerComplete(String result, boolean isWorking) {
 		SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
 		if (isWorking){
 			selectedCustomServer.setEnabled(true);
@@ -274,7 +267,6 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 			selectedCustomServer.setChecked(false);
 			selectedCustomServer.setEnabled(false);		
 			selectedCustomServer.setSummary(getResources().getString(R.string.selected_custom_server_summary_disabled));
-			Toast.makeText(SettingsActivity.this.getApplicationContext(), SettingsActivity.this.getApplicationContext().getResources().getString(R.string.custom_server_error), Toast.LENGTH_SHORT).show();
 			customServerURL.setSummary(getResources().getString(R.string.custom_server_error));
 			prefsEditor.putBoolean(PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, false);
 			prefsEditor.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false);

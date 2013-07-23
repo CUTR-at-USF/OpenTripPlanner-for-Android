@@ -17,6 +17,11 @@
 <resources>
     <string name="app_name">OpenTripPlanner</string>
     <string name="servers_spreadsheet_url"><![CDATA[https://spreadsheets.google.com/spreadsheet/pub?hl=en_US&hl=en_US&key=0AgWy8ujaGosCdDhxTC04cUZNeHo0eGFBQTBpU2dxN0E&single=true&gid=0&output=csv]]></string>
+    <string name="metadata_location"><string>"/metadata"</string></string>
+    <string name="metadata_request_successful">Metadata dowloaded correctly</string>
+    <string name="metadata_request_progress">Getting graph metadata. Please wait...</string>
+    <string name="server_checker_progress">Getting server info. Please wait...</string>
+    <string name="server_checker_successful">Server is working OK</string>
     <string name="choose_mode">Choose a mode to travel by</string>
     <string name="choose_optimization">Choose an optimization</string>
     <string name="enable_gps">Enable GPS</string>

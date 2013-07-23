@@ -8,6 +8,7 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -15,36 +16,48 @@ import android.util.Log;
 import android.widget.Toast;
 import de.mastacode.http.Http;
 import edu.usf.cutr.opentripplanner.android.R;
+import edu.usf.cutr.opentripplanner.android.SettingsActivity;
 import edu.usf.cutr.opentripplanner.android.listeners.ServerCheckerCompleteListener;
 import edu.usf.cutr.opentripplanner.android.model.Server;
 
 public class ServerChecker extends AsyncTask<Server, Long, String> {
 	
 	private static final String TAG = "OTP";
+	private ProgressDialog progressDialog;
 	private Context context;
 
+	private ServerCheckerCompleteListener callback = null;
 	
-	private ServerCheckerCompleteListener callback;
 	private boolean showMessage;
 	private boolean isWorking = false;
 	
-    @Override
-	protected void onPreExecute() {
-		super.onPreExecute();
-
+	/**
+     * Constructs a new ServerChecker
+     * @param 
+     */
+	public ServerChecker(Context context, boolean showMessage) {
+		this.context = context;
+		this.showMessage = showMessage;
+    	progressDialog = new ProgressDialog(context);
 	}
-
+	
 	/**
      * Constructs a new ServerChecker
      * @param 
      */
 	public ServerChecker(Context context, ServerCheckerCompleteListener callback, boolean showMessage) {
 		this.context = context;
-		this.callback = callback;
 		this.showMessage = showMessage;
+		this.callback = callback;
+    	progressDialog = new ProgressDialog(context);
 	}
-
-	@Override
+	
+    @Override
+	protected void onPreExecute() {
+    	progressDialog = ProgressDialog.show(context,"", context.getString(R.string.server_checker_progress), true);
+	}
+	
+    @Override
 	protected String doInBackground(Server... params) {
 		Server server = params[0];
 		
@@ -100,12 +113,33 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
 
 	@Override
 	protected void onPostExecute(String result) {
-		super.onPostExecute(result);
+		try{
+			if (progressDialog != null && progressDialog.isShowing()) {
+				progressDialog.dismiss();
+			}
+		}catch(Exception e){
+			Log.e(TAG, "Error in Server Checker PostExecute dismissing dialog: " + e);
+		}
+
+		if (showMessage){
+			AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+			dialog.setTitle("OpenTripPlanner Server Info");
+			dialog.setMessage(result);
+			dialog.setNeutralButton("OK", null);
+			dialog.create().show();
+		}
+		else{
+			if (isWorking){
+				Toast.makeText(context, context.getResources().getString(R.string.server_checker_successful), Toast.LENGTH_SHORT).show();
+			}
+			else{
+				Toast.makeText(context, context.getResources().getString(R.string.custom_server_error), Toast.LENGTH_SHORT).show();
+			}
+		}
 		
-		callback.onServerCheckerComplete(result, showMessage, isWorking);
+		if (callback != null){
+			callback.onServerCheckerComplete(result, isWorking);
+		}
 	}
-
-
-
 
 }

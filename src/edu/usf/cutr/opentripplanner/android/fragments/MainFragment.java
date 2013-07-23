@@ -16,13 +16,7 @@
 
 package edu.usf.cutr.opentripplanner.android.fragments;
 
-import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER;
-import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL;
-import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_GEOCODER_PROVIDER;
-import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE;
-import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_MAX_WALKING_DISTANCE;
-import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER;
-import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_WHEEL_ACCESSIBLE;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.*;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -88,7 +82,6 @@ import edu.usf.cutr.opentripplanner.android.SettingsActivity;
 import edu.usf.cutr.opentripplanner.android.listeners.OTPGeocodingListener;
 import edu.usf.cutr.opentripplanner.android.listeners.OTPGetCurrentLocationListener;
 import edu.usf.cutr.opentripplanner.android.listeners.OnFragmentListener;
-import edu.usf.cutr.opentripplanner.android.listeners.ServerCheckerCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.ServerSelectorCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.TripRequestCompleteListener;
 import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
@@ -113,7 +106,7 @@ import edu.usf.cutr.opentripplanner.android.util.LocationUtil;
  */
 
 public class MainFragment extends Fragment implements
-		OnSharedPreferenceChangeListener, ServerSelectorCompleteListener, ServerCheckerCompleteListener,
+		OnSharedPreferenceChangeListener, ServerSelectorCompleteListener,
 		TripRequestCompleteListener, OTPGetCurrentLocationListener,
 		OTPGeocodingListener {
 
@@ -314,7 +307,7 @@ public class MainFragment extends Fragment implements
 								myActivity.setButtonStartLocation(false);
 							}
 							activity.startActivityForResult(intent,
-									OTPApp.CHOOSE_CONTACT_REQUEST_CODE);
+									CHOOSE_CONTACT_REQUEST_CODE);
 
 						} else { // Point on Map
 							if (buttonID == R.id.btnStartLocation) {
@@ -426,16 +419,22 @@ public class MainFragment extends Fragment implements
 		else {
 			if (prefs.getBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)){
 				String baseURL = prefs.getString(PREFERENCE_KEY_CUSTOM_SERVER_URL, "");
-				app.setSelectedServer(new Server(baseURL));
+				Server s = new Server(baseURL);
+				String bounds;
+				if ((bounds = prefs.getString(PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS, null)) != null){
+					s.setBounds(bounds);
+				}
+				app.setSelectedServer(s);
+
 				Log.v(TAG, "Now using custom OTP server: " + baseURL);
 			}
 			else{
 				MyActivity myActivity = (MyActivity) this.getActivity();
 				ServersDataSource dataSource = myActivity.getDatasource();
-				long serverId = prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0);
+				long serverId = prefs.getLong(PREFERENCE_KEY_SELECTED_SERVER, 0);
 				if (serverId != 0){
 					dataSource.open();
-					Server s = new Server(dataSource.getServer(prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)));
+					Server s = new Server(dataSource.getServer(prefs.getLong(PREFERENCE_KEY_SELECTED_SERVER, 0)));
 					app.setSelectedServer(s);
 					dataSource.close();
 					Log.v(TAG, "Now using OTP server: " + s.getRegion());
@@ -698,17 +697,17 @@ public class MainFragment extends Fragment implements
 			MyActivity myActivity = (MyActivity) this.getActivity();
 
 			if (prefs.getBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)){
-				app.setSelectedServer(new Server(prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, "")));
-				Log.v(TAG, "Now using custom OTP server: " + prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
+				app.setSelectedServer(new Server(prefs.getString(PREFERENCE_KEY_CUSTOM_SERVER_URL, "")));
+				Log.v(TAG, "Now using custom OTP server: " + prefs.getString(PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
 				MetadataRequest metaRequest = new MetadataRequest(myActivity);
-				metaRequest.execute("");
+				metaRequest.execute(prefs.getString(PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
 			}
 			else{
-				long serverId = prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0);
+				long serverId = prefs.getLong(PREFERENCE_KEY_SELECTED_SERVER, 0);
 				if (serverId != 0){
 					ServersDataSource dataSource = myActivity.getDatasource();
 					dataSource.open();
-					Server s = new Server(dataSource.getServer(prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)));
+					Server s = new Server(dataSource.getServer(prefs.getLong(PREFERENCE_KEY_SELECTED_SERVER, 0)));
 					app.setSelectedServer(s);
 					dataSource.close();
 				}
@@ -770,7 +769,7 @@ public class MainFragment extends Fragment implements
 		case R.id.settings:
 			this.getActivity().startActivityForResult(
 					new Intent(this.getActivity(), SettingsActivity.class),
-					OTPApp.REFRESH_SERVER_LIST_REQUEST_CODE);
+					REFRESH_SERVER_LIST_REQUEST_CODE);
 			break;
 		case R.id.feedback:
 			Server selectedServer = app.getSelectedServer();
@@ -802,15 +801,16 @@ public class MainFragment extends Fragment implements
 			break;
 		case R.id.server_info:
 			Server server = app.getSelectedServer();
+			
 			if (server == null) {
 				Log.w(TAG,
 						"Tried to get server info when no server was selected");
-				Toast.makeText(this.getActivity().getApplicationContext(), this.getActivity().getApplicationContext().getResources().getString(R.string.info_server_no_server_selected), Toast.LENGTH_SHORT).show();
+				Toast.makeText(getActivity(), getResources().getString(R.string.info_server_no_server_selected), Toast.LENGTH_SHORT).show();
 				break;
 			}
 		
-
-			ServerChecker serverChecker = new ServerChecker(this.getActivity().getApplicationContext(), this, true);
+			
+			ServerChecker serverChecker = new ServerChecker(this.getActivity(), true);
 			serverChecker.execute(server);				
 
 			break;
@@ -1059,14 +1059,4 @@ public class MainFragment extends Fragment implements
 			Log.e(TAG, "Error in Main Fragment Geocoding callback: " + e);
 		}
 	}
-	@Override
-	public void onServerCheckerComplete(String result, boolean showMessage, boolean isWorking) {
-		if (showMessage){
-			AlertDialog.Builder dialog = new AlertDialog.Builder(this.getActivity());
-			dialog.setTitle("OpenTripPlanner Server Info");
-			dialog.setMessage(result);
-			dialog.setNeutralButton("OK", null);
-			dialog.create().show();
-		}
-	}
 }
