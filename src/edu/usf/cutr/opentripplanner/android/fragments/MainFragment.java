@@ -24,6 +24,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import maps.MyUrlTileProvider;
+
 import org.miscwidgets.widget.Panel;
 import org.opentripplanner.api.ws.Request;
 import org.opentripplanner.routing.core.OptimizeType;
@@ -36,6 +38,12 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MyLocationOverlay;
+
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.TileOverlayOptions;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -110,9 +118,7 @@ public class MainFragment extends Fragment implements
 		TripRequestCompleteListener, OTPGetCurrentLocationListener,
 		OTPGeocodingListener {
 
-	private MapView mv;
-	private MapController mc;
-	private MyLocationOverlay mlo;
+	private GoogleMap mMap;
 	private MenuItem mGPS;
 
 	private EditText tbStartLocation;
@@ -199,6 +205,7 @@ public class MainFragment extends Fragment implements
 		tbStartLocation = (EditText) mainView
 				.findViewById(R.id.tbStartLocation);
 		tbEndLocation = (EditText) mainView.findViewById(R.id.tbEndLocation);
+		
 		btnPlanTrip = (Button) mainView.findViewById(R.id.btnPlanTrip);
 		tripPanel = (Panel) mainView.findViewById(R.id.slidingDrawer1);
 		ddlOptimization = (Spinner) mainView
@@ -381,6 +388,17 @@ public class MainFragment extends Fragment implements
 				.setOnFocusChangeListener(tbLocationOnFocusChangeListener);
 		tbEndLocation.setOnFocusChangeListener(tbLocationOnFocusChangeListener);
 
+		mMap = ((SupportMapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+		
+		String mUrl = "http://a.tile.openstreetmap.org/{z}/{x}/{y}.png";
+		MyUrlTileProvider mTileProvider = new MyUrlTileProvider(256, 256, mUrl);
+		mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mTileProvider));
+		
+		mMap.addMarker(new MarkerOptions()
+		        .position(new LatLng(0, 0))
+		        .title("Hello world"));
+		
+/*
 		mv = (MapView) mainView.findViewById(R.id.mapview);
 		mv.setBuiltInZoomControls(true);
 		mv.setMultiTouchControls(true);
@@ -407,7 +425,7 @@ public class MainFragment extends Fragment implements
 		
 		modeOverlay = new OTPModeOverlay(this);
 		mv.getOverlays().add(modeOverlay);
-
+*/
 		if (prefs.getBoolean(PREFERENCE_KEY_AUTO_DETECT_SERVER, true)) {
 		
 			if (app.getSelectedServer() == null) {
@@ -531,9 +549,9 @@ public class MainFragment extends Fragment implements
 			tbStartLocation.setText(savedInstanceState.getString("tbStartLocation"));
 			tbEndLocation.setText(savedInstanceState.getString("tbEndLocation"));
 			GeoPoint startMarkerLocation = new GeoPoint(savedInstanceState.getIntArray("startMarkerLocation")[0], savedInstanceState.getIntArray("startMarkerLocation")[1]);  
-			startMarker.setLocation(startMarkerLocation);
+		//	startMarker.setLocation(startMarkerLocation);
 			GeoPoint endMarkerLocation = new GeoPoint(savedInstanceState.getIntArray("endMarkerLocation")[0], savedInstanceState.getIntArray("endMarkerLocation")[1]);  
-			endMarker.setLocation(endMarkerLocation);
+		//	endMarker.setLocation(endMarkerLocation);
 			ddlOptimization.setSelection(savedInstanceState.getInt("ddlOptimization"));
 			ddlTravelMode.setSelection(savedInstanceState.getInt("ddlTravelMode"));
 		}
@@ -547,8 +565,8 @@ public class MainFragment extends Fragment implements
 		super.onSaveInstanceState(bundle);
 		bundle.putString("tbStartLocation", tbStartLocation.getText().toString());
 		bundle.putString("tbEndLocation", tbEndLocation.getText().toString());
-		bundle.putIntArray("startMarkerLocation", new int[]{startMarker.getLocation().getLatitudeE6(), startMarker.getLocation().getLongitudeE6()});
-		bundle.putIntArray("endMarkerLocation", new int[]{endMarker.getLocation().getLatitudeE6(), endMarker.getLocation().getLongitudeE6()});
+	//	bundle.putIntArray("startMarkerLocation", new int[]{startMarker.getLocation().getLatitudeE6(), startMarker.getLocation().getLongitudeE6()});
+	//	bundle.putIntArray("endMarkerLocation", new int[]{endMarker.getLocation().getLatitudeE6(), endMarker.getLocation().getLongitudeE6()});
 		bundle.putInt("ddlOptimization", ddlOptimization.getSelectedItemPosition());
 		bundle.putInt("ddlTravelMode", ddlTravelMode.getSelectedItemPosition());
 	}
@@ -638,8 +656,6 @@ public class MainFragment extends Fragment implements
 	@Override
 	public void onResume() {
 		super.onResume();
-		mlo.enableMyLocation();
-		mlo.enableCompass();
 		
 		Log.v(TAG, "MainFragment onResume");
 
@@ -658,8 +674,6 @@ public class MainFragment extends Fragment implements
 
 	@Override
 	public void onPause() {
-		mlo.disableMyLocation();
-		mlo.disableCompass();
 
 		// Save states before leaving
 		this.saveOTPBundle();
@@ -671,12 +685,6 @@ public class MainFragment extends Fragment implements
 	public void onDestroy() {
 		// Release all map-related objects to make sure GPS is shut down when
 		// the user leaves the app
-		mlo.disableFollowLocation();
-		mlo.disableMyLocation();
-		mlo.disableCompass();
-		mlo = null;
-		mc = null;
-		mv = null;
 
 		Log.d(TAG, "Released all map objects in MainFragment.onDestroy()");
 
@@ -691,8 +699,7 @@ public class MainFragment extends Fragment implements
 		}
 		Log.v(TAG, "A preference was changed: " + key);
 		if (key.equals(PREFERENCE_KEY_MAP_TILE_SOURCE)) {
-			mv.setTileSource(TileSourceFactory.getTileSource(prefs.getString(
-					PREFERENCE_KEY_MAP_TILE_SOURCE, "Mapnik")));
+			//TODO
 		} else if (key.equals(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER)) {
 			MyActivity myActivity = (MyActivity) this.getActivity();
 
@@ -764,7 +771,7 @@ public class MainFragment extends Fragment implements
 			// OTPGetCurrentLocation getCurrentLocation = new
 			// OTPGetCurrentLocation(this.getActivity(), this);
 			// getCurrentLocation.execute("");
-			mlo.enableFollowLocation();
+			//TODO
 			break;
 		case R.id.settings:
 			this.getActivity().startActivityForResult(
@@ -811,7 +818,8 @@ public class MainFragment extends Fragment implements
 		
 			
 			ServerChecker serverChecker = new ServerChecker(this.getActivity(), true);
-			serverChecker.execute(server);				
+			serverChecker.execute(server);
+				
 
 			break;
 		default:
@@ -843,13 +851,13 @@ public class MainFragment extends Fragment implements
 		GeoPoint p = LocationUtil.getLastLocation(this.getActivity());
 
 		if (p != null) {
-			mc.animateTo(p);
+			//TODO
 		}
 	}
 
 	public void zoomToLocation(GeoPoint p) {
 		if (p != null) {
-			mc.animateTo(p);
+			//TODO
 		}
 	}
 	
@@ -873,9 +881,8 @@ public class MainFragment extends Fragment implements
 			 }
 
 			double fitFactor = 1.1;
-			mc.zoomToSpan((int) (Math.abs(maxLat - minLat) * fitFactor), (int)(Math.abs(maxLon - minLon) * fitFactor));	
-			mc.animateTo(new GeoPoint( (maxLat + minLat)/2, 
-			(maxLon + minLon)/2 )); 
+			//TODO
+
 		}
 		
 	}
@@ -1058,5 +1065,6 @@ public class MainFragment extends Fragment implements
 		}catch(Exception e){
 			Log.e(TAG, "Error in Main Fragment Geocoding callback: " + e);
 		}
-	}
+	}
+
 }
