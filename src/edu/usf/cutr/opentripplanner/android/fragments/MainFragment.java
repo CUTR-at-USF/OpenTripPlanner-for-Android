@@ -389,11 +389,11 @@ public class MainFragment extends Fragment implements
 		tbEndLocation.setOnFocusChangeListener(tbLocationOnFocusChangeListener);
 
 		mMap = ((SupportMapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
-		
+	/*	
 		String mUrl = "http://a.tile.openstreetmap.org/{z}/{x}/{y}.png";
 		MyUrlTileProvider mTileProvider = new MyUrlTileProvider(256, 256, mUrl);
 		mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mTileProvider));
-		
+		*/
 		mMap.addMarker(new MarkerOptions()
 		        .position(new LatLng(0, 0))
 		        .title("Hello world"));
