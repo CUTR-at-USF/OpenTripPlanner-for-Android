@@ -411,14 +411,14 @@ public class MainFragment extends Fragment implements
 		mlo = new MyLocationOverlay(activity, mv);
 		// mlo.enableCompass();
 		mv.getOverlays().add(mlo);
-
+*/
 		startMarker = new MapOverlay(this, R.drawable.start, mainView);
 		startMarker.setLocation(currentLocation);
-		mv.getOverlays().add(startMarker);
-
+/*		mv.getOverlays().add(startMarker);
+*/
 		endMarker = new MapOverlay(this, R.drawable.end, mainView);
 		endMarker.setLocation(currentLocation);
-		mv.getOverlays().add(endMarker);
+/*		mv.getOverlays().add(endMarker);
 
 		routeOverlay = new OTPPathOverlay(Color.DKGRAY, activity);
 		mv.getOverlays().add(routeOverlay);
@@ -549,9 +549,9 @@ public class MainFragment extends Fragment implements
 			tbStartLocation.setText(savedInstanceState.getString("tbStartLocation"));
 			tbEndLocation.setText(savedInstanceState.getString("tbEndLocation"));
 			GeoPoint startMarkerLocation = new GeoPoint(savedInstanceState.getIntArray("startMarkerLocation")[0], savedInstanceState.getIntArray("startMarkerLocation")[1]);  
-		//	startMarker.setLocation(startMarkerLocation);
+			startMarker.setLocation(startMarkerLocation);
 			GeoPoint endMarkerLocation = new GeoPoint(savedInstanceState.getIntArray("endMarkerLocation")[0], savedInstanceState.getIntArray("endMarkerLocation")[1]);  
-		//	endMarker.setLocation(endMarkerLocation);
+			endMarker.setLocation(endMarkerLocation);
 			ddlOptimization.setSelection(savedInstanceState.getInt("ddlOptimization"));
 			ddlTravelMode.setSelection(savedInstanceState.getInt("ddlTravelMode"));
 		}
