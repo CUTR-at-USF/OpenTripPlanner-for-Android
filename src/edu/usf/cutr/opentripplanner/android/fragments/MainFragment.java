@@ -16,7 +16,17 @@
 
 package edu.usf.cutr.opentripplanner.android.fragments;
 
-import static edu.usf.cutr.opentripplanner.android.OTPApp.*;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.CHOOSE_CONTACT_REQUEST_CODE;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_GEOCODER_PROVIDER;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_MAX_WALKING_DISTANCE;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_SELECTED_SERVER;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_WHEEL_ACCESSIBLE;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.REFRESH_SERVER_LIST_REQUEST_CODE;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -33,20 +43,11 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.v092snapshot.api.model.Itinerary;
 import org.opentripplanner.v092snapshot.api.model.Leg;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapController;
-import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.MyLocationOverlay;
-
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.TileOverlayOptions;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -83,6 +84,14 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.TileOverlayOptions;
+
 import edu.usf.cutr.opentripplanner.android.MyActivity;
 import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.R;
@@ -194,6 +203,19 @@ public class MainFragment extends Fragment implements
 		prefs.registerOnSharedPreferenceChangeListener(this);
 
 		app = ((OTPApp) activity.getApplication());
+		
+		setUpMapIfNeeded();
+		
+		String serverUrl = prefs.getString(PREFERENCE_KEY_MAP_TILE_SOURCE, getResources().getString(R.string.map_tiles_default_server)); 
+		MyUrlTileProvider mTileProvider = new MyUrlTileProvider(256, 256, serverUrl);
+		mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mTileProvider));
+		
+		UiSettings uiSettings = mMap.getUiSettings();
+		mMap.setMyLocationEnabled(true);
+		uiSettings.setMyLocationButtonEnabled(true);
+		uiSettings.setCompassEnabled(true);
+		uiSettings.setAllGesturesEnabled(true);
+		uiSettings.setZoomControlsEnabled(true);
 
 		locationManager = (LocationManager) activity
 				.getSystemService(Context.LOCATION_SERVICE);
@@ -388,15 +410,9 @@ public class MainFragment extends Fragment implements
 				.setOnFocusChangeListener(tbLocationOnFocusChangeListener);
 		tbEndLocation.setOnFocusChangeListener(tbLocationOnFocusChangeListener);
 
-		mMap = ((SupportMapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
-	/*	
-		String mUrl = "http://a.tile.openstreetmap.org/{z}/{x}/{y}.png";
-		MyUrlTileProvider mTileProvider = new MyUrlTileProvider(256, 256, mUrl);
-		mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mTileProvider));
-		*/
-		mMap.addMarker(new MarkerOptions()
-		        .position(new LatLng(0, 0))
-		        .title("Hello world"));
+		
+
+		
 		
 /*
 		mv = (MapView) mainView.findViewById(R.id.mapview);
@@ -559,6 +575,24 @@ public class MainFragment extends Fragment implements
 		Log.v(TAG, "finish onStart()");
 
 		return mainView;
+	}
+	
+	private void setUpMapIfNeeded() {
+	    // Do a null check to confirm that we have not already instantiated the map.
+	    if (mMap == null) {
+	        mMap = ((SupportMapFragment) getFragmentManager().findFragmentById(R.id.map))
+	                            .getMap();
+	        // Check if we were successful in obtaining the map.
+	        if (mMap == null) {
+		        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getActivity().getApplicationContext());
+		        
+		        if(status!=ConnectionResult.SUCCESS){
+		            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this.getActivity(), OTPApp.CHECK_GOOGLE_PLAY_REQUEST_CODE);
+		            dialog.show();
+		        }	        
+		    }
+
+	    }
 	}
 	
 	public void onSaveInstanceState(Bundle bundle){
