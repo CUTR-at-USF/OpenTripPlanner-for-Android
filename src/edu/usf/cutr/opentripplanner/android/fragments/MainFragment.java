@@ -733,7 +733,9 @@ public class MainFragment extends Fragment implements
 		}
 		Log.v(TAG, "A preference was changed: " + key);
 		if (key.equals(PREFERENCE_KEY_MAP_TILE_SOURCE)) {
-			//TODO
+			String serverUrl = prefs.getString(PREFERENCE_KEY_MAP_TILE_SOURCE, getResources().getString(R.string.map_tiles_default_server)); 
+			MyUrlTileProvider mTileProvider = new MyUrlTileProvider(256, 256, serverUrl);
+			mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mTileProvider));
 		} else if (key.equals(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER)) {
 			MyActivity myActivity = (MyActivity) this.getActivity();
 

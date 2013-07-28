@@ -16,14 +16,18 @@
 
 package edu.usf.cutr.opentripplanner.android;
 
-import static edu.usf.cutr.opentripplanner.android.OTPApp.*;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_GEOCODER_PROVIDER;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_OTP_PROVIDER_FEEDBACK;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_REFRESH_SERVER_LIST;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.REFRESH_SERVER_RETURN_KEY;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-
-import org.osmdroid.tileprovider.tilesource.ITileSource;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -74,16 +78,9 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 		customServerURL = (EditTextPreference) findPreference(PREFERENCE_KEY_CUSTOM_SERVER_URL);
 		selectedCustomServer = (CheckBoxPreference) findPreference(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER);
 
-		ArrayList<CharSequence> names = new ArrayList<CharSequence>();
-		ArrayList<ITileSource> tiles = TileSourceFactory.getTileSources();
-
-		for (ITileSource iTileSource : tiles) {
-			names.add(iTileSource.name());
-		}
-
-		mapTileProvider.setEntries(names.toArray(new CharSequence[names.size()]));
-		mapTileProvider.setEntryValues(names.toArray(new CharSequence[names.size()]));
-		mapTileProvider.setDefaultValue("Mapnik");
+		mapTileProvider.setDefaultValue(getResources().getString(R.string.map_tiles_default_server));
+		mapTileProvider.setEntries(R.array.map_tiles_servers_names);
+		mapTileProvider.setEntryValues(R.array.map_tiles_servers_urls);
 		
 		String[] availableGeocoderProviders = getResources().getStringArray(R.array.available_geocoder_providers);
 		geocoderProvider.setEntries(availableGeocoderProviders);

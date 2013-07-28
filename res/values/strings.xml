@@ -72,4 +72,15 @@
         <item>MapQuest Nominatim</item>
         <item>Google Places</item>
     </string-array>
+    <string name="map_tiles_default_server">"http://a.tile.openstreetmap.org/{z}/{x}/{y}.png"</string>
+    <string-array name="map_tiles_servers_names">
+        <item>Mapnik</item>
+        <item>MapQuestOSM</item>
+        <item>CycleMap</item>
+    </string-array>
+    <string-array name="map_tiles_servers_urls">
+        <item>"http://a.tile.openstreetmap.org/{z}/{x}/{y}.png"</item>
+        <item>"http://otile1.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png"</item>
+        <item>"http://a.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png"</item>
+    </string-array>
 </resources>

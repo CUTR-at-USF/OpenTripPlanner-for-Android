@@ -25,6 +25,8 @@ import edu.usf.cutr.opentripplanner.android.model.Server;
 
 public class OTPApp extends Application {
 	
+	public static final int CHECK_GOOGLE_PLAY_REQUEST_CODE = 3;
+	
 	public static final int REFRESH_SERVER_LIST_REQUEST_CODE = 2;
 	
 	public static final int CHOOSE_CONTACT_REQUEST_CODE = 1;

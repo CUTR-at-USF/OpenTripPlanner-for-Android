@@ -10,6 +10,8 @@ package edu.usf.cutr.opentripplanner.android;
 public final class R {
     public static final class array {
         public static final int available_geocoder_providers=0x7f0a0000;
+        public static final int map_tiles_servers_names=0x7f0a0001;
+        public static final int map_tiles_servers_urls=0x7f0a0002;
     }
     public static final class attr {
         /**  Defines panel animation duration in ms. 
@@ -496,6 +498,7 @@ containing a value of this type.
         public static final int map_options=0x7f08002c;
         public static final int map_tile_provider=0x7f08002d;
         public static final int map_tile_provider_description=0x7f080035;
+        public static final int map_tiles_default_server=0x7f08004a;
         public static final int maximum_walk=0x7f080029;
         public static final int maximum_walk_description=0x7f08002a;
         public static final int metadata_location=0x7f080017;
