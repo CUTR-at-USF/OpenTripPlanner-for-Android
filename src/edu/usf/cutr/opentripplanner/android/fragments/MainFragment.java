@@ -90,6 +90,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 
 import edu.usf.cutr.opentripplanner.android.MyActivity;
@@ -128,6 +129,7 @@ public class MainFragment extends Fragment implements
 		OTPGeocodingListener {
 
 	private GoogleMap mMap;
+	private TileOverlay actualTileOverlay;
 	private MenuItem mGPS;
 
 	private EditText tbStartLocation;
@@ -206,9 +208,8 @@ public class MainFragment extends Fragment implements
 		
 		setUpMapIfNeeded();
 		
-		String serverUrl = prefs.getString(PREFERENCE_KEY_MAP_TILE_SOURCE, getResources().getString(R.string.map_tiles_default_server)); 
-		MyUrlTileProvider mTileProvider = new MyUrlTileProvider(256, 256, serverUrl);
-		mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mTileProvider));
+		String overlayString = prefs.getString(PREFERENCE_KEY_MAP_TILE_SOURCE, getResources().getString(R.string.map_tiles_default_server)); 
+		updateOverlay(overlayString);
 		
 		UiSettings uiSettings = mMap.getUiSettings();
 		mMap.setMyLocationEnabled(true);
@@ -733,9 +734,8 @@ public class MainFragment extends Fragment implements
 		}
 		Log.v(TAG, "A preference was changed: " + key);
 		if (key.equals(PREFERENCE_KEY_MAP_TILE_SOURCE)) {
-			String serverUrl = prefs.getString(PREFERENCE_KEY_MAP_TILE_SOURCE, getResources().getString(R.string.map_tiles_default_server)); 
-			MyUrlTileProvider mTileProvider = new MyUrlTileProvider(256, 256, serverUrl);
-			mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mTileProvider));
+			String overlayString = prefs.getString(PREFERENCE_KEY_MAP_TILE_SOURCE, getResources().getString(R.string.map_tiles_default_server));
+			updateOverlay(overlayString);
 		} else if (key.equals(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER)) {
 			MyActivity myActivity = (MyActivity) this.getActivity();
 
@@ -1100,6 +1100,34 @@ public class MainFragment extends Fragment implements
 			alertGeocoder.show();
 		}catch(Exception e){
 			Log.e(TAG, "Error in Main Fragment Geocoding callback: " + e);
+		}
+	}
+	
+	private void updateOverlay(String overlayString){
+		if (actualTileOverlay != null){
+			actualTileOverlay.remove();
+		}
+		if (overlayString.startsWith(OTPApp.MAP_TILE_GOOGLE)){
+			int mapType = GoogleMap.MAP_TYPE_NORMAL;
+			
+			if (overlayString.equals(OTPApp.MAP_TILE_GOOGLE_HYBRID)){
+				mapType = GoogleMap.MAP_TYPE_HYBRID;
+			}
+			else if (overlayString.equals(OTPApp.MAP_TILE_GOOGLE_NORMAL)){
+				mapType = GoogleMap.MAP_TYPE_NORMAL;	
+			}
+			else if (overlayString.equals(OTPApp.MAP_TILE_GOOGLE_TERRAIN)){
+				mapType = GoogleMap.MAP_TYPE_TERRAIN;
+			}
+			else if (overlayString.equals(OTPApp.MAP_TILE_GOOGLE_SATELLITE)){
+				mapType = GoogleMap.MAP_TYPE_SATELLITE;	
+			}
+			mMap.setMapType(mapType);
+		}
+		else{
+			mMap.setMapType(GoogleMap.MAP_TYPE_NONE);
+			MyUrlTileProvider mTileProvider = new MyUrlTileProvider(256, 256, overlayString);
+			actualTileOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mTileProvider));
 		}
 	}
 

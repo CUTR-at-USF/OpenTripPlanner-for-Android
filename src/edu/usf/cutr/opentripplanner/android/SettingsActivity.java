@@ -26,8 +26,12 @@ import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_REFRESH
 import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER;
 import static edu.usf.cutr.opentripplanner.android.OTPApp.REFRESH_SERVER_RETURN_KEY;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+
+import com.google.android.gms.maps.GoogleMap;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -79,8 +83,22 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 		selectedCustomServer = (CheckBoxPreference) findPreference(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER);
 
 		mapTileProvider.setDefaultValue(getResources().getString(R.string.map_tiles_default_server));
-		mapTileProvider.setEntries(R.array.map_tiles_servers_names);
-		mapTileProvider.setEntryValues(R.array.map_tiles_servers_urls);
+		
+		String[] entriesArray = getResources().getStringArray(R.array.map_tiles_servers_names);
+		ArrayList<String> entries = new ArrayList<String>(Arrays.asList(entriesArray));
+		entries.add(OTPApp.MAP_TILE_GOOGLE_NORMAL);
+		entries.add(OTPApp.MAP_TILE_GOOGLE_SATELLITE);
+		entries.add(OTPApp.MAP_TILE_GOOGLE_HYBRID);
+		entries.add(OTPApp.MAP_TILE_GOOGLE_TERRAIN);
+		mapTileProvider.setEntries(entries.toArray(new CharSequence[entries.size()]));
+		
+		String[] entriesValuesArray = getResources().getStringArray(R.array.map_tiles_servers_urls);
+		ArrayList<String> entriesValues = new ArrayList<String>(Arrays.asList(entriesValuesArray));
+		entriesValues.add(OTPApp.MAP_TILE_GOOGLE_NORMAL);
+		entriesValues.add(OTPApp.MAP_TILE_GOOGLE_SATELLITE);
+		entriesValues.add(OTPApp.MAP_TILE_GOOGLE_HYBRID);
+		entriesValues.add(OTPApp.MAP_TILE_GOOGLE_TERRAIN);
+		mapTileProvider.setEntryValues(entriesValues.toArray(new CharSequence[entriesValues.size()]));
 		
 		String[] availableGeocoderProviders = getResources().getStringArray(R.array.available_geocoder_providers);
 		geocoderProvider.setEntries(availableGeocoderProviders);

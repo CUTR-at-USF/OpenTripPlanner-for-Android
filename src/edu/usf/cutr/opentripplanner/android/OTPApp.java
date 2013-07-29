@@ -33,6 +33,12 @@ public class OTPApp extends Application {
 	
 	public static final String REFRESH_SERVER_RETURN_KEY = "RefreshServer";
 	
+	public static final String MAP_TILE_GOOGLE = "Google";
+	public static final String MAP_TILE_GOOGLE_HYBRID = "Google hybrid";
+	public static final String MAP_TILE_GOOGLE_NORMAL = "Google normal";
+	public static final String MAP_TILE_GOOGLE_SATELLITE = "Google satellite";
+	public static final String MAP_TILE_GOOGLE_TERRAIN = "Google terrain";
+
 	/**
 	 * Preference keys
 	 */
