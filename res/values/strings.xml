@@ -33,6 +33,13 @@
     <string name="server_info">Server Info</string>
     <string name="exit">Exit</string>
     <string name="confirmation">OK</string>
+    <string name="start_marker_title">Route Start</string>
+    <string name="start_marker_activated">Start Location</string>
+    <string name="start_marker_description">Long press to drag...</string>
+    <string name="end_marker_title">Route End</string>
+    <string name="end_marker_activated">End Location</string>
+    <string name="end_marker_description">Long press to drag...</string>
+    <string name="markers_dialog_title">Choose Type for Point</string>
     <string name="wheelchair_accessible">Wheelchair Accessible</string>
     <string name="wheelchair_accessibility_description">Request wheelchair accessible routes</string>
     <string name="maximum_walk">Maximum Walk</string>

@@ -33,8 +33,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
-import maps.MyUrlTileProvider;
+import edu.usf.cutr.opentripplanner.android.maps.MyUrlTileProvider;
 
 import org.miscwidgets.widget.Panel;
 import org.opentripplanner.api.ws.Request;
@@ -88,8 +89,14 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 
@@ -148,8 +155,8 @@ public class MainFragment extends Fragment implements
 
 	private ImageButton btnDisplayDirection;
 
-	MapOverlay startMarker;
-	MapOverlay endMarker;
+	Marker startMarker;
+	Marker endMarker;
 	OTPPathOverlay routeOverlay;
 	OTPModeOverlay modeOverlay;
 
@@ -225,6 +232,7 @@ public class MainFragment extends Fragment implements
 				.findViewById(R.id.btnStartLocation);
 		btnEndLocation = (ImageButton) mainView
 				.findViewById(R.id.btnEndLocation);
+				
 		tbStartLocation = (EditText) mainView
 				.findViewById(R.id.tbStartLocation);
 		tbEndLocation = (EditText) mainView.findViewById(R.id.tbEndLocation);
@@ -319,12 +327,12 @@ public class MainFragment extends Fragment implements
 								tbStartLocation.setText("My Location");
 
 								if (p != null) {
-									startMarker.setLocation(p);
+									startMarker.setPosition(new LatLng(p.getLatitudeE6(), p.getLongitudeE6()));
 								}
 							} else if (buttonID == R.id.btnEndLocation) {
 								tbEndLocation.setText("My Location");
 								if (p != null) {
-									endMarker.setLocation(p);
+									endMarker.setPosition(new LatLng(p.getLatitudeE6(), p.getLongitudeE6()));
 								}
 							}
 						} else if (items[item].equals("Contact Address")) {
@@ -341,11 +349,11 @@ public class MainFragment extends Fragment implements
 
 						} else { // Point on Map
 							if (buttonID == R.id.btnStartLocation) {
-								tbStartLocation.setText(startMarker
-										.getLocationFormatedString());
+							//	tbStartLocation.setText(startMarker
+							//			.getLocationFormatedString());
 							} else if (buttonID == R.id.btnEndLocation) {
-								tbEndLocation.setText(endMarker
-										.getLocationFormatedString());
+							//	tbEndLocation.setText(endMarker
+							//			.getLocationFormatedString());
 							}
 						}
 					}
@@ -429,12 +437,12 @@ public class MainFragment extends Fragment implements
 		// mlo.enableCompass();
 		mv.getOverlays().add(mlo);
 */
-		startMarker = new MapOverlay(this, R.drawable.start, mainView);
-		startMarker.setLocation(currentLocation);
-/*		mv.getOverlays().add(startMarker);
-*/
-		endMarker = new MapOverlay(this, R.drawable.end, mainView);
-		endMarker.setLocation(currentLocation);
+//		startMarker = new MapOverlay(this, R.drawable.start, mainView);
+//		startMarker.setLocation(currentLocation);
+//		mv.getOverlays().add(startMarker);
+//
+//		endMarker = new MapOverlay(this, R.drawable.end, mainView);
+//		endMarker.setLocation(currentLocation);
 /*		mv.getOverlays().add(endMarker);
 
 		routeOverlay = new OTPPathOverlay(Color.DKGRAY, activity);
@@ -442,7 +450,74 @@ public class MainFragment extends Fragment implements
 		
 		modeOverlay = new OTPModeOverlay(this);
 		mv.getOverlays().add(modeOverlay);
+		
+		
 */
+		OnMapClickListener omcl = new OnMapClickListener() {
+			@Override
+			public void onMapClick(LatLng latLng) {
+				Toast.makeText(MainFragment.this.getActivity(), getResources().getString(R.string.end_marker_activated), Toast.LENGTH_SHORT).show();
+				if (endMarker == null){
+					endMarker = mMap.addMarker(new MarkerOptions()
+					.position(latLng)
+					.title(getResources().getString(R.string.end_marker_title))
+					.snippet(getResources().getString(R.string.end_marker_description))
+					.draggable(true));
+				}			
+				else{
+					endMarker.setPosition(latLng);
+				}
+			}
+		};
+		
+		mMap.setOnMapClickListener(omcl);
+		
+		OnMapLongClickListener omlcl = new OnMapLongClickListener() {
+			@Override
+			public void onMapLongClick(LatLng latLng) {
+				final LatLng latLngFinal = latLng;
+				final CharSequence[] items = {getResources().getString(R.string.start_marker_activated), getResources().getString(R.string.end_marker_activated)};
+
+				AlertDialog.Builder builder = new AlertDialog.Builder(MainFragment.this.getActivity());
+				builder.setTitle(getResources().getString(R.string.markers_dialog_title));
+				builder.setItems(items, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int item) {
+						Toast.makeText(MainFragment.this.getActivity(), items[item], Toast.LENGTH_SHORT).show();
+						if(items[item].equals("Start Location")) {
+							if (startMarker == null){
+								Toast.makeText(MainFragment.this.getActivity(), getResources().getString(R.string.start_marker_activated), Toast.LENGTH_SHORT).show();
+								startMarker = mMap.addMarker(new MarkerOptions()
+								.position(latLngFinal)
+								.title(getResources().getString(R.string.start_marker_title))
+								.snippet(getResources().getString(R.string.start_marker_description))
+								.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
+								.draggable(true));
+							}
+							else{
+								startMarker.setPosition(latLngFinal);
+							}
+						}
+						else {
+							if (endMarker == null){
+								endMarker = mMap.addMarker(new MarkerOptions()
+								.position(latLngFinal)
+								.title(getResources().getString(R.string.end_marker_title))
+								.snippet(getResources().getString(R.string.end_marker_description))
+								.draggable(true));
+							}			
+							else{
+								endMarker.setPosition(latLngFinal);
+							}
+						}
+					}
+				});
+				AlertDialog alert = builder.create();
+				alert.show();
+			}
+		};
+		
+		mMap.setOnMapLongClickListener(omlcl);
+		
 		if (prefs.getBoolean(PREFERENCE_KEY_AUTO_DETECT_SERVER, true)) {
 		
 			if (app.getSelectedServer() == null) {
@@ -496,10 +571,10 @@ public class MainFragment extends Fragment implements
 				tripPanel.setOpen(false, true);
 
 				Request request = new Request();
-				request.setFrom(URLEncoder.encode(startMarker
-						.getLocationFormatedString()));
-				request.setTo(URLEncoder.encode(endMarker
-						.getLocationFormatedString()));
+				//request.setFrom(URLEncoder.encode(startMarker
+				//		.getLocationFormatedString()));
+			//	request.setTo(URLEncoder.encode(endMarker
+				//		.getLocationFormatedString()));
 				request.setArriveBy(false);
 
 				request.setOptimize(((OptimizeSpinnerItem) ddlOptimization
@@ -566,9 +641,9 @@ public class MainFragment extends Fragment implements
 			tbStartLocation.setText(savedInstanceState.getString("tbStartLocation"));
 			tbEndLocation.setText(savedInstanceState.getString("tbEndLocation"));
 			GeoPoint startMarkerLocation = new GeoPoint(savedInstanceState.getIntArray("startMarkerLocation")[0], savedInstanceState.getIntArray("startMarkerLocation")[1]);  
-			startMarker.setLocation(startMarkerLocation);
+		//	startMarker.setLocation(startMarkerLocation);
 			GeoPoint endMarkerLocation = new GeoPoint(savedInstanceState.getIntArray("endMarkerLocation")[0], savedInstanceState.getIntArray("endMarkerLocation")[1]);  
-			endMarker.setLocation(endMarkerLocation);
+		//	endMarker.setLocation(endMarkerLocation);
 			ddlOptimization.setSelection(savedInstanceState.getInt("ddlOptimization"));
 			ddlTravelMode.setSelection(savedInstanceState.getInt("ddlTravelMode"));
 		}
@@ -609,8 +684,8 @@ public class MainFragment extends Fragment implements
 	private void retrievePreviousState(OTPBundle bundle) {
 		tbStartLocation.setText(bundle.getFromText());
 		tbEndLocation.setText(bundle.getToText());
-		startMarker.setLocation(bundle.getStartLocation());
-		endMarker.setLocation(bundle.getEndLocation());
+	//	startMarker.setLocation(bundle.getStartLocation());
+	//	endMarker.setLocation(bundle.getEndLocation());
 		ddlOptimization.setSelection(bundle.getOptimization());
 		ddlTravelMode.setSelection(bundle.getTravelMode());
 
@@ -621,8 +696,8 @@ public class MainFragment extends Fragment implements
 		OTPBundle bundle = new OTPBundle();
 		bundle.setFromText(tbStartLocation.getText().toString());
 		bundle.setToText(tbEndLocation.getText().toString());
-		bundle.setStartLocation(startMarker.getLocation());
-		bundle.setEndLocation(endMarker.getLocation());
+	//	bundle.setStartLocation(startMarker.getLocation());
+	//	bundle.setEndLocation(endMarker.getLocation());
 		bundle.setOptimization(ddlOptimization.getSelectedItemPosition());
 		bundle.setTravelMode(ddlTravelMode.getSelectedItemPosition());
 
@@ -872,11 +947,11 @@ public class MainFragment extends Fragment implements
 	public void moveMarker(Boolean start, Address addr) {
 		GeoPoint point = new GeoPoint(addr.getLatitude(), addr.getLongitude());
 		if (start) {
-			startMarker.setLocation(point);
+	//		startMarker.setLocation(point);
 			tbStartLocation.setText(addr.getAddressLine(addr
 					.getMaxAddressLineIndex()));
 		} else {
-			endMarker.setLocation(point);
+	//		endMarker.setLocation(point);
 			tbEndLocation.setText(addr.getAddressLine(addr
 					.getMaxAddressLineIndex()));
 		}
@@ -927,9 +1002,9 @@ public class MainFragment extends Fragment implements
 		if (p == null)
 			return;
 		if (isStartMarker) {
-			startMarker.setLocation(p);
+	//		startMarker.setLocation(p);
 		} else {
-			endMarker.setLocation(p);
+	//		endMarker.setLocation(p);
 		}
 	}
 
