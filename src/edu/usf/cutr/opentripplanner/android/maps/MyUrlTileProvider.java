@@ -1,4 +1,4 @@
-package maps;
+package edu.usf.cutr.opentripplanner.android.maps;
 
 import java.net.MalformedURLException;
 import java.net.URL;
