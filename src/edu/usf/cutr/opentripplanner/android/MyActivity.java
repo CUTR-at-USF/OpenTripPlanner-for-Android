@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.opentripplanner.v092snapshot.api.model.Itinerary;
 import org.opentripplanner.v092snapshot.api.model.Leg;
-import org.osmdroid.util.GeoPoint;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -33,6 +32,9 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+
+import com.google.android.gms.maps.model.LatLng;
+
 import edu.usf.cutr.opentripplanner.android.fragments.DirectionListFragment;
 import edu.usf.cutr.opentripplanner.android.fragments.MainFragment;
 import edu.usf.cutr.opentripplanner.android.listeners.OnFragmentListener;
@@ -98,7 +100,8 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 				boolean shouldRefresh = data.getBooleanExtra(OTPApp.REFRESH_SERVER_RETURN_KEY, false);
 				//				Toast.makeText(this, "Should server list refresh? " + shouldRefresh, Toast.LENGTH_LONG).show();
 				if(shouldRefresh){
-					mainFragment.processServerSelector(true);
+					mainFragment.setNeedToRunAutoDetect(false);
+					mainFragment.runAutoDetectServer(mainFragment.getSavedLastLocation());
 				}
 				break;
 			}
@@ -218,13 +221,8 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 	}
 	
 	@Override
-	public void zoomToLocation(GeoPoint location){
+	public void zoomToLocation(LatLng location){
 		mainFragment.zoomToLocation(location);
-	}
-	
-	@Override
-	public void setMarker(GeoPoint location, boolean isStartMarker){
-		mainFragment.setMarker(location, isStartMarker);
 	}
 
 	@Override

@@ -22,7 +22,8 @@ import java.util.List;
 
 import org.opentripplanner.v092snapshot.api.model.Itinerary;
 import org.opentripplanner.v092snapshot.api.model.Leg;
-import org.osmdroid.util.GeoPoint;
+
+import com.google.android.gms.maps.model.LatLng;
 
 /**
  * @author Khoa Tran
@@ -32,7 +33,7 @@ import org.osmdroid.util.GeoPoint;
 public class OTPBundle implements Serializable{
 	private String toText, fromText;
 	private int optimization, travelMode;
-	private GeoPoint startLocation, endLocation;
+	private LatLng startLocation, endLocation;
 	private List<Leg> currentItinerary;
 	private List<Itinerary> itineraryList;
 	private int currentItineraryIndex;
@@ -91,25 +92,25 @@ public class OTPBundle implements Serializable{
 	/**
 	 * @return the startLocation
 	 */
-	public GeoPoint getStartLocation() {
+	public LatLng getStartLocation() {
 		return startLocation;
 	}
 	/**
 	 * @param startLocation the startLocation to set
 	 */
-	public void setStartLocation(GeoPoint startLocation) {
+	public void setStartLocation(LatLng startLocation) {
 		this.startLocation = startLocation;
 	}
 	/**
 	 * @return the endLocation
 	 */
-	public GeoPoint getEndLocation() {
+	public LatLng getEndLocation() {
 		return endLocation;
 	}
 	/**
 	 * @param endLocation the endLocation to set
 	 */
-	public void setEndLocation(GeoPoint endLocation) {
+	public void setEndLocation(LatLng endLocation) {
 		this.endLocation = endLocation;
 	}
 	/**

@@ -20,7 +20,8 @@ import java.util.List;
 
 import org.opentripplanner.v092snapshot.api.model.Itinerary;
 import org.opentripplanner.v092snapshot.api.model.Leg;
-import org.osmdroid.util.GeoPoint;
+
+import com.google.android.gms.maps.model.LatLng;
 
 import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
 import edu.usf.cutr.opentripplanner.android.sqlite.ServersDataSource;
@@ -59,10 +60,8 @@ public interface OnFragmentListener {
 	
 	public String getCurrentRequestString();
 	
-	public void zoomToLocation(GeoPoint p);
-	
-	public void setMarker(GeoPoint p, boolean isStartMarker);
-	
+	public void zoomToLocation(LatLng latLng);
+		
 	public void setButtonStartLocation (boolean isButtonStartLocation);
 	
 }

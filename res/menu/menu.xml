@@ -17,7 +17,6 @@
 <menu
   xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/gps_settings" android:title="@string/enable_gps" android:icon="@android:drawable/ic_menu_compass"></item>
-    <item android:id="@+id/my_location" android:title="@string/my_location" android:icon="@android:drawable/ic_menu_mylocation"></item>
     <item android:id="@+id/settings" android:title="@string/settings" android:icon="@android:drawable/ic_menu_manage"></item>
     <item android:id="@+id/feedback" android:title="@string/feedback" android:icon="@android:drawable/ic_menu_send"></item>
     <item android:id="@+id/server_info" android:title="@string/server_info" android:icon="@android:drawable/ic_menu_info_details"></item>

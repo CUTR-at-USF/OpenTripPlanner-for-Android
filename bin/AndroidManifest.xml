@@ -68,7 +68,7 @@
         <service android:name=".NavigationService" />
 	    <meta-data
 		    android:name="com.google.android.maps.v2.API_KEY"
-		    android:value="AIzaSyAw1sLRxHOUY-CpJNDqF9t--ZLuloI83yg"/>
+		    android:value="AIzaSyDPJYV1HbmDL7nLgEfU3I6GK2CzAC0sXk8"/>
     </application>
 
 

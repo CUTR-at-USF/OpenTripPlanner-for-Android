@@ -16,8 +16,6 @@
 
 package edu.usf.cutr.opentripplanner.android.tasks;
 
-import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -25,19 +23,16 @@ import java.net.URL;
 import org.opentripplanner.api.ws.GraphMetadata;
 
 import android.app.ProgressDialog;
-import android.content.SharedPreferences;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import edu.usf.cutr.opentripplanner.android.MyActivity;
-import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.R;
-import edu.usf.cutr.opentripplanner.android.model.Server;
+import edu.usf.cutr.opentripplanner.android.listeners.MetadataRequestCompleteListener;
 
 /**
  * @author Khoa Tran
@@ -48,24 +43,26 @@ public class MetadataRequest extends AsyncTask<String, Integer, GraphMetadata> {
 	private GraphMetadata metadata;
 	private static final String TAG = "OTP";
 	private ProgressDialog progressDialog;
-	private MyActivity activity;
+	private Context context;
+	
+	private MetadataRequestCompleteListener callback;
 	
 	private static ObjectMapper mapper = null;
 
-	public MetadataRequest(MyActivity activity) {
-		this.activity = activity;
-		progressDialog = new ProgressDialog(activity);
+	public MetadataRequest(Context context, MetadataRequestCompleteListener callback) {
+		this.context = context;
+		this.callback = callback;
+		progressDialog = new ProgressDialog(context);
 	}
 
 	protected void onPreExecute() {
-		progressDialog = ProgressDialog.show(activity,"",
-				activity.getResources().getString(R.string.metadata_request_progress), true);
+		progressDialog = ProgressDialog.show(context,"",
+				context.getResources().getString(R.string.metadata_request_progress), true);
 
 	}
 
 	protected GraphMetadata doInBackground(String... reqs) {
 		int count = reqs.length;
-		long totalSize = 0;
 		for (int i = 0; i < count; i++) {
 			String serverURL = reqs[0];
 			metadata = requestMetadata(serverURL);
@@ -83,28 +80,11 @@ public class MetadataRequest extends AsyncTask<String, Integer, GraphMetadata> {
 			Log.e(TAG, "Error in Metadata Request PostExecute dismissing dialog: " + e);
 		}
 
-		Toast.makeText(activity, activity.getResources().getString(R.string.metadata_request_successful), Toast.LENGTH_SHORT).show();
+		Toast.makeText(context, context.getResources().getString(R.string.metadata_request_successful), Toast.LENGTH_SHORT).show();
+		
 
 		if (metadata != null) {
-			double lowerLeftLatitude = metadata.getLowerLeftLatitude();
-			double lowerLeftLongitude = metadata.getLowerLeftLongitude();
-			double upperRightLatitude = metadata.getUpperRightLatitude();
-			double upperRightLongitude = metadata.getUpperRightLongitude();
-			OTPApp app = ((OTPApp) activity.getApplication());
-	
-			Server selectedServer = app.getSelectedServer();
-			
-			String bounds = String.valueOf(lowerLeftLongitude) +
-					"," + String.valueOf(lowerLeftLongitude) +
-					"," + String.valueOf(upperRightLatitude) + "," + String.valueOf(upperRightLongitude);
-			selectedServer.setBounds(bounds);
-			
-			SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(activity).edit();
-			prefsEditor.putString(PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS, bounds);
-			prefsEditor.commit();
-			
-			Log.v(TAG, "LowerLeft: " + Double.toString(lowerLeftLatitude)+","+Double.toString(lowerLeftLongitude));
-			Log.v(TAG, "UpperRight" + Double.toString(upperRightLatitude)+","+Double.toString(upperRightLongitude));
+			callback.onMetadataRequestComplete(metadata);
 		} else {
 			// TODO - handle errors here?
 //			String msg = "No metadata";
@@ -119,7 +99,7 @@ public class MetadataRequest extends AsyncTask<String, Integer, GraphMetadata> {
 	}
 	
 	private GraphMetadata requestMetadata(String serverURL) {
-		String res = activity.getResources().getString(R.string.metadata_location);
+		String res = context.getResources().getString(R.string.metadata_location);
 
 		String u = serverURL + res;
 

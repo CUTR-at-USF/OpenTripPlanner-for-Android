@@ -16,16 +16,20 @@
 
 package edu.usf.cutr.opentripplanner.android.tasks;
 
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_SELECTED_SERVER;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.osmdroid.util.GeoPoint;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -33,24 +37,24 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.location.LocationManager;
 import android.os.AsyncTask;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.webkit.URLUtil;
 import android.widget.EditText;
 import android.widget.Toast;
 import au.com.bytecode.opencsv.CSVReader;
+
+import com.google.android.gms.maps.model.LatLng;
+
 import de.mastacode.http.Http;
+import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.R;
-import edu.usf.cutr.opentripplanner.android.listeners.OTPLocationListener;
 import edu.usf.cutr.opentripplanner.android.listeners.ServerCheckerCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.ServerSelectorCompleteListener;
 import edu.usf.cutr.opentripplanner.android.model.Server;
 import edu.usf.cutr.opentripplanner.android.sqlite.ServersDataSource;
 import edu.usf.cutr.opentripplanner.android.util.LocationUtil;
-import static edu.usf.cutr.opentripplanner.android.OTPApp.*;
 
 /**
  * A task that retrieves the list of OTP servers from the Google Docs directory,
@@ -61,7 +65,7 @@ import static edu.usf.cutr.opentripplanner.android.OTPApp.*;
  * @author Khoa Tran
  */
 
-public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> implements ServerCheckerCompleteListener{
+public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements ServerCheckerCompleteListener{
 	private Server selectedServer;
 	private static final String TAG = "OTP";
 	private ProgressDialog progressDialog;
@@ -70,19 +74,9 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> implement
 	private boolean mustRefreshList = false;
 	private boolean isAutoDetectEnabled = true;
 	private ServerSelectorCompleteListener callback;
-	
-	public double currentLat = 0.0;
-    public double currentLon = 0.0;
-    private GeoPoint currentLocation;
-
-    public LocationManager lm;
-    public ArrayList<OTPLocationListener> otpLocationListenerList;    
-    OTPLocationListener otpLocationListener;
-    
+  
     public ServersDataSource dataSource = null;
     
-    private List<String> providers = new ArrayList<String>();
-
     /**
      * Constructs a new ServerSelector
      * @param context
@@ -91,12 +85,10 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> implement
      * @param mustRefreshList true if we should download a new list of servers from the Google Doc, false if we should use cached list of servers
      * @param isAutoDetectEnabled true if we should automatically compare the user's current location to the bounding boxes of OTP servers, false if we should prompt the user to pick the OTP server manually
      */
-	public ServerSelector(Context context, ServersDataSource dataSource, ServerSelectorCompleteListener callback, boolean mustRefreshList, boolean isAutoDetectEnabled) {
+	public ServerSelector(Context context, ServersDataSource dataSource, ServerSelectorCompleteListener callback) {
 		this.context = context;
 		this.dataSource = dataSource;
 		this.callback = callback;
-		this.mustRefreshList = mustRefreshList;
-		this.isAutoDetectEnabled = isAutoDetectEnabled;
 		progressDialog = new ProgressDialog(context);
 	}
 
@@ -107,31 +99,18 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> implement
         progressDialog.setCancelable(true);
         progressDialog.show();
         
-        if(isAutoDetectEnabled){
-        	prepareLocationListener();
-        }
-	}
-	
-	private void prepareLocationListener(){
-		otpLocationListenerList = new ArrayList<OTPLocationListener>();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         
-        lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+		isAutoDetectEnabled = prefs.getBoolean(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER,
+				true);
+		mustRefreshList = prefs.getBoolean(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER,
+				true);
         
-		providers.addAll(lm.getProviders(true));
-
-		for (int i=0; i<providers.size(); i++) {
-			otpLocationListener = new OTPLocationListener();
-			lm.requestLocationUpdates(providers.get(i), 
-									  0, 
-									  0,
-									  otpLocationListener);
-			otpLocationListenerList.add(otpLocationListener);
-		}
 	}
 
-	protected Long doInBackground(GeoPoint... currLoc) {
-		long startMillis = SystemClock.currentThreadTimeMillis();
-		long deltaMillis = startMillis;
+
+	protected Long doInBackground(LatLng... latLng) {		
+		LatLng currentLocation = latLng[0];
 		
 		List<Server> serverList = null;
 		
@@ -139,7 +118,7 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> implement
 		if(!mustRefreshList){
 			// Check if servers are stored in SQLite?
 			Log.v(TAG, "Attempt retrieving servers from sqlite");
-			serverList = getServerFromSQLite();
+			serverList = getServersFromSQLite();
 		}
 		
 		// If forced to refresh list OR
@@ -151,7 +130,7 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> implement
 			// Insert new list to database
 			if(serverList!=null && !serverList.isEmpty()){
 				insertServerListToDatabase(serverList);
-				serverList = getServerFromSQLite();
+				serverList = getServersFromSQLite();
 			}
 		
 			// If still null
@@ -164,38 +143,15 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> implement
 		knownServers.addAll(serverList);
 		
 		//If we're autodetecting a server, get the location find the optimal server
-		if(isAutoDetectEnabled){
-			while ((currentLat == 0.0) && deltaMillis < 5000) {
-				deltaMillis = SystemClock.currentThreadTimeMillis() - startMillis;
-	        	for(int i=0; i<providers.size(); i++){
-	        		currentLat = otpLocationListenerList.get(i).getCurrentLat();
-	        		currentLon = otpLocationListenerList.get(i).getCurrentLon();
-	        		if(currentLat!=0.0)
-	        			break;
-	        	}
-	        }
-			currentLocation =new GeoPoint(currentLat, currentLon);
-			
-	        if (otpLocationListenerList != null){
-		        for (int i=0; i<otpLocationListenerList.size(); i++) {
-		        	OTPLocationListener listener;
-		        	if ((listener = otpLocationListenerList.get(i)) != null)
-		        		lm.removeUpdates(listener);
-				}
-		        otpLocationListenerList.clear();
-	        }
-			
+		if(isAutoDetectEnabled && (currentLocation != null)){
 			selectedServer = findOptimalSever(currentLocation);
-			
-		} else {
-			currentLocation = currLoc[0];
 		}
 		
-		long totalSize = currLoc.length;
+		long totalSize = serverList.size();
 		return totalSize;
 	}
 
-	private List<Server> getServerFromSQLite(){
+	private List<Server> getServersFromSQLite(){
 		List<Server> servers = new ArrayList<Server>();
 		
 		dataSource.open();
@@ -285,8 +241,8 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> implement
 	 * @param currLoc location of the device
 	 * @return Server the OTP server that the location is within
 	 */
-	private Server findOptimalSever(GeoPoint currLoc) {
-		if(currLoc == null){
+	private Server findOptimalSever(LatLng currentLocation) {
+		if(currentLocation == null){
 			return null;
 		}
 		
@@ -299,7 +255,7 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> implement
 		Server server = null;
 		for (int i=0; i<knownServers.size(); i++) {
 			// Check bounds here to find server - acceptable error is set to 1000m = 1km
-			isInBoundingBox = LocationUtil.checkPointInBoundingBox(currLoc, knownServers.get(i), 1000);
+			isInBoundingBox = LocationUtil.checkPointInBoundingBox(currentLocation, knownServers.get(i), 1000);
 			
 			if(isInBoundingBox){
 				server = knownServers.get(i);
@@ -314,27 +270,13 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> implement
 		if (progressDialog.isShowing()) {
 			progressDialog.dismiss();
 		}
-		
-		//Remove locationlisteners
-	/*	for (int i=0; i<providers.size(); i++) { 			
-			lm.removeUpdates(otpLocationListener);			
-		}
-	 */
-        if (otpLocationListenerList != null){
-	        for (int i=0; i<otpLocationListenerList.size(); i++) {
-	        	OTPLocationListener listener;
-	        	if ((listener = otpLocationListenerList.get(i)) != null)
-	        		lm.removeUpdates(listener);
-			}
-	        otpLocationListenerList.clear();
-        }
         
 		if (selectedServer != null) {
 			//We've already auto-selected a server
 			Toast.makeText(context.getApplicationContext(), 
 						   "Detected "+selectedServer.getRegion() + ". Change this manually in Settings", 
 						   Toast.LENGTH_SHORT).show();
-			callback.onServerSelectorComplete(currentLocation, selectedServer);
+			callback.onServerSelectorComplete(selectedServer);
 		} else if (knownServers != null && !knownServers.isEmpty()){
 			Log.d(TAG, "No server automatically selected.  User will need to choose the OTP server.");
 			
@@ -382,7 +324,7 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> implement
 						urlAlert.create().show();
 						String baseURL = prefs.getString(PREFERENCE_KEY_CUSTOM_SERVER_URL, "");
 						selectedServer = new Server(baseURL);
-						callback.onServerSelectorComplete(currentLocation, selectedServer);
+						callback.onServerSelectorComplete(selectedServer);
 					} else { 
 						//User picked server from the list
 						for (Server server : knownServers) {
@@ -394,8 +336,7 @@ public class ServerSelector extends AsyncTask<GeoPoint, Integer, Long> implement
 								e.putLong(PREFERENCE_KEY_SELECTED_SERVER, selectedServer.getId());
 								e.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false);
 								e.commit();
-								GeoPoint centerPoint = new GeoPoint(selectedServer.getCenterLatitude(), selectedServer.getCenterLongitude());
-								callback.onServerSelectorComplete(centerPoint, selectedServer);
+								callback.onServerSelectorComplete(selectedServer);
 								break;
 							}
 						}

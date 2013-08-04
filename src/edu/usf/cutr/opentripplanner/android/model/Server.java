@@ -16,8 +16,6 @@
 
 package edu.usf.cutr.opentripplanner.android.model;
 
-import java.util.Date;
-
 import android.location.Location;
 
 /**
@@ -39,6 +37,12 @@ public class Server {
 	private double lowerLeftLatitude, lowerLeftLongitude, upperRightLatitude, upperRightLongitude;
 
 	private double centerLatitude, centerLongitude;  //for Google Places
+	
+	private boolean boundsSet = false;
+
+	public boolean areBoundsSet() {
+		return boundsSet;
+	}
 
 	public Server() {
 		super();
@@ -113,6 +117,7 @@ public class Server {
 	}
 
 	public void setBounds(String bounds) {
+		boundsSet = true;
 		this.bounds = bounds;
 		String[] tokens = bounds.split(",");
 

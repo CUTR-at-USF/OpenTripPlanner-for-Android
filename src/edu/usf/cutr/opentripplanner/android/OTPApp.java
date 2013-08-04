@@ -25,6 +25,8 @@ import edu.usf.cutr.opentripplanner.android.model.Server;
 
 public class OTPApp extends Application {
 	
+	public static final int	CONNECTION_FAILURE_RESOLUTION_REQUEST_CODE = 9000;
+	
 	public static final int CHECK_GOOGLE_PLAY_REQUEST_CODE = 3;
 	
 	public static final int REFRESH_SERVER_LIST_REQUEST_CODE = 2;
@@ -38,10 +40,27 @@ public class OTPApp extends Application {
 	public static final String MAP_TILE_GOOGLE_NORMAL = "Google normal";
 	public static final String MAP_TILE_GOOGLE_SATELLITE = "Google satellite";
 	public static final String MAP_TILE_GOOGLE_TERRAIN = "Google terrain";
+	
+    private static final int MILLISECONDS_PER_SECOND = 1000;
+    private static final int UPDATE_INTERVAL_IN_SECONDS = 5;
+    public static final long UPDATE_INTERVAL = MILLISECONDS_PER_SECOND * UPDATE_INTERVAL_IN_SECONDS;
+    private static final int FASTEST_INTERVAL_IN_SECONDS = 1;
+    public static final long FASTEST_INTERVAL = MILLISECONDS_PER_SECOND * FASTEST_INTERVAL_IN_SECONDS;
+    
+    public static final String BUNDLE_KEY_MAP_CAMERA = "Map Camera";
+    public static final String BUNDLE_KEY_MAP_START_MARKER_OPTIONS = "Map StartMarkerOptions";
+    public static final String BUNDLE_KEY_MAP_END_MARKER_OPTIONS = "Map EndMarkerOptions";
+    public static final String BUNDLE_KEY_TB_START_LOCATION = "tbStartLocation";
+    public static final String BUNDLE_KEY_TB_END_LOCATION = "tbEndLocation";
+    public static final String BUNDLE_KEY_DDL_OPTIMIZATION = "ddlOptimization";
+    public static final String BUNDLE_KEY_DDL_TRAVEL_MODE = "ddlTravelMode";
+
 
 	/**
 	 * Preference keys
 	 */
+	public static final String PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION = "origin_is_my_location";
+	public static final String PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION = "destination_is_my_location";
 	public static final String PREFERENCE_KEY_MAP_TILE_SOURCE = "map_tile_source";
 	public static final String PREFERENCE_KEY_GEOCODER_PROVIDER = "geocoder_provider";
 	public static final String PREFERENCE_KEY_ROUTING_OPTIONS = "routing_options";
@@ -59,6 +78,9 @@ public class OTPApp extends Application {
 	private static Server selectedServer;
 	
 	public static final String TAG = "OTP";
+	
+	public final float defaultInitialZoomLevel = 12;
+	public final int defaultPadding = 100;
 
 	/**
 	 * Sets the currently selected OTP server

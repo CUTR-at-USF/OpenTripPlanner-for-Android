@@ -75,6 +75,9 @@
     <string name="selected_custom_server_summary_disactivate">One reference server is in use</string>
     <string name="selected_custom_server_summary_disabled">You should provide a valid custom server URL</string>
     <string name="server_down">Not reachable server</string>
+    <string name="origin_destination_are_mylocation">"Not planning, origin and destination are the same"</string>
+    <string name="play_services_error">Not possible to contact Google servers, app may not work correctly</string>
+    <string name="location_error">Not possible to retrieve actual location.</string>
     <string-array name="available_geocoder_providers">
         <item>MapQuest Nominatim</item>
         <item>Google Places</item>

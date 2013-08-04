@@ -56,15 +56,6 @@
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:src="@android:drawable/ic_menu_directions" />
-
-            <ImageView
-                android:id="@+id/googlePlacesIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="true"
-                android:background="@null"
-                android:src="@drawable/powered_by_google_on_white" />
         </LinearLayout>
     </RelativeLayout>
 

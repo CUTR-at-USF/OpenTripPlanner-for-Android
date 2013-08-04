@@ -24,19 +24,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 
-import org.osmdroid.util.GeoPoint;
-
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.res.Resources;
 import android.content.res.Resources.NotFoundException;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.util.Log;
-import edu.usf.cutr.opentripplanner.android.OTPApp;
+
+import com.google.android.gms.maps.model.LatLng;
+
 import edu.usf.cutr.opentripplanner.android.R;
 import edu.usf.cutr.opentripplanner.android.listeners.OTPGeocodingListener;
 import edu.usf.cutr.opentripplanner.android.model.Server;
@@ -44,7 +43,6 @@ import edu.usf.cutr.opentripplanner.android.pois.GooglePlaces;
 import edu.usf.cutr.opentripplanner.android.pois.Nominatim;
 import edu.usf.cutr.opentripplanner.android.pois.POI;
 import edu.usf.cutr.opentripplanner.android.pois.Places;
-import edu.usf.cutr.opentripplanner.android.util.LocationUtil;
 
 /**
  * @author Khoa Tran
@@ -82,19 +80,19 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 
 		String address = reqs[0];
 
+
 		if(address==null || address.equalsIgnoreCase("")) {
 			return count;
 		}
 
 		if(address.equalsIgnoreCase(context.getString(R.string.my_location))) {
-			GeoPoint currentLocation = LocationUtil.getLastLocation(context);
-			if(currentLocation==null){
-				return count;
-			}
-
+			String currentLat = reqs[1];
+			String currentLng = reqs[2];
+			LatLng latLng = new LatLng(Double.parseDouble(currentLat), Double.parseDouble(currentLng));
+			
 			Address addressReturn = new Address(Locale.US);
-			addressReturn.setLatitude(currentLocation.getLatitudeE6()/1E6);
-			addressReturn.setLongitude(currentLocation.getLongitudeE6()/1E6);
+			addressReturn.setLatitude(latLng.latitude);
+			addressReturn.setLongitude(latLng.longitude);
 			addressReturn.setAddressLine(addressReturn.getMaxAddressLineIndex()+1, context.getString(R.string.my_location));
 
 			addressesReturn.add(addressReturn);
