@@ -445,11 +445,23 @@ public class MainFragment extends Fragment implements
 
 						} else { // Point on Map
 							if (buttonID == R.id.btnStartLocation) {
-							//	tbStartLocation.setText(startMarker
-							//			.getLocationFormatedString());
+								if (startMarker != null){
+									updateMarkerPosition(startMarker.getPosition(), true);
+								}
+								else{
+									tbStartLocation.setText("");
+									tbStartLocation.setHint(getResources().getString(R.string.need_to_place_marker));
+									tbStartLocation.requestFocus();
+								}
 							} else if (buttonID == R.id.btnEndLocation) {
-							//	tbEndLocation.setText(endMarker
-							//			.getLocationFormatedString());
+								if (endMarker != null){
+									updateMarkerPosition(endMarker.getPosition(), false);
+								}
+								else{
+									tbEndLocation.setText("");
+									tbEndLocation.setHint(getResources().getString(R.string.need_to_place_marker));
+									tbEndLocation.requestFocus();
+								}
 							}
 						}
 					}
@@ -571,7 +583,12 @@ public class MainFragment extends Fragment implements
 		OnMapClickListener omcl = new OnMapClickListener() {
 			@Override
 			public void onMapClick(LatLng latlng) {
-				setMarker(false, latlng);
+				if (tbStartLocation.hasFocus()){
+					setMarker(true, latlng);
+				}
+				else{
+					setMarker(false, latlng);
+				}
 			}
 		};
 		
