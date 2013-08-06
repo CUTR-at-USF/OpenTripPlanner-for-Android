@@ -165,6 +165,8 @@ public class MainFragment extends Fragment implements
 	
 	private LatLng savedLastLocation;
 	
+	private boolean appStarts = true;
+	
 //	private boolean isStartLocationGeocodingProcessed = false;
 //	private boolean isEndLocationGeocodingProcessed = true;
 
@@ -682,7 +684,7 @@ public class MainFragment extends Fragment implements
 			@Override
 			public void onClick(View arg0) {
 				// Save states before leaving
-
+				appStarts = false;
 				ofl.onSwitchedToDirectionFragment();
 			}
 		};
@@ -1066,6 +1068,7 @@ public class MainFragment extends Fragment implements
 			break;
 		case R.id.settings:
 			needToRunAutoDetect = false;
+			appStarts = false;
 			this.getActivity().startActivityForResult(
 					new Intent(this.getActivity(), SettingsActivity.class),
 					OTPApp.REFRESH_SERVER_LIST_REQUEST_CODE);
@@ -1418,7 +1421,7 @@ public class MainFragment extends Fragment implements
 	public void onConnected(Bundle connectionHint) {
 		
         //mLocationClient.requestLocationUpdates(mLocationRequest, this);
-		if (!restoredSavedState){
+		if (!restoredSavedState && appStarts){
 			mMap = setUpMap(mMap);
 			LatLng mCurrentLatLng = getLastLocation();	
 			
