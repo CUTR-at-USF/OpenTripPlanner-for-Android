@@ -18,7 +18,6 @@ package edu.usf.cutr.opentripplanner.android.fragments;
 
 import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS;
 
-import java.lang.reflect.Array;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -28,7 +27,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.http.impl.client.RoutedRequest;
 import org.miscwidgets.widget.Panel;
 import org.opentripplanner.api.ws.GraphMetadata;
 import org.opentripplanner.api.ws.Request;
@@ -47,6 +45,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Location;
@@ -87,7 +86,6 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
@@ -186,7 +184,9 @@ public class MainFragment extends Fragment implements
 
 	Marker endMarker;
 	MarkerOptions endMarkerOptions;
-
+	
+	ArrayList<Marker> modeMarkers;
+	ArrayList<MarkerOptions> modeMarkersOptions;
 
 	private SharedPreferences prefs;
 	private OTPApp app;
@@ -713,10 +713,10 @@ public class MainFragment extends Fragment implements
 				ofl.onItinerariesLoaded(otpBundle.getItineraryList());
 				ofl.onItinerarySelected(otpBundle.getCurrentItineraryIndex());
 			}
-			Parcelable[] parcelableArray = savedInstanceState.getParcelableArray(OTPApp.BUNDLE_KEY_MAP_POLYLINE_OPTIONS);
+			Parcelable[] parcelableArrayPolyline = savedInstanceState.getParcelableArray(OTPApp.BUNDLE_KEY_MAP_POLYLINE_OPTIONS);
 
-			if (parcelableArray != null){
-				PolylineOptions[] polylineOptionsArray = Arrays.copyOf(parcelableArray, parcelableArray.length, PolylineOptions[].class);
+			if (parcelableArrayPolyline != null){
+				PolylineOptions[] polylineOptionsArray = Arrays.copyOf(parcelableArrayPolyline, parcelableArrayPolyline.length, PolylineOptions[].class);
 				routeOptions = new ArrayList<PolylineOptions>(Arrays.asList(polylineOptionsArray));
 				route = new ArrayList<Polyline>();
 				for (PolylineOptions options : routeOptions) {
@@ -724,6 +724,18 @@ public class MainFragment extends Fragment implements
 					route.add(routeLine);
 				}
 			}
+			Parcelable[] parcelableArrayMode = savedInstanceState.getParcelableArray(OTPApp.BUNDLE_KEY_MAP_MODE_MARKERS_OPTIONS);
+
+			if (parcelableArrayMode != null){
+				MarkerOptions[] modeMarkersOptionsArray = Arrays.copyOf(parcelableArrayMode, parcelableArrayMode.length, MarkerOptions[].class);
+				modeMarkersOptions = new ArrayList<MarkerOptions>(Arrays.asList(modeMarkersOptionsArray));
+				modeMarkers = new ArrayList<Marker>();
+				for (MarkerOptions modeMarkerOptions : modeMarkersOptions) {
+					Marker modeMarker = mMap.addMarker(modeMarkerOptions);
+					modeMarkers.add(modeMarker);
+				}
+			}
+			
 		}
 		else{
 			restoredSavedState = false;
@@ -808,7 +820,7 @@ public class MainFragment extends Fragment implements
 									.position(latlng)
 									.title(getResources().getString(R.string.start_marker_title))
 									.snippet(getResources().getString(R.string.start_marker_description))
-									.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
+									.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
 									.draggable(true);
 				startMarker = mMap.addMarker(startMarkerOptions);
 			}
@@ -889,6 +901,11 @@ public class MainFragment extends Fragment implements
 			Object[] objectArray = routeOptions.toArray();
 			PolylineOptions[] polylineOptionsArray = Arrays.copyOf(objectArray, objectArray.length, PolylineOptions[].class);
 			bundle.putParcelableArray(OTPApp.BUNDLE_KEY_MAP_POLYLINE_OPTIONS, polylineOptionsArray);
+		}
+		if (modeMarkersOptions != null){
+			Object[] objectArray = modeMarkersOptions.toArray();
+			MarkerOptions[] modeMarkersOptions = Arrays.copyOf(objectArray, objectArray.length, MarkerOptions[].class);
+			bundle.putParcelableArray(OTPApp.BUNDLE_KEY_MAP_MODE_MARKERS_OPTIONS, modeMarkersOptions);
 		}
 		bundle.putString(OTPApp.BUNDLE_KEY_TB_START_LOCATION, tbStartLocation.getText().toString());
 		bundle.putString(OTPApp.BUNDLE_KEY_TB_END_LOCATION, tbEndLocation.getText().toString());
@@ -1179,8 +1196,15 @@ public class MainFragment extends Fragment implements
 			routeOptions.clear();
 			route.clear();
 		}
+		if (modeMarkers != null){
+			for (Marker modeMarker : modeMarkers){
+				modeMarker.remove();
+			}
+		}
 		routeOptions = new ArrayList<PolylineOptions>();
 		route = new ArrayList<Polyline>();
+		modeMarkers = new ArrayList<Marker>();
+		modeMarkersOptions = new ArrayList<MarkerOptions>();
 		
 		if (!itinerary.isEmpty()) {
 			btnDisplayDirection.setVisibility(View.VISIBLE);
@@ -1188,11 +1212,27 @@ public class MainFragment extends Fragment implements
 			LatLngBounds.Builder boundsCreator = LatLngBounds.builder();
 			
 			for (Leg leg : itinerary) {
-				int pathColor = getPathColor(leg.mode);
 				List<LatLng> points = LocationUtil.decodePoly(leg.legGeometry
 						.getPoints());
+				MarkerOptions modeMarkerOption = new MarkerOptions().position(points.get(0))
+						                                        .icon(BitmapDescriptorFactory.fromResource(getPathIcon(leg.mode)));
+				String title = "";
+				String temp = "";
+				if ((temp = leg.getRouteShortName()) != null){
+					title += temp;
+				}
+				if ((temp = leg.getHeadsign()) != null){
+					title += temp;
+					modeMarkerOption.title(title);
+				}
+				if ((temp = leg.getRouteLongName()) != null){
+					modeMarkerOption.snippet(temp);
+				}
+				modeMarkersOptions.add(modeMarkerOption);
+				Marker modeMarker = mMap.addMarker(modeMarkerOption);
+				modeMarkers.add(modeMarker);
 				PolylineOptions options = new PolylineOptions().addAll(points)
-						   .color(pathColor);
+						   .color(OTPApp.COLOR_ROUTE_LINE);
 				routeOptions.add(options);
 				Polyline routeLine = mMap.addPolyline(options);
 				route.add(routeLine);
@@ -1205,6 +1245,45 @@ public class MainFragment extends Fragment implements
 			mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsCreator.build(), app.defaultPadding));
 		}
 	}
+
+	private int getPathIcon(String modeString){
+		TraverseMode mode = TraverseMode.valueOf(modeString);
+		int icon;
+		
+		if(mode.compareTo(TraverseMode.BICYCLE) == 0){
+			icon = R.drawable.cycling;
+		} else if(mode.compareTo(TraverseMode.CAR) == 0){
+			icon = R.drawable.car;
+		} else if((mode.compareTo(TraverseMode.BUS) == 0) || (mode.compareTo(TraverseMode.BUSISH) == 0)){
+			icon = R.drawable.bus;
+		} else if((mode.compareTo(TraverseMode.RAIL) == 0)  || (mode.compareTo(TraverseMode.TRAINISH) == 0)){
+			icon = R.drawable.train;
+		} else if(mode.compareTo(TraverseMode.FERRY) == 0){
+			icon = R.drawable.ferry;
+		} else if(mode.compareTo(TraverseMode.GONDOLA) == 0){
+			icon = R.drawable.boat;
+		} else if(mode.compareTo(TraverseMode.SUBWAY) == 0){
+			icon = R.drawable.underground;
+		} else if(mode.compareTo(TraverseMode.TRAM) == 0){
+			icon = R.drawable.tramway;
+		} else if(mode.compareTo(TraverseMode.WALK) == 0){
+			icon = R.drawable.pedestriancrossing;
+		} else if(mode.compareTo(TraverseMode.CABLE_CAR) == 0){
+			icon = R.drawable.cablecar;
+		} else if(mode.compareTo(TraverseMode.FUNICULAR) == 0){
+			icon = R.drawable.funicolar;
+		} else if(mode.compareTo(TraverseMode.TRANSIT) == 0){
+			icon = R.drawable.road;
+		} else if(mode.compareTo(TraverseMode.TRANSFER) == 0){
+			icon = R.drawable.caution;
+		}
+		else{
+			icon = R.drawable.road;
+		}
+		
+		return icon;
+	}
+
 
 	private int getPathColor(String mode) {
 		if (mode.equalsIgnoreCase("WALK")) {
