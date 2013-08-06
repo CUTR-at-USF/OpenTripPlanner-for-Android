@@ -21,6 +21,9 @@ import java.util.ArrayList;
 import org.opentripplanner.v092snapshot.api.model.Itinerary;
 import org.opentripplanner.v092snapshot.api.model.Leg;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -33,6 +36,8 @@ import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import edu.usf.cutr.opentripplanner.android.MyActivity;
+import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.R;
 import edu.usf.cutr.opentripplanner.android.listeners.OnFragmentListener;
 import edu.usf.cutr.opentripplanner.android.model.Direction;
@@ -80,8 +85,8 @@ public class DirectionListFragment extends ExpandableListFragment {
 	}
 
 	@Override
-	public void onActivityCreated(Bundle savedState) {
-		super.onActivityCreated(savedState);
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
 		
 		ImageButton btnDisplayMap = (ImageButton)header.findViewById(R.id.btnDisplayMap);
 		final OnFragmentListener ofl = this.getFragmentListener();
@@ -94,11 +99,16 @@ public class DirectionListFragment extends ExpandableListFragment {
 		};
 		btnDisplayMap.setOnClickListener(oclDisplayDirection);
 		
-		OTPBundle otpBundle = fragmentListener.getOTPBundle();
-		TextView fromHeader = (TextView)header.findViewById(R.id.fromHeader);
-		fromHeader.setText(otpBundle.getFromText());
-		TextView toHeader = (TextView)header.findViewById(R.id.toHeader);
-		toHeader.setText(otpBundle.getToText());
+		if (savedInstanceState != null){
+			TextView tbStartLocation = (TextView)header.findViewById(R.id.fromHeader);
+			tbStartLocation.setText(savedInstanceState.getString(OTPApp.BUNDLE_KEY_TB_START_LOCATION));
+			TextView tbEndLocation = (TextView)header.findViewById(R.id.toHeader);
+			tbEndLocation.setText(savedInstanceState.getString(OTPApp.BUNDLE_KEY_TB_END_LOCATION));
+			OTPBundle otpBundle = (OTPBundle) savedInstanceState.getSerializable(OTPApp.BUNDLE_KEY_OTP_BUNDLE);
+			fragmentListener.onItinerariesLoaded(otpBundle.getItineraryList());
+			fragmentListener.onItinerarySelected(otpBundle.getCurrentItineraryIndex());
+	//		fragmentListener.setOTPBundle(otpBundle);
+		}
 		
 		ArrayList<Leg> currentItinerary = new ArrayList<Leg>();
 		currentItinerary.addAll(fragmentListener.getCurrentItinerary());
@@ -174,6 +184,20 @@ public class DirectionListFragment extends ExpandableListFragment {
 		elv.setAdapter(adapter);
 		
 		elv.setGroupIndicator(null); // Get rid of the down arrow
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle bundle) {
+		super.onSaveInstanceState(bundle);
+		TextView tbStartLocation = (TextView)header.findViewById(R.id.fromHeader);
+		TextView tbEndLocation = (TextView)header.findViewById(R.id.toHeader);
+		bundle.putString(OTPApp.BUNDLE_KEY_TB_START_LOCATION, tbStartLocation.getText().toString());
+		bundle.putString(OTPApp.BUNDLE_KEY_TB_END_LOCATION, tbEndLocation.getText().toString());
+		OTPBundle otpBundle = new OTPBundle();
+		otpBundle.setItineraryList(fragmentListener.getCurrentItineraryList());
+		otpBundle.setCurrentItineraryIndex(fragmentListener.getCurrentItineraryIndex());
+		otpBundle.setCurrentItinerary(fragmentListener.getCurrentItinerary());
+		bundle.putSerializable(OTPApp.BUNDLE_KEY_OTP_BUNDLE, otpBundle);
 	}
 
 	@Override

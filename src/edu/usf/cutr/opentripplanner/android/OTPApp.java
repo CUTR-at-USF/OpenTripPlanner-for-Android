@@ -50,11 +50,13 @@ public class OTPApp extends Application {
     public static final String BUNDLE_KEY_MAP_CAMERA = "Map Camera";
     public static final String BUNDLE_KEY_MAP_START_MARKER_OPTIONS = "Map StartMarkerOptions";
     public static final String BUNDLE_KEY_MAP_END_MARKER_OPTIONS = "Map EndMarkerOptions";
+    public static final String BUNDLE_KEY_MAP_POLYLINE_OPTIONS = "Map PolylineOptions";
     public static final String BUNDLE_KEY_TB_START_LOCATION = "tbStartLocation";
     public static final String BUNDLE_KEY_TB_END_LOCATION = "tbEndLocation";
     public static final String BUNDLE_KEY_DDL_OPTIMIZATION = "ddlOptimization";
     public static final String BUNDLE_KEY_DDL_TRAVEL_MODE = "ddlTravelMode";
-
+    public static final String BUNDLE_KEY_OTP_BUNDLE = "OTP bundle";
+    public static final String BUNDLE_KEY_PANEL_STATE = "panel state";
 
 	/**
 	 * Preference keys

@@ -74,11 +74,12 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		bundle = (OTPBundle)getLastCustomNonConfigurationInstance();
+	//	bundle = (OTPBundle)getLastCustomNonConfigurationInstance();
 		setContentView(R.layout.activity);
 
 		if (savedInstanceState != null) {
 			mainFragment = (MainFragment) getSupportFragmentManager().findFragmentByTag("mainFragmentTag");//recuperar o tag adecuado e pillar ese fragment
+			
 	    }
 		
 		if(savedInstanceState==null){
@@ -168,7 +169,7 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 
 		transaction.commit();
 	}
-
+/*
 	@Override
 	public OTPBundle getOTPBundle() {
 		// TODO Auto-generated method stub
@@ -182,7 +183,7 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 		this.bundle.setCurrentItineraryIndex(currentItineraryIndex);
 		this.bundle.setItineraryList(currentItineraryList);
 	}
-
+*/
 	@Override
 	public void onSwitchedToMainFragment(Fragment f) {
 		// TODO Auto-generated method stub

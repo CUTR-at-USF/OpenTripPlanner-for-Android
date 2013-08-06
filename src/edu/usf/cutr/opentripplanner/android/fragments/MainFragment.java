@@ -18,14 +18,17 @@ package edu.usf.cutr.opentripplanner.android.fragments;
 
 import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS;
 
+import java.lang.reflect.Array;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.http.impl.client.RoutedRequest;
 import org.miscwidgets.widget.Panel;
 import org.opentripplanner.api.ws.GraphMetadata;
 import org.opentripplanner.api.ws.Request;
@@ -50,6 +53,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.provider.Settings;
@@ -148,6 +152,7 @@ public class MainFragment extends Fragment implements
     LocationRequest mLocationRequest;
 	
 	private List<Polyline> route;
+	private List<PolylineOptions> routeOptions;
 
 	private EditText tbStartLocation;
 	private EditText tbEndLocation;
@@ -247,8 +252,13 @@ public class MainFragment extends Fragment implements
 
 		btnDisplayDirection = (ImageButton) mainView
 				.findViewById(R.id.btnDisplayDirection);
-
-		tripPanel.setOpen(true, true);
+		
+		if (savedInstanceState == null){
+			tripPanel.setOpen(true, true);
+		}
+		else{
+			tripPanel.setOpen(savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_PANEL_STATE), false);
+		}
 
 		tripPanel.setFocusable(true);
 		tripPanel.setFocusableInTouchMode(true);
@@ -655,25 +665,11 @@ public class MainFragment extends Fragment implements
 			@Override
 			public void onClick(View arg0) {
 				// Save states before leaving
-				saveOTPBundle();
 
 				ofl.onSwitchedToDirectionFragment();
 			}
 		};
 		btnDisplayDirection.setOnClickListener(oclDisplayDirection);
-
-		// Do NOT show direction icon if there is no direction yet
-		if (ofl.getCurrentItinerary().isEmpty()) {
-			btnDisplayDirection.setVisibility(View.INVISIBLE);
-		} else {
-			btnDisplayDirection.setVisibility(View.VISIBLE);
-		}
-		
-		// get previous state if already exist
-		OTPBundle otpBundle = ofl.getOTPBundle();
-		if (otpBundle != null) {
-			retrievePreviousState(otpBundle);
-		}
 		
 		if (savedInstanceState != null){
 			restoredSavedState = true;
@@ -693,11 +689,33 @@ public class MainFragment extends Fragment implements
 			}
 			ddlOptimization.setSelection(savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION));
 			ddlTravelMode.setSelection(savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE));
+			OTPBundle otpBundle = (OTPBundle) savedInstanceState.getSerializable(OTPApp.BUNDLE_KEY_OTP_BUNDLE);
+			if (otpBundle != null){
+				ofl.onItinerariesLoaded(otpBundle.getItineraryList());
+				ofl.onItinerarySelected(otpBundle.getCurrentItineraryIndex());
+			}
+			Parcelable[] parcelableArray = savedInstanceState.getParcelableArray(OTPApp.BUNDLE_KEY_MAP_POLYLINE_OPTIONS);
+
+			if (parcelableArray != null){
+				PolylineOptions[] polylineOptionsArray = Arrays.copyOf(parcelableArray, parcelableArray.length, PolylineOptions[].class);
+				routeOptions = new ArrayList<PolylineOptions>(Arrays.asList(polylineOptionsArray));
+				route = new ArrayList<Polyline>();
+				for (PolylineOptions options : routeOptions) {
+					Polyline routeLine = mMap.addPolyline(options);
+					route.add(routeLine);
+				}
+			}
 		}
 		else{
 			restoredSavedState = false;
 		}
 
+		// Do NOT show direction icon if there is no direction yet
+		if (ofl.getCurrentItinerary().isEmpty()) {
+			btnDisplayDirection.setVisibility(View.INVISIBLE);
+		} else {
+			btnDisplayDirection.setVisibility(View.VISIBLE);
+		}
 		
 	}
 	
@@ -847,33 +865,24 @@ public class MainFragment extends Fragment implements
 		bundle.putParcelable(OTPApp.BUNDLE_KEY_MAP_CAMERA, mMap.getCameraPosition());
 		bundle.putParcelable(OTPApp.BUNDLE_KEY_MAP_START_MARKER_OPTIONS, startMarkerOptions);
 		bundle.putParcelable(OTPApp.BUNDLE_KEY_MAP_END_MARKER_OPTIONS, endMarkerOptions);
+		bundle.putBoolean(OTPApp.BUNDLE_KEY_PANEL_STATE, tripPanel.isOpen());
+		if (routeOptions != null){
+			Object[] objectArray = routeOptions.toArray();
+			PolylineOptions[] polylineOptionsArray = Arrays.copyOf(objectArray, objectArray.length, PolylineOptions[].class);
+			bundle.putParcelableArray(OTPApp.BUNDLE_KEY_MAP_POLYLINE_OPTIONS, polylineOptionsArray);
+		}
 		bundle.putString(OTPApp.BUNDLE_KEY_TB_START_LOCATION, tbStartLocation.getText().toString());
 		bundle.putString(OTPApp.BUNDLE_KEY_TB_END_LOCATION, tbEndLocation.getText().toString());
 		bundle.putInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION, ddlOptimization.getSelectedItemPosition());
 		bundle.putInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE, ddlTravelMode.getSelectedItemPosition());
-	}
-	
-	private void retrievePreviousState(OTPBundle bundle) {
-		tbStartLocation.setText(bundle.getFromText());
-		tbEndLocation.setText(bundle.getToText());
-	//	startMarker.setLocation(bundle.getStartLocation());
-	//	endMarker.setLocation(bundle.getEndLocation());
-		ddlOptimization.setSelection(bundle.getOptimization());
-		ddlTravelMode.setSelection(bundle.getTravelMode());
+		if (!fragmentListener.getCurrentItineraryList().isEmpty()){
+			OTPBundle otpBundle = new OTPBundle();
+			otpBundle.setItineraryList(fragmentListener.getCurrentItineraryList());
+			otpBundle.setCurrentItineraryIndex(fragmentListener.getCurrentItineraryIndex());
+			otpBundle.setCurrentItinerary(fragmentListener.getCurrentItinerary());
+			bundle.putSerializable(OTPApp.BUNDLE_KEY_OTP_BUNDLE, otpBundle);
+		}
 
-		this.showRouteOnMap(bundle.getCurrentItinerary());
-	}
-
-	private void saveOTPBundle() {
-		OTPBundle bundle = new OTPBundle();
-		bundle.setFromText(tbStartLocation.getText().toString());
-		bundle.setToText(tbEndLocation.getText().toString());
-	//	bundle.setStartLocation(startMarker.getLocation());
-	//	bundle.setEndLocation(endMarker.getLocation());
-		bundle.setOptimization(ddlOptimization.getSelectedItemPosition());
-		bundle.setTravelMode(ddlTravelMode.getSelectedItemPosition());
-
-		this.getFragmentListener().setOTPBundle(bundle);
 	}
 
 	public void processAddress(final boolean isStartTextBox, String address) {
@@ -931,9 +940,6 @@ public class MainFragment extends Fragment implements
 	@Override
 	public void onPause() {
 
-		// Save states before leaving
-		this.saveOTPBundle();
-
 		super.onPause();
 	}
 	
@@ -945,8 +951,6 @@ public class MainFragment extends Fragment implements
         }
 
         mLocationClient.disconnect();
-
-        this.saveOTPBundle();
 
 		super.onStop();
 	}
@@ -1152,27 +1156,26 @@ public class MainFragment extends Fragment implements
 			for (Polyline legLine : route) {
 				legLine.remove();
 			}
+			routeOptions.clear();
 			route.clear();
 		}
+		routeOptions = new ArrayList<PolylineOptions>();
 		route = new ArrayList<Polyline>();
 		
 		if (!itinerary.isEmpty()) {
 			btnDisplayDirection.setVisibility(View.VISIBLE);
-			//routeOverlay.removeAllPath();
-	//		modeOverlay.removeAllMode();
 			List<LatLng> allGeoPoints = new ArrayList<LatLng>();
-		//	int index = 0;
 			LatLngBounds.Builder boundsCreator = LatLngBounds.builder();
 			
 			for (Leg leg : itinerary) {
 				int pathColor = getPathColor(leg.mode);
-//				routeOverlay.addPath(pathColor);
 				List<LatLng> points = LocationUtil.decodePoly(leg.legGeometry
 						.getPoints());
-				Polyline routeLine = mMap.addPolyline(new PolylineOptions().addAll(points)
-																		   .color(pathColor));
+				PolylineOptions options = new PolylineOptions().addAll(points)
+						   .color(pathColor);
+				routeOptions.add(options);
+				Polyline routeLine = mMap.addPolyline(options);
 				route.add(routeLine);
-		//		modeOverlay.addLeg(points.get(0), leg.mode);
 				for (LatLng point : points) {
 					boundsCreator.include(point);
 				}
