@@ -44,7 +44,7 @@ import android.util.Log;
  */
 
 public class GooglePlaces implements Places{
-	private String request = "https://maps.googleapis.com/maps/api/place/search/json?";
+	private String request = "https://maps.googleapis.com/maps/api/place/textsearch/json?";
 
 	private String apiKey;
 
@@ -52,7 +52,7 @@ public class GooglePlaces implements Places{
 	
 	public static final String PARAM_LOCATION = "location";
 	public static final String PARAM_RADIUS = "radius";
-	public static final String PARAM_NAME = "name";
+	public static final String PARAM_NAME = "query";
 
 	// JSON Node names
 	private static final String TAG_HTML_ATTRIBUTIONS = "html_attributions";
@@ -69,6 +69,7 @@ public class GooglePlaces implements Places{
 	private static final String TAG_REFERENCE = "reference";
 	private static final String TAG_TYPES = "types";
 	private static final String TAG_VICINITY = "vicinity";
+	private static final String TAG_FORMATTED_ADDRESS = "formatted_address";
 	private static final String TAG_EVENTS = "events";
 	private static final String TAG_EVENT_ID = "event_id";
 	private static final String TAG_SUMMARY = "summary";
@@ -100,7 +101,7 @@ public class GooglePlaces implements Places{
 
 		request += "location=" + encodedParamLocation;
 		request += "&radius=" + encodedParamRadius;
-		request += "&name=" + encodedParamName;
+		request += "&query=" + encodedParamName;
 		request += "&sensor=false";
 		request += "&key=" + getApiKey();
 
@@ -157,7 +158,7 @@ public class GooglePlaces implements Places{
 				JSONObject r = results.getJSONObject(i);
 
 				String name = r.getString(TAG_NAME);
-				String address = r.getString(TAG_VICINITY);
+				String address = r.getString(TAG_FORMATTED_ADDRESS);
 
 				JSONObject geometry = r.getJSONObject(TAG_GEOMETRY);
 				JSONObject location = geometry.getJSONObject(TAG_LOCATION);
