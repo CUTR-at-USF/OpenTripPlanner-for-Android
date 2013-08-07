@@ -1045,13 +1045,6 @@ public class MainFragment extends Fragment implements
 			else {
 				needToRunAutoDetect = false;
 			}
-		} else if (key.equals(OTPApp.PREFERENCE_KEY_GEOCODER_PROVIDER)) {
-			if (prefs.getString(OTPApp.PREFERENCE_KEY_GEOCODER_PROVIDER, "Google Places").equals(
-					"Google Places")) {
-				googlePlacesIcon.setVisibility(View.VISIBLE);
-			} else {
-				googlePlacesIcon.setVisibility(View.INVISIBLE);
-			}
 		}
 	}
 
