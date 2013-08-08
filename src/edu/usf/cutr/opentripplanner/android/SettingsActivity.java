@@ -16,17 +16,6 @@
 
 package edu.usf.cutr.opentripplanner.android;
 
-import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER;
-import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL;
-import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID;
-import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_GEOCODER_PROVIDER;
-import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE;
-import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_OTP_PROVIDER_FEEDBACK;
-import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_REFRESH_SERVER_LIST;
-import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER;
-import static edu.usf.cutr.opentripplanner.android.OTPApp.REFRESH_SERVER_RETURN_KEY;
-import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_USE_ANDROID_GEOCODER;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -64,7 +53,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 	private Preference serverRefreshButton;
 	private CheckBoxPreference selectedCustomServer;
 	private ListPreference geocoderProvider;
-	private CheckBoxPreference useAndroidGeocoder;
+	private EditTextPreference maxWalkingDistance;
 	
 	private ServersDataSource datasource;
 
@@ -78,12 +67,12 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 
 		addPreferencesFromResource(R.xml.preferences);
 
-		mapTileProvider = (ListPreference) findPreference(PREFERENCE_KEY_MAP_TILE_SOURCE);
-		geocoderProvider = (ListPreference) findPreference(PREFERENCE_KEY_GEOCODER_PROVIDER);
-		autoDetectServer = (CheckBoxPreference) findPreference(PREFERENCE_KEY_AUTO_DETECT_SERVER);
-		customServerURL = (EditTextPreference) findPreference(PREFERENCE_KEY_CUSTOM_SERVER_URL);
-		selectedCustomServer = (CheckBoxPreference) findPreference(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER);
-		useAndroidGeocoder = (CheckBoxPreference) findPreference(PREFERENCE_KEY_USE_ANDROID_GEOCODER);
+		mapTileProvider = (ListPreference) findPreference(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE);
+		geocoderProvider = (ListPreference) findPreference(OTPApp.PREFERENCE_KEY_GEOCODER_PROVIDER);
+		autoDetectServer = (CheckBoxPreference) findPreference(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER);
+		customServerURL = (EditTextPreference) findPreference(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL);
+		selectedCustomServer = (CheckBoxPreference) findPreference(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER);
+		maxWalkingDistance = (EditTextPreference) findPreference(OTPApp.PREFERENCE_KEY_MAX_WALKING_DISTANCE);
 
 		mapTileProvider.setDefaultValue(getResources().getString(R.string.map_tiles_default_server));
 		
@@ -102,84 +91,114 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 		entriesValues.add(OTPApp.MAP_TILE_GOOGLE_HYBRID);
 		entriesValues.add(OTPApp.MAP_TILE_GOOGLE_TERRAIN);
 		mapTileProvider.setEntryValues(entriesValues.toArray(new CharSequence[entriesValues.size()]));
+			
+		CharSequence geocoders[] = {getResources().getString(R.string.geocoder_nominatim), getResources().getString(R.string.geocoder_google_places)};
+		geocoderProvider.setEntries(geocoders);
+		geocoderProvider.setEntryValues(geocoders);
+		geocoderProvider.setDefaultValue(getResources().getString(R.string.geocoder_nominatim));
 		
-		String[] availableGeocoderProviders = getResources().getStringArray(R.array.available_geocoder_providers);
-		geocoderProvider.setEntries(availableGeocoderProviders);
-		geocoderProvider.setEntryValues(availableGeocoderProviders);
-		geocoderProvider.setDefaultValue(availableGeocoderProviders[0]);
-		geocoderProvider.setSummary(getResources().getString(R.string.geocoder_preference_provider_nominatim_fallback));
+		if (geocoderProvider.getValue().equals(getResources().getString(R.string.geocoder_nominatim))){
+			geocoderProvider.setSummary(getResources().getString(R.string.geocoder_preference_provider_nominatim));
+		}
+		else{
+			geocoderProvider.setSummary(getResources().getString(R.string.geocoder_preference_provider_google_places));
+		}
 		
 		geocoderProvider.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 
 			@Override
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
 				String value = (String) newValue;
-				String mapquestNominatimValue = getResources().getStringArray(R.array.available_geocoder_providers)[0];
 				
-				if (useAndroidGeocoder.isChecked()){
-					if (value.equals(mapquestNominatimValue)){
-						geocoderProvider.setSummary(getResources().getString(R.string.geocoder_preference_provider_nominatim_fallback));
-					}
-					else{
-						geocoderProvider.setSummary(getResources().getString(R.string.geocoder_preference_provider_google_places_fallback));	
-					}
+				if (value.equals(getResources().getString(R.string.geocoder_nominatim))){
+					geocoderProvider.setSummary(getResources().getString(R.string.geocoder_preference_provider_nominatim));
 				}
 				else{
-					if (value.equals(mapquestNominatimValue)){
-						geocoderProvider.setSummary(getResources().getString(R.string.geocoder_preference_provider_nominatim_alone));
-					}
-					else{
-						geocoderProvider.setSummary(getResources().getString(R.string.geocoder_preference_provider_google_places_alone));	
-					}
+					geocoderProvider.setSummary(getResources().getString(R.string.geocoder_preference_provider_google_places));	
 				}
+
 				return true;
 			}
 
 		});
 		
-		useAndroidGeocoder.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+		
+		if (mapTileProvider.getValue().equals(getResources().getString(R.string.tiles_mapnik))){
+			mapTileProvider.setSummary(getResources().getString(R.string.mapnik));
+		}
+		else if (mapTileProvider.getValue().equals(getResources().getString(R.string.tiles_maquest))){
+			mapTileProvider.setSummary(getResources().getString(R.string.maquest));
+		}
+		else if (mapTileProvider.getValue().equals(getResources().getString(R.string.tiles_cyclemap))){
+			mapTileProvider.setSummary(getResources().getString(R.string.cyclemap));
+		}
+		else if (mapTileProvider.getValue().equals(OTPApp.MAP_TILE_GOOGLE_NORMAL)){
+			mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_NORMAL);
+		}
+		else if (mapTileProvider.getValue().equals(OTPApp.MAP_TILE_GOOGLE_HYBRID)){
+			mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_NORMAL);
+		}
+		else if (mapTileProvider.getValue().equals(OTPApp.MAP_TILE_GOOGLE_SATELLITE)){
+			mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_NORMAL);
+		}
+		else if (mapTileProvider.getValue().equals(OTPApp.MAP_TILE_GOOGLE_TERRAIN)){
+			mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_NORMAL);
+		}
+		
+		mapTileProvider.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 
 			@Override
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
-				Boolean value = (Boolean) newValue;
-				String mapquestNominatimValue = getResources().getStringArray(R.array.available_geocoder_providers)[0];
+				String value = (String) newValue;
 				
-				if (value){
-					if (geocoderProvider.getEntry().equals(mapquestNominatimValue)){
-						useAndroidGeocoder.setSummary(getResources().getString(R.string.use_android_geocoder_activated_nominatim_fallback));
-						geocoderProvider.setSummary(getResources().getString(R.string.geocoder_preference_provider_nominatim_fallback));
-					}
-					else{
-						useAndroidGeocoder.setSummary(getResources().getString(R.string.use_android_geocoder_activated_google_places_fallback));	
-						geocoderProvider.setSummary(getResources().getString(R.string.geocoder_preference_provider_google_places_fallback));	
-					}
+				if (value.equals(getResources().getString(R.string.tiles_mapnik))){
+					mapTileProvider.setSummary(getResources().getString(R.string.mapnik));
 				}
-				else{
-					if (geocoderProvider.getEntry().equals(mapquestNominatimValue)){
-						geocoderProvider.setSummary(getResources().getString(R.string.geocoder_preference_provider_nominatim_alone));
-					}
-					else{
-						geocoderProvider.setSummary(getResources().getString(R.string.geocoder_preference_provider_google_places_alone));	
-					}
-					useAndroidGeocoder.setSummary(getResources().getString(R.string.use_android_geocoder_disactivated));
-				}		
-				return true;
+				else if (value.equals(getResources().getString(R.string.tiles_maquest))){
+					mapTileProvider.setSummary(getResources().getString(R.string.maquest));
+				}
+				else if (value.equals(getResources().getString(R.string.tiles_cyclemap))){
+					mapTileProvider.setSummary(getResources().getString(R.string.cyclemap));
+				}
+				else if (value.equals(OTPApp.MAP_TILE_GOOGLE_NORMAL)){
+					mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_NORMAL);
+				}
+				else if (value.equals(OTPApp.MAP_TILE_GOOGLE_HYBRID)){
+					mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_NORMAL);
+				}
+				else if (value.equals(OTPApp.MAP_TILE_GOOGLE_SATELLITE)){
+					mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_NORMAL);
+				}
+				else if (value.equals(OTPApp.MAP_TILE_GOOGLE_TERRAIN)){
+					mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_NORMAL);
+				}
 
+				return true;
 			}
+
 		});
 		
+		maxWalkingDistance.setSummary(maxWalkingDistance.getText() + " " + getResources().getString(R.string.maximum_walk_description));	
+
+		maxWalkingDistance.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+
+			@Override
+			public boolean onPreferenceChange(Preference preference, Object newValue) {
+				String value = (String) newValue;
+				
+				maxWalkingDistance.setSummary(value + " " + getResources().getString(R.string.maximum_walk_description));	
+
+				return true;
+			}
+
+		});
+
+		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		if (prefs.getBoolean(PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, false)){
-			if (selectedCustomServer.isChecked()){
-				selectedCustomServer.setSummary(getResources().getString(R.string.selected_custom_server_summary_activate));
-			}
-			else{
-				selectedCustomServer.setSummary(getResources().getString(R.string.selected_custom_server_summary_disactivate));
-			}
+		if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, false)){
 			customServerURL.setSummary(getResources().getString(R.string.custom_server_url_description));
 		}
 		else{
-			selectedCustomServer.setSummary(getResources().getString(R.string.selected_custom_server_summary_disabled));
 			selectedCustomServer.setEnabled(false);
 			customServerURL.setSummary(getResources().getString(R.string.custom_server_url_error));
 		}
@@ -188,7 +207,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 			autoDetectServer.setEnabled(false);
 		}
 		
-		selectedCustomServer.setDependency(PREFERENCE_KEY_CUSTOM_SERVER_URL);
+		selectedCustomServer.setDependency(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL);
 
 		customServerURL.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 
@@ -221,11 +240,9 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 				if (value){
 					autoDetectServer.setChecked(false);
 					autoDetectServer.setEnabled(false);
-					selectedCustomServer.setSummary(getResources().getString(R.string.selected_custom_server_summary_activate));
 				}
 				else{
 					autoDetectServer.setEnabled(true);
-					selectedCustomServer.setSummary(getResources().getString(R.string.selected_custom_server_summary_disactivate));
 				}
 				
 				Log.v(TAG, "Custom server Button clicked");
@@ -247,7 +264,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 					selectedCustomServer.setEnabled(false);
 				}
 				else{
-					if (prefs.getBoolean(PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, false)){
+					if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, false)){
 						selectedCustomServer.setEnabled(true);
 					}
 				}
@@ -256,7 +273,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 			}
 		});
 
-		providerFeedbackButton = (Preference)findPreference(PREFERENCE_KEY_OTP_PROVIDER_FEEDBACK);
+		providerFeedbackButton = (Preference)findPreference(OTPApp.PREFERENCE_KEY_OTP_PROVIDER_FEEDBACK);
 		providerFeedbackButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 			@Override
 			public boolean onPreferenceClick(Preference arg0) {
@@ -285,7 +302,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 		datasource.open();
 		Long mostRecentDate = datasource.getMostRecentDate();
 		
-		serverRefreshButton = (Preference)findPreference(PREFERENCE_KEY_REFRESH_SERVER_LIST);
+		serverRefreshButton = (Preference)findPreference(OTPApp.PREFERENCE_KEY_REFRESH_SERVER_LIST);
 		
 		if(mostRecentDate != null){
 			Calendar cal = Calendar.getInstance();
@@ -300,7 +317,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 			public boolean onPreferenceClick(Preference arg0) {
 				Log.v(TAG, "Server Refresh Button clicked");
 				Intent returnIntent = new Intent();
-				returnIntent.putExtra(REFRESH_SERVER_RETURN_KEY, true);
+				returnIntent.putExtra(OTPApp.REFRESH_SERVER_RETURN_KEY, true);
 				setResult(RESULT_OK, returnIntent);
 				finish();
 				return true;
@@ -331,23 +348,18 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 		if (isWorking){
 			selectedCustomServer.setEnabled(true);
 			if (selectedCustomServer.isChecked()){
-				selectedCustomServer.setSummary(getResources().getString(R.string.selected_custom_server_summary_activate));
-				prefsEditor.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, true);
-			}
-			else{
-				selectedCustomServer.setSummary(getResources().getString(R.string.selected_custom_server_summary_disactivate));
+				prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, true);
 			}
 			customServerURL.setSummary(getResources().getString(R.string.custom_server_url_description));
-			prefsEditor.putBoolean(PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, true);
+			prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, true);
 		}
 		else{
 			autoDetectServer.setEnabled(true);
 			selectedCustomServer.setChecked(false);
 			selectedCustomServer.setEnabled(false);		
-			selectedCustomServer.setSummary(getResources().getString(R.string.selected_custom_server_summary_disabled));
 			customServerURL.setSummary(getResources().getString(R.string.custom_server_error));
-			prefsEditor.putBoolean(PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, false);
-			prefsEditor.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false);
+			prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, false);
+			prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false);
 		}
 		
 		prefsEditor.commit();

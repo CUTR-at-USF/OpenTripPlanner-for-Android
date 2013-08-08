@@ -985,11 +985,9 @@ public class MainFragment extends Fragment implements
 	}
 
 	public void processAddress(final boolean isStartTextBox, String address) {
-		String[] availableGeocoderProviders = getResources().getStringArray(
-				R.array.available_geocoder_providers);
 		OTPGeocoding geocodingTask = new OTPGeocoding(this.getActivity(),
 				isStartTextBox, app.getSelectedServer(), prefs.getString(
-						OTPApp.PREFERENCE_KEY_GEOCODER_PROVIDER, availableGeocoderProviders[0]),
+						OTPApp.PREFERENCE_KEY_GEOCODER_PROVIDER, getResources().getString(R.string.geocoder_nominatim)),
 				this);
 		LatLng mCurrentLatLng = getLastLocation();
 
@@ -1274,7 +1272,7 @@ public class MainFragment extends Fragment implements
 					title += temp;
 				}
 				if ((temp = leg.getHeadsign()) != null){
-					title += temp;
+					title += " " + temp;
 					modeMarkerOption.title(title);
 				}
 				if ((temp = leg.getRouteLongName()) != null){

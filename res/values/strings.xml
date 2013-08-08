@@ -25,6 +25,7 @@
     <string name="metadata_request_progress">Getting graph metadata. Please wait...</string>
     <string name="server_checker_progress">Getting server info. Please wait...</string>
     <string name="server_checker_successful">Server is working OK</string>
+    <string name="custom_server_not_set">"Cumstom server not set: incorrect URL"</string>
     <string name="choose_mode">Choose a mode to travel by</string>
     <string name="choose_optimization">Choose an optimization</string>
     <string name="enable_gps">Enable GPS</string>
@@ -43,22 +44,20 @@
     <string name="end_marker_activated">End Location</string>
     <string name="end_marker_description">Long press to drag...</string>
     <string name="markers_dialog_title">Choose Type for Point</string>
+    <string name="choose_geocoder">Select the address</string>
     <string name="wheelchair_accessible">Wheelchair Accessible</string>
     <string name="wheelchair_accessibility_description">Request wheelchair accessible routes</string>
     <string name="maximum_walk">Maximum Walk</string>
-    <string name="maximum_walk_description">Maximum walking distance in meters</string>
+    <string name="maximum_walk_description">meters</string>
     <string name="routing_options">Routing Options</string>
     <string name="map_options">Map Options</string>
     <string name="map_tile_provider">Map Tile Provider</string>
     <string name="custom_server_url">Custom Server URL</string>
     <string name="custom_server_url_description">"URL set to a working OpenTripPlanner server"</string>
-    <string name="custom_server_url_error">"You should write a valid URL"</string>
-    <string name="custom_server_error">"Server at selected URL not working"</string>
-    <string name="custom_server_not_set">"Cumstom server not set: incorrect URL"</string>
+    <string name="custom_server_url_error">"URL is not valid"</string>
+    <string name="custom_server_error">"You should write an URL to a working Server"</string>
     <string name="auto_detect_server">Auto Detect OTP Server</string>
     <string name="auto_detect_server_description">Automatically choose an OpenTripPlanner server based on current location</string>
-    <string name="map_tile_provider_description">Choose a tile provider (Note: some may not work properly)</string>
-    <string name="choose_geocoder">Select the address</string>
     <string name="geocoder_results_title">Geocoder Results</string>
     <string name="geocoder_no_results_message">Sorry, the address returns no geographical location</string>
     <string name="tripplanner_progress">"Generating trip. Please wait..."</string>   
@@ -70,37 +69,35 @@
     <string name="refresh_server_list">Refresh server list</string>
     <string name="alternative_routes">Select a route</string>
     <string name="geocoder_preference_provider_title">Geocoder Provider</string>
-    <string name="geocoder_preference_provider_nominatim_fallback">Using Mapquest Nominatim as fallback</string>
-    <string name="geocoder_preference_provider_google_places_fallback">Using Google Places as fallback</string>
-    <string name="geocoder_preference_provider_nominatim_alone">Using Mapquest Nominatim</string>
-    <string name="geocoder_preference_provider_google_places_alone">Using Google Places</string>
-    <string name="use_android_geocoder_title">Activate Android Geocoder</string>
-    <string name="use_android_geocoder_activated_nominatim_fallback">In use along with Mapquest Nominatim</string>
-    <string name="use_android_geocoder_activated_google_places_fallback">In use along with Google Places</string>
-    <string name="use_android_geocoder_disactivated">Android Geocoder is not in use</string>
+    <string name="geocoder_preference_provider_nominatim">Mapquest Nominatim</string>
+    <string name="geocoder_preference_provider_google_places">Google Places</string>
+    <string name="use_android_geocoder_title">Android Geocoder</string>
+    <string name="use_android_geocoder_description">Query first to Android Geocoder</string>
     <string name="info_server_no_server_selected">No server is selected</string>
     <string name="info_server_error">Not possible to obtain server info</string>
-    <string name="selected_custom_server_title">Use custom server</string>
-    <string name="selected_custom_server_summary_activate">Custom server is in use</string>
-    <string name="selected_custom_server_summary_disactivate">One reference server is in use</string>
-    <string name="selected_custom_server_summary_disabled">You should provide a valid custom server URL</string>
+    <string name="selected_custom_server_title">Custom OTP Server</string>
+    <string name="selected_custom_server_description">Select server provided by custom URL</string>
     <string name="server_down">Not reachable server</string>
     <string name="origin_destination_are_mylocation">"Not planning, origin and destination are the same"</string>
     <string name="play_services_error">Not possible to contact Google servers, app may not work correctly</string>
     <string name="location_error">Not possible to retrieve actual location.</string>
-    <string-array name="available_geocoder_providers">
-        <item>MapQuest Nominatim</item>
-        <item>Google Places</item>
-    </string-array>
+    <string name="geocoder_nominatim">MapQuest Nominatim</string>
+    <string name="geocoder_google_places">Google Places</string>
     <string name="map_tiles_default_server">"http://a.tile.openstreetmap.org/{z}/{x}/{y}.png"</string>
     <string-array name="map_tiles_servers_names">
         <item>Mapnik</item>
         <item>MapQuestOSM</item>
         <item>CycleMap</item>
     </string-array>
+    <string name="mapnik">Mapnik</string>
+    <string name="maquest">MapQuestOSM</string>
+    <string name="cyclemap">CycleMap</string>
     <string-array name="map_tiles_servers_urls">
         <item>"http://a.tile.openstreetmap.org/{z}/{x}/{y}.png"</item>
         <item>"http://otile1.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png"</item>
         <item>"http://a.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png"</item>
     </string-array>
+    <string name="tiles_mapnik">"http://a.tile.openstreetmap.org/{z}/{x}/{y}.png"</string>
+    <string name="tiles_maquest">"http://otile1.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png"</string>
+    <string name="tiles_cyclemap">"http://a.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png"</string>
 </resources>
