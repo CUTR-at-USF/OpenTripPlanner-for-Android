@@ -74,7 +74,6 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 		selectedCustomServer = (CheckBoxPreference) findPreference(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER);
 		maxWalkingDistance = (EditTextPreference) findPreference(OTPApp.PREFERENCE_KEY_MAX_WALKING_DISTANCE);
 
-		mapTileProvider.setDefaultValue(getResources().getString(R.string.map_tiles_default_server));
 		
 		String[] entriesArray = getResources().getStringArray(R.array.map_tiles_servers_names);
 		ArrayList<String> entries = new ArrayList<String>(Arrays.asList(entriesArray));
@@ -90,14 +89,18 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 		entriesValues.add(OTPApp.MAP_TILE_GOOGLE_SATELLITE);
 		entriesValues.add(OTPApp.MAP_TILE_GOOGLE_HYBRID);
 		entriesValues.add(OTPApp.MAP_TILE_GOOGLE_TERRAIN);
-		mapTileProvider.setEntryValues(entriesValues.toArray(new CharSequence[entriesValues.size()]));
-			
+		mapTileProvider.setEntryValues(entriesValues.toArray(new CharSequence[entriesValues.size()]));			
+		mapTileProvider.setDefaultValue(getResources().getString(R.string.map_tiles_default_server));
+
 		CharSequence geocoders[] = {getResources().getString(R.string.geocoder_nominatim), getResources().getString(R.string.geocoder_google_places)};
 		geocoderProvider.setEntries(geocoders);
 		geocoderProvider.setEntryValues(geocoders);
 		geocoderProvider.setDefaultValue(getResources().getString(R.string.geocoder_nominatim));
 		
-		if (geocoderProvider.getValue().equals(getResources().getString(R.string.geocoder_nominatim))){
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		
+		if (prefs.getString(OTPApp.PREFERENCE_KEY_GEOCODER_PROVIDER, getResources().getString(R.string.geocoder_nominatim))
+			.equals(getResources().getString(R.string.geocoder_nominatim))){
 			geocoderProvider.setSummary(getResources().getString(R.string.geocoder_preference_provider_nominatim));
 		}
 		else{
@@ -122,26 +125,27 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 
 		});
 		
+		String actualMapTileProvider = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, getResources().getString(R.string.tiles_mapnik));
 		
-		if (mapTileProvider.getValue().equals(getResources().getString(R.string.tiles_mapnik))){
+		if (actualMapTileProvider.equals(getResources().getString(R.string.tiles_mapnik))){
 			mapTileProvider.setSummary(getResources().getString(R.string.mapnik));
 		}
-		else if (mapTileProvider.getValue().equals(getResources().getString(R.string.tiles_maquest))){
+		else if (actualMapTileProvider.equals(getResources().getString(R.string.tiles_maquest))){
 			mapTileProvider.setSummary(getResources().getString(R.string.maquest));
 		}
-		else if (mapTileProvider.getValue().equals(getResources().getString(R.string.tiles_cyclemap))){
+		else if (actualMapTileProvider.equals(getResources().getString(R.string.tiles_cyclemap))){
 			mapTileProvider.setSummary(getResources().getString(R.string.cyclemap));
 		}
-		else if (mapTileProvider.getValue().equals(OTPApp.MAP_TILE_GOOGLE_NORMAL)){
+		else if (actualMapTileProvider.equals(OTPApp.MAP_TILE_GOOGLE_NORMAL)){
 			mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_NORMAL);
 		}
-		else if (mapTileProvider.getValue().equals(OTPApp.MAP_TILE_GOOGLE_HYBRID)){
+		else if (actualMapTileProvider.equals(OTPApp.MAP_TILE_GOOGLE_HYBRID)){
 			mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_NORMAL);
 		}
-		else if (mapTileProvider.getValue().equals(OTPApp.MAP_TILE_GOOGLE_SATELLITE)){
+		else if (actualMapTileProvider.equals(OTPApp.MAP_TILE_GOOGLE_SATELLITE)){
 			mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_NORMAL);
 		}
-		else if (mapTileProvider.getValue().equals(OTPApp.MAP_TILE_GOOGLE_TERRAIN)){
+		else if (actualMapTileProvider.equals(OTPApp.MAP_TILE_GOOGLE_TERRAIN)){
 			mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_NORMAL);
 		}
 		
@@ -194,7 +198,6 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 		});
 
 		
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, false)){
 			customServerURL.setSummary(getResources().getString(R.string.custom_server_url_description));
 		}
