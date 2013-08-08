@@ -1,6 +1,7 @@
 package edu.usf.cutr.opentripplanner.android.tasks;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -8,6 +9,7 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -24,6 +26,7 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
 	
 	private static final String TAG = "OTP";
 	private ProgressDialog progressDialog;
+	private WeakReference<Activity> activity;
 	private Context context;
 
 	private ServerCheckerCompleteListener callback = null;
@@ -35,26 +38,36 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
      * Constructs a new ServerChecker
      * @param 
      */
-	public ServerChecker(Context context, boolean showMessage) {
+	public ServerChecker(WeakReference<Activity> activity, Context context, boolean showMessage) {
+		this.activity = activity;
 		this.context = context;
 		this.showMessage = showMessage;
-    	progressDialog = new ProgressDialog(context);
+		if (activity.get() != null){
+			progressDialog = new ProgressDialog(activity.get());
+		}	
 	}
 	
 	/**
      * Constructs a new ServerChecker
      * @param 
      */
-	public ServerChecker(Context context, ServerCheckerCompleteListener callback, boolean showMessage) {
+	public ServerChecker(WeakReference<Activity> activity, Context context, ServerCheckerCompleteListener callback, boolean showMessage) {
+		this.activity = activity;
 		this.context = context;
 		this.showMessage = showMessage;
 		this.callback = callback;
-    	progressDialog = new ProgressDialog(context);
+		if (activity.get() != null){
+			progressDialog = new ProgressDialog(activity.get());
+		}	
 	}
 	
     @Override
 	protected void onPreExecute() {
-    	progressDialog = ProgressDialog.show(context,"", context.getString(R.string.server_checker_progress), true);
+		if (activity.get() != null){
+			progressDialog.setIndeterminate(true);
+			progressDialog.setCancelable(true);
+	    	progressDialog = ProgressDialog.show(activity.get(),"", context.getString(R.string.server_checker_progress), true);
+		}
 	}
 	
     @Override
@@ -108,25 +121,29 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
 	protected void onCancelled() {
 		super.onCancelled();
 		
-		Toast.makeText(context, context.getApplicationContext().getResources().getString(R.string.info_server_error), Toast.LENGTH_SHORT).show();
+		Toast.makeText(context, context.getResources().getString(R.string.info_server_error), Toast.LENGTH_SHORT).show();
 	}
 
 	@Override
 	protected void onPostExecute(String result) {
-		try{
-			if (progressDialog != null && progressDialog.isShowing()) {
-				progressDialog.dismiss();
+		if (activity.get() != null){
+			try{
+				if (progressDialog != null && progressDialog.isShowing()) {
+					progressDialog.dismiss();
+				}
+			}catch(Exception e){
+				Log.e(TAG, "Error in Server Checker PostExecute dismissing dialog: " + e);
 			}
-		}catch(Exception e){
-			Log.e(TAG, "Error in Server Checker PostExecute dismissing dialog: " + e);
 		}
 
 		if (showMessage){
-			AlertDialog.Builder dialog = new AlertDialog.Builder(context);
-			dialog.setTitle("OpenTripPlanner Server Info");
-			dialog.setMessage(result);
-			dialog.setNeutralButton("OK", null);
-			dialog.create().show();
+			if (activity.get() != null){
+				AlertDialog.Builder dialog = new AlertDialog.Builder(activity.get());
+				dialog.setTitle("OpenTripPlanner Server Info");
+				dialog.setMessage(result);
+				dialog.setNeutralButton("OK", null);
+				dialog.create().show();
+			}
 		}
 		else{
 			if (isWorking){

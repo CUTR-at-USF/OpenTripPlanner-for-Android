@@ -17,6 +17,7 @@
 package edu.usf.cutr.opentripplanner.android.tasks;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Collection;
@@ -28,6 +29,7 @@ import org.opentripplanner.api.ws.Request;
 import org.opentripplanner.v092snapshot.api.model.Itinerary;
 import org.opentripplanner.v092snapshot.api.ws.Response;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -51,21 +53,29 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 	private Response response;
 	private static final String TAG = "OTP";
 	private ProgressDialog progressDialog;
+	private WeakReference<Activity> activity;
 	private Context context;
 	private String currentRequestString = "";
 	private Server selectedServer;
 	private TripRequestCompleteListener callback;
 
-	public TripRequest(Context context, Server selectedServer, TripRequestCompleteListener callback) {
+	public TripRequest(WeakReference<Activity> activity, Context context, Server selectedServer, TripRequestCompleteListener callback) {
+		this.activity = activity;
 		this.context = context;
 		this.selectedServer = selectedServer;
 		this.callback = callback;
-		progressDialog = new ProgressDialog(context);
+		if (activity.get() != null){
+			progressDialog = new ProgressDialog(activity.get());
+		}
 	}
 
 	protected void onPreExecute() {
-		progressDialog = ProgressDialog.show(context, "",
-				context.getText(R.string.tripplanner_progress), true);
+		if (activity.get() != null){
+			progressDialog.setIndeterminate(true);
+	        progressDialog.setCancelable(true);
+			progressDialog = ProgressDialog.show(activity.get(), "",
+					context.getText(R.string.tripplanner_progress), true);
+		}
 	}
 
 	protected Long doInBackground(Request... reqs) {
@@ -87,28 +97,32 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 			Log.e(TAG, "Error in TripRequest Cancelled dismissing dialog: " + e);
 		}
 		
-		AlertDialog.Builder geocoderAlert = new AlertDialog.Builder(context);
-		geocoderAlert.setTitle(R.string.tripplanner_results_title)
-				.setMessage(R.string.tripplanner_no_results_message)
-				.setCancelable(false)
-				.setPositiveButton(R.string.confirmation, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-					}
-				});
+		if (activity.get() != null){
+			AlertDialog.Builder geocoderAlert = new AlertDialog.Builder(activity.get());
+			geocoderAlert.setTitle(R.string.tripplanner_results_title)
+					.setMessage(R.string.tripplanner_no_results_message)
+					.setCancelable(false)
+					.setPositiveButton(R.string.confirmation, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+						}
+					});
 
-		AlertDialog alert = geocoderAlert.create();
-		alert.show();
+			AlertDialog alert = geocoderAlert.create();
+			alert.show();
+		}
 				
 		Log.e(TAG, "No route to display!");
 	}
 
 	protected void onPostExecute(Long result) {
-		try{		
-			if (progressDialog != null && progressDialog.isShowing()) {
-				progressDialog.dismiss();
+		if (activity.get() != null){
+			try{		
+				if (progressDialog != null && progressDialog.isShowing()) {
+					progressDialog.dismiss();
+				}
+			}catch(Exception e){
+				Log.e(TAG, "Error in TripRequest PostExecute dismissing dialog: " + e);
 			}
-		}catch(Exception e){
-			Log.e(TAG, "Error in TripRequest PostExecute dismissing dialog: " + e);
 		}
 		
 		if (response != null && response.getPlan() != null && response.getPlan().getItinerary().get(0) != null) {
@@ -124,11 +138,13 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 			// TODO - handle errors here?
 			if(response != null && response.getError() != null) {
 				String msg = response.getError().toString();
-				AlertDialog.Builder feedback = new AlertDialog.Builder(context);
-				feedback.setTitle("Error Planning Trip");
-				feedback.setMessage(msg);
-				feedback.setNeutralButton("OK", null);
-				feedback.create().show();
+				if (activity.get() != null){
+					AlertDialog.Builder feedback = new AlertDialog.Builder(activity.get());
+					feedback.setTitle("Error Planning Trip");
+					feedback.setMessage(msg);
+					feedback.setNeutralButton("OK", null);
+					feedback.create().show();
+				}
 			}
 			Log.e(TAG, "No route to display!");
 		}

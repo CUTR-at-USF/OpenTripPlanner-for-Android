@@ -16,6 +16,7 @@
 
 package edu.usf.cutr.opentripplanner.android;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -23,6 +24,7 @@ import java.util.Date;
 
 import com.google.android.gms.maps.GoogleMap;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -37,6 +39,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.webkit.URLUtil;
 import android.widget.Toast;
+import edu.usf.cutr.opentripplanner.android.fragments.MainFragment;
 import edu.usf.cutr.opentripplanner.android.listeners.ServerCheckerCompleteListener;
 import edu.usf.cutr.opentripplanner.android.model.Server;
 import edu.usf.cutr.opentripplanner.android.sqlite.ServersDataSource;
@@ -220,7 +223,8 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 				
 						
 				if (URLUtil.isValidUrl(value)){		
-					ServerChecker serverChecker = new ServerChecker(SettingsActivity.this, SettingsActivity.this, false);
+					WeakReference<Activity> weakContext = new WeakReference<Activity>(SettingsActivity.this);
+					ServerChecker serverChecker = new ServerChecker(weakContext, SettingsActivity.this.getApplicationContext(), SettingsActivity.this, false);
 					serverChecker.execute(new Server(value));
 					return true;
 				}

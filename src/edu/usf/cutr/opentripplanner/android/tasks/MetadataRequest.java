@@ -17,11 +17,13 @@
 package edu.usf.cutr.opentripplanner.android.tasks;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 import org.opentripplanner.api.ws.GraphMetadata;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -43,22 +45,29 @@ public class MetadataRequest extends AsyncTask<String, Integer, GraphMetadata> {
 	private GraphMetadata metadata;
 	private static final String TAG = "OTP";
 	private ProgressDialog progressDialog;
+	private WeakReference<Activity> activity;
 	private Context context;
 	
 	private MetadataRequestCompleteListener callback;
 	
 	private static ObjectMapper mapper = null;
 
-	public MetadataRequest(Context context, MetadataRequestCompleteListener callback) {
+	public MetadataRequest(WeakReference<Activity> activity, Context context, MetadataRequestCompleteListener callback) {
+		this.activity = activity;
 		this.context = context;
 		this.callback = callback;
-		progressDialog = new ProgressDialog(context);
+		if (activity.get() != null){
+			progressDialog = new ProgressDialog(activity.get());
+		}	
 	}
 
 	protected void onPreExecute() {
-		progressDialog = ProgressDialog.show(context,"",
-				context.getResources().getString(R.string.metadata_request_progress), true);
-
+		if (activity.get() != null){
+			progressDialog.setIndeterminate(true);
+	        progressDialog.setCancelable(true);
+			progressDialog = ProgressDialog.show(activity.get(),"",
+					context.getResources().getString(R.string.metadata_request_progress), true);
+		}
 	}
 
 	protected GraphMetadata doInBackground(String... reqs) {
@@ -72,14 +81,15 @@ public class MetadataRequest extends AsyncTask<String, Integer, GraphMetadata> {
 	}
 
 	protected void onPostExecute(GraphMetadata metadata) {
-		try{
-			if (progressDialog != null && progressDialog.isShowing()) {
-				progressDialog.dismiss();
+		if (activity.get() != null){
+			try{
+				if (progressDialog != null && progressDialog.isShowing()) {
+					progressDialog.dismiss();
+				}
+			}catch(Exception e){
+				Log.e(TAG, "Error in Metadata Request PostExecute dismissing dialog: " + e);
 			}
-		}catch(Exception e){
-			Log.e(TAG, "Error in Metadata Request PostExecute dismissing dialog: " + e);
 		}
-
 		Toast.makeText(context, context.getResources().getString(R.string.metadata_request_successful), Toast.LENGTH_SHORT).show();
 		
 

@@ -20,10 +20,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -55,6 +57,7 @@ import edu.usf.cutr.opentripplanner.android.pois.Places;
 public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 	private static final String TAG = "OTP";
 	private ProgressDialog progressDialog;
+	private WeakReference<Activity> activity;
 	private Context context;
 	private boolean isStartTextbox;
 	private OTPGeocodingListener callback;
@@ -64,18 +67,25 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 
 	private Server selectedServer;
 
-	public OTPGeocoding(Context context, boolean isStartTextbox, Server selectedServer, String placesService, OTPGeocodingListener callback) {
+	public OTPGeocoding(WeakReference<Activity> activity, Context context, boolean isStartTextbox, Server selectedServer, String placesService, OTPGeocodingListener callback) {
 		this.context = context;
+		this.activity = activity;
 		this.isStartTextbox = isStartTextbox;
 		this.callback = callback;
 		this.selectedServer = selectedServer;
 		this.placesService = placesService;
-		progressDialog = new ProgressDialog(context);
+		if (activity.get() != null){
+			progressDialog = new ProgressDialog(activity.get());
+		}
 	}
 
 	protected void onPreExecute() {
-		progressDialog = ProgressDialog.show(context, "",
-				"Processing geocoding. Please wait... ", true);
+		if (activity.get() != null){
+			progressDialog.setIndeterminate(true);
+	        progressDialog.setCancelable(true);
+			progressDialog = ProgressDialog.show(activity.get(), "",
+					"Processing geocoding. Please wait... ", true);
+		}
 	}
 
 	protected Long doInBackground(String... reqs) {
@@ -219,26 +229,29 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 	}
 	
 	protected void  onCancelled(Long result){
-
-		try{		
-			if (progressDialog != null && progressDialog.isShowing()) {
-				progressDialog.dismiss();
+		if (activity.get() != null){
+			try{		
+				if (progressDialog != null && progressDialog.isShowing()) {
+					progressDialog.dismiss();
+				}
+			}catch(Exception e){
+				Log.e(TAG, "Error in Geocoding Cancelled dismissing dialog: " + e);
 			}
-		}catch(Exception e){
-			Log.e(TAG, "Error in Geocoding Cancelled dismissing dialog: " + e);
 		}
-		
-		AlertDialog.Builder geocoderAlert = new AlertDialog.Builder(context);
-		geocoderAlert.setTitle(R.string.geocoder_results_title)
-				.setMessage(R.string.geocoder_no_results_message)
-				.setCancelable(false)
-				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-					}
-				});
+		if (activity.get() != null){
+			AlertDialog.Builder geocoderAlert = new AlertDialog.Builder(activity.get());
+			geocoderAlert.setTitle(R.string.geocoder_results_title)
+					.setMessage(R.string.geocoder_no_results_message)
+					.setCancelable(false)
+					.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+						}
+					});
 
-		AlertDialog alert = geocoderAlert.create();
-		alert.show();
+			AlertDialog alert = geocoderAlert.create();
+			alert.show();
+		}
+
 				
 		Log.e(TAG, "No geocoding processed!");
 	}

@@ -18,6 +18,7 @@ package edu.usf.cutr.opentripplanner.android.fragments;
 
 import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS;
 
+import java.lang.ref.WeakReference;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -573,8 +574,10 @@ public class MainFragment extends Fragment implements
 								.toString());
 
 				request.setShowIntermediateStops(Boolean.TRUE);
+				
+				WeakReference<Activity> weakContext = new WeakReference<Activity>(MainFragment.this.getActivity());
 
-				new TripRequest(MainFragment.this.getActivity(), app
+				new TripRequest(weakContext, MainFragment.this.getActivity().getApplicationContext(), app
 						.getSelectedServer(), MainFragment.this)
 						.execute(request);
 
@@ -848,7 +851,9 @@ public class MainFragment extends Fragment implements
 		}
 
 		ServersDataSource dataSource = ((MyActivity)this.getActivity()).getDatasource();
-		ServerSelector serverSelector = new ServerSelector(this.getActivity(), dataSource, this);
+		WeakReference<Activity> weakContext = new WeakReference<Activity>(this.getActivity());
+
+		ServerSelector serverSelector = new ServerSelector(weakContext, this.getActivity().getApplicationContext(), dataSource, this);
 		serverSelector.execute(mCurrentLatLng);
 		needToRunAutoDetect = false;
 	}
@@ -985,10 +990,12 @@ public class MainFragment extends Fragment implements
 	}
 
 	public void processAddress(final boolean isStartTextBox, String address) {
-		OTPGeocoding geocodingTask = new OTPGeocoding(this.getActivity(),
+		WeakReference<Activity> weakContext = new WeakReference<Activity>(this.getActivity());
+
+		OTPGeocoding geocodingTask = new OTPGeocoding(weakContext, this.getActivity().getApplicationContext(),
 				isStartTextBox, app.getSelectedServer(), prefs.getString(
 						OTPApp.PREFERENCE_KEY_GEOCODER_PROVIDER, getResources().getString(R.string.geocoder_nominatim)),
-				this);
+				this);	
 		LatLng mCurrentLatLng = getLastLocation();
 
 		if(address.equalsIgnoreCase(this.getResources().getString(R.string.my_location))) {
@@ -1076,7 +1083,9 @@ public class MainFragment extends Fragment implements
 			if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)){
 				app.setSelectedServer(new Server(prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, "")));
 				Log.v(TAG, "Now using custom OTP server: " + prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
-				MetadataRequest metaRequest = new MetadataRequest(this.getActivity(), this);
+				WeakReference<Activity> weakContext = new WeakReference<Activity>(this.getActivity());
+
+				MetadataRequest metaRequest = new MetadataRequest(weakContext, this.getActivity().getApplicationContext(), this);
 				metaRequest.execute(prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
 			}
 			else{
@@ -1181,8 +1190,9 @@ public class MainFragment extends Fragment implements
 				break;
 			}
 		
-			
-			ServerChecker serverChecker = new ServerChecker(this.getActivity(), true);
+			WeakReference<Activity> weakContext = new WeakReference<Activity>(this.getActivity());
+
+			ServerChecker serverChecker = new ServerChecker(weakContext, this.getActivity().getApplicationContext(), true);
 			serverChecker.execute(server);
 				
 

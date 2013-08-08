@@ -24,6 +24,7 @@ import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_SELECTE
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -31,6 +32,7 @@ import java.util.List;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -69,6 +71,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements 
 	private Server selectedServer;
 	private static final String TAG = "OTP";
 	private ProgressDialog progressDialog;
+	private WeakReference<Activity> activity;
 	private Context context;
 	private static List<Server> knownServers = new ArrayList<Server>();
 	private boolean mustRefreshList = false;
@@ -86,19 +89,23 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements 
      * @param mustRefreshList true if we should download a new list of servers from the Google Doc, false if we should use cached list of servers
      * @param isAutoDetectEnabled true if we should automatically compare the user's current location to the bounding boxes of OTP servers, false if we should prompt the user to pick the OTP server manually
      */
-	public ServerSelector(Context context, ServersDataSource dataSource, ServerSelectorCompleteListener callback) {
+	public ServerSelector(WeakReference<Activity> activity, Context context, ServersDataSource dataSource, ServerSelectorCompleteListener callback) {
+		this.activity = activity;
 		this.context = context;
 		this.dataSource = dataSource;
 		this.callback = callback;
-		progressDialog = new ProgressDialog(context);
+		if (activity.get() != null){
+			progressDialog = new ProgressDialog(activity.get());
+		}
 	}
 
 	protected void onPreExecute() {
-		progressDialog = ProgressDialog.show(context, "",
-				"Detecting optimal server. Please wait...", true);
-		progressDialog.setIndeterminate(true);
-        progressDialog.setCancelable(true);
-        progressDialog.show();
+		if (activity.get() != null){
+			progressDialog.setIndeterminate(true);
+	        progressDialog.setCancelable(true);
+			progressDialog = ProgressDialog.show(activity.get(), "",
+					"Detecting optimal server. Please wait...", true);
+		}
         
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         
@@ -268,8 +275,14 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements 
 	}
 
 	protected void onPostExecute(Long result) {
-		if (progressDialog.isShowing()) {
-			progressDialog.dismiss();
+		if (activity.get() != null){
+			try{
+				if (progressDialog != null && progressDialog.isShowing()) {
+					progressDialog.dismiss();
+				}
+			}catch(Exception e){
+				Log.e(TAG, "Error in Server Selector PostExecute dismissing dialog: " + e);
+			}
 		}
         
 		if (selectedServer != null) {
@@ -289,63 +302,64 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements 
 			serverNames.add("Custom Server");
 
 			final CharSequence[] items = serverNames.toArray(new CharSequence[serverNames.size()]);
-
-			AlertDialog.Builder builder = new AlertDialog.Builder(context);
-			builder.setTitle("Choose OpenTripPlanner Server");
-			builder.setItems(items, new DialogInterface.OnClickListener() {
-
-				public void onClick(DialogInterface dialog, int item) {
-
-					//If the user selected to enter a custom URL, they are shown this EditText box to enter it
-					if(items[item].equals("Custom Server")) {
-						SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-
-						final EditText tbBaseURL = new EditText(context);
-						String actualCustomServer = prefs.getString(PREFERENCE_KEY_CUSTOM_SERVER_URL, "");
-						tbBaseURL.setText(actualCustomServer);
-
-						AlertDialog.Builder urlAlert = new AlertDialog.Builder(context);
-						urlAlert.setTitle("Enter a custom OTP server domain");
-						urlAlert.setView(tbBaseURL);
-						urlAlert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int whichButton) {
-								String value = tbBaseURL.getText().toString().trim();
-								if (URLUtil.isValidUrl(value)){
-									SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext()).edit();
-									prefsEditor.putString(PREFERENCE_KEY_CUSTOM_SERVER_URL, value);
-									ServerChecker serverChecker = new ServerChecker(context, ServerSelector.this, false);
-									serverChecker.execute(new Server(value));
-									prefsEditor.commit();
+			
+			if (activity.get() != null){
+				AlertDialog.Builder builder = new AlertDialog.Builder(activity.get() );
+				builder.setTitle("Choose OpenTripPlanner Server");
+				builder.setItems(items, new DialogInterface.OnClickListener() {
+	
+					public void onClick(DialogInterface dialog, int item) {
+	
+						//If the user selected to enter a custom URL, they are shown this EditText box to enter it
+						if(items[item].equals("Custom Server")) {
+							SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+	
+							final EditText tbBaseURL = new EditText(activity.get());
+							String actualCustomServer = prefs.getString(PREFERENCE_KEY_CUSTOM_SERVER_URL, "");
+							tbBaseURL.setText(actualCustomServer);
+	
+							AlertDialog.Builder urlAlert = new AlertDialog.Builder(activity.get());
+							urlAlert.setTitle("Enter a custom OTP server domain");
+							urlAlert.setView(tbBaseURL);
+							urlAlert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int whichButton) {
+									String value = tbBaseURL.getText().toString().trim();
+									if (URLUtil.isValidUrl(value)){
+										SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext()).edit();
+										prefsEditor.putString(PREFERENCE_KEY_CUSTOM_SERVER_URL, value);
+	
+										ServerChecker serverChecker = new ServerChecker(activity, context, ServerSelector.this, false);
+										serverChecker.execute(new Server(value));
+										prefsEditor.commit();
+									}
+									else{
+										Toast.makeText(context, context.getResources().getString(R.string.custom_server_url_error), Toast.LENGTH_SHORT).show();
+									}
 								}
-								else{
-									Toast.makeText(context, context.getResources().getString(R.string.custom_server_url_error), Toast.LENGTH_SHORT).show();
+							});
+							selectedCustomServer = true;
+							urlAlert.create().show();
+						} else { 
+							//User picked server from the list
+							for (Server server : knownServers) {
+								//If this server region matches what the user picked, then set the server as the selected server
+								if (server.getRegion().equals(items[item])) {
+									selectedServer = server;
+									SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+									Editor e = prefs.edit();
+									e.putLong(PREFERENCE_KEY_SELECTED_SERVER, selectedServer.getId());
+									e.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false);
+									e.commit();
+									callback.onServerSelectorComplete(selectedServer);
+									break;
 								}
-							}
-						});
-						selectedCustomServer = true;
-						urlAlert.create().show();
-					} else { 
-						//User picked server from the list
-						for (Server server : knownServers) {
-							//If this server region matches what the user picked, then set the server as the selected server
-							if (server.getRegion().equals(items[item])) {
-								selectedServer = server;
-								SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-								Editor e = prefs.edit();
-								e.putLong(PREFERENCE_KEY_SELECTED_SERVER, selectedServer.getId());
-								e.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false);
-								e.commit();
-								callback.onServerSelectorComplete(selectedServer);
-								break;
 							}
 						}
+						Log.v(TAG, "Chosen: " + items[item]);
 					}
-					Log.v(TAG, "Chosen: " + items[item]);
-				}
-			});
-			AlertDialog alert = builder.create();
-			alert.show();
-
+				});
+				builder.show();
+			}
 		} else {
 			//TODO - handle error here that server list cannot be loaded
 			Log.e(TAG, "Server list could not be downloaded!!");
