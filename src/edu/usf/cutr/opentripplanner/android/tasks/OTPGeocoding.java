@@ -109,12 +109,18 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 		if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_USE_ANDROID_GEOCODER, true)){
 			Geocoder gc = new Geocoder(context);
 			try {
-				addresses = (ArrayList<Address>)gc.getFromLocationName(address, 
-						context.getResources().getInteger(R.integer.geocoder_max_results), 
-						selectedServer.getLowerLeftLatitude(), 
-						selectedServer.getLowerLeftLongitude(), 
-						selectedServer.getUpperRightLatitude(), 
-						selectedServer.getUpperRightLongitude());
+				if (selectedServer != null){
+					addresses = (ArrayList<Address>)gc.getFromLocationName(address, 
+							context.getResources().getInteger(R.integer.geocoder_max_results), 
+							selectedServer.getLowerLeftLatitude(), 
+							selectedServer.getLowerLeftLongitude(), 
+							selectedServer.getUpperRightLatitude(), 
+							selectedServer.getUpperRightLongitude());
+				}
+				else{
+					addresses = (ArrayList<Address>)gc.getFromLocationName(address, 
+							context.getResources().getInteger(R.integer.geocoder_max_results));
+				}
 				for(int i=0; i<addresses.size(); i++){
 					Address addr = addresses.get(i);
 					String addressLine = "";
@@ -171,19 +177,24 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 		Places p;
 
 		if(placesService.equals(context.getResources().getString(R.string.geocoder_google_places))){
-			params.put(GooglePlaces.PARAM_LOCATION, Double.toString(selectedServer.getCenterLatitude()) + "," + Double.toString(selectedServer.getCenterLongitude()));
-			params.put(GooglePlaces.PARAM_RADIUS, Double.toString(selectedServer.getRadius()));
 			params.put(GooglePlaces.PARAM_NAME, name);
-
+			if (selectedServer != null){
+				params.put(GooglePlaces.PARAM_LOCATION, Double.toString(selectedServer.getCenterLatitude()) + "," + Double.toString(selectedServer.getCenterLongitude()));
+				params.put(GooglePlaces.PARAM_RADIUS, Double.toString(selectedServer.getRadius()));
+			}
 			p = new GooglePlaces(getKeyFromResource());
 
 			Log.v(TAG, "Using Google Places!");
 		} else {
 			params.put(Nominatim.PARAM_NAME, name);
-			p = new Nominatim(selectedServer.getLowerLeftLongitude(), 
-					selectedServer.getLowerLeftLatitude(),
-					selectedServer.getUpperRightLongitude(), 
-					selectedServer.getUpperRightLatitude());
+			if (selectedServer != null){
+				params.put(Nominatim.PARAM_LEFT, Double.toString(selectedServer.getLowerLeftLongitude()));
+				params.put(Nominatim.PARAM_TOP, Double.toString(selectedServer.getLowerLeftLatitude()));
+				params.put(Nominatim.PARAM_RIGHT, Double.toString(selectedServer.getUpperRightLongitude()));
+				params.put(Nominatim.PARAM_BOTTOM, Double.toString(selectedServer.getUpperRightLatitude()));
+			}
+
+			p = new Nominatim();
 
 			Log.v(TAG, "Using Nominatim!");
 		}

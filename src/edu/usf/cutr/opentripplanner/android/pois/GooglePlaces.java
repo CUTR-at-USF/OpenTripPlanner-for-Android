@@ -90,18 +90,25 @@ public class GooglePlaces implements Places{
 		String encodedParamRadius = "";
 		String encodedParamName = "";
 		try {
-			encodedParamLocation = URLEncoder.encode(paramLocation, "UTF-8");
-			encodedParamRadius = URLEncoder.encode(paramRadius, "UTF-8");
+			if ((paramLocation != null) && (paramRadius != null)){
+				encodedParamLocation = URLEncoder.encode(paramLocation, "UTF-8");
+				encodedParamRadius = URLEncoder.encode(paramRadius, "UTF-8");
+			}
 			encodedParamName = URLEncoder.encode(paramName, "UTF-8");
 		} catch (UnsupportedEncodingException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			return null;
 		}
-
-		request += "location=" + encodedParamLocation;
-		request += "&radius=" + encodedParamRadius;
-		request += "&query=" + encodedParamName;
+		
+		if ((paramLocation != null) && (paramRadius != null)){
+			request += "location=" + encodedParamLocation;
+			request += "&radius=" + encodedParamRadius;
+			request += "&query=" + encodedParamName;
+		}
+		else{
+			request += "query=" + encodedParamName;
+		}
 		request += "&sensor=false";
 		request += "&key=" + getApiKey();
 

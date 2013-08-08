@@ -49,9 +49,13 @@ public class Nominatim implements Places{
 
 	private static String TAG = "OTP";
 
-	private double left, top, right, bottom;
-
 	public static final String PARAM_NAME = "q";
+	public static final String PARAM_LEFT = "left";
+	public static final String PARAM_TOP = "top";
+	public static final String PARAM_RIGHT = "right";
+	public static final String PARAM_BOTTOM = "bottom";
+
+
 
 	// JSON Node names
 	private static final String TAG_PLACE_ID = "html_attributions";
@@ -68,22 +72,28 @@ public class Nominatim implements Places{
 	// contacts JSONArray
 	JSONArray json = null;
 
-	public Nominatim(double left, double top, double right, double bottom){
-		this.left = left;
-		this.top = top;
-		this.right = right;
-		this.bottom = bottom;
+	public Nominatim(){
 	}
 
 	//	http://open.mapquestapi.com/nominatim/v1/search?format=json&q=Walmart&viewbox=-82.8511308,27.6236434,-82.0559399,28.3251809&bounded=1
 
-	public JSONArray requestPlaces(String paramName){
+	public JSONArray requestPlaces(String paramName, String left, String top, String right, String bottom){
 		StringBuilder builder = new StringBuilder();
 		HttpClient client = new DefaultHttpClient();
 		
 		String encodedParamName = "";
+		String encodedParamLeft= "";
+		String encodedParamTop = "";
+		String encodedParamRight = "";
+		String encodedParamBottom = "";
 		try {
 			encodedParamName = URLEncoder.encode(paramName, "UTF-8");
+			if ((left != null) && (top != null) && (right != null) && (bottom != null)){
+				encodedParamLeft = URLEncoder.encode(left, "UTF-8");
+				encodedParamTop = URLEncoder.encode(top, "UTF-8");
+				encodedParamRight = URLEncoder.encode(right, "UTF-8");
+				encodedParamBottom = URLEncoder.encode(bottom, "UTF-8");
+			}
 		} catch (UnsupportedEncodingException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -91,11 +101,13 @@ public class Nominatim implements Places{
 		}
 		
 		request += "&q=" + encodedParamName;
-		request += "&viewbox=" + Double.toString(left)
-				+ "," + Double.toString(top)
-				+ "," + Double.toString(right)
-				+ "," + Double.toString(bottom);
-		request += "&bounded=1";
+		if ((left != null) && (top != null) && (right != null) && (bottom != null)){
+			request += "&viewbox=" + encodedParamLeft
+					+ "," + encodedParamTop
+					+ "," + encodedParamRight
+					+ "," + encodedParamBottom;
+			request += "&bounded=1";
+		}
 
 		Log.v(TAG, request);
 
@@ -136,9 +148,14 @@ public class Nominatim implements Places{
 		ArrayList<POI> pois = new ArrayList<POI>();
 
 		String paramName = params.get(PARAM_NAME);
+		String paramLeft = params.get(PARAM_LEFT);
+		String paramTop = params.get(PARAM_TOP);
+		String paramRight = params.get(PARAM_RIGHT);
+		String paramBottom = params.get(PARAM_BOTTOM);
+
 
 		// Get JSON
-		JSONArray json = this.requestPlaces(paramName);
+		JSONArray json = this.requestPlaces(paramName, paramLeft, paramTop, paramRight, paramBottom);
 
 		// Decrypt JSON
 		try {
