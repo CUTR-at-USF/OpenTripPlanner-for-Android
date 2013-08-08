@@ -74,6 +74,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements 
 	private boolean mustRefreshList = false;
 	private boolean isAutoDetectEnabled = true;
 	private ServerSelectorCompleteListener callback;
+	private boolean selectedCustomServer;
   
     public ServersDataSource dataSource = null;
     
@@ -321,10 +322,8 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements 
 								}
 							}
 						});
+						selectedCustomServer = true;
 						urlAlert.create().show();
-						String baseURL = prefs.getString(PREFERENCE_KEY_CUSTOM_SERVER_URL, "");
-						selectedServer = new Server(baseURL);
-						callback.onServerSelectorComplete(selectedServer);
 					} else { 
 						//User picked server from the list
 						for (Server server : knownServers) {
@@ -355,12 +354,18 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements 
 
 	@Override
 	public void onServerCheckerComplete(String result, boolean isWorking) {
-		SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext()).edit();
-
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+		SharedPreferences.Editor prefsEditor = prefs.edit();
 		if (isWorking){
 			prefsEditor.putBoolean(PREFERENCE_KEY_AUTO_DETECT_SERVER, false);
 			prefsEditor.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, true);
 			prefsEditor.putBoolean(PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, true);
+			prefsEditor.commit();
+			if (selectedCustomServer){
+				String baseURL = prefs.getString(PREFERENCE_KEY_CUSTOM_SERVER_URL, "");
+				selectedServer = new Server(baseURL);
+				callback.onServerSelectorComplete(selectedServer);
+			}
 		}
 		else{
 			prefsEditor.putBoolean(PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, false);

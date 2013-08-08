@@ -1367,19 +1367,20 @@ public class MainFragment extends Fragment implements
 	public void onServerSelectorComplete(Server server) {
 		//Update application server
 		app.setSelectedServer(server);
-		Log.v(TAG, "Automatically selected server: " + server.getRegion());
-
-		LatLng mCurrentLatLng = getLastLocation();
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getActivity().getApplicationContext());
 		
-		if ((mCurrentLatLng != null) && (LocationUtil.checkPointInBoundingBox(mCurrentLatLng, server, 1000))){
-			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, app.defaultInitialZoomLevel));
+		if (!prefs.getBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)){
+			LatLng mCurrentLatLng = getLastLocation();
+			
+			if ((mCurrentLatLng != null) && (LocationUtil.checkPointInBoundingBox(mCurrentLatLng, server, 1000))){
+				mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, app.defaultInitialZoomLevel));
+			}
+			else{
+				LatLng serverCenter = new LatLng(server.getCenterLatitude(), server.getCenterLongitude());
+				mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, app.defaultInitialZoomLevel));
+				setMarker(true, serverCenter);
+			}
 		}
-		else{
-			LatLng serverCenter = new LatLng(server.getCenterLatitude(), server.getCenterLongitude());
-			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, app.defaultInitialZoomLevel));
-			setMarker(true, serverCenter);
-		}
-		
 	}
 
 	@Override
@@ -1598,7 +1599,7 @@ public class MainFragment extends Fragment implements
 				"," + String.valueOf(upperRightLatitude) + "," + String.valueOf(upperRightLongitude);
 		selectedServer.setBounds(bounds);
 		
-		SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(this.getActivity()).edit();
+		SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(this.getActivity().getApplicationContext()).edit();
 		prefsEditor.putString(PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS, bounds);
 		prefsEditor.commit();
 		
