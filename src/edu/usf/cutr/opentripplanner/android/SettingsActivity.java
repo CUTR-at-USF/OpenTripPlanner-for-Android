@@ -25,6 +25,7 @@ import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_OTP_PRO
 import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_REFRESH_SERVER_LIST;
 import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER;
 import static edu.usf.cutr.opentripplanner.android.OTPApp.REFRESH_SERVER_RETURN_KEY;
+import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_USE_ANDROID_GEOCODER;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,6 +64,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 	private Preference serverRefreshButton;
 	private CheckBoxPreference selectedCustomServer;
 	private ListPreference geocoderProvider;
+	private CheckBoxPreference useAndroidGeocoder;
 	
 	private ServersDataSource datasource;
 
@@ -81,6 +83,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 		autoDetectServer = (CheckBoxPreference) findPreference(PREFERENCE_KEY_AUTO_DETECT_SERVER);
 		customServerURL = (EditTextPreference) findPreference(PREFERENCE_KEY_CUSTOM_SERVER_URL);
 		selectedCustomServer = (CheckBoxPreference) findPreference(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER);
+		useAndroidGeocoder = (CheckBoxPreference) findPreference(PREFERENCE_KEY_USE_ANDROID_GEOCODER);
 
 		mapTileProvider.setDefaultValue(getResources().getString(R.string.map_tiles_default_server));
 		
@@ -104,6 +107,66 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 		geocoderProvider.setEntries(availableGeocoderProviders);
 		geocoderProvider.setEntryValues(availableGeocoderProviders);
 		geocoderProvider.setDefaultValue(availableGeocoderProviders[0]);
+		geocoderProvider.setSummary(getResources().getString(R.string.geocoder_preference_provider_nominatim_fallback));
+		
+		geocoderProvider.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+
+			@Override
+			public boolean onPreferenceChange(Preference preference, Object newValue) {
+				String value = (String) newValue;
+				String mapquestNominatimValue = getResources().getStringArray(R.array.available_geocoder_providers)[0];
+				
+				if (useAndroidGeocoder.isChecked()){
+					if (value.equals(mapquestNominatimValue)){
+						geocoderProvider.setSummary(getResources().getString(R.string.geocoder_preference_provider_nominatim_fallback));
+					}
+					else{
+						geocoderProvider.setSummary(getResources().getString(R.string.geocoder_preference_provider_google_places_fallback));	
+					}
+				}
+				else{
+					if (value.equals(mapquestNominatimValue)){
+						geocoderProvider.setSummary(getResources().getString(R.string.geocoder_preference_provider_nominatim_alone));
+					}
+					else{
+						geocoderProvider.setSummary(getResources().getString(R.string.geocoder_preference_provider_google_places_alone));	
+					}
+				}
+				return true;
+			}
+
+		});
+		
+		useAndroidGeocoder.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+
+			@Override
+			public boolean onPreferenceChange(Preference preference, Object newValue) {
+				Boolean value = (Boolean) newValue;
+				String mapquestNominatimValue = getResources().getStringArray(R.array.available_geocoder_providers)[0];
+				
+				if (value){
+					if (geocoderProvider.getEntry().equals(mapquestNominatimValue)){
+						useAndroidGeocoder.setSummary(getResources().getString(R.string.use_android_geocoder_activated_nominatim_fallback));
+						geocoderProvider.setSummary(getResources().getString(R.string.geocoder_preference_provider_nominatim_fallback));
+					}
+					else{
+						useAndroidGeocoder.setSummary(getResources().getString(R.string.use_android_geocoder_activated_google_places_fallback));	
+						geocoderProvider.setSummary(getResources().getString(R.string.geocoder_preference_provider_google_places_fallback));	
+					}
+				}
+				else{
+					if (geocoderProvider.getEntry().equals(mapquestNominatimValue)){
+						geocoderProvider.setSummary(getResources().getString(R.string.geocoder_preference_provider_nominatim_alone));
+					}
+					else{
+						geocoderProvider.setSummary(getResources().getString(R.string.geocoder_preference_provider_google_places_alone));	
+					}
+					useAndroidGeocoder.setSummary(getResources().getString(R.string.use_android_geocoder_disactivated));
+				}		
+				return true;
+
+			}
+		});
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		if (prefs.getBoolean(PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, false)){

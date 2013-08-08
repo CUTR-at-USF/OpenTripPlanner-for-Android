@@ -28,14 +28,17 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.res.Resources.NotFoundException;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.R;
 import edu.usf.cutr.opentripplanner.android.listeners.OTPGeocodingListener;
 import edu.usf.cutr.opentripplanner.android.model.Server;
@@ -79,6 +82,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 		long count = reqs.length;
 
 		String address = reqs[0];
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
 
 		if(address==null || address.equalsIgnoreCase("")) {
@@ -99,36 +103,33 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 
 			return count;
 		}
-
-		Geocoder gc = new Geocoder(context);
+		
 		ArrayList<Address> addresses = null;
-		try {
-			addresses = (ArrayList<Address>)gc.getFromLocationName(address, 
-					context.getResources().getInteger(R.integer.geocoder_max_results), 
-					selectedServer.getLowerLeftLatitude(), 
-					selectedServer.getLowerLeftLongitude(), 
-					selectedServer.getUpperRightLatitude(), 
-					selectedServer.getUpperRightLongitude());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			cancel(true);
+		
+		if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_USE_ANDROID_GEOCODER, true)){
+			Geocoder gc = new Geocoder(context);
+			try {
+				addresses = (ArrayList<Address>)gc.getFromLocationName(address, 
+						context.getResources().getInteger(R.integer.geocoder_max_results), 
+						selectedServer.getLowerLeftLatitude(), 
+						selectedServer.getLowerLeftLongitude(), 
+						selectedServer.getUpperRightLatitude(), 
+						selectedServer.getUpperRightLongitude());
+				for(int i=0; i<addresses.size(); i++){
+					Address addr = addresses.get(i);
+					String addressLine = "";
+					addressLine += addr.getAddressLine(0)!=null ? addr.getAddressLine(0) : "no-name";
+					addressLine += addr.getAddressLine(1)!=null ? "\n" + addr.getAddressLine(1) : "";
+					addressLine += addr.getAddressLine(2)!=null ? ", " + addr.getAddressLine(2) : "";
+					addr.setAddressLine(addr.getMaxAddressLineIndex()+1, addressLine);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-
-		if(addresses==null || addresses.isEmpty()){
+		
+		if ((addresses == null) || addresses.isEmpty()){
 			addresses = searchPlaces(address);
-			if(addresses==null || addresses.isEmpty()){
-				return count;
-			}
-		} else {
-			for(int i=0; i<addresses.size(); i++){
-				Address addr = addresses.get(i);
-				String addressLine = "";
-				addressLine += addr.getAddressLine(0)!=null ? addr.getAddressLine(0) : "no-name";
-				addressLine += addr.getAddressLine(1)!=null ? "\n" + addr.getAddressLine(1) : "";
-				addressLine += addr.getAddressLine(2)!=null ? ", " + addr.getAddressLine(2) : "";
-				addr.setAddressLine(addr.getMaxAddressLineIndex()+1, addressLine);
-			}
 		}
 
 		addressesReturn.addAll(addresses);
@@ -169,7 +170,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 		HashMap<String, String> params = new HashMap<String, String>();
 		Places p;
 
-		if(placesService.equals("Google Places")){
+		if(placesService.equals(context.getResources().getStringArray(R.array.available_geocoder_providers)[1])){
 			params.put(GooglePlaces.PARAM_LOCATION, Double.toString(selectedServer.getCenterLatitude()) + "," + Double.toString(selectedServer.getCenterLongitude()));
 			params.put(GooglePlaces.PARAM_RADIUS, Double.toString(selectedServer.getRadius()));
 			params.put(GooglePlaces.PARAM_NAME, name);

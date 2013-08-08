@@ -4,14 +4,15 @@
     <PreferenceCategory android:title="@string/routing_options" android:key="routing_options">
         <CheckBoxPreference android:key="wheelchair_accessible" android:defaultValue="false" android:summary="@string/wheelchair_accessibility_description" android:title="@string/wheelchair_accessible"></CheckBoxPreference>
         <EditTextPreference android:key="max_walking_distance" android:defaultValue="@integer/max_walking_distance" android:summary="@string/maximum_walk_description" android:title="@string/maximum_walk" android:numeric="integer"></EditTextPreference>
-        <CheckBoxPreference android:title="@string/auto_detect_server" android:key="auto_detect_server" android:summary="@string/auto_detect_server_description" android:defaultValue="true"></CheckBoxPreference>
+        <CheckBoxPreference android:title="@string/auto_detect_server" android:key="auto_detect_server" android:summary="@string/auto_detect_server_description" android:defaultValue="true" android:checked="true"></CheckBoxPreference>
         <Preference android:title="@string/refresh_server_list" android:key="refresh_server_list"/>
         <CheckBoxPreference android:title="@string/selected_custom_server_title" android:key="selected_custom_server" android:defaultValue="false"></CheckBoxPreference>
         <EditTextPreference android:key="custom_server_url" android:title="@string/custom_server_url"></EditTextPreference>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/map_options" android:key="map_options">
-        <ListPreference android:title="@string/geocoder_preference_provider_title" android:key="geocoder_provider" android:summary="@string/geocoder_preference_provider_summary"></ListPreference>
-        <ListPreference android:title="@string/map_tile_provider" android:key="map_tile_source" android:summary="@string/map_tile_provider_description"></ListPreference>
+        <CheckBoxPreference android:title="@string/use_android_geocoder_title" android:key="use_android_geocoder" android:summary="@string/use_android_geocoder_activated_nominatim_fallback" android:defaultValue="true" android:checked="true"></CheckBoxPreference>
+        <ListPreference android:title="@string/geocoder_preference_provider_title" android:key="geocoder_provider" android:state_selected="true"></ListPreference>
+        <ListPreference android:title="@string/map_tile_provider" android:key="map_tile_source" android:summary="@string/map_tile_provider_description" android:state_selected="true"></ListPreference>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/feedback" android:key="feedback_options">
         <Preference android:title="@string/feedback_android_developer" android:key="otp_provider_feedback"/>

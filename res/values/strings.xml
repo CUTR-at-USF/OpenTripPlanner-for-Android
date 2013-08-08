@@ -70,7 +70,14 @@
     <string name="refresh_server_list">Refresh server list</string>
     <string name="alternative_routes">Select a route</string>
     <string name="geocoder_preference_provider_title">Geocoder Provider</string>
-    <string name="geocoder_preference_provider_summary">Select a provider for use in geocoder</string>
+    <string name="geocoder_preference_provider_nominatim_fallback">Using Mapquest Nominatim as fallback</string>
+    <string name="geocoder_preference_provider_google_places_fallback">Using Google Places as fallback</string>
+    <string name="geocoder_preference_provider_nominatim_alone">Using Mapquest Nominatim</string>
+    <string name="geocoder_preference_provider_google_places_alone">Using Google Places</string>
+    <string name="use_android_geocoder_title">Activate Android Geocoder</string>
+    <string name="use_android_geocoder_activated_nominatim_fallback">In use along with Mapquest Nominatim</string>
+    <string name="use_android_geocoder_activated_google_places_fallback">In use along with Google Places</string>
+    <string name="use_android_geocoder_disactivated">Android Geocoder is not in use</string>
     <string name="info_server_no_server_selected">No server is selected</string>
     <string name="info_server_error">Not possible to obtain server info</string>
     <string name="selected_custom_server_title">Use custom server</string>
@@ -82,7 +89,6 @@
     <string name="play_services_error">Not possible to contact Google servers, app may not work correctly</string>
     <string name="location_error">Not possible to retrieve actual location.</string>
     <string-array name="available_geocoder_providers">
-        <item>Android Geocoder</item>
         <item>MapQuest Nominatim</item>
         <item>Google Places</item>
     </string-array>
