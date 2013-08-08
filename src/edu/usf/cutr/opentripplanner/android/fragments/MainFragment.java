@@ -57,6 +57,8 @@ import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -165,8 +167,10 @@ public class MainFragment extends Fragment implements
 	
 	private boolean appStarts = true;
 	
-//	private boolean isStartLocationGeocodingProcessed = false;
-//	private boolean isEndLocationGeocodingProcessed = true;
+	private boolean isStartLocationGeocodingProcessed = false;
+	private boolean isEndLocationGeocodingProcessed = false;
+	
+	private boolean locationChangedByUser = true;
 
 	// private Spinner ddlGeocoder;
 
@@ -405,7 +409,7 @@ public class MainFragment extends Fragment implements
 							if (mCurrentLatLng != null){
 								SharedPreferences.Editor prefsEditor = prefs.edit();
 								if (buttonID == R.id.btnStartLocation) {
-									tbStartLocation.setText("My Location");
+									setTextBoxLocation("My Location", true);
 									prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true);
 
 									if (mCurrentLatLng != null) {
@@ -416,7 +420,7 @@ public class MainFragment extends Fragment implements
 										}
 									}
 								} else if (buttonID == R.id.btnEndLocation) {
-									tbEndLocation.setText("My Location");
+									setTextBoxLocation("My Location", false);
 									prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, true);
 
 									if (mCurrentLatLng != null) {
@@ -451,7 +455,7 @@ public class MainFragment extends Fragment implements
 									updateMarkerPosition(startMarker.getPosition(), true);
 								}
 								else{
-									tbStartLocation.setText("");
+									setTextBoxLocation("", true);
 									tbStartLocation.setHint(getResources().getString(R.string.need_to_place_marker));
 									tbStartLocation.requestFocus();
 								}
@@ -460,7 +464,7 @@ public class MainFragment extends Fragment implements
 									updateMarkerPosition(endMarker.getPosition(), false);
 								}
 								else{
-									tbEndLocation.setText("");
+									setTextBoxLocation("", false);
 									tbEndLocation.setHint(getResources().getString(R.string.need_to_place_marker));
 									tbEndLocation.requestFocus();
 								}
@@ -637,18 +641,69 @@ public class MainFragment extends Fragment implements
 				}
 				TextView tv = (TextView) v;
 				if (!hasFocus) {
-					if (v.getId() == R.id.tbStartLocation) {
-						processAddress(true, tv.getText().toString());
-					} else if (v.getId() == R.id.tbEndLocation) {
-						processAddress(false, tv.getText().toString());
+					String text = tv.getText().toString();
+					if (text != null){
+						if (v.getId() == R.id.tbStartLocation && !isStartLocationGeocodingProcessed) {
+							processAddress(true, tv.getText().toString());
+						} else if (v.getId() == R.id.tbEndLocation && !isEndLocationGeocodingProcessed) {
+							processAddress(false, tv.getText().toString());
+						}
 					}
 				}
 			}
 		};
-		//tbStartLocation.setOnFocusChangeListener(tbLocationOnFocusChangeListener);
-		//tbEndLocation.setOnFocusChangeListener(tbLocationOnFocusChangeListener);
-		
+		tbStartLocation.setOnFocusChangeListener(tbLocationOnFocusChangeListener);
+		tbEndLocation.setOnFocusChangeListener(tbLocationOnFocusChangeListener);
 
+		TextWatcher textWatcherStart = new TextWatcher() {
+
+	        @Override
+	        public void onTextChanged(CharSequence s, int start, int before, int count) {
+	        }
+
+	        @Override
+	        public void beforeTextChanged(CharSequence s, int start, int count,
+	                int after) {
+	        }
+
+	        @Override
+	        public void afterTextChanged(Editable s) {
+	        	if (locationChangedByUser){
+		            isStartLocationGeocodingProcessed = false;
+	        	}
+	        	else{
+	        		locationChangedByUser = true;
+	        	}
+	        }
+	    };
+	    
+	    
+
+		TextWatcher textWatcherEnd = new TextWatcher() {
+
+	        @Override
+	        public void onTextChanged(CharSequence s, int start, int before, int count) {
+	        }
+
+	        @Override
+	        public void beforeTextChanged(CharSequence s, int start, int count,
+	                int after) {
+	        }
+
+	        @Override
+	        public void afterTextChanged(Editable s) {
+	        	if (locationChangedByUser){
+	        		isEndLocationGeocodingProcessed = false;
+	        	}
+	        	else{
+	        		locationChangedByUser = true;
+	        	}
+	        }
+	    };
+	    
+	    tbStartLocation.addTextChangedListener(textWatcherStart);
+	    tbEndLocation.addTextChangedListener(textWatcherEnd);
+		
 		OnEditorActionListener tbLocationOnEditorActionListener = new OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,
@@ -692,8 +747,8 @@ public class MainFragment extends Fragment implements
 		
 		if (savedInstanceState != null){
 			restoredSavedState = true;
-			tbStartLocation.setText(savedInstanceState.getString(OTPApp.BUNDLE_KEY_TB_START_LOCATION));
-			tbEndLocation.setText(savedInstanceState.getString(OTPApp.BUNDLE_KEY_TB_END_LOCATION));
+			setTextBoxLocation(savedInstanceState.getString(OTPApp.BUNDLE_KEY_TB_START_LOCATION), true);
+			setTextBoxLocation(savedInstanceState.getString(OTPApp.BUNDLE_KEY_TB_END_LOCATION), false);
 			CameraPosition camPosition = savedInstanceState.getParcelable(OTPApp.BUNDLE_KEY_MAP_CAMERA);
 			if (camPosition != null){
 				mMap.moveCamera(CameraUpdateFactory.newCameraPosition(camPosition));
@@ -795,10 +850,10 @@ public class MainFragment extends Fragment implements
 		decimalFormatSymbols.setDecimalSeparator('.');
 		DecimalFormat decimalFormat = new DecimalFormat("#.00000", decimalFormatSymbols);
 		if (isStartTb){
-			tbStartLocation.setText(decimalFormat.format(latlng.latitude) + ", " + decimalFormat.format(latlng.longitude));
+			setTextBoxLocation(decimalFormat.format(latlng.latitude) + ", " + decimalFormat.format(latlng.longitude), true);
 		}
 		else{
-			tbEndLocation.setText(decimalFormat.format(latlng.latitude) + ", " + decimalFormat.format(latlng.longitude));
+			setTextBoxLocation(decimalFormat.format(latlng.latitude) + ", " + decimalFormat.format(latlng.longitude), false);
 		}
 	}
 	
@@ -1142,13 +1197,13 @@ public class MainFragment extends Fragment implements
 		if (start) {
 			startMarkerOptions.position(latlng);
 			startMarker.setPosition(latlng);
-			tbStartLocation.setText(addr.getAddressLine(addr
-					.getMaxAddressLineIndex()));
+			setTextBoxLocation(addr.getAddressLine(addr
+					.getMaxAddressLineIndex()), true);
 		} else {
 			endMarkerOptions.position(latlng);
 			endMarker.setPosition(latlng);
-			tbEndLocation.setText(addr.getAddressLine(addr
-					.getMaxAddressLineIndex()));
+			setTextBoxLocation(addr.getAddressLine(addr
+					.getMaxAddressLineIndex()), false);
 		}
 		tripPanel.setOpen(true, true);
 	}
@@ -1166,17 +1221,13 @@ public class MainFragment extends Fragment implements
 	}
 
 	public void setTextBoxLocation(String text, boolean isStartTextBox) {
+		locationChangedByUser = false;
 		if (isStartTextBox) {
 			tbStartLocation.setText(text);
 		} else {
 			tbEndLocation.setText(text);
 		}
 	}
-
-	//
-	// private GeoPoint getPoint(double lat, double lon) {
-	// return (new GeoPoint((int) (lat * 1000000.0), (int) (lon * 1000000.0)));
-	// }
 
 	public void showRouteOnMap(List<Leg> itinerary) {
 		Log.v(TAG,
@@ -1343,6 +1394,12 @@ public class MainFragment extends Fragment implements
 	@Override
 	public void onOTPGeocodingComplete(final boolean isStartTextbox,
 			ArrayList<Address> addressesReturn) {
+		if (isStartTextbox){
+			isStartLocationGeocodingProcessed = true;
+		}
+		else{
+			isEndLocationGeocodingProcessed = true;
+		}
 		// isRealLostFocus = false;
 		
 		try{
