@@ -642,11 +642,19 @@ public class MainFragment extends Fragment implements
 				TextView tv = (TextView) v;
 				if (!hasFocus) {
 					String text = tv.getText().toString();
-					if (text != null){
+					if (!text.isEmpty()){
 						if (v.getId() == R.id.tbStartLocation && !isStartLocationGeocodingProcessed) {
 							processAddress(true, tv.getText().toString());
 						} else if (v.getId() == R.id.tbEndLocation && !isEndLocationGeocodingProcessed) {
 							processAddress(false, tv.getText().toString());
+						}
+					} else {
+						locationChangedByUser = false;
+						if (v.getId() == R.id.tbStartLocation){
+							tv.setHint(getResources().getString(R.string.start_location_hint));
+						}
+						else if (v.getId() == R.id.tbEndLocation){	
+							tv.setHint(getResources().getString(R.string.end_location_hint));
 						}
 					}
 				}

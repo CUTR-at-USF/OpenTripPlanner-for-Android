@@ -18,6 +18,8 @@
     <string name="app_name">OpenTripPlanner</string>
     <string name="servers_spreadsheet_url"><![CDATA[https://spreadsheets.google.com/spreadsheet/pub?hl=en_US&hl=en_US&key=0AgWy8ujaGosCdDhxTC04cUZNeHo0eGFBQTBpU2dxN0E&single=true&gid=0&output=csv]]></string>
     <string name="need_to_place_marker"><string>"Add a position marker..."</string></string>
+    <string name="start_location_hint">Start Location</string>
+    <string name="end_location_hint">End Location</string>
     <string name="metadata_location"><string>"/metadata"</string></string>
     <string name="metadata_request_successful">Metadata dowloaded correctly</string>
     <string name="metadata_request_progress">Getting graph metadata. Please wait...</string>
@@ -80,6 +82,7 @@
     <string name="play_services_error">Not possible to contact Google servers, app may not work correctly</string>
     <string name="location_error">Not possible to retrieve actual location.</string>
     <string-array name="available_geocoder_providers">
+        <item>Android Geocoder</item>
         <item>MapQuest Nominatim</item>
         <item>Google Places</item>
     </string-array>

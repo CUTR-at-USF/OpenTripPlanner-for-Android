@@ -124,7 +124,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_toLeftOf="@+id/btnEndLocation"
-                    android:hint="End Location"
+                    android:hint="@string/end_location_hint"
                     android:selectAllOnFocus="true"
                     android:singleLine="true" >
                 </EditText>
