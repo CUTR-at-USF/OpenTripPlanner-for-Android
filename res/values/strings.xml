@@ -43,6 +43,7 @@
     <string name="end_marker_title">Route End</string>
     <string name="end_marker_activated">End Location</string>
     <string name="end_marker_description">Long press to drag...</string>
+    <string name="marker_out_of_boundaries">Out of boundaries rectangle, marker not set</string>
     <string name="markers_dialog_title">Choose Type for Point</string>
     <string name="choose_geocoder">Select the address</string>
     <string name="wheelchair_accessible">Wheelchair Accessible</string>

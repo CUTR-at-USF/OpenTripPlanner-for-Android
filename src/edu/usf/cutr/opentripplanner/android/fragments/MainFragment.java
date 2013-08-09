@@ -102,6 +102,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.TileOverlay;
@@ -192,6 +193,9 @@ public class MainFragment extends Fragment implements
 	
 	ArrayList<Marker> modeMarkers;
 	ArrayList<MarkerOptions> modeMarkersOptions;
+	
+	Polyline boudariesPolyline;
+	PolylineOptions boundariesPolylineOptions;
 
 	private SharedPreferences prefs;
 	private OTPApp app;
@@ -333,9 +337,10 @@ public class MainFragment extends Fragment implements
 			String bounds;
 			if ((bounds = prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS, null)) != null){
 				s.setBounds(bounds);
+				addBoundariesRectangle(s);
 			}
 			app.setSelectedServer(s);
-
+			
 			Log.v(TAG, "Now using custom OTP server: " + baseURL);
 		}
 		else{
@@ -344,8 +349,11 @@ public class MainFragment extends Fragment implements
 			if (serverId != 0){
 				dataSource.open();
 				Server s = new Server(dataSource.getServer(prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)));
-				app.setSelectedServer(s);
 				dataSource.close();
+				
+				app.setSelectedServer(s);
+				addBoundariesRectangle(s);
+				
 				Log.v(TAG, "Now using OTP server: " + s.getRegion());
 			}
 		}
@@ -779,7 +787,7 @@ public class MainFragment extends Fragment implements
 				ofl.onItinerariesLoaded(otpBundle.getItineraryList());
 				ofl.onItinerarySelected(otpBundle.getCurrentItineraryIndex());
 			}
-			Parcelable[] parcelableArrayPolyline = savedInstanceState.getParcelableArray(OTPApp.BUNDLE_KEY_MAP_POLYLINE_OPTIONS);
+			Parcelable[] parcelableArrayPolyline = savedInstanceState.getParcelableArray(OTPApp.BUNDLE_KEY_MAP_ROUTE_POLYLINE_OPTIONS);
 
 			if (parcelableArrayPolyline != null){
 				PolylineOptions[] polylineOptionsArray = Arrays.copyOf(parcelableArrayPolyline, parcelableArrayPolyline.length, PolylineOptions[].class);
@@ -802,6 +810,8 @@ public class MainFragment extends Fragment implements
 				}
 			}
 			
+			boundariesPolylineOptions = (PolylineOptions) savedInstanceState.get(OTPApp.BUNDLE_KEY_MAP_BOUNDARIES_POLYLINE_OPTIONS);
+			boudariesPolyline = mMap.addPolyline(boundariesPolylineOptions);
 		}
 		else{
 			restoredSavedState = false;
@@ -873,53 +883,61 @@ public class MainFragment extends Fragment implements
 	private void setMarker(boolean isStartMarker, LatLng latlng, boolean showMessage){
 		SharedPreferences.Editor prefsEditor = prefs.edit();
 		
-		if (showMessage){
-			String toasText;
-			if (isStartMarker){
-				toasText = getResources().getString(R.string.start_marker_activated);
+		if (((app.getSelectedServer() != null) && LocationUtil.checkPointInBoundingBox(latlng, app.getSelectedServer(), 1000)) 
+				|| (app.getSelectedServer() == null)){
+			if (showMessage){
+				String toasText;
+				if (isStartMarker){
+					toasText = getResources().getString(R.string.start_marker_activated);
+				}
+				else{
+					toasText = getResources().getString(R.string.end_marker_activated);
+				}
+				Toast.makeText(getActivity().getApplicationContext(), toasText, Toast.LENGTH_SHORT).show();
 			}
-			else{
-				toasText = getResources().getString(R.string.end_marker_activated);
+			
+			if(isStartMarker) {
+				if (startMarker == null){
+					startMarkerOptions = new MarkerOptions()
+										.position(latlng)
+										.title(getResources().getString(R.string.start_marker_title))
+										.snippet(getResources().getString(R.string.start_marker_description))
+										.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+										.draggable(true);
+					startMarker = mMap.addMarker(startMarkerOptions);
+				}
+				else{
+					startMarkerOptions.position(latlng);
+					startMarker.setPosition(latlng);
+				}
+				MainFragment.this.setLocationTb(latlng, true);
+				prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, false);
+				updateMarkerPosition(latlng, true);
 			}
-			Toast.makeText(getActivity().getApplicationContext(), toasText, Toast.LENGTH_SHORT).show();
+			else {
+				if (endMarker == null){
+					endMarkerOptions = new MarkerOptions()
+									    .position(latlng)
+										.title(getResources().getString(R.string.end_marker_title))
+										.snippet(getResources().getString(R.string.end_marker_description))
+										.draggable(true);
+					endMarker = mMap.addMarker(endMarkerOptions);
+				}			
+				else{
+					endMarkerOptions.position(latlng);
+					endMarker.setPosition(latlng);
+				}
+				MainFragment.this.setLocationTb(latlng, false);
+				prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false);
+				updateMarkerPosition(latlng, false);
+			}
+			prefsEditor.commit();
 		}
-		
-		if(isStartMarker) {
-			if (startMarker == null){
-				startMarkerOptions = new MarkerOptions()
-									.position(latlng)
-									.title(getResources().getString(R.string.start_marker_title))
-									.snippet(getResources().getString(R.string.start_marker_description))
-									.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-									.draggable(true);
-				startMarker = mMap.addMarker(startMarkerOptions);
+		else{
+			if (showMessage){
+				Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.marker_out_of_boundaries), Toast.LENGTH_SHORT).show();
 			}
-			else{
-				startMarkerOptions.position(latlng);
-				startMarker.setPosition(latlng);
-			}
-			MainFragment.this.setLocationTb(latlng, true);
-			prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, false);
-			updateMarkerPosition(latlng, true);
 		}
-		else {
-			if (endMarker == null){
-				endMarkerOptions = new MarkerOptions()
-								    .position(latlng)
-									.title(getResources().getString(R.string.end_marker_title))
-									.snippet(getResources().getString(R.string.end_marker_description))
-									.draggable(true);
-				endMarker = mMap.addMarker(endMarkerOptions);
-			}			
-			else{
-				endMarkerOptions.position(latlng);
-				endMarker.setPosition(latlng);
-			}
-			MainFragment.this.setLocationTb(latlng, false);
-			prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false);
-			updateMarkerPosition(latlng, false);
-		}
-		prefsEditor.commit();
 	}
 	
 	private String getLocationTbText(boolean isTbStartLocation){
@@ -970,12 +988,15 @@ public class MainFragment extends Fragment implements
 		if (routeOptions != null){
 			Object[] objectArray = routeOptions.toArray();
 			PolylineOptions[] polylineOptionsArray = Arrays.copyOf(objectArray, objectArray.length, PolylineOptions[].class);
-			bundle.putParcelableArray(OTPApp.BUNDLE_KEY_MAP_POLYLINE_OPTIONS, polylineOptionsArray);
+			bundle.putParcelableArray(OTPApp.BUNDLE_KEY_MAP_ROUTE_POLYLINE_OPTIONS, polylineOptionsArray);
 		}
 		if (modeMarkersOptions != null){
 			Object[] objectArray = modeMarkersOptions.toArray();
 			MarkerOptions[] modeMarkersOptions = Arrays.copyOf(objectArray, objectArray.length, MarkerOptions[].class);
 			bundle.putParcelableArray(OTPApp.BUNDLE_KEY_MAP_MODE_MARKERS_OPTIONS, modeMarkersOptions);
+		}
+		if (boundariesPolylineOptions != null){
+			bundle.putParcelable(OTPApp.BUNDLE_KEY_MAP_BOUNDARIES_POLYLINE_OPTIONS, boundariesPolylineOptions);
 		}
 		bundle.putString(OTPApp.BUNDLE_KEY_TB_START_LOCATION, tbStartLocation.getText().toString());
 		bundle.putString(OTPApp.BUNDLE_KEY_TB_END_LOCATION, tbEndLocation.getText().toString());
@@ -1096,9 +1117,11 @@ public class MainFragment extends Fragment implements
 					ServersDataSource dataSource = ((MyActivity)getActivity()).getDatasource();
 					dataSource.open();
 					Server s = new Server(dataSource.getServer(prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)));
-					app.setSelectedServer(s);
 					dataSource.close();
 					
+					app.setSelectedServer(s);
+					addBoundariesRectangle(s);
+
 					LatLng mCurrentLatLng = getLastLocation();
 					LatLng serverCenter = new LatLng(s.getCenterLatitude(), s.getCenterLongitude());
 					if (((mCurrentLatLng != null) && !LocationUtil.checkPointInBoundingBox(mCurrentLatLng, s, 1000)) || (mCurrentLatLng == null)){
@@ -1381,7 +1404,7 @@ public class MainFragment extends Fragment implements
 		app.setSelectedServer(server);
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
 		
-		if (!prefs.getBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)){
+		if (!prefs.getBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)){		
 			LatLng mCurrentLatLng = getLastLocation();
 			
 			if ((mCurrentLatLng != null) && (LocationUtil.checkPointInBoundingBox(mCurrentLatLng, server, 1000))){
@@ -1618,6 +1641,8 @@ public class MainFragment extends Fragment implements
 		Log.v(TAG, "LowerLeft: " + Double.toString(lowerLeftLatitude)+","+Double.toString(lowerLeftLongitude));
 		Log.v(TAG, "UpperRight" + Double.toString(upperRightLatitude)+","+Double.toString(upperRightLongitude));	
 		
+		addBoundariesRectangle(selectedServer);
+		
 		LatLng serverCenter = new LatLng(selectedServer.getCenterLatitude(), selectedServer.getCenterLongitude());
 		
 		LatLng mCurrentLatLng = getLastLocation();
@@ -1649,5 +1674,21 @@ public class MainFragment extends Fragment implements
 		
 	}
 
+	public void addBoundariesRectangle(Server server){
+		List<LatLng> bounds = new ArrayList<LatLng>();
+		bounds.add(new LatLng(server.getLowerLeftLatitude(), server.getLowerLeftLongitude()));
+		bounds.add(new LatLng(server.getLowerLeftLatitude(), server.getUpperRightLongitude()));
+		bounds.add(new LatLng(server.getUpperRightLatitude(), server.getUpperRightLongitude()));
+		bounds.add(new LatLng(server.getUpperRightLatitude(), server.getLowerLeftLongitude()));
+		bounds.add(new LatLng(server.getLowerLeftLatitude(), server.getLowerLeftLongitude()));
+
+		if (boundariesPolylineOptions != null){
+			boudariesPolyline.remove();
+		}
+		boundariesPolylineOptions = new PolylineOptions()
+						 .addAll(bounds)
+						 .color(Color.GRAY);
+		boudariesPolyline = mMap.addPolyline(boundariesPolylineOptions);
+	}
 
 }

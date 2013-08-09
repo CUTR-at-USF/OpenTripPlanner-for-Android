@@ -50,8 +50,9 @@ public class OTPApp extends Application {
     public static final String BUNDLE_KEY_MAP_CAMERA = "Map Camera";
     public static final String BUNDLE_KEY_MAP_START_MARKER_OPTIONS = "Map StartMarkerOptions";
     public static final String BUNDLE_KEY_MAP_END_MARKER_OPTIONS = "Map EndMarkerOptions";
-    public static final String BUNDLE_KEY_MAP_POLYLINE_OPTIONS = "Map PolylineOptions";
+    public static final String BUNDLE_KEY_MAP_ROUTE_POLYLINE_OPTIONS = "Map RoutePolylineOptions";
     public static final String BUNDLE_KEY_MAP_MODE_MARKERS_OPTIONS = "Map ModeMarkersOptions";
+    public static final String BUNDLE_KEY_MAP_BOUNDARIES_POLYLINE_OPTIONS = "Map BoundariesPolylineOptions";
     public static final String BUNDLE_KEY_TB_START_LOCATION = "tbStartLocation";
     public static final String BUNDLE_KEY_TB_END_LOCATION = "tbEndLocation";
     public static final String BUNDLE_KEY_DDL_OPTIMIZATION = "ddlOptimization";
