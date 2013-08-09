@@ -65,6 +65,10 @@ public class OTPApp extends Application {
     public static final String BUNDLE_KEY_DDL_TRAVEL_MODE = "ddlTravelMode";
     public static final String BUNDLE_KEY_OTP_BUNDLE = "OTP bundle";
     public static final String BUNDLE_KEY_PANEL_STATE = "panel state";
+    public static final String BUNDLE_KEY_APP_STARTS = "app starts";
+    public static final String BUNDLE_KEY_IS_START_LOCATION_GEOCODING_PROCESSED = "startlocation geocoding processed";
+    public static final String BUNDLE_KEY_IS_END_LOCATION_GEOCODING_PROCESSED = "enlocation geocoding processed";
+    public static final String BUNDLE_KEY_LOCATION_CHANGED_BY_USER = "location changed by user";
     
     public static final int COLOR_ROUTE_LINE = 0x7F0000FF;
 

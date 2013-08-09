@@ -797,6 +797,11 @@ public class MainFragment extends Fragment implements
 			if (endMarkerOptions != null){
 				endMarker = mMap.addMarker(endMarkerOptions);
 			}
+			isStartLocationGeocodingProcessed = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_IS_START_LOCATION_GEOCODING_PROCESSED);
+			isEndLocationGeocodingProcessed = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_IS_END_LOCATION_GEOCODING_PROCESSED);
+			appStarts = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_APP_STARTS);
+			locationChangedByUser = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_LOCATION_CHANGED_BY_USER);
+
 			ddlOptimization.setSelection(savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION));
 			ddlTravelMode.setSelection(savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE));
 			OTPBundle otpBundle = (OTPBundle) savedInstanceState.getSerializable(OTPApp.BUNDLE_KEY_OTP_BUNDLE);
@@ -1002,6 +1007,10 @@ public class MainFragment extends Fragment implements
 		bundle.putParcelable(OTPApp.BUNDLE_KEY_MAP_START_MARKER_OPTIONS, startMarkerOptions);
 		bundle.putParcelable(OTPApp.BUNDLE_KEY_MAP_END_MARKER_OPTIONS, endMarkerOptions);
 		bundle.putBoolean(OTPApp.BUNDLE_KEY_PANEL_STATE, tripPanel.isOpen());
+		bundle.putBoolean(OTPApp.BUNDLE_KEY_APP_STARTS, appStarts);
+		bundle.putBoolean(OTPApp.BUNDLE_KEY_IS_START_LOCATION_GEOCODING_PROCESSED, isStartLocationGeocodingProcessed);
+		bundle.putBoolean(OTPApp.BUNDLE_KEY_IS_END_LOCATION_GEOCODING_PROCESSED, isEndLocationGeocodingProcessed);
+		bundle.putBoolean(OTPApp.BUNDLE_KEY_LOCATION_CHANGED_BY_USER, locationChangedByUser);
 		if (routeOptions != null){
 			Object[] objectArray = routeOptions.toArray();
 			PolylineOptions[] polylineOptionsArray = Arrays.copyOf(objectArray, objectArray.length, PolylineOptions[].class);
