@@ -18,6 +18,7 @@ package edu.usf.cutr.opentripplanner.android.fragments;
 
 import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
@@ -46,7 +47,6 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Location;
@@ -102,7 +102,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.TileOverlay;
@@ -163,8 +162,6 @@ public class MainFragment extends Fragment implements
 	private Spinner ddlOptimization;
 	private Spinner ddlTravelMode;
 	private Button btnPlanTrip;
-	private ImageView googlePlacesIcon;
-	
 	private LatLng savedLastLocation;
 	
 	private boolean appStarts = true;
@@ -555,20 +552,27 @@ public class MainFragment extends Fragment implements
 				tripPanel.setOpen(false, true);
 				
 				Request request = new Request();
-				request.setFrom(URLEncoder.encode(startLocationString));
-				request.setTo(URLEncoder.encode(endLocationString));
+				try {
+					request.setFrom(URLEncoder.encode(startLocationString, "UTF-8"));
+					request.setTo(URLEncoder.encode(endLocationString, "UTF-8"));
+				} catch (UnsupportedEncodingException e1) {
+					e1.printStackTrace();
+				}
+
 				request.setArriveBy(false);
 				request.setOptimize(((OptimizeSpinnerItem) ddlOptimization
 						.getSelectedItem()).getOptimizeType());
 				request.setModes(((TraverseModeSpinnerItem) ddlTravelMode
 						.getSelectedItem()).getTraverseModeSet());
+				
+				Integer defaultMaxWalkInt = getResources().getInteger(R.integer.max_walking_distance);
 
 				try {
-					Double maxWalk = Double.parseDouble(prefs.getString(
-							OTPApp.PREFERENCE_KEY_MAX_WALKING_DISTANCE, "1600"));
+					Double maxWalk = Double.parseDouble(prefs.getString(OTPApp.PREFERENCE_KEY_MAX_WALKING_DISTANCE,
+							defaultMaxWalkInt.toString()));
 					request.setMaxWalkDistance(maxWalk);
 				} catch (NumberFormatException ex) {
-					request.setMaxWalkDistance(new Double("1600"));
+					request.setMaxWalkDistance((double)defaultMaxWalkInt);
 				}
 
 				request.setWheelchair(prefs.getBoolean(OTPApp.PREFERENCE_KEY_WHEEL_ACCESSIBLE,
@@ -883,7 +887,7 @@ public class MainFragment extends Fragment implements
 	private void setMarker(boolean isStartMarker, LatLng latlng, boolean showMessage){
 		SharedPreferences.Editor prefsEditor = prefs.edit();
 		
-		if (((app.getSelectedServer() != null) && LocationUtil.checkPointInBoundingBox(latlng, app.getSelectedServer(), 1000)) 
+		if (((app.getSelectedServer() != null) && LocationUtil.checkPointInBoundingBox(latlng, app.getSelectedServer(), OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)) 
 				|| (app.getSelectedServer() == null)){
 			if (showMessage){
 				String toasText;
@@ -1124,7 +1128,7 @@ public class MainFragment extends Fragment implements
 
 					LatLng mCurrentLatLng = getLastLocation();
 					LatLng serverCenter = new LatLng(s.getCenterLatitude(), s.getCenterLongitude());
-					if (((mCurrentLatLng != null) && !LocationUtil.checkPointInBoundingBox(mCurrentLatLng, s, 1000)) || (mCurrentLatLng == null)){
+					if (((mCurrentLatLng != null) && !LocationUtil.checkPointInBoundingBox(mCurrentLatLng, s, OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)) || (mCurrentLatLng == null)){
 						mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, app.defaultInitialZoomLevel));	
 						setMarker(true, serverCenter, false);
 					}
@@ -1196,7 +1200,13 @@ public class MainFragment extends Fragment implements
 			uriText += "?subject=" + subject;
 
 			String content = ((MyActivity)getActivity()).getCurrentRequestString();
-			uriText += "&body=" + URLEncoder.encode(content);
+			
+			try {
+				uriText += "&body=" + URLEncoder.encode(content, "UTF-8");
+			} catch (UnsupportedEncodingException e1) {
+				e1.printStackTrace();
+				return false;
+			}
 
 			Uri uri = Uri.parse(uriText);
 
@@ -1369,20 +1379,6 @@ public class MainFragment extends Fragment implements
 		return icon;
 	}
 
-
-	private int getPathColor(String mode) {
-		if (mode.equalsIgnoreCase("WALK")) {
-			return Color.DKGRAY;
-		} else if (mode.equalsIgnoreCase("BUS")) {
-			return Color.RED;
-		} else if (mode.equalsIgnoreCase("TRAIN")) {
-			return Color.YELLOW;
-		} else if (mode.equalsIgnoreCase("BICYCLE")) {
-			return Color.BLUE;
-		}
-		return Color.WHITE;
-	}
-
 	/**
 	 * @return the fragmentListener
 	 */
@@ -1407,7 +1403,7 @@ public class MainFragment extends Fragment implements
 		if (!prefs.getBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)){		
 			LatLng mCurrentLatLng = getLastLocation();
 			
-			if ((mCurrentLatLng != null) && (LocationUtil.checkPointInBoundingBox(mCurrentLatLng, server, 1000))){
+			if ((mCurrentLatLng != null) && (LocationUtil.checkPointInBoundingBox(mCurrentLatLng, server, OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))){
 				mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, app.defaultInitialZoomLevel));
 			}
 			else{
@@ -1535,8 +1531,8 @@ public class MainFragment extends Fragment implements
 		}
 		else{
 			mMap.setMapType(GoogleMap.MAP_TYPE_NONE);
-			MyUrlTileProvider mTileProvider = new MyUrlTileProvider(256, 256, overlayString);
-			actualTileOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mTileProvider).zIndex(-1));
+			MyUrlTileProvider mTileProvider = new MyUrlTileProvider(OTPApp.CUSTOM_MAP_TILE_HEIGHT, OTPApp.CUSTOM_MAP_TILE_HEIGHT, overlayString);
+			actualTileOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mTileProvider).zIndex(OTPApp.CUSTOM_MAP_TILE_Z_INDEX));
 		}
 	}
 	
@@ -1606,7 +1602,7 @@ public class MainFragment extends Fragment implements
 			else{
 				Server selectedServer = app.getSelectedServer();	
 
-				if ((selectedServer != null) && selectedServer.areBoundsSet() && !LocationUtil.checkPointInBoundingBox(mCurrentLatLng, selectedServer, 1000)){
+				if ((selectedServer != null) && selectedServer.areBoundsSet() && !LocationUtil.checkPointInBoundingBox(mCurrentLatLng, selectedServer, OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)){
 					LatLng serverCenter = new LatLng(selectedServer.getCenterLatitude(), selectedServer.getCenterLongitude());
 					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, app.defaultInitialZoomLevel));	
 					setMarker(true, serverCenter, false);
@@ -1647,7 +1643,7 @@ public class MainFragment extends Fragment implements
 		
 		LatLng mCurrentLatLng = getLastLocation();
 		
-		if (((mCurrentLatLng != null) && !LocationUtil.checkPointInBoundingBox(mCurrentLatLng, selectedServer, 1000)) || (mCurrentLatLng == null)){
+		if (((mCurrentLatLng != null) && !LocationUtil.checkPointInBoundingBox(mCurrentLatLng, selectedServer, OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)) || (mCurrentLatLng == null)){
 			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, app.defaultInitialZoomLevel));	
 			setMarker(true, serverCenter, false);
 		}
@@ -1658,7 +1654,7 @@ public class MainFragment extends Fragment implements
         LatLng mCurrentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
 		Server selectedServer = app.getSelectedServer();	
         
-        if ((mCurrentLatLng != null) && (selectedServer != null) && (LocationUtil.checkPointInBoundingBox(mCurrentLatLng, selectedServer, 1000))){
+        if ((mCurrentLatLng != null) && (selectedServer != null) && (LocationUtil.checkPointInBoundingBox(mCurrentLatLng, selectedServer, OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))){
 			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, app.defaultInitialZoomLevel));
 		}
 		else if ((selectedServer != null) && selectedServer.areBoundsSet()){

@@ -40,7 +40,13 @@ public class OTPApp extends Application {
 	public static final String MAP_TILE_GOOGLE_NORMAL = "Google normal";
 	public static final String MAP_TILE_GOOGLE_SATELLITE = "Google satellite";
 	public static final String MAP_TILE_GOOGLE_TERRAIN = "Google terrain";
+    
+    public static final int CUSTOM_MAP_TILE_HEIGHT = 256;
+    public static final int CUSTOM_MAP_TILE_WIDTH = 256;
+    public static final int CUSTOM_MAP_TILE_Z_INDEX = -1;
 	
+    public static final int CHECK_BOUNDS_ACCEPTABLE_ERROR = 1000;
+    
     private static final int MILLISECONDS_PER_SECOND = 1000;
     private static final int UPDATE_INTERVAL_IN_SECONDS = 5;
     public static final long UPDATE_INTERVAL = MILLISECONDS_PER_SECOND * UPDATE_INTERVAL_IN_SECONDS;
