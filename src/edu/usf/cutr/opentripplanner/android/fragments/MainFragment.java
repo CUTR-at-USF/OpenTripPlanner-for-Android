@@ -294,13 +294,13 @@ public class MainFragment extends Fragment implements
 		
 		final OnFragmentListener ofl = this.getFragmentListener();
 		
-		app = ((OTPApp) this.getActivity().getApplication());
+		app = ((OTPApp) getActivity().getApplication());
 		
 		prefs = PreferenceManager.getDefaultSharedPreferences(
-				this.getActivity().getApplicationContext());
+				getActivity().getApplicationContext());
 		prefs.registerOnSharedPreferenceChangeListener(this);
 		
-		locationManager = (LocationManager) this.getActivity()
+		locationManager = (LocationManager) getActivity()
 				.getSystemService(Context.LOCATION_SERVICE);
 		
 		mLocationRequest = LocationRequest.create();
@@ -339,7 +339,7 @@ public class MainFragment extends Fragment implements
 			Log.v(TAG, "Now using custom OTP server: " + baseURL);
 		}
 		else{
-			ServersDataSource dataSource = ((MyActivity)this.getActivity()).getDatasource();
+			ServersDataSource dataSource = ((MyActivity)getActivity()).getDatasource();
 			long serverId = prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0);
 			if (serverId != 0){
 				dataSource.open();
@@ -351,7 +351,7 @@ public class MainFragment extends Fragment implements
 		}
 		
 		ArrayAdapter<OptimizeSpinnerItem> optimizationAdapter = new ArrayAdapter<OptimizeSpinnerItem>(
-				this.getActivity(),
+				getActivity(),
 				android.R.layout.simple_spinner_item,
 				new OptimizeSpinnerItem[] {
 						new OptimizeSpinnerItem("Quickest", OptimizeType.QUICK),
@@ -364,7 +364,7 @@ public class MainFragment extends Fragment implements
 		ddlOptimization.setAdapter(optimizationAdapter);
 
 		ArrayAdapter<TraverseModeSpinnerItem> traverseModeAdapter = new ArrayAdapter<TraverseModeSpinnerItem>(
-				this.getActivity(), android.R.layout.simple_spinner_item,
+				getActivity(), android.R.layout.simple_spinner_item,
 				new TraverseModeSpinnerItem[] {
 						new TraverseModeSpinnerItem("Transit",
 								new TraverseModeSet(TraverseMode.TRANSIT,
@@ -435,7 +435,7 @@ public class MainFragment extends Fragment implements
 								prefsEditor.commit();
 							}
 							else{
-								Toast.makeText(MainFragment.this.getActivity(), getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
+								Toast.makeText(MainFragment.this.getActivity().getApplicationContext(), getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
 							}
 							
 							
@@ -489,10 +489,10 @@ public class MainFragment extends Fragment implements
 				builder.setItems(items, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
 						if (item == 0){
-							setMarker(true, latLngFinal);
+							setMarker(true, latLngFinal, true);
 						}
 						else{
-							setMarker(false, latLngFinal);
+							setMarker(false, latLngFinal, true);
 						}
 					}
 				});
@@ -518,12 +518,12 @@ public class MainFragment extends Fragment implements
 				Boolean isDestinationMyLocation = prefs.getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false);
 				
 				if (isOriginMyLocation && isDestinationMyLocation){
-					Toast.makeText(MainFragment.this.getActivity(), getResources().getString(R.string.origin_destination_are_mylocation), Toast.LENGTH_SHORT).show();
+					Toast.makeText(MainFragment.this.getActivity().getApplicationContext(), getResources().getString(R.string.origin_destination_are_mylocation), Toast.LENGTH_SHORT).show();
 					return;
 				}
 				else if (isOriginMyLocation || isDestinationMyLocation){
 					if (mCurrentLatLng == null){
-						Toast.makeText(MainFragment.this.getActivity(), getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
+						Toast.makeText(MainFragment.this.getActivity().getApplicationContext(), getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
 						return;
 					}
 					else {
@@ -593,10 +593,10 @@ public class MainFragment extends Fragment implements
 			@Override
 			public void onMapClick(LatLng latlng) {
 				if (tbStartLocation.hasFocus()){
-					setMarker(true, latlng);
+					setMarker(true, latlng, true);
 				}
 				else{
-					setMarker(false, latlng);
+					setMarker(false, latlng, true);
 				}
 			}
 		};
@@ -823,10 +823,10 @@ public class MainFragment extends Fragment implements
 	                            .getMap();
 	        // Check if we were successful in obtaining the map.
 	        if (mMap == null) {
-		        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getActivity().getApplicationContext());
+		        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity().getApplicationContext());
 		        
 		        if(status!=ConnectionResult.SUCCESS){
-		            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this.getActivity(), OTPApp.CHECK_GOOGLE_PLAY_REQUEST_CODE);
+		            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, getActivity(), OTPApp.CHECK_GOOGLE_PLAY_REQUEST_CODE);
 		            dialog.show();
 		        }	        
 		    }
@@ -847,13 +847,13 @@ public class MainFragment extends Fragment implements
 	public void runAutoDetectServer(LatLng mCurrentLatLng){
 
 		if (mCurrentLatLng == null){
-			Toast.makeText(MainFragment.this.getActivity(), getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
+			Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
 		}
 
-		ServersDataSource dataSource = ((MyActivity)this.getActivity()).getDatasource();
-		WeakReference<Activity> weakContext = new WeakReference<Activity>(this.getActivity());
+		ServersDataSource dataSource = ((MyActivity)getActivity()).getDatasource();
+		WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
 
-		ServerSelector serverSelector = new ServerSelector(weakContext, this.getActivity().getApplicationContext(), dataSource, this);
+		ServerSelector serverSelector = new ServerSelector(weakContext, getActivity().getApplicationContext(), dataSource, this);
 		serverSelector.execute(mCurrentLatLng);
 		needToRunAutoDetect = false;
 	}
@@ -870,20 +870,22 @@ public class MainFragment extends Fragment implements
 		}
 	}
 	
-	private void setMarker(boolean isStartMarker, LatLng latlng){
+	private void setMarker(boolean isStartMarker, LatLng latlng, boolean showMessage){
 		SharedPreferences.Editor prefsEditor = prefs.edit();
-		String toasText;
-		if (isStartMarker){
-			toasText = getResources().getString(R.string.start_marker_activated);
+		
+		if (showMessage){
+			String toasText;
+			if (isStartMarker){
+				toasText = getResources().getString(R.string.start_marker_activated);
+			}
+			else{
+				toasText = getResources().getString(R.string.end_marker_activated);
+			}
+			Toast.makeText(getActivity().getApplicationContext(), toasText, Toast.LENGTH_SHORT).show();
 		}
-		else{
-			toasText = getResources().getString(R.string.end_marker_activated);
-		}
-		Toast.makeText(MainFragment.this.getActivity(), toasText, Toast.LENGTH_SHORT).show();
 		
 		if(isStartMarker) {
 			if (startMarker == null){
-				Toast.makeText(MainFragment.this.getActivity(), getResources().getString(R.string.start_marker_activated), Toast.LENGTH_SHORT).show();
 				startMarkerOptions = new MarkerOptions()
 									.position(latlng)
 									.title(getResources().getString(R.string.start_marker_title))
@@ -939,7 +941,7 @@ public class MainFragment extends Fragment implements
 	public void onStart() {
 		super.onStart();	
 
-		mLocationClient = new LocationClient(this.getActivity().getApplicationContext(), this, this);
+		mLocationClient = new LocationClient(getActivity().getApplicationContext(), this, this);
 		//mLocationClient.connect();
 		
 		if (!mLocationClient.isConnected() && !mLocationClient.isConnecting()){
@@ -990,9 +992,9 @@ public class MainFragment extends Fragment implements
 	}
 
 	public void processAddress(final boolean isStartTextBox, String address) {
-		WeakReference<Activity> weakContext = new WeakReference<Activity>(this.getActivity());
+		WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
 
-		OTPGeocoding geocodingTask = new OTPGeocoding(weakContext, this.getActivity().getApplicationContext(),
+		OTPGeocoding geocodingTask = new OTPGeocoding(weakContext, getActivity().getApplicationContext(),
 				isStartTextBox, app.getSelectedServer(), prefs.getString(
 						OTPApp.PREFERENCE_KEY_GEOCODER_PROVIDER, getResources().getString(R.string.geocoder_nominatim)),
 				this);	
@@ -1003,7 +1005,7 @@ public class MainFragment extends Fragment implements
 				geocodingTask.execute(address, String.valueOf(mCurrentLatLng.latitude), String.valueOf(mCurrentLatLng.longitude));
 			}
 			else{
-				Toast.makeText(MainFragment.this.getActivity(), getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();	
+				Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();	
 			}
 		}
 		else{
@@ -1083,15 +1085,15 @@ public class MainFragment extends Fragment implements
 			if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)){
 				app.setSelectedServer(new Server(prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, "")));
 				Log.v(TAG, "Now using custom OTP server: " + prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
-				WeakReference<Activity> weakContext = new WeakReference<Activity>(this.getActivity());
+				WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
 
-				MetadataRequest metaRequest = new MetadataRequest(weakContext, this.getActivity().getApplicationContext(), this);
+				MetadataRequest metaRequest = new MetadataRequest(weakContext, getActivity().getApplicationContext(), this);
 				metaRequest.execute(prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
 			}
 			else{
 				long serverId = prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0);
 				if (serverId != 0){
-					ServersDataSource dataSource = ((MyActivity)this.getActivity()).getDatasource();
+					ServersDataSource dataSource = ((MyActivity)getActivity()).getDatasource();
 					dataSource.open();
 					Server s = new Server(dataSource.getServer(prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)));
 					app.setSelectedServer(s);
@@ -1101,7 +1103,7 @@ public class MainFragment extends Fragment implements
 					LatLng serverCenter = new LatLng(s.getCenterLatitude(), s.getCenterLongitude());
 					if (((mCurrentLatLng != null) && !LocationUtil.checkPointInBoundingBox(mCurrentLatLng, s, 1000)) || (mCurrentLatLng == null)){
 						mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, app.defaultInitialZoomLevel));	
-						setMarker(true, serverCenter);
+						setMarker(true, serverCenter, false);
 					}
 				}
 			}
@@ -1136,10 +1138,10 @@ public class MainFragment extends Fragment implements
 	}
 
 	public boolean onOptionsItemSelected(final MenuItem pItem) {
-		OTPApp app = ((OTPApp) this.getActivity().getApplication());
+		OTPApp app = ((OTPApp) getActivity().getApplication());
 		switch (pItem.getItemId()) {
 		case R.id.exit:
-			this.getActivity().finish();
+			getActivity().finish();
 			return true;
 		case R.id.gps_settings:
 			Intent myIntent = new Intent(
@@ -1149,8 +1151,8 @@ public class MainFragment extends Fragment implements
 		case R.id.settings:
 			needToRunAutoDetect = false;
 			appStarts = false;
-			this.getActivity().startActivityForResult(
-					new Intent(this.getActivity(), SettingsActivity.class),
+			getActivity().startActivityForResult(
+					new Intent(getActivity(), SettingsActivity.class),
 					OTPApp.REFRESH_SERVER_LIST_REQUEST_CODE);
 			break;
 		case R.id.feedback:
@@ -1170,7 +1172,7 @@ public class MainFragment extends Fragment implements
 			subject += "[" + d.toString() + "]";
 			uriText += "?subject=" + subject;
 
-			String content = ((MyActivity)this.getActivity()).getCurrentRequestString();
+			String content = ((MyActivity)getActivity()).getCurrentRequestString();
 			uriText += "&body=" + URLEncoder.encode(content);
 
 			Uri uri = Uri.parse(uriText);
@@ -1186,13 +1188,13 @@ public class MainFragment extends Fragment implements
 			if (server == null) {
 				Log.w(TAG,
 						"Tried to get server info when no server was selected");
-				Toast.makeText(getActivity(), getResources().getString(R.string.info_server_no_server_selected), Toast.LENGTH_SHORT).show();
+				Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.info_server_no_server_selected), Toast.LENGTH_SHORT).show();
 				break;
 			}
 		
-			WeakReference<Activity> weakContext = new WeakReference<Activity>(this.getActivity());
+			WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
 
-			ServerChecker serverChecker = new ServerChecker(weakContext, this.getActivity().getApplicationContext(), true);
+			ServerChecker serverChecker = new ServerChecker(weakContext, getActivity().getApplicationContext(), true);
 			serverChecker.execute(server);
 				
 
@@ -1377,7 +1379,7 @@ public class MainFragment extends Fragment implements
 	public void onServerSelectorComplete(Server server) {
 		//Update application server
 		app.setSelectedServer(server);
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getActivity().getApplicationContext());
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
 		
 		if (!prefs.getBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)){
 			LatLng mCurrentLatLng = getLastLocation();
@@ -1388,7 +1390,7 @@ public class MainFragment extends Fragment implements
 			else{
 				LatLng serverCenter = new LatLng(server.getCenterLatitude(), server.getCenterLongitude());
 				mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, app.defaultInitialZoomLevel));
-				setMarker(true, serverCenter);
+				setMarker(true, serverCenter, false);
 			}
 		}
 	}
@@ -1402,7 +1404,7 @@ public class MainFragment extends Fragment implements
 		// onItinerariesLoaded must be invoked before onItinerarySelected(0)
 		ofl.onItinerariesLoaded(itineraries);
 		ofl.onItinerarySelected(0);
-		((MyActivity)this.getActivity()).setCurrentRequestString(currentRequestString);
+		((MyActivity)getActivity()).setCurrentRequestString(currentRequestString);
 		
 		tripPanel.setOpen(false, true);
 	}
@@ -1421,7 +1423,7 @@ public class MainFragment extends Fragment implements
 		
 		try{
 			AlertDialog.Builder geocoderAlert = new AlertDialog.Builder(
-					this.getActivity());
+					getActivity());
 			geocoderAlert.setTitle(R.string.geocoder_results_title)
 					.setMessage(R.string.geocoder_no_results_message)
 					.setCancelable(false)
@@ -1442,7 +1444,7 @@ public class MainFragment extends Fragment implements
 			adjustFocusAfterSelectAddress(isStartTextbox);
 	
 			AlertDialog.Builder geocoderSelector = new AlertDialog.Builder(
-					this.getActivity());
+					getActivity());
 			geocoderSelector.setTitle(R.string.choose_geocoder);
 	
 			final CharSequence[] addressesText = new CharSequence[addressesReturn
@@ -1544,7 +1546,7 @@ public class MainFragment extends Fragment implements
             try {
                 // Start an Activity that tries to resolve the error
                 connectionResult.startResolutionForResult(
-                        this.getActivity(),
+                        getActivity(),
                         OTPApp.CONNECTION_FAILURE_RESOLUTION_REQUEST_CODE);
                 /*
                  * Thrown if Google Play services canceled the original
@@ -1554,7 +1556,7 @@ public class MainFragment extends Fragment implements
                 e.printStackTrace();
             }
         } else {
-			AlertDialog.Builder errorPlay = new AlertDialog.Builder(this.getActivity());
+			AlertDialog.Builder errorPlay = new AlertDialog.Builder(getActivity());
 			errorPlay.setTitle("Play Services Error ")
 					.setMessage(getResources().getString(R.string.play_services_error) + connectionResult.getErrorCode())
 					.setNeutralButton("OK", null)
@@ -1584,7 +1586,7 @@ public class MainFragment extends Fragment implements
 				if ((selectedServer != null) && selectedServer.areBoundsSet() && !LocationUtil.checkPointInBoundingBox(mCurrentLatLng, selectedServer, 1000)){
 					LatLng serverCenter = new LatLng(selectedServer.getCenterLatitude(), selectedServer.getCenterLongitude());
 					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, app.defaultInitialZoomLevel));	
-					setMarker(true, serverCenter);
+					setMarker(true, serverCenter, false);
 				}
 			}
 		}	
@@ -1609,7 +1611,7 @@ public class MainFragment extends Fragment implements
 				"," + String.valueOf(upperRightLatitude) + "," + String.valueOf(upperRightLongitude);
 		selectedServer.setBounds(bounds);
 		
-		SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(this.getActivity().getApplicationContext()).edit();
+		SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).edit();
 		prefsEditor.putString(PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS, bounds);
 		prefsEditor.commit();
 		
@@ -1622,7 +1624,7 @@ public class MainFragment extends Fragment implements
 		
 		if (((mCurrentLatLng != null) && !LocationUtil.checkPointInBoundingBox(mCurrentLatLng, selectedServer, 1000)) || (mCurrentLatLng == null)){
 			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, app.defaultInitialZoomLevel));	
-			setMarker(true, serverCenter);
+			setMarker(true, serverCenter, false);
 		}
 	}
 
@@ -1637,13 +1639,13 @@ public class MainFragment extends Fragment implements
 		else if ((selectedServer != null) && selectedServer.areBoundsSet()){
 			LatLng serverCenter = new LatLng(selectedServer.getCenterLatitude(), selectedServer.getCenterLongitude());
 			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, app.defaultInitialZoomLevel));
-			setMarker(true, serverCenter);
+			setMarker(true, serverCenter, false);
 		}
 
         String msg = "Updated Location: " +
                 Double.toString(location.getLatitude()) + "," +
                 Double.toString(location.getLongitude());
-        Toast.makeText(this.getActivity(), msg, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity().getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
 		
 	}
 
