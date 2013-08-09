@@ -618,28 +618,41 @@ public class MainFragment extends Fragment implements
 		
 		
 		OnMarkerDragListener omdl = new OnMarkerDragListener() {
-
+			
+			LatLng markerPreviousPosition;
+			
 			@Override
 			public void onMarkerDrag(Marker marker) {
-				
 			}
 
 			@Override
-			public void onMarkerDragEnd(Marker marker) {
-				if ((startMarker != null) && (marker.hashCode() == startMarker.hashCode())){
-					LatLng latlng = marker.getPosition();
-					updateMarkerPosition(latlng, true);
+			public void onMarkerDragEnd(Marker marker) {	
+				LatLng markerLatlng = marker.getPosition();
+
+				if (((app.getSelectedServer() != null) && LocationUtil.checkPointInBoundingBox(markerLatlng, app.getSelectedServer(), OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)) 
+						|| (app.getSelectedServer() == null)){
+					if ((startMarker != null) && (marker.hashCode() == startMarker.hashCode())){
+						updateMarkerPosition(markerLatlng, true);
+					}
+					else if ((endMarker != null) && (marker.hashCode() == endMarker.hashCode())){
+						updateMarkerPosition(markerLatlng, false);
+					}
 				}
-				else if ((endMarker != null) && (marker.hashCode() == endMarker.hashCode())){
-					LatLng latlng = marker.getPosition();
-					updateMarkerPosition(latlng, false);
+				else{
+					marker.setPosition(markerPreviousPosition);
+					Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.marker_out_of_boundaries), Toast.LENGTH_SHORT).show();
 				}
+
 				
 			}
 			
 			@Override
 			public void onMarkerDragStart(Marker marker) {
-				
+				LatLng markerLatlng = marker.getPosition();
+
+				if ((app.getSelectedServer() != null) && LocationUtil.checkPointInBoundingBox(markerLatlng, app.getSelectedServer(), OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)){
+					markerPreviousPosition = markerLatlng;
+				}
 			}
 
 		};
