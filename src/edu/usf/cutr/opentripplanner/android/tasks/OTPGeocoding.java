@@ -257,12 +257,14 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 	}
 
 	protected void onPostExecute(Long result) {
-		try{		
-			if (progressDialog != null && progressDialog.isShowing()) {
-				progressDialog.dismiss();
+		if (activity.get() != null){
+			try{		
+				if (progressDialog != null && progressDialog.isShowing()) {
+					progressDialog.dismiss();
+				}
+			}catch(Exception e){
+				Log.e(TAG, "Error in Geocoding PostExecute dismissing dialog: " + e);
 			}
-		}catch(Exception e){
-			Log.e(TAG, "Error in Geocoding PostExecute dismissing dialog: " + e);
 		}
 		
 		callback.onOTPGeocodingComplete(isStartTextbox, addressesReturn);
