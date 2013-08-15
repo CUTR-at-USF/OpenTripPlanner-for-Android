@@ -143,13 +143,13 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 			mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_NORMAL);
 		}
 		else if (actualMapTileProvider.equals(OTPApp.MAP_TILE_GOOGLE_HYBRID)){
-			mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_NORMAL);
+			mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_HYBRID);
 		}
 		else if (actualMapTileProvider.equals(OTPApp.MAP_TILE_GOOGLE_SATELLITE)){
-			mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_NORMAL);
+			mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_SATELLITE);
 		}
 		else if (actualMapTileProvider.equals(OTPApp.MAP_TILE_GOOGLE_TERRAIN)){
-			mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_NORMAL);
+			mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_TERRAIN);
 		}
 		
 		mapTileProvider.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
@@ -171,13 +171,13 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 					mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_NORMAL);
 				}
 				else if (value.equals(OTPApp.MAP_TILE_GOOGLE_HYBRID)){
-					mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_NORMAL);
+					mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_HYBRID);
 				}
 				else if (value.equals(OTPApp.MAP_TILE_GOOGLE_SATELLITE)){
-					mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_NORMAL);
+					mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_SATELLITE);
 				}
 				else if (value.equals(OTPApp.MAP_TILE_GOOGLE_TERRAIN)){
-					mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_NORMAL);
+					mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_TERRAIN);
 				}
 
 				return true;
