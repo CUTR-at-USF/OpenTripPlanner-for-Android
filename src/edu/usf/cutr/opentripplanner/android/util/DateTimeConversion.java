@@ -60,7 +60,9 @@ public class DateTimeConversion {
 			return null;
 		long m = (sec%3600)/60;
 		long s = (sec%3600)%60;
-		text += Long.toString(h) + "h" + " ";
+		if (h > 0){
+			text += Long.toString(h) + "h" + " ";
+		}
 		text += Long.toString(m) + "m" + " ";
 		text += Long.toString(s) + "s" + " ";
 		return text;
