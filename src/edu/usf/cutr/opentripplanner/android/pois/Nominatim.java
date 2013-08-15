@@ -156,21 +156,23 @@ public class Nominatim implements Places{
 
 		// Get JSON
 		JSONArray json = this.requestPlaces(paramName, paramLeft, paramTop, paramRight, paramBottom);
-
-		// Decrypt JSON
-		try {
-			for(int i = 0; i < json.length(); i++){
-				JSONObject r = json.getJSONObject(i);
-
-				String name = r.getString(TAG_NAME);
-				double lat = Double.parseDouble(r.getString(TAG_LATITUDE));
-				double lon = Double.parseDouble(r.getString(TAG_LONGITUDE));
-
-				POI point = new POI(name, lat, lon);
-				pois.add(point);
+		
+		if (json != null){
+			// Decrypt JSON
+			try {
+				for(int i = 0; i < json.length(); i++){
+					JSONObject r = json.getJSONObject(i);
+	
+					String name = r.getString(TAG_NAME);
+					double lat = Double.parseDouble(r.getString(TAG_LATITUDE));
+					double lon = Double.parseDouble(r.getString(TAG_LONGITUDE));
+	
+					POI point = new POI(name, lat, lon);
+					pois.add(point);
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
 			}
-		} catch (JSONException e) {
-			e.printStackTrace();
 		}
 
 		return pois;

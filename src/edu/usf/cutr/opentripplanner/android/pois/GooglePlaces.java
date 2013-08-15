@@ -157,26 +157,28 @@ public class GooglePlaces implements Places{
 		// Get JSON
 		JSONObject json = this.requestPlaces(paramLocation, paramRadius, paramName);
 
-		// Decrypt JSON
-		try {
-			results = json.getJSONArray(TAG_RESULTS);
+		if (json != null){
+			// Decrypt JSON
+			try {
+				results = json.getJSONArray(TAG_RESULTS);
 
-			for(int i = 0; i < results.length(); i++){
-				JSONObject r = results.getJSONObject(i);
+				for(int i = 0; i < results.length(); i++){
+					JSONObject r = results.getJSONObject(i);
 
-				String name = r.getString(TAG_NAME);
-				String address = r.getString(TAG_FORMATTED_ADDRESS);
+					String name = r.getString(TAG_NAME);
+					String address = r.getString(TAG_FORMATTED_ADDRESS);
 
-				JSONObject geometry = r.getJSONObject(TAG_GEOMETRY);
-				JSONObject location = geometry.getJSONObject(TAG_LOCATION);
-				double lat = location.getDouble(TAG_LATITUDE);
-				double lon = location.getDouble(TAG_LONGITUDE);
-				
-				POI point = new POI(name, address, lat, lon);
-				pois.add(point);
+					JSONObject geometry = r.getJSONObject(TAG_GEOMETRY);
+					JSONObject location = geometry.getJSONObject(TAG_LOCATION);
+					double lat = location.getDouble(TAG_LATITUDE);
+					double lon = location.getDouble(TAG_LONGITUDE);
+					
+					POI point = new POI(name, address, lat, lon);
+					pois.add(point);
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
 			}
-		} catch (JSONException e) {
-			e.printStackTrace();
 		}
 
 		return pois;
