@@ -40,6 +40,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
 	private static final String DATABASE_NAME = "OTPServers.db";
 	private static final int DATABASE_VERSION = 1;
+	
+	private static MySQLiteHelper mInstance = null;
 
 	// Database creation sql statement
 	private static final String DATABASE_CREATE = "CREATE TABLE "
@@ -54,9 +56,22 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_CONTACT_EMAIL + " TEXT NOT NULL"
 			+ ");";
 
-	public MySQLiteHelper(Context context) {
+	private MySQLiteHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
+	  
+	 
+    public static MySQLiteHelper getInstance(Context ctx) {
+      
+	    // Use the application context, which will ensure that you 
+	    // don't accidentally leak an Activity's context.
+	    // See this article for more information: http://bit.ly/6LRzfx
+    	if (mInstance == null) {
+    		mInstance = new MySQLiteHelper(ctx.getApplicationContext());
+    	}
+    	return mInstance;
+    }
+
 
 	@Override
 	public void onCreate(SQLiteDatabase database) {

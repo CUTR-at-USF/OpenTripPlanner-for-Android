@@ -42,6 +42,7 @@ public class ServersDataSource {
 	// Database fields
 	private SQLiteDatabase database;
 	private MySQLiteHelper dbHelper;
+	private static ServersDataSource mInstance = null;
 	private String[] allColumns = { MySQLiteHelper.COLUMN_ID,
 			MySQLiteHelper.COLUMN_DATE, 
 			MySQLiteHelper.COLUMN_REGION,
@@ -55,9 +56,16 @@ public class ServersDataSource {
 	
 	private SimpleDateFormat dateFormat = (SimpleDateFormat) SimpleDateFormat.getDateTimeInstance();
 
-	public ServersDataSource(Context context) {
-		dbHelper = new MySQLiteHelper(context);
+	private ServersDataSource(Context context) {
+		dbHelper = MySQLiteHelper.getInstance(context);
 	}
+	
+    public static ServersDataSource getInstance(Context ctx) {
+    	if (mInstance == null) {
+    		mInstance = new ServersDataSource(ctx);
+    	}
+    	return mInstance;
+    }
 
 	public void open() throws SQLException {
 		database = dbHelper.getWritableDatabase();

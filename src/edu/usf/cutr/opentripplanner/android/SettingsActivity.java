@@ -58,16 +58,12 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 	private ListPreference geocoderProvider;
 	private EditTextPreference maxWalkingDistance;
 	
-	private ServersDataSource datasource;
-
 	private final String TAG = "OTP";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		setDatasource(new ServersDataSource(this));
-
 		addPreferencesFromResource(R.xml.preferences);
 
 		mapTileProvider = (ListPreference) findPreference(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE);
@@ -305,7 +301,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 			}
 		});
 		
-		ServersDataSource datasource = this.getDatasource();
+		ServersDataSource datasource = ServersDataSource.getInstance(this);
 		datasource.open();
 		Long mostRecentDate = datasource.getMostRecentDate();
 		
@@ -334,20 +330,6 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 		datasource.close();
 	}
 
-
-	/**
-	 * @return the datasource
-	 */
-	public ServersDataSource getDatasource() {
-		return datasource;
-	}
-
-	/**
-	 * @param datasource the datasource to set
-	 */
-	public void setDatasource(ServersDataSource datasource) {
-		this.datasource = datasource;
-	}
 
 	@Override
 	public void onServerCheckerComplete(String result, boolean isWorking) {

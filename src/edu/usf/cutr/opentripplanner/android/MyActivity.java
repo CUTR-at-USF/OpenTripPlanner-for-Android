@@ -61,8 +61,6 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 
 	private MainFragment mainFragment;
 
-	private ServersDataSource datasource;
-
 	private String TAG = "OTP";
 	
 	private String currentRequestString="";
@@ -89,7 +87,6 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 			fragmentTransaction.commit();
 		}
 		
-		setDatasource(new ServersDataSource(this));
 	}
 
 	@Override
@@ -195,20 +192,6 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 		transaction.commit();
 		
 		mainFragment.showRouteOnMap(currentItinerary);
-	}
-
-	/**
-	 * @return the datasource
-	 */
-	public ServersDataSource getDatasource() {
-		return datasource;
-	}
-
-	/**
-	 * @param datasource the datasource to set
-	 */
-	public void setDatasource(ServersDataSource datasource) {
-		this.datasource = datasource;
 	}
 
 	@Override
