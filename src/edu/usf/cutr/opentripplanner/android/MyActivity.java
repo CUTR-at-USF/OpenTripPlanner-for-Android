@@ -166,7 +166,7 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 
 		transaction.commit();
 	}
-/*
+
 	@Override
 	public OTPBundle getOTPBundle() {
 		// TODO Auto-generated method stub
@@ -180,7 +180,7 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 		this.bundle.setCurrentItineraryIndex(currentItineraryIndex);
 		this.bundle.setItineraryList(currentItineraryList);
 	}
-*/
+
 	@Override
 	public void onSwitchedToMainFragment(Fragment f) {
 		// TODO Auto-generated method stub

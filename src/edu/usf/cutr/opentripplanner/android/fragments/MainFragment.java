@@ -698,6 +698,7 @@ public class MainFragment extends Fragment implements
 		OnClickListener oclDisplayDirection = new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
+				saveOTPBundle();
 				getFragmentListener().onSwitchedToDirectionFragment();
 			}
 		};
@@ -709,6 +710,14 @@ public class MainFragment extends Fragment implements
 		} else {
 			btnDisplayDirection.setVisibility(View.VISIBLE);
 		}
+	}
+	
+	private void saveOTPBundle() {
+		OTPBundle bundle = new OTPBundle();
+		bundle.setFromText(tbStartLocation.getText().toString());
+		bundle.setToText(tbEndLocation.getText().toString());
+
+		this.getFragmentListener().setOTPBundle(bundle);
 	}
 
 

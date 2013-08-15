@@ -48,9 +48,9 @@ public interface OnFragmentListener {
 	
 	public void onSwitchedToMainFragment(Fragment f);
 	
-	//public OTPBundle getOTPBundle();
+	public OTPBundle getOTPBundle();
 	
-	//public void setOTPBundle(OTPBundle b);
+	public void setOTPBundle(OTPBundle b);
 	
 	public void setCurrentRequestString(String url);
 	

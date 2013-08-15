@@ -99,16 +99,24 @@ public class DirectionListFragment extends ExpandableListFragment {
 		};
 		btnDisplayMap.setOnClickListener(oclDisplayDirection);
 		
+
+		TextView fromHeader = (TextView)header.findViewById(R.id.fromHeader);
+		TextView toHeader = (TextView)header.findViewById(R.id.toHeader);
+
+
 		if (savedInstanceState != null){
-			TextView tbStartLocation = (TextView)header.findViewById(R.id.fromHeader);
-			tbStartLocation.setText(savedInstanceState.getString(OTPApp.BUNDLE_KEY_TB_START_LOCATION));
-			TextView tbEndLocation = (TextView)header.findViewById(R.id.toHeader);
-			tbEndLocation.setText(savedInstanceState.getString(OTPApp.BUNDLE_KEY_TB_END_LOCATION));
-			OTPBundle otpBundle = (OTPBundle) savedInstanceState.getSerializable(OTPApp.BUNDLE_KEY_OTP_BUNDLE);
-			fragmentListener.onItinerariesLoaded(otpBundle.getItineraryList());
-			fragmentListener.onItinerarySelected(otpBundle.getCurrentItineraryIndex());
-	//		fragmentListener.setOTPBundle(otpBundle);
+			fromHeader.setText(savedInstanceState.getString(OTPApp.BUNDLE_KEY_TB_START_LOCATION));
+			toHeader.setText(savedInstanceState.getString(OTPApp.BUNDLE_KEY_TB_END_LOCATION));
+			OTPBundle otpBundleRestored = (OTPBundle) savedInstanceState.getSerializable(OTPApp.BUNDLE_KEY_OTP_BUNDLE);
+			fragmentListener.onItinerariesLoaded(otpBundleRestored.getItineraryList());
+			fragmentListener.onItinerarySelected(otpBundleRestored.getCurrentItineraryIndex());
 		}
+		else{
+			OTPBundle otpBundle = fragmentListener.getOTPBundle();
+			fromHeader.setText(otpBundle.getFromText());
+			toHeader.setText(otpBundle.getToText());
+		}
+		
 		
 		ArrayList<Leg> currentItinerary = new ArrayList<Leg>();
 		currentItinerary.addAll(fragmentListener.getCurrentItinerary());
