@@ -52,10 +52,6 @@ public interface OnFragmentListener {
 	
 	//public void setOTPBundle(OTPBundle b);
 	
-	public ServersDataSource getDatasource();
-
-	public void setDatasource(ServersDataSource datasource);
-	
 	public void setCurrentRequestString(String url);
 	
 	public String getCurrentRequestString();
