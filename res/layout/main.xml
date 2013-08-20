@@ -47,7 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" 
             android:layout_alignParentLeft="true"
-            android:layout_alignParentBottom="true"
+            android:layout_centerVertical="true"
             android:orientation="vertical">
 
             <ImageButton
@@ -57,118 +57,155 @@
                 android:background="@null"
                 android:src="@android:drawable/ic_menu_directions" />
         </LinearLayout>
-    </RelativeLayout>
 
-    <org.miscwidgets.widget.Panel
-        android:id="@+id/slidingDrawer1"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        panel:animationDuration="1000"
-        panel:closedHandle="@android:drawable/ic_menu_myplaces"
-        panel:content="@+id/panelContent"
-        panel:handle="@+id/panelHandle"
-        panel:linearFlying="true"
-        panel:openedHandle="@android:drawable/ic_menu_myplaces"
-        panel:position="top" >
-
-        <Button
-            android:id="@+id/panelHandle"
+	    <org.miscwidgets.widget.Panel
+	        android:id="@+id/slidingDrawer1"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:orientation="vertical"
+	        panel:animationDuration="1000"
+	        panel:closedHandle="@android:drawable/ic_menu_myplaces"
+	        panel:content="@+id/panelContent"
+	        panel:handle="@+id/panelHandle"
+	        panel:linearFlying="true"
+	        panel:openedHandle="@android:drawable/ic_menu_myplaces"
+	        panel:position="top" >
+	
+	        <Button
+	            android:id="@+id/panelHandle"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_gravity="center" />
+	
+	        <RelativeLayout
+	            android:id="@+id/panelContent"
+	            android:layout_width="fill_parent"
+	            android:layout_height="wrap_content"
+	            android:background="#000000" >
+	
+	            <RelativeLayout
+	                android:id="@+id/relativeLayout1"
+	                android:layout_width="fill_parent"
+	                android:layout_height="wrap_content"
+	                android:gravity="left"
+	                android:orientation="vertical"
+	                android:paddingTop="5dip" >
+	
+	                <EditText
+	                    android:id="@+id/tbStartLocation"
+	                    android:layout_width="fill_parent"
+	                    android:layout_height="wrap_content"
+	                    android:layout_toLeftOf="@+id/btnStartLocation"
+	                    android:selectAllOnFocus="true"
+	                    android:singleLine="true"
+	                    android:text="My Location" >
+	                </EditText>
+	
+	                <ImageButton
+	                    android:id="@+id/btnStartLocation"
+	                    android:layout_width="40dip"
+	                    android:layout_height="wrap_content"
+	                    android:layout_alignParentRight="true"
+	                    android:scaleType="center"
+	                    android:src="@android:drawable/ic_input_get" >
+	                </ImageButton>
+	            </RelativeLayout>
+	
+	            <RelativeLayout
+	                android:id="@+id/relativeLayout2"
+	                android:layout_width="fill_parent"
+	                android:layout_height="wrap_content"
+	                android:layout_below="@+id/relativeLayout1"
+	                android:gravity="left" >
+	
+	                <EditText
+	                    android:id="@+id/tbEndLocation"
+	                    android:layout_width="fill_parent"
+	                    android:layout_height="wrap_content"
+	                    android:layout_toLeftOf="@+id/btnEndLocation"
+	                    android:hint="@string/end_location_hint"
+	                    android:selectAllOnFocus="true"
+	                    android:singleLine="true" >
+	                </EditText>
+	
+	                <ImageButton
+	                    android:id="@+id/btnEndLocation"
+	                    android:layout_width="40dip"
+	                    android:layout_height="wrap_content"
+	                    android:layout_alignParentRight="true"
+	                    android:scaleType="centerCrop"
+	                    android:src="@android:drawable/ic_input_get" >
+	                </ImageButton>
+	            </RelativeLayout>
+	
+	            <LinearLayout
+	                android:id="@+id/relativeLayout3"
+	                android:layout_width="fill_parent"
+	                android:layout_height="wrap_content"
+	                android:layout_below="@+id/relativeLayout2"
+	                android:gravity="center"
+	                android:orientation="horizontal" >
+	
+	                <Spinner
+	                    android:id="@+id/spinTravelMode"
+	                    android:layout_width="125dip"
+	                    android:layout_height="wrap_content"
+	                    android:prompt="@string/choose_mode" >
+	                </Spinner>
+	
+	                <Spinner
+	                    android:id="@+id/spinOptimization"
+	                    android:layout_width="125dip"
+	                    android:layout_height="wrap_content"
+	                    android:prompt="@string/choose_optimization" >
+	                </Spinner>
+	
+	                <Button
+	                    android:id="@+id/btnPlanTrip"
+	                    android:layout_width="75dip"
+	                    android:layout_height="wrap_content"
+	                    android:text="Plan Trip" >
+	                </Button>
+	            </LinearLayout>
+	        </RelativeLayout>
+	    </org.miscwidgets.widget.Panel>
+	    
+        <ImageButton
+            android:id="@+id/btnCompass"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center" />
-
-        <RelativeLayout
-            android:id="@+id/panelContent"
-            android:layout_width="fill_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/slidingDrawer1"            
+            android:src="@android:drawable/ic_menu_compass" >
+        </ImageButton>
+        
+        <ImageButton
+            android:id="@+id/btnMyLocation"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="#000000" >
-
-            <RelativeLayout
-                android:id="@+id/relativeLayout1"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:gravity="left"
-                android:orientation="vertical"
-                android:paddingTop="5dip" >
-
-                <EditText
-                    android:id="@+id/tbStartLocation"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_toLeftOf="@+id/btnStartLocation"
-                    android:selectAllOnFocus="true"
-                    android:singleLine="true"
-                    android:text="My Location" >
-                </EditText>
-
-                <ImageButton
-                    android:id="@+id/btnStartLocation"
-                    android:layout_width="40dip"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:scaleType="center"
-                    android:src="@android:drawable/ic_input_get" >
-                </ImageButton>
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/relativeLayout2"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/relativeLayout1"
-                android:gravity="left" >
-
-                <EditText
-                    android:id="@+id/tbEndLocation"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_toLeftOf="@+id/btnEndLocation"
-                    android:hint="@string/end_location_hint"
-                    android:selectAllOnFocus="true"
-                    android:singleLine="true" >
-                </EditText>
-
-                <ImageButton
-                    android:id="@+id/btnEndLocation"
-                    android:layout_width="40dip"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:scaleType="centerCrop"
-                    android:src="@android:drawable/ic_input_get" >
-                </ImageButton>
-            </RelativeLayout>
-
-            <LinearLayout
-                android:id="@+id/relativeLayout3"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/relativeLayout2"
-                android:gravity="center"
-                android:orientation="horizontal" >
-
-                <Spinner
-                    android:id="@+id/spinTravelMode"
-                    android:layout_width="125dip"
-                    android:layout_height="wrap_content"
-                    android:prompt="@string/choose_mode" >
-                </Spinner>
-
-                <Spinner
-                    android:id="@+id/spinOptimization"
-                    android:layout_width="125dip"
-                    android:layout_height="wrap_content"
-                    android:prompt="@string/choose_optimization" >
-                </Spinner>
-
-                <Button
-                    android:id="@+id/btnPlanTrip"
-                    android:layout_width="75dip"
-                    android:layout_height="wrap_content"
-                    android:text="Plan Trip" >
-                </Button>
-            </LinearLayout>
-        </RelativeLayout>
-    </org.miscwidgets.widget.Panel>
-
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/slidingDrawer1"
+            android:src="@android:drawable/ic_menu_mylocation" >
+        </ImageButton>
+        
+        <ImageButton
+            android:id="@+id/btnZoomIn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_above="@+id/btnZoomOut"
+            android:src="@android:drawable/btn_plus" >
+        </ImageButton>
+        
+        <ImageButton
+            android:id="@id/btnZoomOut"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:src="@android:drawable/btn_minus" >
+        </ImageButton>
+    
+    </RelativeLayout>
+    
 </FrameLayout>

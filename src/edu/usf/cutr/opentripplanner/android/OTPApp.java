@@ -96,8 +96,9 @@ public class OTPApp extends Application {
 	
 	public static final String TAG = "OTP";
 	
-	public final float defaultInitialZoomLevel = 12;
-	public final int defaultPadding = 100;
+	public static final float defaultZoomStep = 1;
+	public static final float defaultInitialZoomLevel = 12;
+	public static final int defaultPadding = 100;
 
 	/**
 	 * Sets the currently selected OTP server

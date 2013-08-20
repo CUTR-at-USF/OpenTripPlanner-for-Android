@@ -21,6 +21,7 @@ import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_CUSTOM_
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.net.URLEncoder;
+import java.security.acl.LastOwnerException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
@@ -88,6 +89,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
@@ -139,7 +141,8 @@ public class MainFragment extends Fragment implements
 		TripRequestCompleteListener, MetadataRequestCompleteListener,
 		OTPGeocodingListener, LocationListener,
 		GooglePlayServicesClient.OnConnectionFailedListener,
-		GooglePlayServicesClient.ConnectionCallbacks {
+		GooglePlayServicesClient.ConnectionCallbacks,
+		GoogleMap.OnCameraChangeListener{
 	
 	//private View mainView;
 
@@ -183,6 +186,13 @@ public class MainFragment extends Fragment implements
 	Panel directionPanel;
 
 	private ImageButton btnDisplayDirection;
+	
+	private ImageButton btnCompass;
+	private ImageButton btnMyLocation;
+	
+	private ImageButton btnZoomIn;
+	private ImageButton btnZoomOut;
+
 
 	Marker startMarker;
 	LatLng startMarkerPosition;
@@ -220,6 +230,8 @@ public class MainFragment extends Fragment implements
 	private boolean restoredSavedState = false;
 
 	public static final String TAG = "OTP";
+	
+	private float bearing = 0;
 
 	@Override
 	public void onAttach(Activity activity) {
@@ -258,6 +270,12 @@ public class MainFragment extends Fragment implements
 		ddlOptimization = (Spinner) mainView
 				.findViewById(R.id.spinOptimization);
 		ddlTravelMode = (Spinner) mainView.findViewById(R.id.spinTravelMode);
+		
+		btnCompass = (ImageButton) mainView.findViewById(R.id.btnCompass);
+		btnMyLocation = (ImageButton) mainView.findViewById(R.id.btnMyLocation);
+		
+		btnZoomIn = (ImageButton) mainView.findViewById(R.id.btnZoomIn);
+		btnZoomOut = (ImageButton) mainView.findViewById(R.id.btnZoomOut);
 
 		btnDisplayDirection = (ImageButton) mainView
 				.findViewById(R.id.btnDisplayDirection);
@@ -313,10 +331,11 @@ public class MainFragment extends Fragment implements
         mMap = retrieveMap(mMap);
 		UiSettings uiSettings = mMap.getUiSettings();
 		mMap.setMyLocationEnabled(true);
-		uiSettings.setMyLocationButtonEnabled(true);
-		uiSettings.setCompassEnabled(true);
+		mMap.setOnCameraChangeListener(this);
+		uiSettings.setMyLocationButtonEnabled(false);
+		uiSettings.setCompassEnabled(false);
 		uiSettings.setAllGesturesEnabled(true);
-		uiSettings.setZoomControlsEnabled(true);
+		uiSettings.setZoomControlsEnabled(false);
 
 		
 		String overlayString = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, getResources().getString(R.string.map_tiles_default_server)); 
@@ -399,6 +418,7 @@ public class MainFragment extends Fragment implements
 	
 	
 	private void addInterfaceListeners(){
+		
 		OnClickListener ocl = new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -706,6 +726,47 @@ public class MainFragment extends Fragment implements
 		} else {
 			btnDisplayDirection.setVisibility(View.VISIBLE);
 		}
+
+		
+		OnClickListener oclCompass = new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				CameraPosition oldCameraPosition = mMap.getCameraPosition();
+				CameraPosition newCameraPosition = new CameraPosition(oldCameraPosition.target, oldCameraPosition.zoom, oldCameraPosition.tilt, 0);
+				mMap.animateCamera(CameraUpdateFactory.newCameraPosition(newCameraPosition));
+			}
+		};
+		btnCompass.setOnClickListener(oclCompass);
+		
+		if (bearing != 0){
+			btnCompass.setVisibility(View.VISIBLE);
+		} else {
+			btnCompass.setVisibility(View.INVISIBLE);
+		}
+		
+		OnClickListener oclMyLocation = new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getLastLocation(), OTPApp.defaultInitialZoomLevel));
+			}
+		};
+		btnMyLocation.setOnClickListener(oclMyLocation);
+		
+		OnClickListener oclZoomIn = new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				mMap.animateCamera(CameraUpdateFactory.zoomBy(OTPApp.defaultZoomStep));
+			}
+		};
+		btnZoomIn.setOnClickListener(oclZoomIn);
+		
+		OnClickListener oclZoomOut = new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				mMap.animateCamera(CameraUpdateFactory.zoomBy(OTPApp.defaultZoomStep * -1));
+			}
+		};
+		btnZoomOut.setOnClickListener(oclZoomOut);
 	}
 	
 	private void saveOTPBundle() {
@@ -1149,7 +1210,7 @@ public class MainFragment extends Fragment implements
 					LatLng mCurrentLatLng = getLastLocation();
 					LatLng serverCenter = new LatLng(s.getCenterLatitude(), s.getCenterLongitude());
 					if (((mCurrentLatLng != null) && !LocationUtil.checkPointInBoundingBox(mCurrentLatLng, s, OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)) || (mCurrentLatLng == null)){
-						mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, app.defaultInitialZoomLevel));	
+						mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, OTPApp.defaultInitialZoomLevel));	
 						setMarker(true, serverCenter, false);
 					}
 				}
@@ -1351,7 +1412,7 @@ public class MainFragment extends Fragment implements
 
 			}
 			if (animateCamera){
-				mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsCreator.build(), app.defaultPadding));
+				mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsCreator.build(), OTPApp.defaultPadding));
 			}
 		}
 	}
@@ -1420,11 +1481,11 @@ public class MainFragment extends Fragment implements
 				LatLng mCurrentLatLng = getLastLocation();
 				
 				if ((mCurrentLatLng != null) && (LocationUtil.checkPointInBoundingBox(mCurrentLatLng, server, OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))){
-					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, app.defaultInitialZoomLevel));
+					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, OTPApp.defaultInitialZoomLevel));
 				}
 				else{
 					LatLng serverCenter = new LatLng(server.getCenterLatitude(), server.getCenterLongitude());
-					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, app.defaultInitialZoomLevel));
+					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, OTPApp.defaultInitialZoomLevel));
 					setMarker(true, serverCenter, false);
 				}
 			}
@@ -1561,7 +1622,7 @@ public class MainFragment extends Fragment implements
 			LatLng mCurrentLatLng = getLastLocation();
 			
 			if (((mCurrentLatLng != null) && !LocationUtil.checkPointInBoundingBox(mCurrentLatLng, selectedServer, OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)) || (mCurrentLatLng == null)){
-				mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, app.defaultInitialZoomLevel));	
+				mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, OTPApp.defaultInitialZoomLevel));	
 				setMarker(true, serverCenter, false);
 			}
 		}
@@ -1653,7 +1714,7 @@ public class MainFragment extends Fragment implements
 			LatLng mCurrentLatLng = getLastLocation();	
 			
 			if (mCurrentLatLng != null){
-				mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, app.defaultInitialZoomLevel));
+				mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, OTPApp.defaultInitialZoomLevel));
 			}
 			
 			if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER, true) && needToRunAutoDetect) {
@@ -1664,7 +1725,7 @@ public class MainFragment extends Fragment implements
 
 				if ((selectedServer != null) && selectedServer.areBoundsSet() && !LocationUtil.checkPointInBoundingBox(mCurrentLatLng, selectedServer, OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)){
 					LatLng serverCenter = new LatLng(selectedServer.getCenterLatitude(), selectedServer.getCenterLongitude());
-					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, app.defaultInitialZoomLevel));	
+					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, OTPApp.defaultInitialZoomLevel));	
 					setMarker(true, serverCenter, false);
 				}
 			}
@@ -1681,11 +1742,11 @@ public class MainFragment extends Fragment implements
 		Server selectedServer = app.getSelectedServer();	
         
         if ((mCurrentLatLng != null) && (selectedServer != null) && (LocationUtil.checkPointInBoundingBox(mCurrentLatLng, selectedServer, OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))){
-			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, app.defaultInitialZoomLevel));
+			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, OTPApp.defaultInitialZoomLevel));
 		}
 		else if ((selectedServer != null) && selectedServer.areBoundsSet()){
 			LatLng serverCenter = new LatLng(selectedServer.getCenterLatitude(), selectedServer.getCenterLongitude());
-			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, app.defaultInitialZoomLevel));
+			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, OTPApp.defaultInitialZoomLevel));
 			setMarker(true, serverCenter, false);
 		}
 
@@ -1713,4 +1774,18 @@ public class MainFragment extends Fragment implements
 		boudariesPolyline = mMap.addPolyline(boundariesPolylineOptions);
 	}
 
+	@Override
+	public void onCameraChange(CameraPosition position) {
+		float newBearing;
+		if ((newBearing = position.bearing) != bearing){
+			bearing = newBearing;
+			if (newBearing != 0){
+				btnCompass.setVisibility(View.VISIBLE);
+			}
+			else{
+				btnCompass.setVisibility(View.INVISIBLE);
+			}
+		}
+	}
+	
 }
