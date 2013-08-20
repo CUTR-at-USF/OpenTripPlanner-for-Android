@@ -152,7 +152,6 @@ public class MainFragment extends Fragment implements
     LocationRequest mLocationRequest;
 	
 	private List<Polyline> route;
-	private List<PolylineOptions> routeOptions;
 
 	private EditText tbStartLocation;
 	private EditText tbEndLocation;
@@ -186,13 +185,12 @@ public class MainFragment extends Fragment implements
 	private ImageButton btnDisplayDirection;
 
 	Marker startMarker;
-	MarkerOptions startMarkerOptions;
+	LatLng startMarkerPosition;
 
 	Marker endMarker;
-	MarkerOptions endMarkerOptions;
+	LatLng endMarkerPosition;
 	
 	ArrayList<Marker> modeMarkers;
-	ArrayList<MarkerOptions> modeMarkersOptions;
 	
 	Polyline boudariesPolyline;
 	PolylineOptions boundariesPolylineOptions;
@@ -430,7 +428,6 @@ public class MainFragment extends Fragment implements
 									if (mCurrentLatLng != null) {
 										if (startMarker != null){
 											startMarker.remove();
-											startMarkerOptions = null;
 											startMarker = null;
 										}
 									}
@@ -441,7 +438,6 @@ public class MainFragment extends Fragment implements
 									if (mCurrentLatLng != null) {
 										if (endMarker != null){
 											endMarker.remove();
-											endMarkerOptions = null;
 											endMarker = null;
 										}
 									}
@@ -800,6 +796,7 @@ public class MainFragment extends Fragment implements
 	
 	private void restoreState(Bundle savedInstanceState){
 		if (savedInstanceState != null){
+			mMap = retrieveMap(mMap);
 			restoredSavedState = true;
 			setTextBoxLocation(savedInstanceState.getString(OTPApp.BUNDLE_KEY_TB_START_LOCATION), true);
 			setTextBoxLocation(savedInstanceState.getString(OTPApp.BUNDLE_KEY_TB_END_LOCATION), false);
@@ -807,14 +804,11 @@ public class MainFragment extends Fragment implements
 			if (camPosition != null){
 				mMap.moveCamera(CameraUpdateFactory.newCameraPosition(camPosition));
 			}
-			startMarkerOptions = savedInstanceState.getParcelable(OTPApp.BUNDLE_KEY_MAP_START_MARKER_OPTIONS);
-			if (startMarkerOptions != null){
-				startMarker = mMap.addMarker(startMarkerOptions);
-			}
-			endMarkerOptions = savedInstanceState.getParcelable(OTPApp.BUNDLE_KEY_MAP_END_MARKER_OPTIONS);
-			if (endMarkerOptions != null){
-				endMarker = mMap.addMarker(endMarkerOptions);
-			}
+			startMarkerPosition = savedInstanceState.getParcelable(OTPApp.BUNDLE_KEY_MAP_START_MARKER_POSITION);
+			startMarker = addStartEndMarker(startMarkerPosition, true);
+			endMarkerPosition = savedInstanceState.getParcelable(OTPApp.BUNDLE_KEY_MAP_END_MARKER_POSITION);
+			endMarker = addStartEndMarker(endMarkerPosition, false);
+			
 			isStartLocationGeocodingProcessed = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_IS_START_LOCATION_GEOCODING_PROCESSED);
 			isEndLocationGeocodingProcessed = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_IS_END_LOCATION_GEOCODING_PROCESSED);
 			appStarts = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_APP_STARTS);
@@ -828,28 +822,7 @@ public class MainFragment extends Fragment implements
 				getFragmentListener().onItinerariesLoaded(otpBundle.getItineraryList());
 				getFragmentListener().onItinerarySelected(otpBundle.getCurrentItineraryIndex());
 			}
-			Parcelable[] parcelableArrayPolyline = savedInstanceState.getParcelableArray(OTPApp.BUNDLE_KEY_MAP_ROUTE_POLYLINE_OPTIONS);
-
-			if (parcelableArrayPolyline != null){
-				PolylineOptions[] polylineOptionsArray = Arrays.copyOf(parcelableArrayPolyline, parcelableArrayPolyline.length, PolylineOptions[].class);
-				routeOptions = new ArrayList<PolylineOptions>(Arrays.asList(polylineOptionsArray));
-				route = new ArrayList<Polyline>();
-				for (PolylineOptions options : routeOptions) {
-					Polyline routeLine = mMap.addPolyline(options);
-					route.add(routeLine);
-				}
-			}
-			Parcelable[] parcelableArrayMode = savedInstanceState.getParcelableArray(OTPApp.BUNDLE_KEY_MAP_MODE_MARKERS_OPTIONS);
-
-			if (parcelableArrayMode != null){
-				MarkerOptions[] modeMarkersOptionsArray = Arrays.copyOf(parcelableArrayMode, parcelableArrayMode.length, MarkerOptions[].class);
-				modeMarkersOptions = new ArrayList<MarkerOptions>(Arrays.asList(modeMarkersOptionsArray));
-				modeMarkers = new ArrayList<Marker>();
-				for (MarkerOptions modeMarkerOptions : modeMarkersOptions) {
-					Marker modeMarker = mMap.addMarker(modeMarkerOptions);
-					modeMarkers.add(modeMarker);
-				}
-			}
+			showRouteOnMap(getFragmentListener().getCurrentItinerary(), false);
 			
 			boundariesPolylineOptions = (PolylineOptions) savedInstanceState.get(OTPApp.BUNDLE_KEY_MAP_BOUNDARIES_POLYLINE_OPTIONS);
 			boudariesPolyline = mMap.addPolyline(boundariesPolylineOptions);
@@ -928,17 +901,11 @@ public class MainFragment extends Fragment implements
 			
 			if(isStartMarker) {
 				if (startMarker == null){
-					startMarkerOptions = new MarkerOptions()
-										.position(latlng)
-										.title(getResources().getString(R.string.start_marker_title))
-										.snippet(getResources().getString(R.string.start_marker_description))
-										.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-										.draggable(true);
-					startMarker = mMap.addMarker(startMarkerOptions);
+					startMarker = addStartEndMarker(latlng, true);
 				}
 				else{
-					startMarkerOptions.position(latlng);
-					startMarker.setPosition(latlng);
+					setMarkerPosition(true, latlng);
+					startMarkerPosition = latlng;
 				}
 				MainFragment.this.setLocationTb(latlng, true);
 				prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, false);
@@ -946,16 +913,11 @@ public class MainFragment extends Fragment implements
 			}
 			else {
 				if (endMarker == null){
-					endMarkerOptions = new MarkerOptions()
-									    .position(latlng)
-										.title(getResources().getString(R.string.end_marker_title))
-										.snippet(getResources().getString(R.string.end_marker_description))
-										.draggable(true);
-					endMarker = mMap.addMarker(endMarkerOptions);
+					endMarker = addStartEndMarker(latlng, false);
 				}			
 				else{
-					endMarkerOptions.position(latlng);
-					endMarker.setPosition(latlng);
+					setMarkerPosition(false, latlng);
+					endMarkerPosition = latlng;
 				}
 				MainFragment.this.setLocationTb(latlng, false);
 				prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false);
@@ -969,6 +931,37 @@ public class MainFragment extends Fragment implements
 			}
 		}
 	}
+	
+	private void setMarkerPosition(boolean isStartMarker, LatLng latLng){
+		if (isStartMarker){
+			startMarker.setPosition(latLng);
+			startMarkerPosition = latLng;
+		}
+		else{
+			endMarker.setPosition(latLng);
+			endMarkerPosition = latLng;
+		}		
+	}
+	
+	private Marker addStartEndMarker(LatLng latLng, boolean isStartMarker){
+		MarkerOptions markerOptions = new MarkerOptions().position(latLng)
+														 .draggable(true);
+		if (isStartMarker){
+			markerOptions.title(getResources().getString(R.string.start_marker_title))
+						 .snippet(getResources().getString(R.string.start_marker_description))
+						 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+			startMarkerPosition = latLng;
+			return mMap.addMarker(markerOptions);
+		}
+		else{
+			markerOptions.title(getResources().getString(R.string.end_marker_title))
+						 .snippet(getResources().getString(R.string.end_marker_description))
+						 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+			endMarkerPosition = latLng;
+			return mMap.addMarker(markerOptions);
+		}
+	}
+	
 	
 	private String getLocationTbText(boolean isTbStartLocation){
 		if (isTbStartLocation){
@@ -1018,24 +1011,14 @@ public class MainFragment extends Fragment implements
 	public void onSaveInstanceState(Bundle bundle){
 		super.onSaveInstanceState(bundle);
 		bundle.putParcelable(OTPApp.BUNDLE_KEY_MAP_CAMERA, mMap.getCameraPosition());
-		bundle.putParcelable(OTPApp.BUNDLE_KEY_MAP_START_MARKER_OPTIONS, startMarkerOptions);
-		bundle.putParcelable(OTPApp.BUNDLE_KEY_MAP_END_MARKER_OPTIONS, endMarkerOptions);
+		bundle.putParcelable(OTPApp.BUNDLE_KEY_MAP_START_MARKER_POSITION, startMarkerPosition);
+		bundle.putParcelable(OTPApp.BUNDLE_KEY_MAP_END_MARKER_POSITION, endMarkerPosition);
 		bundle.putBoolean(OTPApp.BUNDLE_KEY_PANEL_STATE, tripPanel.isOpen());
 		bundle.putBoolean(OTPApp.BUNDLE_KEY_APP_STARTS, appStarts);
 		bundle.putBoolean(OTPApp.BUNDLE_KEY_IS_START_LOCATION_GEOCODING_PROCESSED, isStartLocationGeocodingProcessed);
 		bundle.putBoolean(OTPApp.BUNDLE_KEY_IS_END_LOCATION_GEOCODING_PROCESSED, isEndLocationGeocodingProcessed);
 		bundle.putBoolean(OTPApp.BUNDLE_KEY_IS_START_LOCATION_CHANGED_BY_USER, isStartLocationChangedByUser);
 		bundle.putBoolean(OTPApp.BUNDLE_KEY_IS_END_LOCATION_CHANGED_BY_USER, isEndLocationChangedByUser);
-		if (routeOptions != null){
-			Object[] objectArray = routeOptions.toArray();
-			PolylineOptions[] polylineOptionsArray = Arrays.copyOf(objectArray, objectArray.length, PolylineOptions[].class);
-			bundle.putParcelableArray(OTPApp.BUNDLE_KEY_MAP_ROUTE_POLYLINE_OPTIONS, polylineOptionsArray);
-		}
-		if (modeMarkersOptions != null){
-			Object[] objectArray = modeMarkersOptions.toArray();
-			MarkerOptions[] modeMarkersOptions = Arrays.copyOf(objectArray, objectArray.length, MarkerOptions[].class);
-			bundle.putParcelableArray(OTPApp.BUNDLE_KEY_MAP_MODE_MARKERS_OPTIONS, modeMarkersOptions);
-		}
 		if (boundariesPolylineOptions != null){
 			bundle.putParcelable(OTPApp.BUNDLE_KEY_MAP_BOUNDARIES_POLYLINE_OPTIONS, boundariesPolylineOptions);
 		}
@@ -1282,13 +1265,11 @@ public class MainFragment extends Fragment implements
 	public void moveMarker(Boolean start, Address addr) {
 		LatLng latlng = new LatLng(addr.getLatitude(), addr.getLongitude());
 		if (start) {
-			startMarkerOptions.position(latlng);
-			startMarker.setPosition(latlng);
+			setMarkerPosition(true, latlng);
 			setTextBoxLocation(addr.getAddressLine(addr
 					.getMaxAddressLineIndex()), true);
 		} else {
-			endMarkerOptions.position(latlng);
-			endMarker.setPosition(latlng);
+			setMarkerPosition(false, latlng);
 			setTextBoxLocation(addr.getAddressLine(addr
 					.getMaxAddressLineIndex()), false);
 		}
@@ -1317,7 +1298,7 @@ public class MainFragment extends Fragment implements
 		}
 	}
 
-	public void showRouteOnMap(List<Leg> itinerary) {
+	public void showRouteOnMap(List<Leg> itinerary, boolean animateCamera) {
 		Log.v(TAG,
 				"(TripRequest) legs size = "
 						+ Integer.toString(itinerary.size()));
@@ -1325,7 +1306,6 @@ public class MainFragment extends Fragment implements
 			for (Polyline legLine : route) {
 				legLine.remove();
 			}
-			routeOptions.clear();
 			route.clear();
 		}
 		if (modeMarkers != null){
@@ -1333,10 +1313,8 @@ public class MainFragment extends Fragment implements
 				modeMarker.remove();
 			}
 		}
-		routeOptions = new ArrayList<PolylineOptions>();
 		route = new ArrayList<Polyline>();
 		modeMarkers = new ArrayList<Marker>();
-		modeMarkersOptions = new ArrayList<MarkerOptions>();
 		
 		if (!itinerary.isEmpty()) {
 			btnDisplayDirection.setVisibility(View.VISIBLE);
@@ -1360,12 +1338,10 @@ public class MainFragment extends Fragment implements
 				if ((temp = leg.getRouteLongName()) != null){
 					modeMarkerOption.snippet(temp);
 				}
-				modeMarkersOptions.add(modeMarkerOption);
 				Marker modeMarker = mMap.addMarker(modeMarkerOption);
 				modeMarkers.add(modeMarker);
 				PolylineOptions options = new PolylineOptions().addAll(points)
 						   .color(OTPApp.COLOR_ROUTE_LINE);
-				routeOptions.add(options);
 				Polyline routeLine = mMap.addPolyline(options);
 				route.add(routeLine);
 				for (LatLng point : points) {
@@ -1374,7 +1350,9 @@ public class MainFragment extends Fragment implements
 				allGeoPoints.addAll(points);
 
 			}
-			mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsCreator.build(), app.defaultPadding));
+			if (animateCamera){
+				mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsCreator.build(), app.defaultPadding));
+			}
 		}
 	}
 
@@ -1457,7 +1435,7 @@ public class MainFragment extends Fragment implements
 	public void onTripRequestComplete(List<Itinerary> itineraries,
 			String currentRequestString) {
 		if (getActivity() != null){
-			showRouteOnMap(itineraries.get(0).legs);
+			showRouteOnMap(itineraries.get(0).legs, true);
 			OnFragmentListener ofl = getFragmentListener();
 
 			// onItinerariesLoaded must be invoked before onItinerarySelected(0)

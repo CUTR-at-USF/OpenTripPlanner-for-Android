@@ -191,7 +191,7 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 		fm.popBackStack();
 		transaction.commit();
 		
-		mainFragment.showRouteOnMap(currentItinerary);
+		mainFragment.showRouteOnMap(currentItinerary, true);
 	}
 
 	@Override
