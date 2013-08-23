@@ -28,6 +28,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.miscwidgets.widget.Panel;
 import org.opentripplanner.api.ws.GraphMetadata;
 import org.opentripplanner.api.ws.Request;
 import org.opentripplanner.routing.core.OptimizeType;
@@ -184,6 +185,8 @@ public class MainFragment extends Fragment implements
 		return savedLastLocation;
 	}
 
+	Panel directionPanel;
+
 	private ImageButton btnDisplayDirection;
 	
 	private ImageButton btnCompass;
@@ -206,8 +209,6 @@ public class MainFragment extends Fragment implements
 	private SharedPreferences prefs;
 	private OTPApp app;
 	private static LocationManager locationManager;
-
-	// private List<Itinerary> itineraries = null;
 
 	ArrayList<String> directionText = new ArrayList<String>();
 
@@ -485,7 +486,7 @@ public class MainFragment extends Fragment implements
 							if (mCurrentLatLng != null){
 								SharedPreferences.Editor prefsEditor = prefs.edit();
 								setTextBoxLocation("My Location", false);
-								prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true);
+								prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, true);
 
 								if (mCurrentLatLng != null) {
 									if (endMarker != null){
@@ -554,17 +555,35 @@ public class MainFragment extends Fragment implements
 					else {
 						if (isOriginMyLocation){
 							startLocationString = mCurrentLatLng.latitude + "," + mCurrentLatLng.longitude;
-							endLocationString = endMarker.getPosition().latitude + "," + endMarker.getPosition().longitude;
+							if (endMarker == null){
+								Toast.makeText(MainFragment.this.applicationContext, getResources().getString(R.string.need_to_place_markers_before_planning), Toast.LENGTH_SHORT).show();
+								return;
+							}
+							else{
+								endLocationString = endMarker.getPosition().latitude + "," + endMarker.getPosition().longitude;
+							}
 						}
 						else if (isDestinationMyLocation){
 							endLocationString = mCurrentLatLng.latitude + "," + mCurrentLatLng.longitude;
-							startLocationString = startMarker.getPosition().latitude + "," + startMarker.getPosition().longitude;
+							if (startMarker == null){
+								Toast.makeText(MainFragment.this.applicationContext, getResources().getString(R.string.need_to_place_markers_before_planning), Toast.LENGTH_SHORT).show();
+								return;
+							}
+							else{
+								startLocationString = startMarker.getPosition().latitude + "," + startMarker.getPosition().longitude;
+							}
 						}
 					}
 				}
 				else{
-					startLocationString = startMarker.getPosition().latitude + "," + startMarker.getPosition().longitude;
-					endLocationString = endMarker.getPosition().latitude + "," + endMarker.getPosition().longitude;
+					if ((startMarker == null) || (endMarker == null)){
+						Toast.makeText(MainFragment.this.applicationContext, getResources().getString(R.string.need_to_place_markers_before_planning), Toast.LENGTH_SHORT).show();
+						return;
+					}
+					else{
+						startLocationString = startMarker.getPosition().latitude + "," + startMarker.getPosition().longitude;
+						endLocationString = endMarker.getPosition().latitude + "," + endMarker.getPosition().longitude;
+					}
 				}
 						
 				
@@ -674,6 +693,9 @@ public class MainFragment extends Fragment implements
 	        @Override
 	        public void afterTextChanged(Editable s) {
 	        	if (isStartLocationChangedByUser){
+					SharedPreferences.Editor prefsEditor = prefs.edit();
+					prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, false);
+					prefsEditor.commit();
 		            isStartLocationGeocodingProcessed = false;
 	        	}
 	        	else{
@@ -698,6 +720,9 @@ public class MainFragment extends Fragment implements
 	        @Override
 	        public void afterTextChanged(Editable s) {
 	        	if (isEndLocationChangedByUser){
+					SharedPreferences.Editor prefsEditor = prefs.edit();
+					prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false);
+					prefsEditor.commit();
 	        		isEndLocationGeocodingProcessed = false;
 	        	}
 	        	else{
@@ -911,10 +936,13 @@ public class MainFragment extends Fragment implements
 			if (camPosition != null){
 				mMap.moveCamera(CameraUpdateFactory.newCameraPosition(camPosition));
 			}
-			startMarkerPosition = savedInstanceState.getParcelable(OTPApp.BUNDLE_KEY_MAP_START_MARKER_POSITION);
-			startMarker = addStartEndMarker(startMarkerPosition, true);
-			endMarkerPosition = savedInstanceState.getParcelable(OTPApp.BUNDLE_KEY_MAP_END_MARKER_POSITION);
-			endMarker = addStartEndMarker(endMarkerPosition, false);
+			
+			if ((startMarkerPosition = savedInstanceState.getParcelable(OTPApp.BUNDLE_KEY_MAP_START_MARKER_POSITION)) != null){
+				startMarker = addStartEndMarker(startMarkerPosition, true);
+			}
+			if ((endMarkerPosition = savedInstanceState.getParcelable(OTPApp.BUNDLE_KEY_MAP_END_MARKER_POSITION)) != null){
+				endMarker = addStartEndMarker(endMarkerPosition, false);
+			}
 			
 			isStartLocationGeocodingProcessed = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_IS_START_LOCATION_GEOCODING_PROCESSED);
 			isEndLocationGeocodingProcessed = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_IS_END_LOCATION_GEOCODING_PROCESSED);
@@ -1043,11 +1071,21 @@ public class MainFragment extends Fragment implements
 	
 	private void setMarkerPosition(boolean isStartMarker, LatLng latLng){
 		if (isStartMarker){
-			startMarker.setPosition(latLng);
+			if (startMarker == null){
+				startMarker = addStartEndMarker(latLng, true);
+			}
+			else{
+				startMarker.setPosition(latLng);
+			}
 			startMarkerPosition = latLng;
 		}
 		else{
-			endMarker.setPosition(latLng);
+			if (endMarker == null){
+				endMarker = addStartEndMarker(latLng, false);
+			}
+			else{
+				endMarker.setPosition(latLng);			
+			}
 			endMarkerPosition = latLng;
 		}		
 	}
