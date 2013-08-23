@@ -822,7 +822,12 @@ public class MainFragment extends Fragment implements
 		OnClickListener oclMyLocation = new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getLastLocation(), OTPApp.defaultInitialZoomLevel));
+				if (mMap.getCameraPosition().zoom < OTPApp.defaultMyLocationZoomLevel){
+					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getLastLocation(), OTPApp.defaultMyLocationZoomLevel));
+				}
+				else{
+					mMap.animateCamera(CameraUpdateFactory.newLatLng(getLastLocation()));
+				}
 			}
 		};
 		btnMyLocation.setOnClickListener(oclMyLocation);
