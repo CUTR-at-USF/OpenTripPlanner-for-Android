@@ -543,6 +543,21 @@ public class MainFragment extends Fragment implements
 				Boolean isOriginMyLocation = prefs.getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, false);
 				Boolean isDestinationMyLocation = prefs.getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false);
 				
+				panelDisplayDirection.setVisibility(View.INVISIBLE);
+				if (route != null){
+					for (Polyline p : route){
+						p.remove();
+					}
+					route = null;
+				}
+				if (modeMarkers != null){
+					for (Marker m : modeMarkers){
+						m.remove();
+					}
+					modeMarkers = null;
+				}
+
+				
 				if (isOriginMyLocation && isDestinationMyLocation){
 					Toast.makeText(MainFragment.this.applicationContext, getResources().getString(R.string.origin_destination_are_mylocation), Toast.LENGTH_SHORT).show();
 					return;
@@ -586,7 +601,14 @@ public class MainFragment extends Fragment implements
 					}
 				}
 						
-				
+				if (!isStartLocationGeocodingProcessed && !isOriginMyLocation){
+					Toast.makeText(MainFragment.this.applicationContext, getResources().getString(R.string.need_to_place_markers_before_planning), Toast.LENGTH_SHORT).show();
+					return;
+				}
+				else if (!isEndLocationGeocodingProcessed && !isDestinationMyLocation){
+					Toast.makeText(MainFragment.this.applicationContext, getResources().getString(R.string.need_to_place_markers_before_planning), Toast.LENGTH_SHORT).show();
+					return;
+				}
 				
 				
 				Request request = new Request();
