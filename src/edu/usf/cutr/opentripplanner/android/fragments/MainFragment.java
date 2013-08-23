@@ -1432,6 +1432,38 @@ public class MainFragment extends Fragment implements
 					.getMaxAddressLineIndex()), false);
 		}
 	}
+	
+	public void zoomToGeocodingResult(boolean isStartLocation, Address addr) {
+		LatLng latlng = new LatLng(addr.getLatitude(), addr.getLongitude());
+		
+		
+		if (isStartLocation){
+			if (isStartLocationChangedByUser){
+				if (endMarker != null){
+					zoomToTwoPoints(latlng, endMarkerPosition);
+				}
+				else if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false)){
+					zoomToTwoPoints(latlng, savedLastLocation);
+				}
+				else{
+					zoomToLocation(latlng);
+				}
+			}
+		}
+		else {
+			if (isEndLocationChangedByUser){
+				if (startMarker != null){
+					zoomToTwoPoints(startMarkerPosition, latlng);
+				}
+				else if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, false)){
+					zoomToTwoPoints(savedLastLocation, latlng);
+				}
+				else{
+					zoomToLocation(latlng);
+				}
+			}
+		}
+	}
 
 	public void zoomToLocation(LatLng latlng) {
 		if (latlng != null) {
@@ -1439,10 +1471,15 @@ public class MainFragment extends Fragment implements
 		}
 	}
 	
-	public void zoomToRegion(LatLng latLngSW, LatLng latLngNE) {
-		int padding = 1;
-		LatLngBounds bounds = new LatLngBounds(latLngSW, latLngNE);
-		mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
+	public void zoomToTwoPoints(LatLng pointA, LatLng pointB) {
+		if ((pointA.latitude != pointB.latitude) && (pointA.longitude != pointB.longitude)){
+			LatLngBounds.Builder boundsCreator = LatLngBounds.builder();
+			
+			boundsCreator.include(pointA);
+			boundsCreator.include(pointB);
+
+			mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsCreator.build(), OTPApp.defaultPadding));	
+		}
 	}
 
 	public void setTextBoxLocation(String text, boolean isStartTextBox) {
@@ -1630,6 +1667,11 @@ public class MainFragment extends Fragment implements
 	
 			if (isStartTextbox){
 				isStartLocationGeocodingProcessed = true;
+				if (isEndLocationGeocodingProcessed){
+					InputMethodManager imm = (InputMethodManager) MainFragment.this.getActivity()
+							.getSystemService(Context.INPUT_METHOD_SERVICE);
+					imm.hideSoftInputFromWindow(tbStartLocation.getWindowToken(), 0);
+				}
 			}
 			else{
 				isEndLocationGeocodingProcessed = true;
@@ -1652,6 +1694,7 @@ public class MainFragment extends Fragment implements
 					alert.show();
 					return;
 				} else if (addressesReturn.size() == 1) {
+					zoomToGeocodingResult(isStartTextbox, addressesReturn.get(0));
 					moveMarker(isStartTextbox, addressesReturn.get(0));
 					return;
 				}
@@ -1691,6 +1734,7 @@ public class MainFragment extends Fragment implements
 								addr.setAddressLine(addr.getMaxAddressLineIndex() + 1,
 										addressLine);
 								moveMarker(isStartTextbox, addr);
+								zoomToGeocodingResult(isStartTextbox, addr);
 								Log.v(TAG, "Chosen: " + addressesText[item]);
 							}
 						});

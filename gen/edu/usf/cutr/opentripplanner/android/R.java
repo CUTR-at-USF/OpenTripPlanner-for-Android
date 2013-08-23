@@ -593,8 +593,8 @@ containing a value of this type.
         public static final int map_options=0x7f08003a;
         public static final int map_tile_provider=0x7f08003b;
         public static final int map_tiles_default_server=0x7f08005c;
-        public static final int mapnik=0x7f08005d;
-        public static final int maquest=0x7f08005e;
+        public static final int mapnik=0x7f08005e;
+        public static final int maquest=0x7f08005d;
         public static final int marker_out_of_boundaries=0x7f080032;
         public static final int markers_dialog_title=0x7f080033;
         public static final int maximum_walk=0x7f080037;
@@ -623,8 +623,8 @@ containing a value of this type.
         public static final int start_marker_description=0x7f08002e;
         public static final int start_marker_title=0x7f08002c;
         public static final int tiles_cyclemap=0x7f080062;
-        public static final int tiles_mapnik=0x7f080060;
-        public static final int tiles_maquest=0x7f080061;
+        public static final int tiles_mapnik=0x7f080061;
+        public static final int tiles_maquest=0x7f080060;
         public static final int total_duration=0x7f080048;
         public static final int tripplanner_no_results_message=0x7f080046;
         public static final int tripplanner_progress=0x7f080044;
