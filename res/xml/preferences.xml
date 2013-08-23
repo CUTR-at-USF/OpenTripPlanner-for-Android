@@ -11,8 +11,8 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/map_options" android:key="map_options">
         <CheckBoxPreference android:title="@string/use_android_geocoder_title" android:key="use_android_geocoder" android:checked="true"  android:defaultValue="true" android:summary="@string/use_android_geocoder_description"></CheckBoxPreference>
-        <ListPreference android:title="@string/geocoder_preference_provider_title" android:key="geocoder_provider" android:state_selected="true"></ListPreference>
-        <ListPreference android:title="@string/map_tile_provider" android:key="map_tile_source" android:state_selected="true"></ListPreference>
+        <ListPreference android:title="@string/geocoder_preference_provider_title" android:key="geocoder_provider"></ListPreference>
+        <ListPreference android:title="@string/map_tile_provider" android:key="map_tile_source"></ListPreference>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/feedback" android:key="feedback_options">
         <Preference android:title="@string/feedback_android_developer" android:key="otp_provider_feedback"/>

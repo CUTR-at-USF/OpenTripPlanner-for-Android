@@ -88,13 +88,17 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 		entriesValues.add(OTPApp.MAP_TILE_GOOGLE_SATELLITE);
 		entriesValues.add(OTPApp.MAP_TILE_GOOGLE_HYBRID);
 		entriesValues.add(OTPApp.MAP_TILE_GOOGLE_TERRAIN);
-		mapTileProvider.setEntryValues(entriesValues.toArray(new CharSequence[entriesValues.size()]));			
-		mapTileProvider.setDefaultValue(getResources().getString(R.string.map_tiles_default_server));
+		mapTileProvider.setEntryValues(entriesValues.toArray(new CharSequence[entriesValues.size()]));	
+		if (mapTileProvider.getValue() == null){
+			mapTileProvider.setValue(getResources().getString(R.string.map_tiles_default_server));
+		}
 
 		CharSequence geocoders[] = {getResources().getString(R.string.geocoder_nominatim), getResources().getString(R.string.geocoder_google_places)};
 		geocoderProvider.setEntries(geocoders);
 		geocoderProvider.setEntryValues(geocoders);
-		geocoderProvider.setDefaultValue(getResources().getString(R.string.geocoder_nominatim));
+		if (geocoderProvider.getValue() == null){
+			geocoderProvider.setValue(getResources().getString(R.string.geocoder_nominatim));
+		}
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		
