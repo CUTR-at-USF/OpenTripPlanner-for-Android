@@ -159,7 +159,22 @@ public class DirectionListFragment extends ExpandableListFragment {
 		    	fragmentListener.onItinerarySelected(position);
 		    	
 		    	if(!isFragmentFirstLoaded){
-		    		ofl.onSwitchedToMainFragment(dlf);
+					ArrayList<Direction> directions = new ArrayList<Direction>();
+					ItineraryDecrypt itDecrypt = new ItineraryDecrypt(fragmentListener.getCurrentItinerary());
+					ArrayList<Direction> tempDirections = itDecrypt.getDirections();
+					if(tempDirections!=null && !tempDirections.isEmpty()){
+						directions.addAll(tempDirections);
+					}
+					
+
+					Direction direction_data[] = directions.toArray(new Direction[directions.size()]);
+					
+					DirectionExpandableListAdapter adapter = new DirectionExpandableListAdapter(DirectionListFragment.this.getActivity(), 
+							R.layout.list_direction_item, direction_data);
+
+
+					elv.setAdapter(adapter);
+					
 		    	}
 		    	
 		    	isFragmentFirstLoaded = false;
