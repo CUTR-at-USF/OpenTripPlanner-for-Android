@@ -231,6 +231,7 @@ public class MainFragment extends Fragment implements
 	public static final String TAG = "OTP";
 	
 	private float bearing = 0;
+	private float tilt = 0;
 
 	@Override
 	public void onAttach(Activity activity) {
@@ -806,13 +807,13 @@ public class MainFragment extends Fragment implements
 			@Override
 			public void onClick(View arg0) {
 				CameraPosition oldCameraPosition = mMap.getCameraPosition();
-				CameraPosition newCameraPosition = new CameraPosition(oldCameraPosition.target, oldCameraPosition.zoom, oldCameraPosition.tilt, 0);
+				CameraPosition newCameraPosition = new CameraPosition(oldCameraPosition.target, oldCameraPosition.zoom, 0, 0);
 				mMap.animateCamera(CameraUpdateFactory.newCameraPosition(newCameraPosition));
 			}
 		};
 		btnCompass.setOnClickListener(oclCompass);
 		
-		if (bearing != 0){
+		if ((bearing != 0) || (tilt != 0)){
 			btnCompass.setVisibility(View.VISIBLE);
 		} else {
 			btnCompass.setVisibility(View.INVISIBLE);
@@ -1881,13 +1882,35 @@ public class MainFragment extends Fragment implements
 	@Override
 	public void onCameraChange(CameraPosition position) {
 		float newBearing;
+		float newTilt;
+		boolean showButton = false;
+		boolean bearingTiltChanged = false;
+		
 		if ((newBearing = position.bearing) != bearing){
+			bearingTiltChanged = true;
 			bearing = newBearing;
 			if (newBearing != 0){
-				btnCompass.setVisibility(View.VISIBLE);
+				showButton = true;
+			}
+		}
+		if ((newTilt = position.tilt) != tilt){
+			bearingTiltChanged = true;
+			tilt = newTilt;
+			if (newTilt != 0){
+				showButton = true;
+			}
+		}
+		
+		if (bearingTiltChanged){
+			if (showButton){
+				if (!btnCompass.isShown()){
+					btnCompass.setVisibility(View.VISIBLE);
+				}
 			}
 			else{
-				btnCompass.setVisibility(View.INVISIBLE);
+				if (btnCompass.isShown()){
+					btnCompass.setVisibility(View.INVISIBLE);
+				}			
 			}
 		}
 	}
