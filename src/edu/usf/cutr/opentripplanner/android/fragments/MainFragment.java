@@ -822,11 +822,18 @@ public class MainFragment extends Fragment implements
 		OnClickListener oclMyLocation = new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				if (mMap.getCameraPosition().zoom < OTPApp.defaultMyLocationZoomLevel){
-					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getLastLocation(), OTPApp.defaultMyLocationZoomLevel));
+				LatLng mCurrentLatLng = getLastLocation();
+				
+				if (mCurrentLatLng == null){
+					Toast.makeText(applicationContext, getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
 				}
 				else{
-					mMap.animateCamera(CameraUpdateFactory.newLatLng(getLastLocation()));
+					if (mMap.getCameraPosition().zoom < OTPApp.defaultMyLocationZoomLevel){
+						mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, OTPApp.defaultMyLocationZoomLevel));
+					}
+					else{
+						mMap.animateCamera(CameraUpdateFactory.newLatLng(getLastLocation()));
+					}
 				}
 			}
 		};
@@ -1023,17 +1030,17 @@ public class MainFragment extends Fragment implements
 
 	
 	public void runAutoDetectServer(LatLng mCurrentLatLng){
-
 		if (mCurrentLatLng == null){
 			Toast.makeText(applicationContext, getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
 		}
-
-		ServersDataSource dataSource = ServersDataSource.getInstance(applicationContext);
-		WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
-
-		ServerSelector serverSelector = new ServerSelector(weakContext, applicationContext, dataSource, this);
-		serverSelector.execute(mCurrentLatLng);
-		needToRunAutoDetect = false;
+		else{
+			ServersDataSource dataSource = ServersDataSource.getInstance(applicationContext);
+			WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
+	
+			ServerSelector serverSelector = new ServerSelector(weakContext, applicationContext, dataSource, this);
+			serverSelector.execute(mCurrentLatLng);
+			needToRunAutoDetect = false;
+		}
 	}
 	
 	private void setSelectedServer(Server s){
@@ -1463,7 +1470,7 @@ public class MainFragment extends Fragment implements
 	
 	public void zoomToGeocodingResult(boolean isStartLocation, Address addr) {
 		LatLng latlng = new LatLng(addr.getLatitude(), addr.getLongitude());
-		
+		LatLng mCurrentLatLng = getLastLocation();
 		
 		if (isStartLocation){
 			if (isStartLocationChangedByUser){
@@ -1471,7 +1478,12 @@ public class MainFragment extends Fragment implements
 					zoomToTwoPoints(latlng, endMarkerPosition);
 				}
 				else if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false)){
-					zoomToTwoPoints(latlng, savedLastLocation);
+					if (mCurrentLatLng == null){
+						Toast.makeText(applicationContext, getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
+					}
+					else{
+						zoomToTwoPoints(latlng, mCurrentLatLng);
+					}
 				}
 				else{
 					zoomToLocation(latlng);
@@ -1484,7 +1496,12 @@ public class MainFragment extends Fragment implements
 					zoomToTwoPoints(startMarkerPosition, latlng);
 				}
 				else if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, false)){
-					zoomToTwoPoints(savedLastLocation, latlng);
+					if (mCurrentLatLng == null){
+						Toast.makeText(applicationContext, getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
+					}
+					else{
+						zoomToTwoPoints(mCurrentLatLng, latlng);
+					}
 				}
 				else{
 					zoomToLocation(latlng);
@@ -1849,6 +1866,9 @@ public class MainFragment extends Fragment implements
 				return mCurrentLocation;
 			}
 		}
+		if (savedLastLocation != null){
+			return savedLastLocation;
+		}
 		return null;
 	}
 
@@ -1897,15 +1917,13 @@ public class MainFragment extends Fragment implements
 			
 			if (mCurrentLatLng != null){
 				mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, OTPApp.defaultInitialZoomLevel));
-			}
-			
-			if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER, true) && needToRunAutoDetect) {
-				runAutoDetectServer(getLastLocation());
+				if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER, true) && needToRunAutoDetect) {
+					runAutoDetectServer(getLastLocation());
+				}
 			}
 			else{
 				Server selectedServer = app.getSelectedServer();	
-
-				if ((selectedServer != null) && selectedServer.areBoundsSet() && !LocationUtil.checkPointInBoundingBox(mCurrentLatLng, selectedServer, OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)){
+				if ((selectedServer != null) && selectedServer.areBoundsSet()){
 					LatLng serverCenter = new LatLng(selectedServer.getCenterLatitude(), selectedServer.getCenterLongitude());
 					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, OTPApp.defaultInitialZoomLevel));	
 					setMarker(true, serverCenter, false);

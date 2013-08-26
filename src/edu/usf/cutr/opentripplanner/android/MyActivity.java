@@ -32,6 +32,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -99,7 +100,12 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 				//				Toast.makeText(this, "Should server list refresh? " + shouldRefresh, Toast.LENGTH_LONG).show();
 				if(shouldRefresh){
 					mainFragment.setNeedToRunAutoDetect(false);
-					mainFragment.runAutoDetectServer(mainFragment.getSavedLastLocation());
+					if (mainFragment.getSavedLastLocation() == null){
+						Toast.makeText(this, getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
+					}
+					else{
+						mainFragment.runAutoDetectServer(mainFragment.getSavedLastLocation());
+					}
 				}
 				break;
 			}
