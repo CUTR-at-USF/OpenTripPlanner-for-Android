@@ -203,7 +203,7 @@ public class MainFragment extends Fragment implements
 	
 	ArrayList<Marker> modeMarkers;
 	
-	Polyline boudariesPolyline;
+	Polyline boundariesPolyline;
 	PolylineOptions boundariesPolylineOptions;
 
 	private SharedPreferences prefs;
@@ -332,11 +332,11 @@ public class MainFragment extends Fragment implements
 			String baseURL = prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, "");
 			Server s = new Server(baseURL);
 			String bounds;
+			setSelectedServer(s);
 			if ((bounds = prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS, null)) != null){
 				s.setBounds(bounds);
 				addBoundariesRectangle(s);
 			}
-			app.setSelectedServer(s);
 			
 			Log.v(TAG, "Now using custom OTP server: " + baseURL);
 		}
@@ -348,7 +348,7 @@ public class MainFragment extends Fragment implements
 				Server s = new Server(dataSource.getServer(prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)));
 				dataSource.close();
 				
-				app.setSelectedServer(s);
+				setSelectedServer(s);
 				addBoundariesRectangle(s);
 				
 				Log.v(TAG, "Now using OTP server: " + s.getRegion());
@@ -990,7 +990,7 @@ public class MainFragment extends Fragment implements
 			showRouteOnMap(getFragmentListener().getCurrentItinerary(), false);
 			
 			boundariesPolylineOptions = (PolylineOptions) savedInstanceState.get(OTPApp.BUNDLE_KEY_MAP_BOUNDARIES_POLYLINE_OPTIONS);
-			boudariesPolyline = mMap.addPolyline(boundariesPolylineOptions);
+			boundariesPolyline = mMap.addPolyline(boundariesPolylineOptions);
 			//isStartLocationGeocodingProcessed = true;
 			//isEndLocationGeocodingProcessed = true;
 			isStartLocationChangedByUser = false;
@@ -1034,6 +1034,34 @@ public class MainFragment extends Fragment implements
 		ServerSelector serverSelector = new ServerSelector(weakContext, applicationContext, dataSource, this);
 		serverSelector.execute(mCurrentLatLng);
 		needToRunAutoDetect = false;
+	}
+	
+	private void setSelectedServer(Server s){
+		restartMap();
+		restartTextBoxes();
+		
+		app.setSelectedServer(s);
+	}
+	
+	private void restartMap(){
+		mMap.clear();
+		
+		startMarker = null;
+		startMarkerPosition = null;
+		endMarker = null;
+		endMarkerPosition = null;
+		route = null;
+		modeMarkers = null;
+		boundariesPolyline = null;
+		boundariesPolylineOptions = null;
+	}
+	
+	private void restartTextBoxes(){
+		SharedPreferences.Editor prefsEditor = prefs.edit();
+		setTextBoxLocation("My Location", true);
+		prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true);
+		
+		setTextBoxLocation("", false);
 	}
 	
 	private void setLocationTb(LatLng latlng, boolean isStartTb){
@@ -1286,7 +1314,7 @@ public class MainFragment extends Fragment implements
 			updateOverlay(overlayString);
 		} else if (key.equals(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER)) {
 			if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)){
-				app.setSelectedServer(new Server(prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, "")));
+				setSelectedServer(new Server(prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, "")));
 				Log.v(TAG, "Now using custom OTP server: " + prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
 				WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
 
@@ -1301,7 +1329,7 @@ public class MainFragment extends Fragment implements
 					Server s = new Server(dataSource.getServer(prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)));
 					dataSource.close();
 					
-					app.setSelectedServer(s);
+					setSelectedServer(s);
 					addBoundariesRectangle(s);
 
 					LatLng mCurrentLatLng = getLastLocation();
@@ -1606,7 +1634,7 @@ public class MainFragment extends Fragment implements
 	public void onServerSelectorComplete(Server server) {
 		//Update application server
 		if (getActivity() != null){
-			app.setSelectedServer(server);
+			setSelectedServer(server);
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext);
 			
 			if (!prefs.getBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)){		
@@ -1920,12 +1948,12 @@ public class MainFragment extends Fragment implements
 		bounds.add(new LatLng(server.getLowerLeftLatitude(), server.getLowerLeftLongitude()));
 
 		if (boundariesPolylineOptions != null){
-			boudariesPolyline.remove();
+			boundariesPolyline.remove();
 		}
 		boundariesPolylineOptions = new PolylineOptions()
 						 .addAll(bounds)
 						 .color(Color.GRAY);
-		boudariesPolyline = mMap.addPolyline(boundariesPolylineOptions);
+		boundariesPolyline = mMap.addPolyline(boundariesPolylineOptions);
 	}
 
 	@Override
