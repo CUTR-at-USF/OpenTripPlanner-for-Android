@@ -1773,7 +1773,7 @@ public class MainFragment extends Fragment implements
 								Address addr = addressesTemp.get(item);
 								String addressLine = addr.getAddressLine(0)
 										+ "\n"
-										+ addr.getAddressLine(1)
+										+ ((addr.getAddressLine(1) != null) ? addr.getAddressLine(1) : "")
 										+ ((addr.getAddressLine(2) != null) ? ", "
 												+ addr.getAddressLine(2) : "");
 								addr.setAddressLine(addr.getMaxAddressLineIndex() + 1,
