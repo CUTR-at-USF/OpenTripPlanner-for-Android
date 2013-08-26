@@ -387,6 +387,12 @@ public class MainFragment extends Fragment implements
 										TraverseMode.BICYCLE)) });
 		ddlTravelMode.setAdapter(traverseModeAdapter);	
 		ddlTravelMode.setItemChecked(0, true);
+		
+		Server selectedServer = app.getSelectedServer();	
+		if (selectedServer != null){
+			LatLng serverCenter = new LatLng(selectedServer.getCenterLatitude(), selectedServer.getCenterLongitude());
+			mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, OTPApp.defaultInitialZoomLevel));	
+		}
 
 		restoreState(savedInstanceState);
 		
