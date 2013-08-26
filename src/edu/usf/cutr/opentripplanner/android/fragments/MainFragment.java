@@ -1761,7 +1761,8 @@ public class MainFragment extends Fragment implements
 					Address addr = addressesReturn.get(i);
 					addressesText[i] = addr.getAddressLine(0)
 							+ "\n"
-							+ addr.getAddressLine(1)
+							+ ((addr.getAddressLine(1) != null) ? ", "
+									+ addr.getAddressLine(1) : "")
 							+ ((addr.getAddressLine(2) != null) ? ", "
 									+ addr.getAddressLine(2) : "");
 					// addressesText[i] = addr.getAddressLine(0)+"\n"+
