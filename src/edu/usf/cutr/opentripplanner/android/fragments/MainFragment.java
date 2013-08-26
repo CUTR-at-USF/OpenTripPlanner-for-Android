@@ -204,7 +204,6 @@ public class MainFragment extends Fragment implements
 	ArrayList<Marker> modeMarkers;
 	
 	Polyline boundariesPolyline;
-	PolylineOptions boundariesPolylineOptions;
 
 	private SharedPreferences prefs;
 	private OTPApp app;
@@ -1001,11 +1000,7 @@ public class MainFragment extends Fragment implements
 				fillItinerariesSpinner(itineraries);
 			}
 			showRouteOnMap(getFragmentListener().getCurrentItinerary(), false);
-			
-			boundariesPolylineOptions = (PolylineOptions) savedInstanceState.get(OTPApp.BUNDLE_KEY_MAP_BOUNDARIES_POLYLINE_OPTIONS);
-			boundariesPolyline = mMap.addPolyline(boundariesPolylineOptions);
-			//isStartLocationGeocodingProcessed = true;
-			//isEndLocationGeocodingProcessed = true;
+					
 			isStartLocationChangedByUser = false;
 			isEndLocationChangedByUser = false;
 		}
@@ -1066,7 +1061,6 @@ public class MainFragment extends Fragment implements
 		route = null;
 		modeMarkers = null;
 		boundariesPolyline = null;
-		boundariesPolylineOptions = null;
 	}
 	
 	private void restartTextBoxes(){
@@ -1235,9 +1229,6 @@ public class MainFragment extends Fragment implements
 		bundle.putBoolean(OTPApp.BUNDLE_KEY_IS_END_LOCATION_GEOCODING_PROCESSED, isEndLocationGeocodingProcessed);
 		bundle.putBoolean(OTPApp.BUNDLE_KEY_IS_START_LOCATION_CHANGED_BY_USER, isStartLocationChangedByUser);
 		bundle.putBoolean(OTPApp.BUNDLE_KEY_IS_END_LOCATION_CHANGED_BY_USER, isEndLocationChangedByUser);
-		if (boundariesPolylineOptions != null){
-			bundle.putParcelable(OTPApp.BUNDLE_KEY_MAP_BOUNDARIES_POLYLINE_OPTIONS, boundariesPolylineOptions);
-		}
 		bundle.putString(OTPApp.BUNDLE_KEY_TB_START_LOCATION, tbStartLocation.getText().toString());
 		bundle.putString(OTPApp.BUNDLE_KEY_TB_END_LOCATION, tbEndLocation.getText().toString());
 		bundle.putInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION, ddlOptimization.getSelectedItemPosition());
@@ -1672,6 +1663,8 @@ public class MainFragment extends Fragment implements
 					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, OTPApp.defaultInitialZoomLevel));
 					setMarker(true, serverCenter, false);
 				}
+				
+				addBoundariesRectangle(server);
 			}
 		}
 	}
@@ -1982,10 +1975,7 @@ public class MainFragment extends Fragment implements
 		bounds.add(new LatLng(server.getUpperRightLatitude(), server.getLowerLeftLongitude()));
 		bounds.add(new LatLng(server.getLowerLeftLatitude(), server.getLowerLeftLongitude()));
 
-		if (boundariesPolylineOptions != null){
-			boundariesPolyline.remove();
-		}
-		boundariesPolylineOptions = new PolylineOptions()
+		PolylineOptions boundariesPolylineOptions = new PolylineOptions()
 						 .addAll(bounds)
 						 .color(Color.GRAY);
 		boundariesPolyline = mMap.addPolyline(boundariesPolylineOptions);
