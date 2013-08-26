@@ -318,7 +318,7 @@ public class MainFragment extends Fragment implements
 		uiSettings.setZoomControlsEnabled(false);
 
 		
-		String overlayString = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, getResources().getString(R.string.map_tiles_default_server)); 
+		String overlayString = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, applicationContext.getResources().getString(R.string.map_tiles_default_server)); 
 		updateOverlay(overlayString);
 		
 		if (savedInstanceState == null){
@@ -437,7 +437,7 @@ public class MainFragment extends Fragment implements
 								prefsEditor.commit();
 							}
 							else{
-								Toast.makeText(MainFragment.this.applicationContext, getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
+								Toast.makeText(MainFragment.this.applicationContext, applicationContext.getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
 							}
 							
 							
@@ -505,7 +505,7 @@ public class MainFragment extends Fragment implements
 								prefsEditor.commit();
 							}
 							else{
-								Toast.makeText(MainFragment.this.applicationContext, getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
+								Toast.makeText(MainFragment.this.applicationContext, applicationContext.getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
 							}
 							
 							
@@ -566,19 +566,19 @@ public class MainFragment extends Fragment implements
 
 				
 				if (isOriginMyLocation && isDestinationMyLocation){
-					Toast.makeText(MainFragment.this.applicationContext, getResources().getString(R.string.origin_destination_are_mylocation), Toast.LENGTH_SHORT).show();
+					Toast.makeText(MainFragment.this.applicationContext, applicationContext.getResources().getString(R.string.origin_destination_are_mylocation), Toast.LENGTH_SHORT).show();
 					return;
 				}
 				else if (isOriginMyLocation || isDestinationMyLocation){
 					if (mCurrentLatLng == null){
-						Toast.makeText(MainFragment.this.applicationContext, getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
+						Toast.makeText(MainFragment.this.applicationContext, applicationContext.getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
 						return;
 					}
 					else {
 						if (isOriginMyLocation){
 							startLocationString = mCurrentLatLng.latitude + "," + mCurrentLatLng.longitude;
 							if (endMarker == null){
-								Toast.makeText(MainFragment.this.applicationContext, getResources().getString(R.string.need_to_place_markers_before_planning), Toast.LENGTH_SHORT).show();
+								Toast.makeText(MainFragment.this.applicationContext, applicationContext.getResources().getString(R.string.need_to_place_markers_before_planning), Toast.LENGTH_SHORT).show();
 								return;
 							}
 							else{
@@ -588,7 +588,7 @@ public class MainFragment extends Fragment implements
 						else if (isDestinationMyLocation){
 							endLocationString = mCurrentLatLng.latitude + "," + mCurrentLatLng.longitude;
 							if (startMarker == null){
-								Toast.makeText(MainFragment.this.applicationContext, getResources().getString(R.string.need_to_place_markers_before_planning), Toast.LENGTH_SHORT).show();
+								Toast.makeText(MainFragment.this.applicationContext, applicationContext.getResources().getString(R.string.need_to_place_markers_before_planning), Toast.LENGTH_SHORT).show();
 								return;
 							}
 							else{
@@ -599,7 +599,7 @@ public class MainFragment extends Fragment implements
 				}
 				else{
 					if ((startMarker == null) || (endMarker == null)){
-						Toast.makeText(MainFragment.this.applicationContext, getResources().getString(R.string.need_to_place_markers_before_planning), Toast.LENGTH_SHORT).show();
+						Toast.makeText(MainFragment.this.applicationContext, applicationContext.getResources().getString(R.string.need_to_place_markers_before_planning), Toast.LENGTH_SHORT).show();
 						return;
 					}
 					else{
@@ -609,11 +609,11 @@ public class MainFragment extends Fragment implements
 				}
 						
 				if (!isStartLocationGeocodingProcessed && !isOriginMyLocation){
-					Toast.makeText(MainFragment.this.applicationContext, getResources().getString(R.string.need_to_place_markers_before_planning), Toast.LENGTH_SHORT).show();
+					Toast.makeText(MainFragment.this.applicationContext, applicationContext.getResources().getString(R.string.need_to_place_markers_before_planning), Toast.LENGTH_SHORT).show();
 					return;
 				}
 				else if (!isEndLocationGeocodingProcessed && !isDestinationMyLocation){
-					Toast.makeText(MainFragment.this.applicationContext, getResources().getString(R.string.need_to_place_markers_before_planning), Toast.LENGTH_SHORT).show();
+					Toast.makeText(MainFragment.this.applicationContext, applicationContext.getResources().getString(R.string.need_to_place_markers_before_planning), Toast.LENGTH_SHORT).show();
 					return;
 				}
 				
@@ -641,7 +641,7 @@ public class MainFragment extends Fragment implements
 				request.setModes(traverseModeSpinnerItem.getTraverseModeSet());
 				
 				
-				Integer defaultMaxWalkInt = getResources().getInteger(R.integer.max_walking_distance);
+				Integer defaultMaxWalkInt = applicationContext.getResources().getInteger(R.integer.max_walking_distance);
 
 				try {
 					Double maxWalk = Double.parseDouble(prefs.getString(OTPApp.PREFERENCE_KEY_MAX_WALKING_DISTANCE,
@@ -831,7 +831,7 @@ public class MainFragment extends Fragment implements
 				LatLng mCurrentLatLng = getLastLocation();
 				
 				if (mCurrentLatLng == null){
-					Toast.makeText(applicationContext, getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
+					Toast.makeText(applicationContext, applicationContext.getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
 				}
 				else{
 					if (mMap.getCameraPosition().zoom < OTPApp.defaultMyLocationZoomLevel){
@@ -917,7 +917,7 @@ public class MainFragment extends Fragment implements
 				}
 				else{
 					marker.setPosition(markerPreviousPosition);
-					Toast.makeText(applicationContext, getResources().getString(R.string.marker_out_of_boundaries), Toast.LENGTH_SHORT).show();
+					Toast.makeText(applicationContext, applicationContext.getResources().getString(R.string.marker_out_of_boundaries), Toast.LENGTH_SHORT).show();
 				}
 			}
 			
@@ -936,7 +936,7 @@ public class MainFragment extends Fragment implements
 			@Override
 			public void onMapLongClick(LatLng latlng) {
 				final LatLng latLngFinal = latlng;
-				final CharSequence[] items = {getResources().getString(R.string.start_marker_activated), getResources().getString(R.string.end_marker_activated)};
+				final CharSequence[] items = {applicationContext.getResources().getString(R.string.start_marker_activated), applicationContext.getResources().getString(R.string.end_marker_activated)};
 
 				AlertDialog.Builder builder = new AlertDialog.Builder(MainFragment.this.getActivity());
 				builder.setTitle(getResources().getString(R.string.markers_dialog_title));
@@ -1037,7 +1037,7 @@ public class MainFragment extends Fragment implements
 	
 	public void runAutoDetectServer(LatLng mCurrentLatLng){
 		if (mCurrentLatLng == null){
-			Toast.makeText(applicationContext, getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
+			Toast.makeText(applicationContext, applicationContext.getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
 		}
 		else{
 			ServersDataSource dataSource = ServersDataSource.getInstance(applicationContext);
@@ -1073,6 +1073,7 @@ public class MainFragment extends Fragment implements
 		SharedPreferences.Editor prefsEditor = prefs.edit();
 		setTextBoxLocation("My Location", true);
 		prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true);
+		prefsEditor.commit();
 		
 		setTextBoxLocation("", false);
 	}
@@ -1097,10 +1098,10 @@ public class MainFragment extends Fragment implements
 			if (showMessage){
 				String toasText;
 				if (isStartMarker){
-					toasText = getResources().getString(R.string.start_marker_activated);
+					toasText = applicationContext.getResources().getString(R.string.start_marker_activated);
 				}
 				else{
-					toasText = getResources().getString(R.string.end_marker_activated);
+					toasText = applicationContext.getResources().getString(R.string.end_marker_activated);
 				}
 				Toast.makeText(applicationContext, toasText, Toast.LENGTH_SHORT).show();
 			}
@@ -1133,7 +1134,7 @@ public class MainFragment extends Fragment implements
 		}
 		else{
 			if (showMessage){
-				Toast.makeText(applicationContext, getResources().getString(R.string.marker_out_of_boundaries), Toast.LENGTH_SHORT).show();
+				Toast.makeText(applicationContext, applicationContext.getResources().getString(R.string.marker_out_of_boundaries), Toast.LENGTH_SHORT).show();
 			}
 		}
 	}
@@ -1163,15 +1164,15 @@ public class MainFragment extends Fragment implements
 		MarkerOptions markerOptions = new MarkerOptions().position(latLng)
 														 .draggable(true);
 		if (isStartMarker){
-			markerOptions.title(getResources().getString(R.string.start_marker_title))
-						 .snippet(getResources().getString(R.string.start_marker_description))
+			markerOptions.title(applicationContext.getResources().getString(R.string.start_marker_title))
+						 .snippet(applicationContext.getResources().getString(R.string.start_marker_description))
 						 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
 			startMarkerPosition = latLng;
 			return mMap.addMarker(markerOptions);
 		}
 		else{
-			markerOptions.title(getResources().getString(R.string.end_marker_title))
-						 .snippet(getResources().getString(R.string.end_marker_description))
+			markerOptions.title(applicationContext.getResources().getString(R.string.end_marker_title))
+						 .snippet(applicationContext.getResources().getString(R.string.end_marker_description))
 						 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
 			endMarkerPosition = latLng;
 			return mMap.addMarker(markerOptions);
@@ -1256,7 +1257,7 @@ public class MainFragment extends Fragment implements
 
 		OTPGeocoding geocodingTask = new OTPGeocoding(weakContext, applicationContext,
 				isStartTextBox, app.getSelectedServer(), prefs.getString(
-						OTPApp.PREFERENCE_KEY_GEOCODER_PROVIDER, getResources().getString(R.string.geocoder_nominatim)),
+						OTPApp.PREFERENCE_KEY_GEOCODER_PROVIDER, applicationContext.getResources().getString(R.string.geocoder_nominatim)),
 				this);	
 		LatLng mCurrentLatLng = getLastLocation();
 
@@ -1265,7 +1266,7 @@ public class MainFragment extends Fragment implements
 				geocodingTask.execute(address, String.valueOf(mCurrentLatLng.latitude), String.valueOf(mCurrentLatLng.longitude));
 			}
 			else{
-				Toast.makeText(applicationContext, getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();	
+				Toast.makeText(applicationContext, applicationContext.getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();	
 			}
 		}
 		else{
@@ -1323,7 +1324,7 @@ public class MainFragment extends Fragment implements
 		}
 		Log.v(TAG, "A preference was changed: " + key);
 		if (key.equals(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE)) {
-			String overlayString = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, getResources().getString(R.string.map_tiles_default_server));
+			String overlayString = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, applicationContext.getResources().getString(R.string.map_tiles_default_server));
 			updateOverlay(overlayString);
 		} else if (key.equals(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER)) {
 			if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)){
@@ -1439,7 +1440,7 @@ public class MainFragment extends Fragment implements
 			if (server == null) {
 				Log.w(TAG,
 						"Tried to get server info when no server was selected");
-				Toast.makeText(applicationContext, getResources().getString(R.string.info_server_no_server_selected), Toast.LENGTH_SHORT).show();
+				Toast.makeText(applicationContext, applicationContext.getResources().getString(R.string.info_server_no_server_selected), Toast.LENGTH_SHORT).show();
 				break;
 			}
 		
@@ -1485,7 +1486,7 @@ public class MainFragment extends Fragment implements
 				}
 				else if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false)){
 					if (mCurrentLatLng == null){
-						Toast.makeText(applicationContext, getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
+						Toast.makeText(applicationContext, applicationContext.getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
 					}
 					else{
 						zoomToTwoPoints(latlng, mCurrentLatLng);
@@ -1503,7 +1504,7 @@ public class MainFragment extends Fragment implements
 				}
 				else if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, false)){
 					if (mCurrentLatLng == null){
-						Toast.makeText(applicationContext, getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
+						Toast.makeText(applicationContext, applicationContext.getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
 					}
 					else{
 						zoomToTwoPoints(mCurrentLatLng, latlng);
@@ -1925,17 +1926,24 @@ public class MainFragment extends Fragment implements
 			LatLng mCurrentLatLng = getLastLocation();	
 			
 			if (mCurrentLatLng != null){
-				mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, OTPApp.defaultInitialZoomLevel));
 				if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER, true) && needToRunAutoDetect) {
 					runAutoDetectServer(getLastLocation());
 				}
-			}
-			else{
-				Server selectedServer = app.getSelectedServer();	
-				if ((selectedServer != null) && selectedServer.areBoundsSet()){
-					LatLng serverCenter = new LatLng(selectedServer.getCenterLatitude(), selectedServer.getCenterLongitude());
-					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, OTPApp.defaultInitialZoomLevel));	
-					setMarker(true, serverCenter, false);
+				else{
+					Server selectedServer = app.getSelectedServer();	
+					if ((selectedServer != null) && selectedServer.areBoundsSet()){
+						if (LocationUtil.checkPointInBoundingBox(mCurrentLatLng, selectedServer, OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)){
+							mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, OTPApp.defaultInitialZoomLevel));
+						}
+						else{
+							LatLng serverCenter = new LatLng(selectedServer.getCenterLatitude(), selectedServer.getCenterLongitude());
+							mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, OTPApp.defaultInitialZoomLevel));	
+							setMarker(true, serverCenter, false);
+						}
+					}
+					else{
+						mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, OTPApp.defaultInitialZoomLevel));
+					}
 				}
 			}
 		}	
