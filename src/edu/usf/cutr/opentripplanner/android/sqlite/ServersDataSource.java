@@ -166,12 +166,15 @@ public class ServersDataSource {
 		Cursor cursor = database.query(MySQLiteHelper.TABLE_SERVERS,
 				allColumns, whereClause, null, null, null, null);
 
-		cursor.moveToFirst();
-		Server s = cursorToServer(cursor);
+		if (cursor.moveToFirst()){
+			Server s = cursorToServer(cursor);
+			
+			// Make sure to close the cursor
+			cursor.close();
+			return s.getDate();
+		}
 		
-		// Make sure to close the cursor
-		cursor.close();
-		return s.getDate();
+		return null;
 	}
 
 	private Server cursorToServer(Cursor cursor) {
