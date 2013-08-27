@@ -220,7 +220,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 			Address addr = new Address(Locale.US);
 			addr.setLatitude(poi.getLatitude());
 			addr.setLongitude(poi.getLongitude());
-			String addressLine = poi.getAddress()==null ? poi.getName() : poi.getAddress();
+			String addressLine = poi.getAddress()==null ? poi.getName() : (poi.getName() + ", " + poi.getAddress());
 			addr.setAddressLine(addr.getMaxAddressLineIndex()+1,addressLine); 
 			addresses.add(addr);
 		}
