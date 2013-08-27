@@ -220,6 +220,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 			@Override
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
 				String value = (String) newValue;
+				selectedCustomServer.setChecked(false);
 				
 						
 				if (URLUtil.isValidUrl(value)){		
