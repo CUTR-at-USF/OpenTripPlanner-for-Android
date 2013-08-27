@@ -99,7 +99,7 @@ public class OTPApp extends Application {
 	public static final float defaultZoomStep = 1;
 	public static final float defaultInitialZoomLevel = 12;
 	public static final float defaultMyLocationZoomLevel = 16;
-	public static final int defaultPadding = 120;
+	public static final int defaultPadding = 192;
 
 	/**
 	 * Sets the currently selected OTP server
