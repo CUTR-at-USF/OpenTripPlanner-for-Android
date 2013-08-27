@@ -89,21 +89,14 @@ public class MetadataRequest extends AsyncTask<String, Integer, GraphMetadata> {
 			}catch(Exception e){
 				Log.e(TAG, "Error in Metadata Request PostExecute dismissing dialog: " + e);
 			}
-		}
-		Toast.makeText(context, context.getResources().getString(R.string.metadata_request_successful), Toast.LENGTH_SHORT).show();
-		
+		}		
 
 		if (metadata != null) {
+			Toast.makeText(context, context.getResources().getString(R.string.metadata_request_successful), Toast.LENGTH_SHORT).show();
 			callback.onMetadataRequestComplete(metadata);
 		} else {
-			// TODO - handle errors here?
-//			String msg = "No metadata";
-//			AlertDialog.Builder feedback = new AlertDialog.Builder(activity);
-//			feedback.setTitle("Error Planning Trip");
-//			feedback.setMessage(msg);
-//			feedback.setNeutralButton("OK", null);
-//			feedback.create().show();
-			
+			Toast.makeText(context, context.getResources().getString(R.string.info_server_error), Toast.LENGTH_SHORT).show();
+
 			Log.e(TAG, "No metadata!");
 		}
 	}
