@@ -627,13 +627,13 @@ public class MainFragment extends Fragment implements
 
 				request.setArriveBy(false);
 				
-				OptimizeSpinnerItem optimizeSpinnerItem = (OptimizeSpinnerItem) ddlOptimization.getSelectedItem();
+				OptimizeSpinnerItem optimizeSpinnerItem = (OptimizeSpinnerItem) ddlOptimization.getItemAtPosition(ddlOptimization.getCheckedItemPosition());
 				if (optimizeSpinnerItem == null){
 					optimizeSpinnerItem = (OptimizeSpinnerItem) ddlOptimization.getItemAtPosition(0);
 				}
 				request.setOptimize(optimizeSpinnerItem.getOptimizeType());
 				
-				TraverseModeSpinnerItem traverseModeSpinnerItem = (TraverseModeSpinnerItem) ddlTravelMode.getSelectedItem();
+				TraverseModeSpinnerItem traverseModeSpinnerItem = (TraverseModeSpinnerItem) ddlTravelMode.getItemAtPosition(ddlTravelMode.getCheckedItemPosition());				
 				if (traverseModeSpinnerItem == null){
 					traverseModeSpinnerItem = (TraverseModeSpinnerItem) ddlTravelMode.getItemAtPosition(0);
 				}
@@ -1231,8 +1231,8 @@ public class MainFragment extends Fragment implements
 		bundle.putBoolean(OTPApp.BUNDLE_KEY_IS_END_LOCATION_CHANGED_BY_USER, isEndLocationChangedByUser);
 		bundle.putString(OTPApp.BUNDLE_KEY_TB_START_LOCATION, tbStartLocation.getText().toString());
 		bundle.putString(OTPApp.BUNDLE_KEY_TB_END_LOCATION, tbEndLocation.getText().toString());
-		bundle.putInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION, ddlOptimization.getSelectedItemPosition());
-		bundle.putInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE, ddlTravelMode.getSelectedItemPosition());
+		bundle.putInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION, ddlOptimization.getCheckedItemPosition());
+		bundle.putInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE, ddlTravelMode.getCheckedItemPosition());
 		if (!fragmentListener.getCurrentItineraryList().isEmpty()){
 			OTPBundle otpBundle = new OTPBundle();
 			otpBundle.setItineraryList(fragmentListener.getCurrentItineraryList());
