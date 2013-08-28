@@ -315,10 +315,6 @@ public class MainFragment extends Fragment implements
 		uiSettings.setCompassEnabled(false);
 		uiSettings.setAllGesturesEnabled(true);
 		uiSettings.setZoomControlsEnabled(false);
-
-		
-		String overlayString = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, applicationContext.getResources().getString(R.string.map_tiles_default_server)); 
-		updateOverlay(overlayString);
 		
 		if (savedInstanceState == null){
 			SharedPreferences.Editor prefsEditor = prefs.edit();
@@ -969,6 +965,10 @@ public class MainFragment extends Fragment implements
 	private void restoreState(Bundle savedInstanceState){
 		if (savedInstanceState != null){
 			mMap = retrieveMap(mMap);
+			
+			String overlayString = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, applicationContext.getResources().getString(R.string.map_tiles_default_server));
+			updateOverlay(overlayString);
+			
 			restoredSavedState = true;
 			setTextBoxLocation(savedInstanceState.getString(OTPApp.BUNDLE_KEY_TB_START_LOCATION), true);
 			setTextBoxLocation(savedInstanceState.getString(OTPApp.BUNDLE_KEY_TB_END_LOCATION), false);
@@ -1198,6 +1198,9 @@ public class MainFragment extends Fragment implements
 	@Override
 	public void onStart() {
 		super.onStart();	
+		
+		String overlayString = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, applicationContext.getResources().getString(R.string.map_tiles_default_server));
+		updateOverlay(overlayString);
 
 		mLocationClient = new LocationClient(applicationContext, this, this);
 		//mLocationClient.connect();
