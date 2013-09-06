@@ -56,6 +56,7 @@ import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -113,6 +114,7 @@ import edu.usf.cutr.opentripplanner.android.MyActivity;
 import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.R;
 import edu.usf.cutr.opentripplanner.android.SettingsActivity;
+import edu.usf.cutr.opentripplanner.android.listeners.DateCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.MetadataRequestCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.OTPGeocodingListener;
 import edu.usf.cutr.opentripplanner.android.listeners.OnFragmentListener;
@@ -130,6 +132,7 @@ import edu.usf.cutr.opentripplanner.android.tasks.ServerChecker;
 import edu.usf.cutr.opentripplanner.android.tasks.ServerSelector;
 import edu.usf.cutr.opentripplanner.android.tasks.TripRequest;
 import edu.usf.cutr.opentripplanner.android.util.DateTimeConversion;
+import edu.usf.cutr.opentripplanner.android.util.DateTimeDialog;
 import edu.usf.cutr.opentripplanner.android.util.LocationUtil;
 import edu.usf.cutr.opentripplanner.android.util.RightDrawableOnTouchListener;
 
@@ -143,6 +146,7 @@ public class MainFragment extends Fragment implements
 		OnSharedPreferenceChangeListener, ServerSelectorCompleteListener,
 		TripRequestCompleteListener, MetadataRequestCompleteListener,
 		OTPGeocodingListener, LocationListener,
+		DateCompleteListener, 
 		GooglePlayServicesClient.OnConnectionFailedListener,
 		GooglePlayServicesClient.ConnectionCallbacks,
 		GoogleMap.OnCameraChangeListener{
@@ -164,6 +168,7 @@ public class MainFragment extends Fragment implements
 	private ListView ddlOptimization;
 	private ListView ddlTravelMode;
 	private ImageButton btnPlanTrip;
+	private ImageButton btnDateDialog;
 	private LatLng savedLastLocation;
 	
 	private View panelDisplayDirection;
@@ -231,11 +236,15 @@ public class MainFragment extends Fragment implements
 	
 	private float bearing = 0;
 	private float tilt = 0;
-
+	
+	private Date tripDate;
+	private boolean arriveBy;
+	
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		try {
+			((MyActivity) activity).setDateCompleteCallback(this);
 			setFragmentListener((OnFragmentListener) activity);
 		} catch (ClassCastException e) {
 			throw new ClassCastException(activity.toString()
@@ -266,6 +275,8 @@ public class MainFragment extends Fragment implements
 		
 		btnCompass = (ImageButton) mainView.findViewById(R.id.btnCompass);
 		btnMyLocation = (ImageButton) mainView.findViewById(R.id.btnMyLocation);
+		
+		btnDateDialog = (ImageButton) mainView.findViewById(R.id.btnDateDialog);
 		
 		btnDisplayDirection = (ImageButton) mainView
 				.findViewById(R.id.btnDisplayDirection);
@@ -359,7 +370,6 @@ public class MainFragment extends Fragment implements
 						new OptimizeSpinnerItem("Fewest Transfers",
 								OptimizeType.TRANSFERS) });
 		ddlOptimization.setAdapter(optimizationAdapter);
-		ddlOptimization.setItemChecked(0, true);
 
 		ArrayAdapter<TraverseModeSpinnerItem> traverseModeAdapter = new ArrayAdapter<TraverseModeSpinnerItem>(
 				getActivity(), android.R.layout.simple_list_item_single_choice,
@@ -381,7 +391,14 @@ public class MainFragment extends Fragment implements
 								new TraverseModeSet(TraverseMode.TRANSIT,
 										TraverseMode.BICYCLE)) });
 		ddlTravelMode.setAdapter(traverseModeAdapter);	
-		ddlTravelMode.setItemChecked(0, true);
+		
+		
+		if (savedInstanceState == null){
+			ddlOptimization.setItemChecked(0, true);
+			ddlTravelMode.setItemChecked(0, true);
+			tripDate = Calendar.getInstance().getTime();
+			arriveBy = false;
+		}
 		
 		Server selectedServer = app.getSelectedServer();	
 		if (selectedServer != null){
@@ -614,6 +631,11 @@ public class MainFragment extends Fragment implements
 				
 				
 				Request request = new Request();
+				
+				request.setArriveBy(arriveBy);
+
+				request.setDateTime(tripDate);
+				
 				try {
 					request.setFrom(URLEncoder.encode(startLocationString, "UTF-8"));
 					request.setTo(URLEncoder.encode(endLocationString, "UTF-8"));
@@ -840,6 +862,29 @@ public class MainFragment extends Fragment implements
 		};
 		btnMyLocation.setOnClickListener(oclMyLocation);
 		
+		OnClickListener oclDateDialog = new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+			    FragmentTransaction ft = MainFragment.this.getActivity().getSupportFragmentManager().beginTransaction();
+			    Fragment prev = MainFragment.this.getActivity().getSupportFragmentManager().findFragmentByTag("dialogSelectorDateTime");
+			    if (prev != null) {
+			        ft.remove(prev);
+			    }
+			    ft.addToBackStack(null);
+
+			    // Create and show the dialog.
+			    DateTimeDialog newFragment = new DateTimeDialog();
+			    
+				Bundle bundle = new Bundle();
+				bundle.putSerializable(OTPApp.BUNDLE_KEY_TRIP_DATE, tripDate);
+				bundle.putBoolean(OTPApp.BUNDLE_KEY_ARRIVE_BY, arriveBy);
+				newFragment.setArguments(bundle);
+				ft.commit();
+
+				newFragment.show(MainFragment.this.getActivity().getSupportFragmentManager(), "dialogSelectorDateTime");
+		    }
+		};
+		btnDateDialog.setOnClickListener(oclDateDialog);
 		
 		AdapterView.OnItemSelectedListener itinerarySpinnerListener = new AdapterView.OnItemSelectedListener() {
 		    @Override
@@ -1000,6 +1045,15 @@ public class MainFragment extends Fragment implements
 				fillItinerariesSpinner(itineraries);
 			}
 			showRouteOnMap(getFragmentListener().getCurrentItinerary(), false);
+			
+			Date savedTripDate = (Date) savedInstanceState.getSerializable(OTPApp.BUNDLE_KEY_TRIP_DATE);
+			if (savedTripDate != null){
+				tripDate = savedTripDate;
+			}
+			else{
+				tripDate = Calendar.getInstance().getTime();
+			}
+			arriveBy = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_ARRIVE_BY, false);
 					
 			isStartLocationChangedByUser = false;
 			isEndLocationChangedByUser = false;
@@ -1236,6 +1290,10 @@ public class MainFragment extends Fragment implements
 		bundle.putString(OTPApp.BUNDLE_KEY_TB_END_LOCATION, tbEndLocation.getText().toString());
 		bundle.putInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION, ddlOptimization.getCheckedItemPosition());
 		bundle.putInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE, ddlTravelMode.getCheckedItemPosition());
+		
+		bundle.putSerializable(OTPApp.BUNDLE_KEY_TRIP_DATE, tripDate);
+		bundle.putBoolean(OTPApp.BUNDLE_KEY_ARRIVE_BY, arriveBy);
+		
 		if (!fragmentListener.getCurrentItineraryList().isEmpty()){
 			OTPBundle otpBundle = new OTPBundle();
 			otpBundle.setItineraryList(fragmentListener.getCurrentItineraryList());
@@ -2018,6 +2076,15 @@ public class MainFragment extends Fragment implements
 				}			
 			}
 		}
+	}
+
+
+	@Override
+	public void onDateComplete(Date tripDate, boolean arriveBy) {
+		this.tripDate = tripDate;
+		this.arriveBy = arriveBy;
+		String tripTime = tripDate.toString() + arriveBy;
+		Log.v(TAG, tripTime);
 	}
 	
 }

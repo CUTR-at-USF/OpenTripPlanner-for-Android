@@ -17,6 +17,7 @@
 package edu.usf.cutr.opentripplanner.android;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.opentripplanner.v092snapshot.api.model.Itinerary;
@@ -38,9 +39,9 @@ import com.google.android.gms.maps.model.LatLng;
 
 import edu.usf.cutr.opentripplanner.android.fragments.DirectionListFragment;
 import edu.usf.cutr.opentripplanner.android.fragments.MainFragment;
+import edu.usf.cutr.opentripplanner.android.listeners.DateCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.OnFragmentListener;
 import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
-import edu.usf.cutr.opentripplanner.android.sqlite.ServersDataSource;
 
 /**
  * Main Activity for the OTP for Android app
@@ -67,7 +68,9 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 	private String currentRequestString="";
 	
 	private boolean isButtonStartLocation = false;
-
+	
+	DateCompleteListener dateCompleteCallback;
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -240,4 +243,13 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 	public void setButtonStartLocation(boolean isButtonStartLocation) {
 		this.isButtonStartLocation = isButtonStartLocation;
 	}
+	
+	public void setDateCompleteCallback(DateCompleteListener callback){
+		this.dateCompleteCallback = callback;
+	}
+
+	public void onDateComplete(Date tripDate, boolean scheduleType) {
+		dateCompleteCallback.onDateComplete(tripDate, scheduleType);
+	}
+
 }

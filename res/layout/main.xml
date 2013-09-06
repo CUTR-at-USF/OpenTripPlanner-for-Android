@@ -40,13 +40,21 @@
 
 		<ImageButton
 			android:id="@+id/btnPlanTrip"
-			android:layout_height="wrap_content"
-			android:layout_width="72dp"
+			android:layout_height="96dp"
+			android:layout_width="80dp"
 			android:layout_alignParentRight="true"
-			android:layout_alignParentTop="true"
-			android:layout_alignBottom="@+id/tbEndLocation"
 			android:src="@drawable/action_search_dark"
-		    android:background="@drawable/drop_shadow">
+		    android:background="@drawable/button_layout">
+		</ImageButton>
+		
+		<ImageButton
+			android:id="@+id/btnDateDialog"
+			android:layout_height="60dp"
+			android:layout_width="60dp"
+			android:layout_below="@+id/btnPlanTrip"
+			android:layout_alignParentRight="true"
+			android:src="@drawable/device_access_time"
+		    android:background="@drawable/button_layout">
 		</ImageButton>
 	    
 		<EditText
@@ -63,7 +71,7 @@
 	     </EditText>
 	
 		<EditText
-		    android:id="@id/tbEndLocation"
+		    android:id="@+id/tbEndLocation"
 		    android:layout_width="match_parent"
 	 		android:layout_below="@id/tbStartLocation"
 		    android:layout_height="wrap_content"
@@ -82,7 +90,7 @@
 		    android:layout_height="60dp"
 		    android:layout_centerVertical="true"  
 		    android:src="@android:drawable/ic_menu_compass"
-		    android:background="@drawable/drop_shadow">
+		    android:background="@drawable/button_layout">
 		</ImageButton>
 		
 		<ImageButton
@@ -92,24 +100,24 @@
 		    android:layout_alignParentRight="true"
 		    android:layout_above="@+id/panelDisplayDirection"
 		    android:src="@drawable/device_access_location_found"
-		    android:background="@drawable/drop_shadow">
+		    android:background="@drawable/button_layout">
 		</ImageButton>
 		
 	
 		<RelativeLayout 
-	    android:layout_width="20dp"
-	    android:layout_height="48dp"
-	    android:layout_alignParentLeft="true"
-	    android:layout_above="@+id/panelDisplayDirection"
-	    android:orientation="vertical"
-	    android:layout_marginTop="4dp"
-	    android:layout_marginBottom="4dp">
+		    android:layout_width="20dp"
+		    android:layout_height="48dp"
+		    android:layout_alignParentLeft="true"
+		    android:layout_above="@+id/panelDisplayDirection"
+		    android:orientation="vertical"
+		    android:layout_marginTop="4dp"
+		    android:layout_marginBottom="4dp">
 	    
 			<ImageButton
 			    android:id="@+id/btnHandle"
 			    android:layout_width="match_parent"
 			    android:layout_height="match_parent"
-			    android:src="@drawable/handle"
+			    android:src="@drawable/handle_layout"
 			    android:background="@android:color/transparent">
 			</ImageButton>
 			
@@ -126,12 +134,12 @@
 			
 				
 		<RelativeLayout
-				android:id="@id/panelDisplayDirection"
-			    android:layout_width="fill_parent"
-			    android:layout_height="wrap_content"
-			    android:orientation="horizontal"
-	   		    android:layout_alignParentBottom="true"
-	   		    android:background="@drawable/drop_shadow">
+			android:id="@id/panelDisplayDirection"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:orientation="horizontal"
+   		    android:layout_alignParentBottom="true"
+   		    android:background="@drawable/button_layout">
 	   		    
    			<ImageButton
 				android:id="@+id/btnDisplayDirection"
@@ -162,54 +170,78 @@
 			</Spinner>
 		
 		</RelativeLayout>
-	
+		
 	</RelativeLayout>
 	
-	<LinearLayout
-   		android:layout_width="240dp"
+	<RelativeLayout
+	    android:id="@+id/navigationDrawerLeftPane"
+   		android:layout_width="280dp"
 		android:layout_height="match_parent"
-		android:orientation="vertical"
 		android:layout_gravity="start"
-		android:padding="8dp"
-		android:background="#D0FFFFFF">
+		android:orientation="vertical"
+		android:background="#D0FFFFFF"
+		android:clickable="false">
 	
-		<TextView
-			android:id="@+id/headerSpinOptimization"
-			android:layout_width="match_parent"
+	    <LinearLayout
+			android:id="@+id/layoutOptimization"
+	   		android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:textSize="15sp"
-			android:text="Optimyzation type">
-	     </TextView>
-
-		<ListView android:id="@+id/spinOptimization"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:choiceMode="singleChoice"
-	        android:divider="@android:color/holo_blue_light"
-	        android:dividerHeight="1dp"
-    	    android:headerDividersEnabled="true"
-            android:footerDividersEnabled="true">
-		</ListView>
+			android:orientation="vertical"
+			android:layout_margin="4dp">
 		
-		<TextView
-			android:id="@+id/headerSpinTravelmode"
-			android:textSize="15sp"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:text="Travel mode">
-	    </TextView>
-		    
-		<ListView android:id="@+id/spinTravelMode"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:choiceMode="singleChoice"
-	        android:divider="@android:color/holo_blue_light"
-	        android:dividerHeight="1dp"
-	        android:headerDividersEnabled="true"
-	        android:footerDividersEnabled="true">
-	     </ListView>
+			<TextView
+				android:id="@+id/headerSpinOptimization"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:textSize="15sp"
+				android:text="Optimyzation type">
+		     </TextView>
+	
+			<ListView android:id="@+id/spinOptimization"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:choiceMode="singleChoice"
+		        android:divider="@android:color/holo_blue_light"
+		        android:dividerHeight="1dp"
+	    	    android:headerDividersEnabled="true"
+	            android:footerDividersEnabled="true"
+	            android:fadeScrollbars="false">
+			</ListView>
 			
-	</LinearLayout>
+		</LinearLayout>
+		
+	    <LinearLayout
+    		android:id="@+id/layoutMode"
+	   		android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="vertical"
+            android:layout_below="@id/layoutOptimization"
+        	android:layout_above="@+id/layoutBike"
+			android:layout_margin="4dp">
+			
+			<TextView
+				android:id="@+id/headerSpinTravelmode"
+				android:textSize="15sp"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="Travel mode">
+		    </TextView>
+			    
+			<ListView android:id="@+id/spinTravelMode"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:choiceMode="singleChoice"
+		        android:divider="@android:color/holo_blue_light"
+		        android:dividerHeight="1dp"
+		        android:headerDividersEnabled="true"
+		        android:footerDividersEnabled="true"
+		        android:fadeScrollbars="false">
+		 	</ListView>
+		     
+	     </LinearLayout>
+	
+	</RelativeLayout>
+			
 </android.support.v4.widget.DrawerLayout>
 	     
 

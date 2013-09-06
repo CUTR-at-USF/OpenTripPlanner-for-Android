@@ -70,6 +70,15 @@ public class OTPApp extends Application {
     public static final String BUNDLE_KEY_IS_START_LOCATION_CHANGED_BY_USER = "startlocation changed by user";
     public static final String BUNDLE_KEY_IS_END_LOCATION_CHANGED_BY_USER = "endlocation changed by user";
     
+    
+    public static final String BUNDLE_KEY_TRIP_DATE = "trip date";
+    public static final String BUNDLE_KEY_ARRIVE_BY = "arrive by";
+    
+    public static final String BUNDLE_KEY_TIMEPICKER_SAVED_HOUR = "timepicker hours";
+    public static final String BUNDLE_KEY_TIMEPICKER_SAVED_MINUTE = "timepicker minutes";
+
+
+    
     public static final int COLOR_ROUTE_LINE = 0x7F0000FF;
 
 	/**
