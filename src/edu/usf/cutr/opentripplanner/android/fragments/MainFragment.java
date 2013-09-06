@@ -1207,6 +1207,9 @@ public class MainFragment extends Fragment implements
 		route = null;
 		modeMarkers = null;
 		boundariesPolyline = null;
+		
+		String overlayString = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, applicationContext.getResources().getString(R.string.map_tiles_default_server));
+		updateOverlay(overlayString);
 	}
 	
 	private void restartTextBoxes(){
