@@ -44,7 +44,12 @@ public class OTPApp extends Application {
     public static final int CUSTOM_MAP_TILE_HEIGHT = 256;
     public static final int CUSTOM_MAP_TILE_WIDTH = 256;
     public static final int CUSTOM_MAP_TILE_Z_INDEX = -1;
-	
+    
+    public static final int BIKE_PARAMETERS_MIN_VALUE = 0;
+    public static final int BIKE_PARAMETERS_QUICK_DEFAULT_VALUE = 34;
+    public static final int BIKE_PARAMETERS_FLAT_DEFAULT_VALUE = 67;
+    public static final int BIKE_PARAMETERS_MAX_VALUE = 100;
+
     public static final int CHECK_BOUNDS_ACCEPTABLE_ERROR = 1000;
     
     private static final int MILLISECONDS_PER_SECOND = 1000;
@@ -70,7 +75,9 @@ public class OTPApp extends Application {
     public static final String BUNDLE_KEY_IS_START_LOCATION_CHANGED_BY_USER = "startlocation changed by user";
     public static final String BUNDLE_KEY_IS_END_LOCATION_CHANGED_BY_USER = "endlocation changed by user";
     
-    
+    public static final String BUNDLE_KEY_SEEKBAR_MIN_VALUE = "seekbar min value";
+    public static final String BUNDLE_KEY_SEEKBAR_MAX_VALUE = "seekbar max value";
+
     public static final String BUNDLE_KEY_TRIP_DATE = "trip date";
     public static final String BUNDLE_KEY_ARRIVE_BY = "arrive by";
     

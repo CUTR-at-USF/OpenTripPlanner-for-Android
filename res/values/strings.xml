@@ -103,4 +103,10 @@
     <string name="tiles_maquest">"http://otile1.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png"</string>
     <string name="tiles_mapnik">"http://a.tile.openstreetmap.org/{z}/{x}/{y}.png"</string>
     <string name="tiles_cyclemap">"http://a.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png"</string>
+    <string name="header_optimization">Optimyzation type</string>
+    <string name="header_travel_mode">Travel mode</string>
+    <string name="header_bike_options">Bike options</string>
+    <string name="header_bike_options_quick">Quick</string>
+    <string name="header_bike_options_flat">Flat</string>
+    <string name="header_bike_options_bike_friendly">Bike friendly</string>
 </resources>

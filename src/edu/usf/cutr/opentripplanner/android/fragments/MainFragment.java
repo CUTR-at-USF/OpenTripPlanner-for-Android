@@ -74,13 +74,16 @@ import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
@@ -134,6 +137,8 @@ import edu.usf.cutr.opentripplanner.android.tasks.TripRequest;
 import edu.usf.cutr.opentripplanner.android.util.DateTimeConversion;
 import edu.usf.cutr.opentripplanner.android.util.DateTimeDialog;
 import edu.usf.cutr.opentripplanner.android.util.LocationUtil;
+import edu.usf.cutr.opentripplanner.android.util.RangeSeekBar;
+import edu.usf.cutr.opentripplanner.android.util.RangeSeekBar.OnRangeSeekBarChangeListener;
 import edu.usf.cutr.opentripplanner.android.util.RightDrawableOnTouchListener;
 
 /**
@@ -146,7 +151,7 @@ public class MainFragment extends Fragment implements
 		OnSharedPreferenceChangeListener, ServerSelectorCompleteListener,
 		TripRequestCompleteListener, MetadataRequestCompleteListener,
 		OTPGeocodingListener, LocationListener,
-		DateCompleteListener, 
+		DateCompleteListener, OnRangeSeekBarChangeListener<Integer>,
 		GooglePlayServicesClient.OnConnectionFailedListener,
 		GooglePlayServicesClient.ConnectionCallbacks,
 		GoogleMap.OnCameraChangeListener{
@@ -175,6 +180,8 @@ public class MainFragment extends Fragment implements
 	
 	private Spinner itinerarySelectionSpinner;
 	
+	private RangeSeekBar<Integer> bikeTriangleParameters;
+	private ViewGroup bikeTriangleParametersLayout;	
 	private boolean appStarts = true;
 	
 	private boolean isStartLocationGeocodingProcessed = false;
@@ -240,6 +247,10 @@ public class MainFragment extends Fragment implements
 	private Date tripDate;
 	private boolean arriveBy;
 	
+	private int bikeTriangleMinValue = OTPApp.BIKE_PARAMETERS_QUICK_DEFAULT_VALUE; 
+	private int bikeTriangleMaxValue = OTPApp.BIKE_PARAMETERS_FLAT_DEFAULT_VALUE;
+
+
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
@@ -272,6 +283,16 @@ public class MainFragment extends Fragment implements
 		ddlOptimization = (ListView) mainView
 				.findViewById(R.id.spinOptimization);
 		ddlTravelMode = (ListView) mainView.findViewById(R.id.spinTravelMode);
+
+		bikeTriangleParameters = new RangeSeekBar<Integer>(OTPApp.BIKE_PARAMETERS_MIN_VALUE, OTPApp.BIKE_PARAMETERS_MAX_VALUE, this.getActivity().getApplicationContext(), R.color.sysRed, R.color.sysGreen, R.color.sysBlue, R.drawable.seek_thumb_normal, R.drawable.seek_thumb_pressed);
+		
+		// add RangeSeekBar to pre-defined layout
+		bikeTriangleParametersLayout = (ViewGroup) mainView.findViewById(R.id.bikeParametersLayout);
+
+		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		params.addRule(RelativeLayout.BELOW, R.id.bikeParametersTags);
+				
+		bikeTriangleParametersLayout.addView(bikeTriangleParameters, params);
 		
 		btnCompass = (ImageButton) mainView.findViewById(R.id.btnCompass);
 		btnMyLocation = (ImageButton) mainView.findViewById(R.id.btnMyLocation);
@@ -332,6 +353,8 @@ public class MainFragment extends Fragment implements
 			prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true);
 			prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false);
 			prefsEditor.commit();
+			bikeTriangleParameters.setSelectedMinValue(OTPApp.BIKE_PARAMETERS_QUICK_DEFAULT_VALUE);
+			bikeTriangleParameters.setSelectedMaxValue(OTPApp.BIKE_PARAMETERS_FLAT_DEFAULT_VALUE);
 		}
 		
 		if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)){
@@ -396,6 +419,8 @@ public class MainFragment extends Fragment implements
 		if (savedInstanceState == null){
 			ddlOptimization.setItemChecked(0, true);
 			ddlTravelMode.setItemChecked(0, true);
+			disableEnableControls(false, bikeTriangleParametersLayout);
+			setRangeSeekBarStateColors(false, bikeTriangleParameters);
 			tripDate = Calendar.getInstance().getTime();
 			arriveBy = false;
 		}
@@ -910,6 +935,34 @@ public class MainFragment extends Fragment implements
 		itinerarySelectionSpinner.setSelection(currentItineraryIndex);
 		itinerarySelectionSpinner.setOnItemSelectedListener(itinerarySpinnerListener);
 		
+
+		
+		bikeTriangleParameters.setOnRangeSeekBarChangeListener(new OnRangeSeekBarChangeListener<Integer>() {
+	        @Override
+	        public void onRangeSeekBarValuesChanged(RangeSeekBar<?> rangeSeekBar, Integer minValue, Integer maxValue) {
+	                // handle changed range values
+	                Log.i(TAG, "User selected new range values: MIN=" + minValue + ", MAX=" + maxValue);
+	        }
+
+		});
+		
+		ddlTravelMode.setOnItemClickListener(new OnItemClickListener() {
+	        public void onItemClick(AdapterView<?> parent, View view,
+	                int position, long id) {
+
+	       TraverseModeSpinnerItem traverseModeSpinnerItem = (TraverseModeSpinnerItem) ddlTravelMode.getItemAtPosition(position);				
+	       if (traverseModeSpinnerItem.getTraverseModeSet().contains(TraverseMode.BICYCLE)){
+	    	   disableEnableControls(true, bikeTriangleParametersLayout);
+	    	   setRangeSeekBarStateColors(true, bikeTriangleParameters);
+	       }
+	       else{
+	    	   disableEnableControls(false, bikeTriangleParametersLayout);
+	    	   setRangeSeekBarStateColors(false, bikeTriangleParameters);
+	       }
+        }
+	    });
+		
+		bikeTriangleParameters.setOnRangeSeekBarChangeListener(this);
 	}
 	
 	private void saveOTPBundle() {
@@ -1037,6 +1090,15 @@ public class MainFragment extends Fragment implements
 			
 			ddlOptimization.setItemChecked(savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION), true);
 			ddlTravelMode.setItemChecked(savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE), true);
+			TraverseModeSpinnerItem mode;
+			if (((mode = (TraverseModeSpinnerItem) ddlTravelMode.getItemAtPosition(ddlTravelMode.getCheckedItemPosition())) != null) && (mode.getTraverseModeSet().contains(TraverseMode.BICYCLE))){
+				disableEnableControls(true, bikeTriangleParametersLayout);
+				setRangeSeekBarStateColors(true, bikeTriangleParameters);
+			}
+			else{
+				disableEnableControls(false, bikeTriangleParametersLayout);
+				setRangeSeekBarStateColors(false, bikeTriangleParameters);
+			}
 			OTPBundle otpBundle = (OTPBundle) savedInstanceState.getSerializable(OTPApp.BUNDLE_KEY_OTP_BUNDLE);
 			if (otpBundle != null){
 				List<Itinerary> itineraries = otpBundle.getItineraryList(); 
@@ -1054,6 +1116,11 @@ public class MainFragment extends Fragment implements
 				tripDate = Calendar.getInstance().getTime();
 			}
 			arriveBy = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_ARRIVE_BY, false);
+			
+			bikeTriangleMinValue = savedInstanceState.getInt(OTPApp.BUNDLE_KEY_SEEKBAR_MIN_VALUE);
+			bikeTriangleMaxValue = savedInstanceState.getInt(OTPApp.BUNDLE_KEY_SEEKBAR_MAX_VALUE);
+			bikeTriangleParameters.setSelectedMinValue(bikeTriangleMinValue);
+			bikeTriangleParameters.setSelectedMaxValue(bikeTriangleMaxValue);
 					
 			isStartLocationChangedByUser = false;
 			isEndLocationChangedByUser = false;
@@ -1082,6 +1149,31 @@ public class MainFragment extends Fragment implements
 		
 	    return mMap;
 	}
+	
+	private void setRangeSeekBarStateColors(boolean enable, RangeSeekBar<Integer> seekBar){
+		if (enable){
+			seekBar.setLeftColor(getResources().getColor(R.color.sysRed));
+			seekBar.setMiddleColor(getResources().getColor(R.color.sysGreen));
+			seekBar.setRightColor(getResources().getColor(R.color.sysBlue));
+		}
+		else{
+			seekBar.setLeftColor(getResources().getColor(R.color.sysRedFaded));
+			seekBar.setMiddleColor(getResources().getColor(R.color.sysGreenFaded));
+			seekBar.setRightColor(getResources().getColor(R.color.sysBlueFaded));
+		}
+		
+	}
+	
+	private void disableEnableControls(boolean enable, ViewGroup vg){
+	    for (int i = 0; i < vg.getChildCount(); i++){
+	       View child = vg.getChildAt(i);
+	       child.setEnabled(enable);
+	       if (child instanceof ViewGroup){ 
+	          disableEnableControls(enable, (ViewGroup)child);
+	       }
+	    }
+	}
+
 
 	
 	public void runAutoDetectServer(LatLng mCurrentLatLng){
@@ -1290,6 +1382,9 @@ public class MainFragment extends Fragment implements
 		bundle.putString(OTPApp.BUNDLE_KEY_TB_END_LOCATION, tbEndLocation.getText().toString());
 		bundle.putInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION, ddlOptimization.getCheckedItemPosition());
 		bundle.putInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE, ddlTravelMode.getCheckedItemPosition());
+		
+		bundle.putInt(OTPApp.BUNDLE_KEY_SEEKBAR_MIN_VALUE, bikeTriangleMinValue);
+		bundle.putInt(OTPApp.BUNDLE_KEY_SEEKBAR_MAX_VALUE, bikeTriangleMaxValue);
 		
 		bundle.putSerializable(OTPApp.BUNDLE_KEY_TRIP_DATE, tripDate);
 		bundle.putBoolean(OTPApp.BUNDLE_KEY_ARRIVE_BY, arriveBy);
@@ -2085,6 +2180,15 @@ public class MainFragment extends Fragment implements
 		this.arriveBy = arriveBy;
 		String tripTime = tripDate.toString() + arriveBy;
 		Log.v(TAG, tripTime);
+	}
+
+	@Override
+	public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar,
+			Integer minValue, Integer maxValue) {
+		bikeTriangleMinValue = minValue;
+		bikeTriangleMaxValue = maxValue;
+		String bikeParam = minValue.toString() + maxValue.toString();
+		Log.v(TAG, bikeParam);
 	}
 	
 }
