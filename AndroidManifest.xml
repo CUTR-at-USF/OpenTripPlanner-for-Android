@@ -54,7 +54,8 @@
             android:name=".MyActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
-            android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateHidden" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -62,9 +63,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".SettingsActivity" 
-        	android:theme="@android:style/Theme.Holo.Light.NoActionBar"/>
+        	android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+        	android:windowSoftInputMode="stateHidden"/>
         <activity android:name=".DirectionActivity" 
-            android:theme="@android:style/Theme.Holo.Light.NoActionBar">
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateHidden">
         </activity>
 
         <service android:name=".NavigationService" />
