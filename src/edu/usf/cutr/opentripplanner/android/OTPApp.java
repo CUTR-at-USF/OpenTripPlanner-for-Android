@@ -45,10 +45,10 @@ public class OTPApp extends Application {
     public static final int CUSTOM_MAP_TILE_WIDTH = 256;
     public static final int CUSTOM_MAP_TILE_Z_INDEX = -1;
     
-    public static final int BIKE_PARAMETERS_MIN_VALUE = 0;
-    public static final int BIKE_PARAMETERS_QUICK_DEFAULT_VALUE = 34;
-    public static final int BIKE_PARAMETERS_FLAT_DEFAULT_VALUE = 67;
-    public static final int BIKE_PARAMETERS_MAX_VALUE = 100;
+    public static final double BIKE_PARAMETERS_MIN_VALUE = 0.0;
+    public static final double BIKE_PARAMETERS_QUICK_DEFAULT_VALUE = 1.0/3.0;
+    public static final double BIKE_PARAMETERS_FLAT_DEFAULT_VALUE = 2.0/3.0;
+    public static final double BIKE_PARAMETERS_MAX_VALUE = 1.0;
 
     public static final int CHECK_BOUNDS_ACCEPTABLE_ERROR = 1000;
     

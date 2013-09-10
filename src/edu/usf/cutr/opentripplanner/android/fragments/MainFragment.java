@@ -151,7 +151,7 @@ public class MainFragment extends Fragment implements
 		OnSharedPreferenceChangeListener, ServerSelectorCompleteListener,
 		TripRequestCompleteListener, MetadataRequestCompleteListener,
 		OTPGeocodingListener, LocationListener,
-		DateCompleteListener, OnRangeSeekBarChangeListener<Integer>,
+		DateCompleteListener, OnRangeSeekBarChangeListener<Double>,
 		GooglePlayServicesClient.OnConnectionFailedListener,
 		GooglePlayServicesClient.ConnectionCallbacks,
 		GoogleMap.OnCameraChangeListener{
@@ -180,7 +180,7 @@ public class MainFragment extends Fragment implements
 	
 	private Spinner itinerarySelectionSpinner;
 	
-	private RangeSeekBar<Integer> bikeTriangleParameters;
+	private RangeSeekBar<Double> bikeTriangleParameters;
 	private ViewGroup bikeTriangleParametersLayout;	
 	private boolean appStarts = true;
 	
@@ -247,8 +247,8 @@ public class MainFragment extends Fragment implements
 	private Date tripDate;
 	private boolean arriveBy;
 	
-	private int bikeTriangleMinValue = OTPApp.BIKE_PARAMETERS_QUICK_DEFAULT_VALUE; 
-	private int bikeTriangleMaxValue = OTPApp.BIKE_PARAMETERS_FLAT_DEFAULT_VALUE;
+	private double bikeTriangleMinValue = OTPApp.BIKE_PARAMETERS_QUICK_DEFAULT_VALUE; 
+	private double bikeTriangleMaxValue = OTPApp.BIKE_PARAMETERS_FLAT_DEFAULT_VALUE;
 
 
 	@Override
@@ -284,7 +284,7 @@ public class MainFragment extends Fragment implements
 				.findViewById(R.id.spinOptimization);
 		ddlTravelMode = (ListView) mainView.findViewById(R.id.spinTravelMode);
 
-		bikeTriangleParameters = new RangeSeekBar<Integer>(OTPApp.BIKE_PARAMETERS_MIN_VALUE, OTPApp.BIKE_PARAMETERS_MAX_VALUE, this.getActivity().getApplicationContext(), R.color.sysRed, R.color.sysGreen, R.color.sysBlue, R.drawable.seek_thumb_normal, R.drawable.seek_thumb_pressed);
+		bikeTriangleParameters = new RangeSeekBar<Double>(OTPApp.BIKE_PARAMETERS_MIN_VALUE, OTPApp.BIKE_PARAMETERS_MAX_VALUE, this.getActivity().getApplicationContext(), R.color.sysRed, R.color.sysGreen, R.color.sysBlue, R.drawable.seek_thumb_normal, R.drawable.seek_thumb_pressed);
 		
 		// add RangeSeekBar to pre-defined layout
 		bikeTriangleParametersLayout = (ViewGroup) mainView.findViewById(R.id.bikeParametersLayout);
@@ -419,8 +419,7 @@ public class MainFragment extends Fragment implements
 		if (savedInstanceState == null){
 			ddlOptimization.setItemChecked(0, true);
 			ddlTravelMode.setItemChecked(0, true);
-			disableEnableControls(false, bikeTriangleParametersLayout);
-			setRangeSeekBarStateColors(false, bikeTriangleParameters);
+			showBikeParameters(false);
 			tripDate = Calendar.getInstance().getTime();
 			arriveBy = false;
 		}
@@ -657,24 +656,30 @@ public class MainFragment extends Fragment implements
 				
 				Request request = new Request();
 				
-				request.setArriveBy(arriveBy);
-
-				request.setDateTime(tripDate);
-				
 				try {
 					request.setFrom(URLEncoder.encode(startLocationString, "UTF-8"));
 					request.setTo(URLEncoder.encode(endLocationString, "UTF-8"));
 				} catch (UnsupportedEncodingException e1) {
 					e1.printStackTrace();
 				}
+				
+				
+				request.setArriveBy(arriveBy);
 
-				request.setArriveBy(false);
+				request.setDateTime(tripDate);
 				
 				OptimizeSpinnerItem optimizeSpinnerItem = (OptimizeSpinnerItem) ddlOptimization.getItemAtPosition(ddlOptimization.getCheckedItemPosition());
 				if (optimizeSpinnerItem == null){
 					optimizeSpinnerItem = (OptimizeSpinnerItem) ddlOptimization.getItemAtPosition(0);
 				}
+				
 				request.setOptimize(optimizeSpinnerItem.getOptimizeType());
+				
+				if (optimizeSpinnerItem.getOptimizeType().equals(OptimizeType.TRIANGLE)){
+					request.setTriangleTimeFactor(bikeTriangleMinValue);
+					request.setTriangleSlopeFactor(bikeTriangleMaxValue - bikeTriangleMinValue);
+					request.setTriangleSafetyFactor(1 - bikeTriangleMaxValue);
+				}
 				
 				TraverseModeSpinnerItem traverseModeSpinnerItem = (TraverseModeSpinnerItem) ddlTravelMode.getItemAtPosition(ddlTravelMode.getCheckedItemPosition());				
 				if (traverseModeSpinnerItem == null){
@@ -937,9 +942,9 @@ public class MainFragment extends Fragment implements
 		
 
 		
-		bikeTriangleParameters.setOnRangeSeekBarChangeListener(new OnRangeSeekBarChangeListener<Integer>() {
+		bikeTriangleParameters.setOnRangeSeekBarChangeListener(new OnRangeSeekBarChangeListener<Double>() {
 	        @Override
-	        public void onRangeSeekBarValuesChanged(RangeSeekBar<?> rangeSeekBar, Integer minValue, Integer maxValue) {
+	        public void onRangeSeekBarValuesChanged(RangeSeekBar<?> rangeSeekBar, Double minValue, Double maxValue) {
 	                // handle changed range values
 	                Log.i(TAG, "User selected new range values: MIN=" + minValue + ", MAX=" + maxValue);
 	        }
@@ -948,18 +953,27 @@ public class MainFragment extends Fragment implements
 		
 		ddlTravelMode.setOnItemClickListener(new OnItemClickListener() {
 	        public void onItemClick(AdapterView<?> parent, View view,
+	                int position, long id) { 
+	        	TraverseModeSpinnerItem traverseModeSpinnerItem = (TraverseModeSpinnerItem) ddlTravelMode.getItemAtPosition(position);			
+	        	if (traverseModeSpinnerItem.getTraverseModeSet().contains(TraverseMode.BICYCLE)){
+		    		setBikeOptimizationAdapter(true);
+		    		showBikeParameters(true);
+	        	}
+	        	else{
+		    		setBikeOptimizationAdapter(false);
+		    		showBikeParameters(false);
+	        	}
+	        }
+	    });
+		
+		ddlOptimization.setOnItemClickListener(new OnItemClickListener() {
+	        public void onItemClick(AdapterView<?> parent, View view,
 	                int position, long id) {
 
-	       TraverseModeSpinnerItem traverseModeSpinnerItem = (TraverseModeSpinnerItem) ddlTravelMode.getItemAtPosition(position);				
-	       if (traverseModeSpinnerItem.getTraverseModeSet().contains(TraverseMode.BICYCLE)){
-	    	   disableEnableControls(true, bikeTriangleParametersLayout);
-	    	   setRangeSeekBarStateColors(true, bikeTriangleParameters);
-	       }
-	       else{
-	    	   disableEnableControls(false, bikeTriangleParametersLayout);
-	    	   setRangeSeekBarStateColors(false, bikeTriangleParameters);
-	       }
-        }
+	        	OptimizeSpinnerItem optimizeSpinnerItem = (OptimizeSpinnerItem) ddlOptimization.getItemAtPosition(position);				
+	        	showBikeParameters(optimizeSpinnerItem.getOptimizeType().equals(OptimizeType.TRIANGLE));
+
+	        }
 	    });
 		
 		bikeTriangleParameters.setOnRangeSeekBarChangeListener(this);
@@ -1088,17 +1102,20 @@ public class MainFragment extends Fragment implements
 			isStartLocationChangedByUser = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_IS_START_LOCATION_CHANGED_BY_USER);
 			isEndLocationChangedByUser = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_IS_END_LOCATION_CHANGED_BY_USER);
 			
-			ddlOptimization.setItemChecked(savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION), true);
+    		showBikeParameters(false);
+    		
 			ddlTravelMode.setItemChecked(savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE), true);
-			TraverseModeSpinnerItem mode;
-			if (((mode = (TraverseModeSpinnerItem) ddlTravelMode.getItemAtPosition(ddlTravelMode.getCheckedItemPosition())) != null) && (mode.getTraverseModeSet().contains(TraverseMode.BICYCLE))){
-				disableEnableControls(true, bikeTriangleParametersLayout);
-				setRangeSeekBarStateColors(true, bikeTriangleParameters);
-			}
-			else{
-				disableEnableControls(false, bikeTriangleParametersLayout);
-				setRangeSeekBarStateColors(false, bikeTriangleParameters);
-			}
+        	TraverseModeSpinnerItem traverseModeSpinnerItem = (TraverseModeSpinnerItem) ddlTravelMode.getItemAtPosition(ddlTravelMode.getCheckedItemPosition());			
+        	if (traverseModeSpinnerItem.getTraverseModeSet().contains(TraverseMode.BICYCLE)){
+	    		setBikeOptimizationAdapter(true);
+				ddlOptimization.setItemChecked(savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION), true);
+	    		OptimizeSpinnerItem optimizeSpinnerItem = (OptimizeSpinnerItem) ddlOptimization.getItemAtPosition(ddlOptimization.getCheckedItemPosition());
+	    		if (optimizeSpinnerItem.getOptimizeType().equals(OptimizeType.TRIANGLE)){
+		    		showBikeParameters(true);
+	    		}
+        	}
+			ddlTravelMode.setItemChecked(savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE), true);
+
 			OTPBundle otpBundle = (OTPBundle) savedInstanceState.getSerializable(OTPApp.BUNDLE_KEY_OTP_BUNDLE);
 			if (otpBundle != null){
 				List<Itinerary> itineraries = otpBundle.getItineraryList(); 
@@ -1117,8 +1134,8 @@ public class MainFragment extends Fragment implements
 			}
 			arriveBy = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_ARRIVE_BY, false);
 			
-			bikeTriangleMinValue = savedInstanceState.getInt(OTPApp.BUNDLE_KEY_SEEKBAR_MIN_VALUE);
-			bikeTriangleMaxValue = savedInstanceState.getInt(OTPApp.BUNDLE_KEY_SEEKBAR_MAX_VALUE);
+			bikeTriangleMinValue = savedInstanceState.getDouble(OTPApp.BUNDLE_KEY_SEEKBAR_MIN_VALUE);
+			bikeTriangleMaxValue = savedInstanceState.getDouble(OTPApp.BUNDLE_KEY_SEEKBAR_MAX_VALUE);
 			bikeTriangleParameters.setSelectedMinValue(bikeTriangleMinValue);
 			bikeTriangleParameters.setSelectedMaxValue(bikeTriangleMaxValue);
 					
@@ -1150,7 +1167,40 @@ public class MainFragment extends Fragment implements
 	    return mMap;
 	}
 	
-	private void setRangeSeekBarStateColors(boolean enable, RangeSeekBar<Integer> seekBar){
+	private void showBikeParameters(boolean enable){
+		setRangeSeekBarStateColors(enable, bikeTriangleParameters);
+		disableEnableControls(enable, bikeTriangleParametersLayout);
+	}
+	
+	private void setBikeOptimizationAdapter(boolean enable){
+		ArrayAdapter<OptimizeSpinnerItem> optimizationAdapter;
+		
+		if (enable){
+			optimizationAdapter = new ArrayAdapter<OptimizeSpinnerItem>(
+					getActivity(),
+					android.R.layout.simple_list_item_single_choice,
+					new OptimizeSpinnerItem[] {
+							new OptimizeSpinnerItem("Quickest", OptimizeType.QUICK),
+							new OptimizeSpinnerItem("Safest", OptimizeType.SAFE),
+							new OptimizeSpinnerItem("Custom trip...", OptimizeType.TRIANGLE) });
+			ddlOptimization.setAdapter(optimizationAdapter);
+			ddlOptimization.setItemChecked(2, true);
+		}
+		else {
+			optimizationAdapter = new ArrayAdapter<OptimizeSpinnerItem>(
+					getActivity(),
+					android.R.layout.simple_list_item_single_choice,
+					new OptimizeSpinnerItem[] {
+							new OptimizeSpinnerItem("Quickest", OptimizeType.QUICK),
+							new OptimizeSpinnerItem("Safest", OptimizeType.SAFE),
+							new OptimizeSpinnerItem("Fewest Transfers",
+									OptimizeType.TRANSFERS) });
+			ddlOptimization.setAdapter(optimizationAdapter);
+			ddlOptimization.setItemChecked(0, true);
+		}
+	}
+	
+	private void setRangeSeekBarStateColors(boolean enable, RangeSeekBar<Double> seekBar){
 		if (enable){
 			seekBar.setLeftColor(getResources().getColor(R.color.sysRed));
 			seekBar.setMiddleColor(getResources().getColor(R.color.sysGreen));
@@ -1386,8 +1436,8 @@ public class MainFragment extends Fragment implements
 		bundle.putInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION, ddlOptimization.getCheckedItemPosition());
 		bundle.putInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE, ddlTravelMode.getCheckedItemPosition());
 		
-		bundle.putInt(OTPApp.BUNDLE_KEY_SEEKBAR_MIN_VALUE, bikeTriangleMinValue);
-		bundle.putInt(OTPApp.BUNDLE_KEY_SEEKBAR_MAX_VALUE, bikeTriangleMaxValue);
+		bundle.putDouble(OTPApp.BUNDLE_KEY_SEEKBAR_MIN_VALUE, bikeTriangleMinValue);
+		bundle.putDouble(OTPApp.BUNDLE_KEY_SEEKBAR_MAX_VALUE, bikeTriangleMaxValue);
 		
 		bundle.putSerializable(OTPApp.BUNDLE_KEY_TRIP_DATE, tripDate);
 		bundle.putBoolean(OTPApp.BUNDLE_KEY_ARRIVE_BY, arriveBy);
@@ -2187,7 +2237,7 @@ public class MainFragment extends Fragment implements
 
 	@Override
 	public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar,
-			Integer minValue, Integer maxValue) {
+			Double minValue, Double maxValue) {
 		bikeTriangleMinValue = minValue;
 		bikeTriangleMaxValue = maxValue;
 		String bikeParam = minValue.toString() + maxValue.toString();
