@@ -67,4 +67,25 @@ public class DateTimeConversion {
 		text += Long.toString(s) + "s" + " ";
 		return text;
 	}
+	
+	/**
+	 * 
+	 * @param sec
+	 * @return
+	 */
+	public static String getFormattedDurationTextNoSeconds(long sec){
+		String text = "";
+		long h = sec/3600;
+		if (h>=24)
+			return null;
+		long m = (sec%3600)/60;
+		if (h > 0){
+			text += Long.toString(h) + "h" + " ";
+			text += Long.toString(m) + "m" + " ";
+		}
+		else{
+			text += Long.toString(m) + "min" + " ";
+		}
+		return text;
+	}
 }

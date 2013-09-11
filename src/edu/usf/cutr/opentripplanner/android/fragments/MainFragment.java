@@ -1779,6 +1779,7 @@ public class MainFragment extends Fragment implements
 		}
 		route = new ArrayList<Polyline>();
 		modeMarkers = new ArrayList<Marker>();
+		Marker firstTransitMarker = null;
 		
 		if (!itinerary.isEmpty()) {
 			List<LatLng> allGeoPoints = new ArrayList<LatLng>();
@@ -1789,20 +1790,38 @@ public class MainFragment extends Fragment implements
 						.getPoints());
 				MarkerOptions modeMarkerOption = new MarkerOptions().position(points.get(0))
 						                                        .icon(BitmapDescriptorFactory.fromResource(getPathIcon(leg.mode)));
-				String title = "";
-				String temp = "";
-				if ((temp = leg.getRouteShortName()) != null){
-					title += temp;
+				
+				TraverseMode traverseMode = TraverseMode.valueOf((String) leg.mode);
+
+				if (traverseMode.isTransit()){
+					String startTime = DateFormat.getTimeFormat(getActivity()).format(Double.parseDouble(leg.getStartTime()));
+					modeMarkerOption.title(leg.getFrom().name + " " + getResources().getString(R.string.connector_time)  + " " + startTime);
+					if (leg.getHeadsign() != null){
+						modeMarkerOption.snippet(leg.getHeadsign());
+					}
 				}
-				if ((temp = leg.getHeadsign()) != null){
-					title += " " + temp;
-					modeMarkerOption.title(title);
+				else{
+					if (traverseMode.equals(TraverseMode.WALK)){
+						modeMarkerOption.title(getResources().getString(R.string.before_distance_walk)
+								+ " " + getResources().getString(R.string.connector_destination) + " " + leg.getTo().name);
+					}
+					else if (traverseMode.equals(TraverseMode.BICYCLE)){
+						modeMarkerOption.title(getResources().getString(R.string.before_distance_bike)
+								+ " " + getResources().getString(R.string.connector_destination) + " " + leg.getTo().name);
+					}
+					modeMarkerOption.snippet(DateTimeConversion.getFormattedDurationTextNoSeconds(leg.duration/1000) + " " + "-" + " " 
+							+ String.format("%.0f", leg.getDistance()) + getResources().getString(R.string.distance_unit));
 				}
-				if ((temp = leg.getRouteLongName()) != null){
-					modeMarkerOption.snippet(temp);
-				}
+
+				
 				Marker modeMarker = mMap.addMarker(modeMarkerOption);
 				modeMarkers.add(modeMarker);
+				
+				if(traverseMode.isTransit()){
+					if (firstTransitMarker == null){
+						firstTransitMarker = modeMarker;
+					}
+				}
 				PolylineOptions options = new PolylineOptions().addAll(points)
 						   .color(OTPApp.COLOR_ROUTE_LINE);
 				Polyline routeLine = mMap.addPolyline(options);
@@ -1814,6 +1833,9 @@ public class MainFragment extends Fragment implements
 
 			}
 			if (animateCamera){
+				if (firstTransitMarker != null){
+					firstTransitMarker.showInfoWindow();
+				}
 				mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsCreator.build(), OTPApp.defaultPadding));
 			}
 		}
@@ -1919,11 +1941,36 @@ public class MainFragment extends Fragment implements
 	private void fillItinerariesSpinner(List<Itinerary> itineraryList){
 		String[] itinerarySummaryList = new String[itineraryList.size()];
 		for(int i=0; i<itinerarySummaryList.length; i++){
+			boolean isTagSet = false;
 			Itinerary it = itineraryList.get(i);
-			itinerarySummaryList[i] = Integer.toString(i+1) + ".   ";//Shown index is i + 1, to use 1-based indexes for the UI instead of 0-based
-			itinerarySummaryList[i] += getString(R.string.total_duration) + " " + DateTimeConversion.getFormattedDurationText(it.duration/1000);
-		//	itinerarySummaryList[i] += "   " + Long.toString(it.walkTime) + " meters";-->VREIXO
-			itinerarySummaryList[i] +=  "   " + getString(R.string.walking_duration) + " " + DateTimeConversion.getFormattedDurationText(it.walkTime);
+			itinerarySummaryList[i] = Integer.toString(i+1) + ".   ";//Shown index is i + 1, to use 1-based indexes for the UI instead of 0-base
+			for (Leg leg : it.legs){
+				TraverseMode traverseMode = TraverseMode.valueOf((String) leg.mode);
+				if(traverseMode.isTransit()){
+					itinerarySummaryList[i] += getString(R.string.before_route) + " " + leg.getRouteShortName();	
+					itinerarySummaryList[i] += " " + getString(R.string.connector_time) + " " + DateFormat.getTimeFormat(getActivity()).format(Double.parseDouble(leg.getStartTime()));	
+					itinerarySummaryList[i] += " " + "-" + " " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.duration/1000);
+					isTagSet = true;
+					break;
+				}
+			}
+			if (!isTagSet){
+				if (it.legs.size() == 1){
+					TraverseMode traverseMode = TraverseMode.valueOf((String) it.legs.get(0).mode);
+					if (traverseMode.equals(TraverseMode.WALK)){
+						itinerarySummaryList[i] += getString(R.string.before_distance_walk) + " " + String.format("%.0f", it.walkDistance) + getResources().getString(R.string.distance_unit);
+						itinerarySummaryList[i] += " " + getString(R.string.connector_time_full) + " " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.duration/1000);
+					}
+					else if (traverseMode.equals(TraverseMode.BICYCLE)){
+						itinerarySummaryList[i] += getString(R.string.before_distance_bike) + " " + String.format("%.0f", it.walkDistance) + getResources().getString(R.string.distance_unit);
+						itinerarySummaryList[i] += " " + getString(R.string.connector_time_full) + " " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.duration/1000);
+					}
+				}
+				else{
+					itinerarySummaryList[i] += getString(R.string.total_duration) + " " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.duration/1000);
+				}
+			}
+
 		}
 		
 		ArrayAdapter<String> itineraryAdapter = new ArrayAdapter<String>(this.getActivity().getApplicationContext(), android.R.layout.simple_spinner_item, itinerarySummaryList);
