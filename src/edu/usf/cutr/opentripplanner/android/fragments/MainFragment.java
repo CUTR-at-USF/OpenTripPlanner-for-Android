@@ -737,9 +737,9 @@ public class MainFragment extends Fragment implements
 					String text = tv.getText().toString();
 					if (!text.isEmpty()){
 						if (v.getId() == R.id.tbStartLocation && !isStartLocationGeocodingProcessed) {
-							processAddress(true, tv.getText().toString());
+							processAddress(true, tv.getText().toString(), false);
 						} else if (v.getId() == R.id.tbEndLocation && !isEndLocationGeocodingProcessed) {
-							processAddress(false, tv.getText().toString());
+							processAddress(false, tv.getText().toString(), false);
 						}
 					} else {
 						if (v.getId() == R.id.tbStartLocation){
@@ -820,14 +820,14 @@ public class MainFragment extends Fragment implements
 								&& event.getAction() == KeyEvent.ACTION_DOWN && event
 								.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
 					isRealLostFocus = false;
-					processAddress(true, v.getText().toString());
+					processAddress(true, v.getText().toString(), false);
 				} else if (v.getId() == R.id.tbEndLocation
 						&& actionId == EditorInfo.IME_ACTION_DONE
 						|| (event != null
 								&& event.getAction() == KeyEvent.ACTION_DOWN && event
 								.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
 					isRealLostFocus = false;
-					processAddress(false, v.getText().toString());
+					processAddress(false, v.getText().toString(), false);
 				}
 				return false;
 			}
@@ -1391,7 +1391,7 @@ public class MainFragment extends Fragment implements
 		else{
 			isEndLocationChangedByUser = false;
 		}
-		processAddress(isStartMarker, locationText);
+		processAddress(isStartMarker, locationText, true);
 	}
 	
 	@Override
@@ -1452,11 +1452,11 @@ public class MainFragment extends Fragment implements
 
 	}
 
-	public void processAddress(final boolean isStartTextBox, String address) {
+	public void processAddress(final boolean isStartTextBox, String address, boolean geocodingForMarker) {
 		WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
 
 		OTPGeocoding geocodingTask = new OTPGeocoding(weakContext, applicationContext,
-				isStartTextBox, app.getSelectedServer(), prefs.getString(
+				isStartTextBox, geocodingForMarker, app.getSelectedServer(), prefs.getString(
 						OTPApp.PREFERENCE_KEY_GEOCODER_PROVIDER, applicationContext.getResources().getString(R.string.geocoder_nominatim)),
 				this);	
 		LatLng mCurrentLatLng = getLastLocation();
@@ -1662,17 +1662,35 @@ public class MainFragment extends Fragment implements
 		return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 	}
 
-	public void moveMarker(Boolean start, Address addr) {
+	public void moveMarker(Boolean isStartMarker, Address addr) {
 		LatLng latlng = new LatLng(addr.getLatitude(), addr.getLongitude());
-		if (start) {
-			setMarkerPosition(true, latlng);
-			setTextBoxLocation(addr.getAddressLine(addr
-					.getMaxAddressLineIndex()), true);
+		setMarkerPosition(isStartMarker, latlng);
+		setTextBoxLocation(addr.getAddressLine(addr.getMaxAddressLineIndex()), isStartMarker);
+		zoomToGeocodingResult(isStartMarker, addr);
+	}
+	
+	public void moveMarkerRelative(Boolean isStartMarker, Address addr) {
+		float results[] = new float[1];
+		double addresLat = addr.getLatitude();
+		double addresLon = addr.getLongitude();
+		Marker marker;
+		if (isStartMarker) {
+			marker = startMarker;
 		} else {
-			setMarkerPosition(false, latlng);
-			setTextBoxLocation(addr.getAddressLine(addr
-					.getMaxAddressLineIndex()), false);
+			marker = endMarker;
 		}
+		
+		Location.distanceBetween(marker.getPosition().latitude, marker.getPosition().longitude, addresLat, addresLon, results);
+		
+		if (results[0] < OTPApp.MARKER_GEOCODING_MAX_ERROR){
+			LatLng newLatlng = new LatLng(addresLat, addresLon);
+			setMarkerPosition(isStartMarker, newLatlng);
+			setTextBoxLocation(addr.getAddressLine(addr.getMaxAddressLineIndex()), isStartMarker);
+		}
+		else{
+			setTextBoxLocation(getResources().getString(R.string.textbox_close_to_marker) + " " + addr.getAddressLine(addr.getMaxAddressLineIndex()), isStartMarker);
+		}
+
 	}
 	
 	public void zoomToGeocodingResult(boolean isStartLocation, Address addr) {
@@ -1916,7 +1934,7 @@ public class MainFragment extends Fragment implements
 
 	@Override
 	public void onOTPGeocodingComplete(final boolean isStartTextbox,
-			ArrayList<Address> addressesReturn) {
+			ArrayList<Address> addressesReturn, boolean geocodingForMarker) {
 		if (getActivity() != null){
 	
 			if (isStartTextbox){
@@ -1948,8 +1966,12 @@ public class MainFragment extends Fragment implements
 					alert.show();
 					return;
 				} else if (addressesReturn.size() == 1) {
-					zoomToGeocodingResult(isStartTextbox, addressesReturn.get(0));
-					moveMarker(isStartTextbox, addressesReturn.get(0));
+					if (geocodingForMarker){
+						moveMarkerRelative(isStartTextbox, addressesReturn.get(0));
+					}
+					else{
+						moveMarker(isStartTextbox, addressesReturn.get(0));
+					}
 					return;
 				}
 			
@@ -1988,7 +2010,6 @@ public class MainFragment extends Fragment implements
 								addr.setAddressLine(addr.getMaxAddressLineIndex() + 1,
 										addressLine);
 								moveMarker(isStartTextbox, addr);
-								zoomToGeocodingResult(isStartTextbox, addr);
 								Log.v(TAG, "Chosen: " + addressesText[item]);
 							}
 						});

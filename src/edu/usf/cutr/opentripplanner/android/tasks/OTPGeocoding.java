@@ -62,18 +62,20 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 	private boolean isStartTextbox;
 	private OTPGeocodingListener callback;
 	private String placesService;
+	private boolean geocodingForMarker;
 
 	private ArrayList<Address> addressesReturn = new ArrayList<Address>();
 
 	private Server selectedServer;
-
-	public OTPGeocoding(WeakReference<Activity> activity, Context context, boolean isStartTextbox, Server selectedServer, String placesService, OTPGeocodingListener callback) {
+	
+	public OTPGeocoding(WeakReference<Activity> activity, Context context, boolean isStartTextbox, boolean geocodingForMarker, Server selectedServer, String placesService, OTPGeocodingListener callback) {
 		this.context = context;
 		this.activity = activity;
 		this.isStartTextbox = isStartTextbox;
 		this.callback = callback;
 		this.selectedServer = selectedServer;
 		this.placesService = placesService;
+		this.geocodingForMarker = geocodingForMarker;
 		if (activity.get() != null){
 			progressDialog = new ProgressDialog(activity.get());
 		}
@@ -267,6 +269,6 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 			}
 		}
 		
-		callback.onOTPGeocodingComplete(isStartTextbox, addressesReturn);
+		callback.onOTPGeocodingComplete(isStartTextbox, addressesReturn, geocodingForMarker);
 	}
 }

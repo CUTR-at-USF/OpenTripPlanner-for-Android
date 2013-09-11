@@ -21,6 +21,7 @@
     <string name="need_to_place_markers_before_planning"><string>"You need to set valid origin and destination first"</string></string>
     <string name="start_location_hint">Start Location</string>
     <string name="end_location_hint">End Location</string>
+    <string name="textbox_close_to_marker">Marker, close to</string>
     <string name="metadata_location"><string>"/metadata"</string></string>
     <string name="metadata_request_successful">Metadata dowloaded correctly</string>
     <string name="metadata_request_progress">Getting graph metadata. Please wait...</string>

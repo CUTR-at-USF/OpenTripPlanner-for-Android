@@ -27,5 +27,5 @@ import android.location.Address;
  */
 
 public interface OTPGeocodingListener {
-	public void onOTPGeocodingComplete(boolean isStartTextbox, ArrayList<Address> addressesReturn);
+	public void onOTPGeocodingComplete(boolean isStartTextbox, ArrayList<Address> addressesReturn, boolean geocodingForMarker);
 }

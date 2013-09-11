@@ -51,6 +51,8 @@ public class OTPApp extends Application {
     public static final double BIKE_PARAMETERS_MAX_VALUE = 1.0;
 
     public static final int CHECK_BOUNDS_ACCEPTABLE_ERROR = 1000;
+    //in meters
+    public static final int MARKER_GEOCODING_MAX_ERROR = 100;
     
     private static final int MILLISECONDS_PER_SECOND = 1000;
     private static final int UPDATE_INTERVAL_IN_SECONDS = 5;

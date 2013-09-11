@@ -121,7 +121,7 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 				if (c.moveToFirst()) {
 				    String address = c.getString(c.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS));
 				    mainFragment.setTextBoxLocation(address, isButtonStartLocation);
-				    mainFragment.processAddress(isButtonStartLocation, address);
+				    mainFragment.processAddress(isButtonStartLocation, address, false);
 				}
 				
 				break;
