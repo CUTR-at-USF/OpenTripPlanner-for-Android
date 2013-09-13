@@ -17,6 +17,11 @@
 <resources>
     <string name="app_name">OpenTripPlanner</string>
     <string name="servers_spreadsheet_url"><![CDATA[https://spreadsheets.google.com/spreadsheet/pub?hl=en_US&hl=en_US&key=0AgWy8ujaGosCdDhxTC04cUZNeHo0eGFBQTBpU2dxN0E&single=true&gid=0&output=csv]]></string>
+    <string name="step_by_step_title">Directions</string>
+    <string name="step_by_step_from">From</string>
+    <string name="step_by_step_to">To</string>
+    <string name="step_by_step_departure">Dep.</string>
+    <string name="step_by_step_arrival">Arr.</string>
     <string name="need_to_place_marker"><string>"Add a position marker..."</string></string>
     <string name="need_to_place_markers_before_planning"><string>"You need to set valid origin and destination first"</string></string>
     <string name="start_location_hint">Start Location</string>
