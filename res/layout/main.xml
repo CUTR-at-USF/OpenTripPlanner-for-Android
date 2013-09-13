@@ -43,6 +43,8 @@
 			android:layout_height="96dp"
 			android:layout_width="80dp"
 			android:layout_alignParentRight="true"
+			android:layout_alignTop="@+id/tbStartLocation"
+			android:layout_alignBottom="@+id/tbEndLocation"
 			android:src="@drawable/action_search_dark"
 		    android:background="@drawable/button_layout">
 		</ImageButton>
@@ -58,7 +60,7 @@
 		</ImageButton>
 	    
 		<EditText
-			android:id="@+id/tbStartLocation"
+			android:id="@id/tbStartLocation"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"		
 			android:selectAllOnFocus="true"
@@ -71,7 +73,7 @@
 	     </EditText>
 	
 		<EditText
-		    android:id="@+id/tbEndLocation"
+		    android:id="@id/tbEndLocation"
 		    android:layout_width="match_parent"
 	 		android:layout_below="@id/tbStartLocation"
 		    android:layout_height="wrap_content"
@@ -88,7 +90,7 @@
 		    android:id="@+id/btnCompass"
 		    android:layout_width="60dp"
 		    android:layout_height="60dp"
-		    android:layout_centerVertical="true"  
+		    android:layout_alignTop="@id/btnDateDialog"  
 		    android:src="@android:drawable/ic_menu_compass"
 		    android:background="@drawable/button_layout">
 		</ImageButton>
