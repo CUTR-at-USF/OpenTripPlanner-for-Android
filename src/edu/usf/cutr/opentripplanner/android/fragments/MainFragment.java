@@ -665,8 +665,6 @@ public class MainFragment extends Fragment implements
 				
 				
 				request.setArriveBy(arriveBy);
-
-				request.setDateTime(tripDate);
 				
 				OptimizeSpinnerItem optimizeSpinnerItem = (OptimizeSpinnerItem) ddlOptimization.getItemAtPosition(ddlOptimization.getCheckedItemPosition());
 				if (optimizeSpinnerItem == null){
@@ -703,10 +701,9 @@ public class MainFragment extends Fragment implements
 
 				request.setDateTime(
 						DateFormat.format("MM/dd/yy",
-								System.currentTimeMillis()).toString(),
+								tripDate.getTime()).toString(),
 						DateFormat
-								.format("hh:mmaa", System.currentTimeMillis())
-								.toString());
+								.format("hh:mmaa", tripDate.getTime()).toString());
 
 				request.setShowIntermediateStops(Boolean.TRUE);
 				
@@ -1128,9 +1125,6 @@ public class MainFragment extends Fragment implements
 			Date savedTripDate = (Date) savedInstanceState.getSerializable(OTPApp.BUNDLE_KEY_TRIP_DATE);
 			if (savedTripDate != null){
 				tripDate = savedTripDate;
-			}
-			else{
-				tripDate = Calendar.getInstance().getTime();
 			}
 			arriveBy = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_ARRIVE_BY, false);
 			
