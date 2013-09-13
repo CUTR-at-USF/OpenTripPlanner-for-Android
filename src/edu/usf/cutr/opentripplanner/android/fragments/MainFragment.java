@@ -37,6 +37,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.v092snapshot.api.model.Itinerary;
 import org.opentripplanner.v092snapshot.api.model.Leg;
+import org.osmdroid.views.overlay.MyLocationOverlay;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -176,6 +177,9 @@ public class MainFragment extends Fragment implements
 	private ImageButton btnPlanTrip;
 	private ImageButton btnDateDialog;
 	private LatLng savedLastLocation;
+	
+	private Address startAddress;
+	private Address endAddress;
 	
 	private String resultTripStartLocation;
 	private String resultTripEndLocation;
@@ -1133,11 +1137,11 @@ public class MainFragment extends Fragment implements
 			}
 			arriveBy = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_ARRIVE_BY, false);
 			
-			if ((resultTripStartLocation = savedInstanceState.getString(OTPApp.BUNDLE_KEY_RESULT_TRIP_START_LOCATION)) == null){
-				resultTripStartLocation = tbStartLocation.getText().toString();
+			if (savedInstanceState.getString(OTPApp.BUNDLE_KEY_RESULT_TRIP_START_LOCATION) != null){
+				resultTripStartLocation = savedInstanceState.getString(OTPApp.BUNDLE_KEY_RESULT_TRIP_START_LOCATION);
 			}
-			if ((resultTripEndLocation = savedInstanceState.getString(OTPApp.BUNDLE_KEY_RESULT_TRIP_END_LOCATION)) == null){
-				resultTripEndLocation = tbEndLocation.getText().toString();
+			if (savedInstanceState.getString(OTPApp.BUNDLE_KEY_RESULT_TRIP_END_LOCATION) != null){
+				resultTripEndLocation = savedInstanceState.getString(OTPApp.BUNDLE_KEY_RESULT_TRIP_END_LOCATION);
 			}
 			
 			bikeTriangleMinValue = savedInstanceState.getDouble(OTPApp.BUNDLE_KEY_SEEKBAR_MIN_VALUE);
@@ -1442,10 +1446,10 @@ public class MainFragment extends Fragment implements
 		bundle.putInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION, ddlOptimization.getCheckedItemPosition());
 		bundle.putInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE, ddlTravelMode.getCheckedItemPosition());
 		
-		if ((resultTripStartLocation != null) && (resultTripStartLocation != tbStartLocation.getText().toString())){
+		if (resultTripStartLocation != null){
 			bundle.putString(OTPApp.BUNDLE_KEY_RESULT_TRIP_START_LOCATION, resultTripStartLocation);
 		}
-		if ((resultTripEndLocation != null) && (resultTripEndLocation != tbEndLocation.getText().toString())){
+		if (resultTripEndLocation != null){
 			bundle.putString(OTPApp.BUNDLE_KEY_RESULT_TRIP_END_LOCATION, resultTripEndLocation);
 		}
 
@@ -1678,9 +1682,14 @@ public class MainFragment extends Fragment implements
 	}
 
 	public void moveMarker(Boolean isStartMarker, Address addr) {
+		if (isStartMarker) {
+			startAddress = addr;
+		} else {
+			endAddress = addr;
+		}
 		LatLng latlng = new LatLng(addr.getLatitude(), addr.getLongitude());
 		setMarkerPosition(isStartMarker, latlng);
-		setTextBoxLocation(addr.getAddressLine(addr.getMaxAddressLineIndex()), isStartMarker);
+		setTextBoxLocation(getStringAddress(addr, false), isStartMarker);
 		zoomToGeocodingResult(isStartMarker, addr);
 	}
 	
@@ -1688,11 +1697,14 @@ public class MainFragment extends Fragment implements
 		float results[] = new float[1];
 		double addresLat = addr.getLatitude();
 		double addresLon = addr.getLongitude();
+		
 		Marker marker;
 		if (isStartMarker) {
 			marker = startMarker;
+			startAddress = addr;
 		} else {
 			marker = endMarker;
+			endAddress = addr;
 		}
 		
 		Location.distanceBetween(marker.getPosition().latitude, marker.getPosition().longitude, addresLat, addresLon, results);
@@ -1700,12 +1712,53 @@ public class MainFragment extends Fragment implements
 		if (results[0] < OTPApp.MARKER_GEOCODING_MAX_ERROR){
 			LatLng newLatlng = new LatLng(addresLat, addresLon);
 			setMarkerPosition(isStartMarker, newLatlng);
-			setTextBoxLocation(addr.getAddressLine(addr.getMaxAddressLineIndex()), isStartMarker);
+			setTextBoxLocation(getStringAddress(addr, false), isStartMarker);
 		}
 		else{
-			setTextBoxLocation(getResources().getString(R.string.textbox_close_to_marker) + " " + addr.getAddressLine(addr.getMaxAddressLineIndex()), isStartMarker);
+			setTextBoxLocation(getResources().getString(R.string.textbox_close_to_marker) + " " + getStringAddress(addr, false), isStartMarker);
 		}
 
+	}
+	
+	private String getStringAddress(Address address, boolean multilines){
+		if (address.getMaxAddressLineIndex() >= 0){
+			
+			String result = address.getAddressLine(0);
+			
+			if (multilines){
+				for (int i = 1; i <= address.getMaxAddressLineIndex(); i++){
+					if (i == 1){
+						result += "\n"; 
+						if (address.getAddressLine(i) != null){
+							result +=  address.getAddressLine(i);
+						}
+					}
+					else if (i == 2){
+						result += "\n"; 			
+						if (address.getAddressLine(i) != null){
+							result +=  address.getAddressLine(i);
+						}
+					}
+					else{
+						if (address.getAddressLine(i) != null){
+							result += ", " + address.getAddressLine(i);
+						}
+					}
+				}
+			}
+			else{
+				for (int i = 1; i <= address.getMaxAddressLineIndex(); i++){
+					if (address.getAddressLine(i) != null){
+						result += ", " + address.getAddressLine(i);
+					}
+				}
+			}
+
+			return result;
+		}
+		else{
+			return null;
+		}
 	}
 	
 	public void zoomToGeocodingResult(boolean isStartLocation, Address addr) {
@@ -1961,8 +2014,22 @@ public class MainFragment extends Fragment implements
 			MyActivity myActivity = (MyActivity)getActivity();
 			myActivity.setCurrentRequestString(currentRequestString);
 			
-			resultTripStartLocation = tbStartLocation.getText().toString();
-			resultTripEndLocation = tbEndLocation.getText().toString();
+			if (startAddress != null){
+				resultTripStartLocation = ((startAddress.getAddressLine(0) != null) ? startAddress.getAddressLine(0) : "")
+						+ ", "
+						+ ((startAddress.getAddressLine(1) != null) ? startAddress.getAddressLine(1) : "");
+			}
+			else{
+				resultTripStartLocation = tbStartLocation.getText().toString();
+			}
+			if (endAddress != null){
+				resultTripEndLocation = ((endAddress.getAddressLine(0) != null) ? endAddress.getAddressLine(0) : "")
+						+ ", "
+						+ ((endAddress.getAddressLine(1) != null) ? endAddress.getAddressLine(1) : "");
+			}
+			else{
+				resultTripEndLocation = tbEndLocation.getText().toString();
+			}
 		}
 	}
 	
@@ -2017,8 +2084,7 @@ public class MainFragment extends Fragment implements
 	@Override
 	public void onOTPGeocodingComplete(final boolean isStartTextbox,
 			ArrayList<Address> addressesReturn, boolean geocodingForMarker) {
-		if (getActivity() != null){
-	
+		if (getActivity() != null){	
 			if (isStartTextbox){
 				isStartLocationGeocodingProcessed = true;
 				if (isEndLocationGeocodingProcessed){
@@ -2065,17 +2131,8 @@ public class MainFragment extends Fragment implements
 						.size()];
 				for (int i = 0; i < addressesReturn.size(); i++) {
 					Address addr = addressesReturn.get(i);
-					addressesText[i] = addr.getAddressLine(0)
-							+ "\n"
-							+ ((addr.getAddressLine(1) != null) ? addr.getAddressLine(1) : "")
-							+ ((addr.getAddressLine(2) != null) ? ", "
-									+ addr.getAddressLine(2) : "");
-					// addressesText[i] = addr.getAddressLine(0)+"\n"+
-					// ((addr.getSubAdminArea()!=null) ? addr.getSubAdminArea()+", " :
-					// "")+
-					// ((addr.getAdminArea()!=null) ? addr.getAdminArea()+" " : "")+
-					// ((addr.getPostalCode()!=null) ? addr.getPostalCode()+" " : "")+
-					// ((addr.getCountryName()!=null) ? addr.getCountryName() : "");
+					addressesText[i] = getStringAddress(addr, true);
+
 					Log.v(TAG, addressesText[i].toString());
 				}
 		
@@ -2084,13 +2141,6 @@ public class MainFragment extends Fragment implements
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int item) {
 								Address addr = addressesTemp.get(item);
-								String addressLine = addr.getAddressLine(0)
-										+ "\n"
-										+ ((addr.getAddressLine(1) != null) ? addr.getAddressLine(1) : "")
-										+ ((addr.getAddressLine(2) != null) ? ", "
-												+ addr.getAddressLine(2) : "");
-								addr.setAddressLine(addr.getMaxAddressLineIndex() + 1,
-										addressLine);
 								moveMarker(isStartTextbox, addr);
 								Log.v(TAG, "Chosen: " + addressesText[item]);
 							}
@@ -2102,7 +2152,7 @@ public class MainFragment extends Fragment implements
 			}
 		}
 	}
-	
+
 
 	@Override
 	public void onMetadataRequestComplete(GraphMetadata metadata) {
@@ -2175,6 +2225,7 @@ public class MainFragment extends Fragment implements
 	public LatLng getLastLocation() {
 		if (mLocationClient.isConnected()){
 			Location loc = mLocationClient.getLastLocation();
+
 			if (loc != null){
 				LatLng mCurrentLocation = new LatLng(loc.getLatitude(), loc.getLongitude());
 				savedLastLocation = mCurrentLocation;

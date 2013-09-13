@@ -22,7 +22,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 import android.app.Activity;
@@ -133,14 +135,6 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 					addresses = (ArrayList<Address>)gc.getFromLocationName(address, 
 							context.getResources().getInteger(R.integer.geocoder_max_results));
 				}
-				for(int i=0; i<addresses.size(); i++){
-					Address addr = addresses.get(i);
-					String addressLine = "";
-					addressLine += addr.getAddressLine(0)!=null ? addr.getAddressLine(0) : "no-name";
-					addressLine += addr.getAddressLine(1)!=null ? "\n" + addr.getAddressLine(1) : "";
-					addressLine += addr.getAddressLine(2)!=null ? ", " + addr.getAddressLine(2) : "";
-					addr.setAddressLine(addr.getMaxAddressLineIndex()+1, addressLine);
-				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -148,6 +142,15 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 		
 		if ((addresses == null) || addresses.isEmpty()){
 			addresses = searchPlaces(address);
+			
+			for(int i=0; i<addresses.size(); i++){
+				Address addr = addresses.get(i);
+				String str = addr.getAddressLine(0);
+				List<String> addrLines = Arrays.asList(str.split(", "));
+				for (int j = 0; j < addrLines.size(); j++){
+					addr.setAddressLine(j, addrLines.get(j));
+				}
+			}
 		}
 
 		addressesReturn.addAll(addresses);
@@ -222,7 +225,19 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 			Address addr = new Address(Locale.US);
 			addr.setLatitude(poi.getLatitude());
 			addr.setLongitude(poi.getLongitude());
-			String addressLine = poi.getAddress()==null ? poi.getName() : (poi.getName() + ", " + poi.getAddress());
+			String addressLine;
+			
+			if (poi.getAddress() != null) {
+				if (!poi.getAddress().contains(poi.getName())){
+					addressLine = (poi.getName() + ", " + poi.getAddress());
+				}
+				else{
+					addressLine = poi.getAddress();
+				}
+			}
+			else{
+				addressLine = poi.getName();
+			}
 			addr.setAddressLine(addr.getMaxAddressLineIndex()+1,addressLine); 
 			addresses.add(addr);
 		}
