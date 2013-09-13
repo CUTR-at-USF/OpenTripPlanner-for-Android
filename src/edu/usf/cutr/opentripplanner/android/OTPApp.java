@@ -77,6 +77,9 @@ public class OTPApp extends Application {
     public static final String BUNDLE_KEY_IS_START_LOCATION_CHANGED_BY_USER = "startlocation changed by user";
     public static final String BUNDLE_KEY_IS_END_LOCATION_CHANGED_BY_USER = "endlocation changed by user";
     
+    public static final String BUNDLE_KEY_RESULT_TRIP_START_LOCATION = "result trip start location";
+    public static final String BUNDLE_KEY_RESULT_TRIP_END_LOCATION = "result trip end location";
+   
     public static final String BUNDLE_KEY_SEEKBAR_MIN_VALUE = "seekbar min value";
     public static final String BUNDLE_KEY_SEEKBAR_MAX_VALUE = "seekbar max value";
 

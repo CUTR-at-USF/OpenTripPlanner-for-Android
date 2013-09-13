@@ -71,6 +71,8 @@ public class DirectionListFragment extends ExpandableListFragment {
 	TextView toHeader;
 	TextView departureTimeHeader;
 	TextView arrivalTimeHeader;
+	
+	OTPBundle otpBundle;
 
 	@Override
 	public void onAttach(Activity activity) {
@@ -112,21 +114,17 @@ public class DirectionListFragment extends ExpandableListFragment {
 		toHeader = (TextView)header.findViewById(R.id.toHeader);
 		departureTimeHeader = (TextView)header.findViewById(R.id.departureTimeHeader);
 		arrivalTimeHeader = (TextView)header.findViewById(R.id.arrivalTimeHeader);
-
-
+		
 		if (savedInstanceState != null){
-			fromHeader.setText(savedInstanceState.getString(OTPApp.BUNDLE_KEY_TB_START_LOCATION));
-			toHeader.setText(savedInstanceState.getString(OTPApp.BUNDLE_KEY_TB_END_LOCATION));
-			OTPBundle otpBundleRestored = (OTPBundle) savedInstanceState.getSerializable(OTPApp.BUNDLE_KEY_OTP_BUNDLE);
-			fragmentListener.onItinerariesLoaded(otpBundleRestored.getItineraryList());
-			fragmentListener.onItinerarySelected(otpBundleRestored.getCurrentItineraryIndex());
+			otpBundle = (OTPBundle) savedInstanceState.getSerializable(OTPApp.BUNDLE_KEY_OTP_BUNDLE);
+			fragmentListener.setOTPBundle(otpBundle);
 		}
 		else{
-			OTPBundle otpBundle = fragmentListener.getOTPBundle();
-			fromHeader.setText(otpBundle.getFromText());
-			toHeader.setText(otpBundle.getToText());
+			otpBundle = fragmentListener.getOTPBundle();
 		}
 		
+	 	fromHeader.setText(otpBundle.getFromText());
+	 	toHeader.setText(otpBundle.getToText());
 		setDepartureArrivalHeaders();
 
 		ArrayList<Leg> currentItinerary = new ArrayList<Leg>();
@@ -249,15 +247,7 @@ public class DirectionListFragment extends ExpandableListFragment {
 	@Override
 	public void onSaveInstanceState(Bundle bundle) {
 		super.onSaveInstanceState(bundle);
-		TextView tbStartLocation = (TextView)header.findViewById(R.id.fromHeader);
-		TextView tbEndLocation = (TextView)header.findViewById(R.id.toHeader);
-		bundle.putString(OTPApp.BUNDLE_KEY_TB_START_LOCATION, tbStartLocation.getText().toString());
-		bundle.putString(OTPApp.BUNDLE_KEY_TB_END_LOCATION, tbEndLocation.getText().toString());
 
-		OTPBundle otpBundle = new OTPBundle();
-		otpBundle.setItineraryList(fragmentListener.getCurrentItineraryList());
-		otpBundle.setCurrentItineraryIndex(fragmentListener.getCurrentItineraryIndex());
-		otpBundle.setCurrentItinerary(fragmentListener.getCurrentItinerary());
 		bundle.putSerializable(OTPApp.BUNDLE_KEY_OTP_BUNDLE, otpBundle);
 	}
 

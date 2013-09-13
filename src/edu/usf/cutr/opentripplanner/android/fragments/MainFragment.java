@@ -177,6 +177,9 @@ public class MainFragment extends Fragment implements
 	private ImageButton btnDateDialog;
 	private LatLng savedLastLocation;
 	
+	private String resultTripStartLocation;
+	private String resultTripEndLocation;
+	
 	private View panelDisplayDirection;
 	
 	private Spinner itinerarySelectionSpinner;
@@ -246,6 +249,7 @@ public class MainFragment extends Fragment implements
 	private float tilt = 0;
 	
 	private Date tripDate;
+
 	private boolean arriveBy;
 	
 	private double bikeTriangleMinValue = OTPApp.BIKE_PARAMETERS_QUICK_DEFAULT_VALUE; 
@@ -979,8 +983,8 @@ public class MainFragment extends Fragment implements
 	
 	private void saveOTPBundle() {
 		OTPBundle bundle = new OTPBundle();
-		bundle.setFromText(tbStartLocation.getText().toString());
-		bundle.setToText(tbEndLocation.getText().toString());
+		bundle.setFromText(resultTripStartLocation);
+		bundle.setToText(resultTripEndLocation);
 
 		this.getFragmentListener().setOTPBundle(bundle);
 	}
@@ -1128,6 +1132,13 @@ public class MainFragment extends Fragment implements
 				tripDate = savedTripDate;
 			}
 			arriveBy = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_ARRIVE_BY, false);
+			
+			if ((resultTripStartLocation = savedInstanceState.getString(OTPApp.BUNDLE_KEY_RESULT_TRIP_START_LOCATION)) == null){
+				resultTripStartLocation = tbStartLocation.getText().toString();
+			}
+			if ((resultTripEndLocation = savedInstanceState.getString(OTPApp.BUNDLE_KEY_RESULT_TRIP_END_LOCATION)) == null){
+				resultTripEndLocation = tbEndLocation.getText().toString();
+			}
 			
 			bikeTriangleMinValue = savedInstanceState.getDouble(OTPApp.BUNDLE_KEY_SEEKBAR_MIN_VALUE);
 			bikeTriangleMaxValue = savedInstanceState.getDouble(OTPApp.BUNDLE_KEY_SEEKBAR_MAX_VALUE);
@@ -1431,6 +1442,13 @@ public class MainFragment extends Fragment implements
 		bundle.putInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION, ddlOptimization.getCheckedItemPosition());
 		bundle.putInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE, ddlTravelMode.getCheckedItemPosition());
 		
+		if ((resultTripStartLocation != null) && (resultTripStartLocation != tbStartLocation.getText().toString())){
+			bundle.putString(OTPApp.BUNDLE_KEY_RESULT_TRIP_START_LOCATION, resultTripStartLocation);
+		}
+		if ((resultTripEndLocation != null) && (resultTripEndLocation != tbEndLocation.getText().toString())){
+			bundle.putString(OTPApp.BUNDLE_KEY_RESULT_TRIP_END_LOCATION, resultTripEndLocation);
+		}
+
 		bundle.putDouble(OTPApp.BUNDLE_KEY_SEEKBAR_MIN_VALUE, bikeTriangleMinValue);
 		bundle.putDouble(OTPApp.BUNDLE_KEY_SEEKBAR_MAX_VALUE, bikeTriangleMaxValue);
 		
@@ -1439,6 +1457,8 @@ public class MainFragment extends Fragment implements
 		
 		if (!fragmentListener.getCurrentItineraryList().isEmpty()){
 			OTPBundle otpBundle = new OTPBundle();
+			otpBundle.setFromText(resultTripStartLocation);
+			otpBundle.setToText(resultTripEndLocation);
 			otpBundle.setItineraryList(fragmentListener.getCurrentItineraryList());
 			otpBundle.setCurrentItineraryIndex(fragmentListener.getCurrentItineraryIndex());
 			otpBundle.setCurrentItinerary(fragmentListener.getCurrentItinerary());
@@ -1940,6 +1960,9 @@ public class MainFragment extends Fragment implements
 			ofl.onItinerarySelected(0);
 			MyActivity myActivity = (MyActivity)getActivity();
 			myActivity.setCurrentRequestString(currentRequestString);
+			
+			resultTripStartLocation = tbStartLocation.getText().toString();
+			resultTripEndLocation = tbEndLocation.getText().toString();
 		}
 	}
 	
