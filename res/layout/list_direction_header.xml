@@ -28,81 +28,78 @@
             android:layout_toRightOf="@+id/btnDisplayMap"
             android:gravity="left"      
             android:padding="5dp"                
-            android:text="Directions"
+            android:text="@string/step_by_step_title"
             android:textColor="#000000"
             android:textSize="22sp"
             android:textStyle="bold" />
+        
     </RelativeLayout>
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:id="@+id/layout1"
         android:orientation="horizontal" >
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentTop="true"
             android:layout_marginLeft="5dp"
             android:gravity="center_vertical"
             android:padding="5dp"
-            android:text="From"
+            android:text="@string/step_by_step_from"
             android:textColor="#C0C0C0"
             android:textSize="18sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/fromHeader"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentTop="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:gravity="center_vertical"
             android:padding="5dp"
             android:textColor="#000000"
             android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:singleLine="true" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:orientation="horizontal" >
+        android:orientation="horizontal"
+	    android:baselineAligned="false" >
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentTop="true"
             android:layout_marginLeft="5dp"
             android:gravity="center_vertical"
             android:padding="10dp"
-            android:text="To"
+            android:text="@string/step_by_step_to"
             android:textColor="#C0C0C0"
             android:textSize="18sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/toHeader"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentTop="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:gravity="center_vertical"
             android:padding="10dp"
             android:textColor="#000000"
             android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:singleLine="true" />
+        
     </LinearLayout>
     
     <LinearLayout
 	    android:layout_width="fill_parent"
 	    android:layout_height="fill_parent"
-	    android:orientation="horizontal" >
+	    android:orientation="horizontal"
+	    android:baselineAligned="false" >
         
         <LinearLayout
 		    android:layout_width="0dp"
@@ -113,12 +110,10 @@
 	        <TextView
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
-	            android:layout_alignParentBottom="true"
-	            android:layout_alignParentTop="true"
 	            android:layout_marginLeft="5dp"
 	            android:gravity="center_vertical"
 	            android:padding="10dp"
-	            android:text="Dep."
+           		android:text="@string/step_by_step_departure"
 	            android:textColor="#C0C0C0"
 	            android:textSize="18sp"
 	            android:textStyle="bold" />
@@ -127,8 +122,6 @@
 	            android:id="@+id/departureTimeHeader"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
-	            android:layout_alignParentBottom="true"
-	            android:layout_alignParentTop="true"
 	            android:gravity="center_vertical"
 	            android:padding="10dp"
 	            android:textColor="#000000"
@@ -146,12 +139,10 @@
 	        <TextView
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
-	            android:layout_alignParentBottom="true"
-	            android:layout_alignParentTop="true"
 	            android:layout_marginLeft="5dp"
 	            android:gravity="center_vertical"
 	            android:padding="10dp"
-	            android:text="Arr."
+           		android:text="@string/step_by_step_arrival"
 	            android:textColor="#C0C0C0"
 	            android:textSize="18sp"
 	            android:textStyle="bold" />
@@ -160,8 +151,6 @@
 	            android:id="@+id/arrivalTimeHeader"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
-	            android:layout_alignParentBottom="true"
-	            android:layout_alignParentTop="true"
 	            android:gravity="center_vertical"
 	            android:padding="10dp"
 	            android:textColor="#000000"
@@ -178,42 +167,5 @@
         android:layout_height="wrap_content"
         android:prompt="@string/alternative_routes" >
     </Spinner>
-
-    <!-- <LinearLayout -->
-    <!-- xmlns:android="http://schemas.android.com/apk/res/android" -->
-    <!-- android:layout_width="fill_parent" -->
-    <!-- android:layout_height="fill_parent" -->
-    <!-- android:layout_gravity="center_vertical" -->
-    <!-- android:orientation="horizontal" > -->
-
-
-    <!-- <TextView -->
-    <!-- android:id="@+id/totalDistanceHeader" -->
-    <!-- android:layout_width="wrap_content" -->
-    <!-- android:layout_height="wrap_content" -->
-    <!-- android:layout_alignParentBottom="true" -->
-    <!-- android:layout_alignParentTop="true" -->
-    <!-- android:layout_marginLeft="5dp" -->
-    <!-- android:gravity="center_vertical" -->
-    <!-- android:padding="10dp" -->
-    <!-- android:textColor="#000000" -->
-    <!-- android:textSize="22dp" -->
-    <!-- android:textStyle="bold" -->
-    <!-- android:text="To" /> -->
-
-
-    <!-- <TextView -->
-    <!-- android:id="@+id/timeTraveledHeader" -->
-    <!-- android:layout_width="fill_parent" -->
-    <!-- android:layout_height="fill_parent" -->
-    <!-- android:layout_alignParentBottom="true" -->
-    <!-- android:layout_alignParentTop="true" -->
-    <!-- android:layout_marginLeft="5dp" -->
-    <!-- android:gravity="center_vertical" -->
-    <!-- android:padding="10dp" -->
-    <!-- android:textColor="#000000" -->
-    <!-- android:textSize="22dp" -->
-    <!-- android:textStyle="bold" /> -->
-    <!-- </LinearLayout> -->
 
 </LinearLayout>
