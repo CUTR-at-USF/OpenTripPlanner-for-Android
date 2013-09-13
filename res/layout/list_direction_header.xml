@@ -98,6 +98,79 @@
             android:textSize="18sp"
             android:textStyle="bold" />
     </LinearLayout>
+    
+    <LinearLayout
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"
+	    android:orientation="horizontal" >
+        
+        <LinearLayout
+		    android:layout_width="0dp"
+		    android:layout_height="fill_parent"
+		    android:orientation="horizontal"
+		    android:layout_weight="1" >
+
+	        <TextView
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_alignParentBottom="true"
+	            android:layout_alignParentTop="true"
+	            android:layout_marginLeft="5dp"
+	            android:gravity="center_vertical"
+	            android:padding="10dp"
+	            android:text="Dep."
+	            android:textColor="#C0C0C0"
+	            android:textSize="18sp"
+	            android:textStyle="bold" />
+	
+	        <TextView
+	            android:id="@+id/departureTimeHeader"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_alignParentBottom="true"
+	            android:layout_alignParentTop="true"
+	            android:gravity="center_vertical"
+	            android:padding="10dp"
+	            android:textColor="#000000"
+	            android:textSize="18sp"
+	            android:textStyle="bold" />
+	        
+        </LinearLayout>
+        
+        <LinearLayout
+		    android:layout_width="0dp"
+		    android:layout_height="fill_parent"
+		    android:orientation="horizontal" 
+		    android:layout_weight="1" >
+	       
+	        <TextView
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_alignParentBottom="true"
+	            android:layout_alignParentTop="true"
+	            android:layout_marginLeft="5dp"
+	            android:gravity="center_vertical"
+	            android:padding="10dp"
+	            android:text="Arr."
+	            android:textColor="#C0C0C0"
+	            android:textSize="18sp"
+	            android:textStyle="bold" />
+	
+	        <TextView
+	            android:id="@+id/arrivalTimeHeader"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_alignParentBottom="true"
+	            android:layout_alignParentTop="true"
+	            android:gravity="center_vertical"
+	            android:padding="10dp"
+	            android:textColor="#000000"
+	            android:textSize="18sp"
+	            android:textStyle="bold" />
+	        
+	        </LinearLayout>
+	        
+    </LinearLayout>
 
     <Spinner
         android:id="@+id/itinerarySelection"

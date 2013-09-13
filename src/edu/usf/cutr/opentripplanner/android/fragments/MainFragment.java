@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.miscwidgets.widget.Panel;
 import org.opentripplanner.api.ws.GraphMetadata;
@@ -1779,7 +1780,16 @@ public class MainFragment extends Fragment implements
 			List<LatLng> allGeoPoints = new ArrayList<LatLng>();
 			LatLngBounds.Builder boundsCreator = LatLngBounds.builder();
 			
+
+
+			int agencyTimeZoneOffset = 0;
+			
 			for (Leg leg : itinerary) {
+				
+				if (leg.getAgencyTimeZoneOffset() != 0){
+					agencyTimeZoneOffset = leg.getAgencyTimeZoneOffset();
+				}
+				
 				List<LatLng> points = LocationUtil.decodePoly(leg.legGeometry
 						.getPoints());
 				MarkerOptions modeMarkerOption = new MarkerOptions().position(points.get(0))
@@ -1788,8 +1798,9 @@ public class MainFragment extends Fragment implements
 				TraverseMode traverseMode = TraverseMode.valueOf((String) leg.mode);
 
 				if (traverseMode.isTransit()){
-					String startTime = DateFormat.getTimeFormat(getActivity()).format(Double.parseDouble(leg.getStartTime()));
-					modeMarkerOption.title(leg.getFrom().name + " " + getResources().getString(R.string.connector_time)  + " " + startTime);
+
+					
+					modeMarkerOption.title(leg.getFrom().name + " " + DateTimeConversion.getTimeWithContext(applicationContext, agencyTimeZoneOffset, Long.parseLong(leg.getStartTime()), true));
 					if (leg.getHeadsign() != null){
 						modeMarkerOption.snippet(leg.getHeadsign());
 					}
@@ -1934,15 +1945,22 @@ public class MainFragment extends Fragment implements
 	
 	private void fillItinerariesSpinner(List<Itinerary> itineraryList){
 		String[] itinerarySummaryList = new String[itineraryList.size()];
+
+		int agencyTimeZoneOffset = 0;
+		
 		for(int i=0; i<itinerarySummaryList.length; i++){
 			boolean isTagSet = false;
 			Itinerary it = itineraryList.get(i);
 			itinerarySummaryList[i] = Integer.toString(i+1) + ".   ";//Shown index is i + 1, to use 1-based indexes for the UI instead of 0-base
 			for (Leg leg : it.legs){
 				TraverseMode traverseMode = TraverseMode.valueOf((String) leg.mode);
+				//OTP can't handle more than two timezones per request, so this is safe
+				if (leg.getAgencyTimeZoneOffset() != 0){
+					agencyTimeZoneOffset = leg.getAgencyTimeZoneOffset();
+				}
 				if(traverseMode.isTransit()){
-					itinerarySummaryList[i] += getString(R.string.before_route) + " " + leg.getRouteShortName();	
-					itinerarySummaryList[i] += " " + getString(R.string.connector_time) + " " + DateFormat.getTimeFormat(getActivity()).format(Double.parseDouble(leg.getStartTime()));	
+					itinerarySummaryList[i] += getString(R.string.before_route) + " " + leg.getRouteShortName();
+					itinerarySummaryList[i] += DateTimeConversion.getTimeWithContext(applicationContext, agencyTimeZoneOffset, Long.parseLong(leg.getStartTime()), true);
 					itinerarySummaryList[i] += " " + "-" + " " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.duration/1000);
 					isTagSet = true;
 					break;

@@ -17,6 +17,8 @@
 package edu.usf.cutr.opentripplanner.android.fragments;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 import org.opentripplanner.v092snapshot.api.model.Itinerary;
 import org.opentripplanner.v092snapshot.api.model.Leg;
@@ -26,6 +28,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -62,7 +65,12 @@ public class DirectionListFragment extends ExpandableListFragment {
 		
 	private ExpandableListView elv;
 	
-	private boolean isFragmentFirstLoaded = true;
+	private boolean isFragmentFirstLoad = true;
+	
+	TextView fromHeader;
+	TextView toHeader;
+	TextView departureTimeHeader;
+	TextView arrivalTimeHeader;
 
 	@Override
 	public void onAttach(Activity activity) {
@@ -87,7 +95,7 @@ public class DirectionListFragment extends ExpandableListFragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		
+				
 		ImageButton btnDisplayMap = (ImageButton)header.findViewById(R.id.btnDisplayMap);
 		final OnFragmentListener ofl = this.getFragmentListener();
 		final DirectionListFragment dlf = this;
@@ -100,8 +108,10 @@ public class DirectionListFragment extends ExpandableListFragment {
 		btnDisplayMap.setOnClickListener(oclDisplayDirection);
 		
 
-		TextView fromHeader = (TextView)header.findViewById(R.id.fromHeader);
-		TextView toHeader = (TextView)header.findViewById(R.id.toHeader);
+		fromHeader = (TextView)header.findViewById(R.id.fromHeader);
+		toHeader = (TextView)header.findViewById(R.id.toHeader);
+		departureTimeHeader = (TextView)header.findViewById(R.id.departureTimeHeader);
+		arrivalTimeHeader = (TextView)header.findViewById(R.id.arrivalTimeHeader);
 
 
 		if (savedInstanceState != null){
@@ -117,7 +127,8 @@ public class DirectionListFragment extends ExpandableListFragment {
 			toHeader.setText(otpBundle.getToText());
 		}
 		
-		
+		setDepartureArrivalHeaders();
+
 		ArrayList<Leg> currentItinerary = new ArrayList<Leg>();
 		currentItinerary.addAll(fragmentListener.getCurrentItinerary());
 		ArrayList<Itinerary> itineraryList = new ArrayList<Itinerary>();
@@ -125,7 +136,7 @@ public class DirectionListFragment extends ExpandableListFragment {
 		int currentItineraryIndex = fragmentListener.getCurrentItineraryIndex();
 		
 		ArrayList<Direction> directions = new ArrayList<Direction>();
-		ItineraryDecrypt itDecrypt = new ItineraryDecrypt(currentItinerary);
+		ItineraryDecrypt itDecrypt = new ItineraryDecrypt(currentItinerary, getActivity().getApplicationContext());
 		ArrayList<Direction> tempDirections = itDecrypt.getDirections();
 		if(tempDirections!=null && !tempDirections.isEmpty()){
 			directions.addAll(tempDirections);
@@ -158,9 +169,11 @@ public class DirectionListFragment extends ExpandableListFragment {
 //		    				   Toast.LENGTH_SHORT).show();
 		    	fragmentListener.onItinerarySelected(position);
 		    	
-		    	if(!isFragmentFirstLoaded){
+		    	setDepartureArrivalHeaders();
+
+		    	if(!isFragmentFirstLoad){
 					ArrayList<Direction> directions = new ArrayList<Direction>();
-					ItineraryDecrypt itDecrypt = new ItineraryDecrypt(fragmentListener.getCurrentItinerary());
+					ItineraryDecrypt itDecrypt = new ItineraryDecrypt(fragmentListener.getCurrentItinerary(), getActivity().getApplicationContext());
 					ArrayList<Direction> tempDirections = itDecrypt.getDirections();
 					if(tempDirections!=null && !tempDirections.isEmpty()){
 						directions.addAll(tempDirections);
@@ -177,7 +190,8 @@ public class DirectionListFragment extends ExpandableListFragment {
 					
 		    	}
 		    	
-		    	isFragmentFirstLoaded = false;
+				isFragmentFirstLoad = false;
+		    	
 		    }
 
 		    @Override
@@ -207,6 +221,29 @@ public class DirectionListFragment extends ExpandableListFragment {
 		elv.setAdapter(adapter);
 		
 		elv.setGroupIndicator(null); // Get rid of the down arrow
+		
+	}
+	
+	private void setDepartureArrivalHeaders(){
+	 	Itinerary firstItinerary = fragmentListener.getCurrentItineraryList().get(fragmentListener.getCurrentItineraryIndex());
+		
+		int agencyTimeZoneOffset = 0;
+		
+		for (Leg leg : firstItinerary.legs){
+			if (leg.getAgencyTimeZoneOffset() != 0){
+				agencyTimeZoneOffset = leg.getAgencyTimeZoneOffset();
+			}
+		}
+		
+		Calendar calStart = firstItinerary.startTime;
+		calStart.setTimeZone(TimeZone.getTimeZone("GMT"));
+		
+		departureTimeHeader.setText(DateTimeConversion.getTimeWithContext(getActivity().getApplicationContext(), agencyTimeZoneOffset, calStart.getTimeInMillis(), false));
+		
+		Calendar calEnd = firstItinerary.endTime;
+		calEnd.setTimeZone(TimeZone.getTimeZone("GMT"));
+		
+		arrivalTimeHeader.setText(DateTimeConversion.getTimeWithContext(getActivity().getApplicationContext(), agencyTimeZoneOffset, calEnd.getTimeInMillis(), false));
 	}
 
 	@Override
@@ -216,6 +253,7 @@ public class DirectionListFragment extends ExpandableListFragment {
 		TextView tbEndLocation = (TextView)header.findViewById(R.id.toHeader);
 		bundle.putString(OTPApp.BUNDLE_KEY_TB_START_LOCATION, tbStartLocation.getText().toString());
 		bundle.putString(OTPApp.BUNDLE_KEY_TB_END_LOCATION, tbEndLocation.getText().toString());
+
 		OTPBundle otpBundle = new OTPBundle();
 		otpBundle.setItineraryList(fragmentListener.getCurrentItineraryList());
 		otpBundle.setCurrentItineraryIndex(fragmentListener.getCurrentItineraryIndex());

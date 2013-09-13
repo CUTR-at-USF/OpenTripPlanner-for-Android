@@ -18,7 +18,10 @@ package edu.usf.cutr.opentripplanner.android.util;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import edu.usf.cutr.opentripplanner.android.R;
 
@@ -31,6 +34,9 @@ import org.opentripplanner.v092snapshot.api.model.Elevation;
 import org.opentripplanner.v092snapshot.api.model.Leg;
 import org.opentripplanner.v092snapshot.api.model.Place;
 import org.opentripplanner.v092snapshot.api.model.WalkStep;
+
+import android.content.Context;
+import android.text.format.DateFormat;
 
 import edu.usf.cutr.opentripplanner.android.model.Direction;
 
@@ -47,10 +53,15 @@ public class ItineraryDecrypt {
 	private double totalDistance = 0;
 
 	private double totalTimeTraveled = 0;
+	
+	private Context applicationContext;
+	
+	int agencyTimeZoneOffset = 0;
 
-	public ItineraryDecrypt(List<Leg> legs){
+	public ItineraryDecrypt(List<Leg> legs, Context applicationContext){
 		this.legs.addAll(legs);
-
+		this.applicationContext = applicationContext;
+		
 		convertToDirectionList();
 	}
 
@@ -110,7 +121,11 @@ public class ItineraryDecrypt {
 		Direction direction = new Direction();
 
 		//		http://opentripplanner.usf.edu/opentripplanner-api-webapp/ws/plan?optimize=QUICK&time=09:24pm&arriveBy=false&wheelchair=false&maxWalkDistance=7600.0&fromPlace=28.033389%2C+-82.521034&toPlace=28.064709%2C+-82.471618&date=03/07/12&mode=WALK,TRAM,SUBWAY,RAIL,BUS,FERRY,CABLE_CAR,GONDOLA,FUNICULAR,TRANSIT,TRAINISH,BUSISH
-
+		
+		if (leg.getAgencyTimeZoneOffset() != 0){
+			this.agencyTimeZoneOffset = leg.getAgencyTimeZoneOffset();
+		}
+		
 		// Get appropriate action and icon
 		String action = "Walk";
 		int icon = R.drawable.mode_walk;
@@ -216,6 +231,10 @@ public class ItineraryDecrypt {
 		ArrayList<Direction> directions = new ArrayList<Direction>(2);
 		Direction onDirection = new Direction();
 		Direction offDirection = new Direction(); 
+		
+		if (leg.getAgencyTimeZoneOffset() != 0){
+			this.agencyTimeZoneOffset = leg.getAgencyTimeZoneOffset();
+		}
 
 		//		set icon
 		TraverseMode mode = TraverseMode.valueOf((String) leg.mode);
@@ -251,6 +270,7 @@ public class ItineraryDecrypt {
 		String routeLongName = leg.routeLongName;
 		String boardRule = leg.boardRule;
 		String alignRule = leg.alightRule;
+		String startTime = leg.startTime;
 
 		ArrayList<Place> stopsInBetween = new ArrayList<Place>();
 		if(leg.getStop()!=null)
@@ -274,7 +294,8 @@ public class ItineraryDecrypt {
 		offDirection.setIcon(icon);
 
 		// Only onDirection has subdirection (list of stops in between)
-		onDirectionText += "Get on " + serviceName + " " + mode + " " + route + "\n";
+		
+		onDirectionText += "Get on " + serviceName + " " + mode + " " + route + DateTimeConversion.getTimeWithContext(applicationContext, agencyTimeZoneOffset, Long.parseLong(leg.getStartTime()), true) + "\n";
 		onDirectionText += "At " + from.name + " (" + agencyAndIdFrom.getAgencyId() + " " + agencyAndIdFrom.getId() + ")\n";
 		onDirectionText += stopsInBetween.size() + " stops in between";
 		onDirection.setDirectionText(onDirectionText);

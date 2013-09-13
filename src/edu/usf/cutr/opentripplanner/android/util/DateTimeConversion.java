@@ -19,7 +19,13 @@ package edu.usf.cutr.opentripplanner.android.util;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
+
+import android.content.Context;
+
+import edu.usf.cutr.opentripplanner.android.R;
 
 /**
  * @author Khoa Tran
@@ -88,4 +94,54 @@ public class DateTimeConversion {
 		}
 		return text;
 	}
+	
+	public static String getTimeWithContext(Context applicationContext, int offsetGMT, long time, boolean inLine){
+		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+		DateFormat timeFormat = android.text.format.DateFormat.getTimeFormat(applicationContext);
+		DateFormat dateFormat = android.text.format.DateFormat.getDateFormat(applicationContext);
+		timeFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+		dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+		
+		cal.setTimeInMillis(time);
+		cal.add(Calendar.MILLISECOND, offsetGMT);
+		
+		if (inLine){
+			if (DateTimeConversion.isToday(cal)){
+				return (" " + applicationContext.getResources().getString(R.string.connector_time) + " " + timeFormat.format(cal.getTime()));	
+			}
+			else if (DateTimeConversion.isTomorrow(cal)){
+				return (" " + "tomorrow" + " " + applicationContext.getResources().getString(R.string.connector_time) + " " + timeFormat.format(cal.getTime()));
+			}
+			else{
+				return (" " + "on" + " " + dateFormat.format(cal.getTime()) +" " + applicationContext.getResources().getString(R.string.connector_time) + " " + timeFormat.format(cal.getTime()));
+			}
+		}
+		else{
+			if (DateTimeConversion.isToday(cal)){
+				return (timeFormat.format(cal.getTime()));	
+			}
+			else{
+				return (timeFormat.format(cal.getTime()) + " " + dateFormat.format(cal.getTime()));
+			}
+		}
+
+	}
+	
+    public static boolean isToday(Calendar cal) {
+    	Calendar actualTime = Calendar.getInstance();
+    	
+        return (actualTime.get(Calendar.ERA) == cal.get(Calendar.ERA) &&
+        		actualTime.get(Calendar.YEAR) == cal.get(Calendar.YEAR) &&
+				actualTime.get(Calendar.DAY_OF_YEAR) == cal.get(Calendar.DAY_OF_YEAR));
+    }
+    
+    public static boolean isTomorrow(Calendar cal) {
+    	Calendar tomorrowTime = Calendar.getInstance();
+    	tomorrowTime.add(Calendar.DAY_OF_YEAR, 1);
+    	
+        return (tomorrowTime.get(Calendar.ERA) == cal.get(Calendar.ERA) &&
+        		tomorrowTime.get(Calendar.YEAR) == cal.get(Calendar.YEAR) &&
+				tomorrowTime.get(Calendar.DAY_OF_YEAR) == cal.get(Calendar.DAY_OF_YEAR));
+    }
+    
 }
