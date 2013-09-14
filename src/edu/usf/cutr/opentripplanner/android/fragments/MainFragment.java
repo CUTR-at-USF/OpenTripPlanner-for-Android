@@ -60,6 +60,7 @@ import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.DrawerLayout.DrawerListener;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
@@ -452,6 +453,27 @@ public class MainFragment extends Fragment implements
 	
 	
 	private void addInterfaceListeners(){
+		
+		DrawerListener dl = new DrawerListener() {
+			@Override
+			public void onDrawerStateChanged(int arg0) {
+			}
+			
+			@Override
+			public void onDrawerSlide(View arg0, float arg1) {
+			}
+			
+			@Override
+			public void onDrawerOpened(View arg0) {
+				tbStartLocation.clearFocus();
+				tbEndLocation.clearFocus();				
+			}
+			
+			@Override
+			public void onDrawerClosed(View arg0) {
+			}
+		};
+		drawerLayout.setDrawerListener(dl);
 		
 		OnTouchListener otlStart = new RightDrawableOnTouchListener(tbStartLocation) {
 			@Override

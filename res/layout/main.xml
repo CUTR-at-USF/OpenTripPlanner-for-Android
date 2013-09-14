@@ -181,7 +181,7 @@
 		android:layout_gravity="start"
 		android:orientation="vertical"
 		android:background="#D0FFFFFF"
-		android:clickable="false">
+		android:clickable="true">
 	
 	    <LinearLayout
 			android:id="@+id/layoutOptimization"
