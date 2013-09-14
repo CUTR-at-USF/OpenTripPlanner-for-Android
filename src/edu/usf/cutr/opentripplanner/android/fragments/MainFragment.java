@@ -1821,7 +1821,7 @@ public class MainFragment extends Fragment implements
 
 	public void zoomToLocation(LatLng latlng) {
 		if (latlng != null) {
-			mMap.animateCamera(CameraUpdateFactory.newLatLng(latlng));
+			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, OTPApp.defaultMyLocationZoomLevel));
 		}
 	}
 	
