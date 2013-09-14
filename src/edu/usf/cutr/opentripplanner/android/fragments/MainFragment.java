@@ -461,6 +461,11 @@ public class MainFragment extends Fragment implements
 			
 			@Override
 			public void onDrawerSlide(View arg0, float arg1) {
+				
+				InputMethodManager imm = (InputMethodManager) MainFragment.this.getActivity()
+						.getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(tbEndLocation.getWindowToken(), 0);
+				imm.hideSoftInputFromWindow(tbStartLocation.getWindowToken(), 0);
 			}
 			
 			@Override
@@ -903,6 +908,11 @@ public class MainFragment extends Fragment implements
 		OnMapClickListener omcl = new OnMapClickListener() {
 			@Override
 			public void onMapClick(LatLng latlng) {
+				InputMethodManager imm = (InputMethodManager) MainFragment.this.getActivity()
+						.getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(tbEndLocation.getWindowToken(), 0);
+				imm.hideSoftInputFromWindow(tbStartLocation.getWindowToken(), 0);
+				
 				if (tbStartLocation.hasFocus()){
 					setMarker(true, latlng, true);
 				}
@@ -951,6 +961,11 @@ public class MainFragment extends Fragment implements
 			
 			@Override
 			public void onMarkerDragStart(Marker marker) {
+				InputMethodManager imm = (InputMethodManager) MainFragment.this.getActivity()
+						.getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(tbEndLocation.getWindowToken(), 0);
+				imm.hideSoftInputFromWindow(tbStartLocation.getWindowToken(), 0);
+				
 				LatLng markerLatlng = marker.getPosition();
 
 				if ((app.getSelectedServer() != null) && LocationUtil.checkPointInBoundingBox(markerLatlng, app.getSelectedServer(), OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)){
@@ -963,6 +978,11 @@ public class MainFragment extends Fragment implements
 		OnMapLongClickListener omlcl = new OnMapLongClickListener() {
 			@Override
 			public void onMapLongClick(LatLng latlng) {
+				InputMethodManager imm = (InputMethodManager) MainFragment.this.getActivity()
+						.getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(tbEndLocation.getWindowToken(), 0);
+				imm.hideSoftInputFromWindow(tbStartLocation.getWindowToken(), 0);
+				
 				final LatLng latLngFinal = latlng;
 				final CharSequence[] items = {applicationContext.getResources().getString(R.string.start_marker_activated), applicationContext.getResources().getString(R.string.end_marker_activated)};
 
