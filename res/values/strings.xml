@@ -91,6 +91,8 @@
     <string name="geocoder_preference_provider_google_places">Google Places</string>
     <string name="use_android_geocoder_title">Android Geocoder</string>
     <string name="use_android_geocoder_description">Query first with Android Geocoder</string>
+    <string name="use_intelligent_markers_title">Intelligent markers</string>
+    <string name="use_intelligent_markers_description">Move markers to a close geographical location</string>
     <string name="info_server_no_server_selected">No server selected</string>
     <string name="info_server_error">Attention: Cannot obtain server info!</string>
     <string name="selected_custom_server_title">Custom OTP Server</string>

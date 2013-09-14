@@ -10,6 +10,7 @@
         <EditTextPreference android:key="custom_server_url" android:title="@string/custom_server_url"></EditTextPreference>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/map_options" android:key="map_options">
+        <CheckBoxPreference android:title="@string/use_intelligent_markers_title" android:key="use_intelligent_markers" android:checked="true"  android:defaultValue="true" android:summary="@string/use_intelligent_markers_description"></CheckBoxPreference>
         <CheckBoxPreference android:title="@string/use_android_geocoder_title" android:key="use_android_geocoder" android:checked="true"  android:defaultValue="true" android:summary="@string/use_android_geocoder_description"></CheckBoxPreference>
         <ListPreference android:title="@string/geocoder_preference_provider_title" android:key="geocoder_provider"></ListPreference>
         <ListPreference android:title="@string/map_tile_provider" android:key="map_tile_source"></ListPreference>

@@ -904,10 +904,20 @@ public class MainFragment extends Fragment implements
 				if (((app.getSelectedServer() != null) && LocationUtil.checkPointInBoundingBox(markerLatlng, app.getSelectedServer(), OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)) 
 						|| (app.getSelectedServer() == null)){
 					if ((startMarker != null) && (marker.hashCode() == startMarker.hashCode())){
-						updateMarkerPosition(markerLatlng, true);
+						if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true)){
+							updateMarkerPosition(markerLatlng, true);
+						}
+						else{
+							isStartLocationGeocodingProcessed = true;
+						}
 					}
 					else if ((endMarker != null) && (marker.hashCode() == endMarker.hashCode())){
-						updateMarkerPosition(markerLatlng, false);
+						if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true)){
+							updateMarkerPosition(markerLatlng, false);
+						}
+						else{
+							isEndLocationGeocodingProcessed = true;
+						}
 					}
 				}
 				else{
@@ -1347,7 +1357,12 @@ public class MainFragment extends Fragment implements
 				}
 				MainFragment.this.setLocationTb(latlng, true);
 				prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, false);
-				updateMarkerPosition(latlng, true);
+				if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true)){
+					updateMarkerPosition(latlng, true);
+				}
+				else{
+					isStartLocationGeocodingProcessed = true;
+				}
 			}
 			else {
 				if (endMarker == null){
@@ -1359,7 +1374,12 @@ public class MainFragment extends Fragment implements
 				}
 				MainFragment.this.setLocationTb(latlng, false);
 				prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false);
-				updateMarkerPosition(latlng, false);
+				if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true)){
+					updateMarkerPosition(latlng, false);
+				}
+				else{
+					isEndLocationGeocodingProcessed = true;
+				}
 			}
 			prefsEditor.commit();
 		}
@@ -2030,7 +2050,7 @@ public class MainFragment extends Fragment implements
 			MyActivity myActivity = (MyActivity)getActivity();
 			myActivity.setCurrentRequestString(currentRequestString);
 			
-			if (startAddress != null){
+			if ((startAddress != null) && (prefs.getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true))){
 				resultTripStartLocation = ((startAddress.getAddressLine(0) != null) ? startAddress.getAddressLine(0) : "")
 						+ ", "
 						+ ((startAddress.getAddressLine(1) != null) ? startAddress.getAddressLine(1) : "");
@@ -2038,7 +2058,7 @@ public class MainFragment extends Fragment implements
 			else{
 				resultTripStartLocation = tbStartLocation.getText().toString();
 			}
-			if (endAddress != null){
+			if ((endAddress != null) && (prefs.getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true))){
 				resultTripEndLocation = ((endAddress.getAddressLine(0) != null) ? endAddress.getAddressLine(0) : "")
 						+ ", "
 						+ ((endAddress.getAddressLine(1) != null) ? endAddress.getAddressLine(1) : "");

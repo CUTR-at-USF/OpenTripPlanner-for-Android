@@ -115,6 +115,7 @@ public class OTPApp extends Application {
 	public static final String PREFERENCE_KEY_SELECTED_SERVER = "selected_server";
 	public static final String PREFERENCE_KEY_SELECTED_CUSTOM_SERVER = "selected_custom_server";
 	public static final String PREFERENCE_KEY_USE_ANDROID_GEOCODER = "use_android_geocoder";
+	public static final String PREFERENCE_KEY_USE_INTELLIGENT_MARKERS = "use_intelligent_markers";
 	
 	private static Server selectedServer;
 	
