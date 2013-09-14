@@ -102,9 +102,9 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 				boolean shouldRefresh = data.getBooleanExtra(OTPApp.REFRESH_SERVER_RETURN_KEY, false);
 				//				Toast.makeText(this, "Should server list refresh? " + shouldRefresh, Toast.LENGTH_LONG).show();
 				if(shouldRefresh){
-					mainFragment.setNeedToRunAutoDetect(false);
 					if (mainFragment.getSavedLastLocation() == null){
 						Toast.makeText(this, getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
+						mainFragment.setNeedToRunAutoDetect(false);
 					}
 					else{
 						mainFragment.runAutoDetectServer(mainFragment.getSavedLastLocation());

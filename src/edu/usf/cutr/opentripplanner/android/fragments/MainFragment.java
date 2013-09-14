@@ -177,7 +177,8 @@ public class MainFragment extends Fragment implements
 	private ImageButton btnPlanTrip;
 	private ImageButton btnDateDialog;
 	private LatLng savedLastLocation;
-	
+	private LatLng savedLastLocationCheckedForServer;
+
 	private Address startAddress;
 	private Address endAddress;
 	
@@ -1108,6 +1109,9 @@ public class MainFragment extends Fragment implements
 			isStartLocationChangedByUser = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_IS_START_LOCATION_CHANGED_BY_USER);
 			isEndLocationChangedByUser = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_IS_END_LOCATION_CHANGED_BY_USER);
 			
+			savedLastLocation = savedInstanceState.getParcelable(OTPApp.BUNDLE_KEY_SAVED_LAST_LOCATION);
+			savedLastLocationCheckedForServer = savedInstanceState.getParcelable(OTPApp.BUNDLE_KEY_SAVED_LAST_LOCATION_CHECKED_FOR_SERVER);
+
     		showBikeParameters(false);
     		
 			ddlTravelMode.setItemChecked(savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE), true);
@@ -1247,6 +1251,7 @@ public class MainFragment extends Fragment implements
 			ServerSelector serverSelector = new ServerSelector(weakContext, applicationContext, dataSource, this);
 			serverSelector.execute(mCurrentLatLng);
 			needToRunAutoDetect = false;
+			savedLastLocationCheckedForServer = mCurrentLatLng;
 		}
 	}
 	
@@ -1411,12 +1416,6 @@ public class MainFragment extends Fragment implements
 		String overlayString = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, applicationContext.getResources().getString(R.string.map_tiles_default_server));
 		updateOverlay(overlayString);
 
-		mLocationClient = new LocationClient(applicationContext, this, this);
-		//mLocationClient.connect();
-		
-		if (!mLocationClient.isConnected() && !mLocationClient.isConnecting()){
-			mLocationClient.connect();
-		}
 	}
 	
 	public void connectLocationClient(){
@@ -1445,6 +1444,9 @@ public class MainFragment extends Fragment implements
 		bundle.putString(OTPApp.BUNDLE_KEY_TB_END_LOCATION, tbEndLocation.getText().toString());
 		bundle.putInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION, ddlOptimization.getCheckedItemPosition());
 		bundle.putInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE, ddlTravelMode.getCheckedItemPosition());
+		
+		bundle.putParcelable(OTPApp.BUNDLE_KEY_SAVED_LAST_LOCATION, savedLastLocation);
+		bundle.putParcelable(OTPApp.BUNDLE_KEY_SAVED_LAST_LOCATION_CHECKED_FOR_SERVER, savedLastLocationCheckedForServer);
 		
 		if (resultTripStartLocation != null){
 			bundle.putString(OTPApp.BUNDLE_KEY_RESULT_TRIP_START_LOCATION, resultTripStartLocation);
@@ -1500,27 +1502,24 @@ public class MainFragment extends Fragment implements
 		
 		Log.v(TAG, "MainFragment onResume");
 
-/*		if (needToRunAutoDetect) {
-			runAutoDetectServer(true);
-			needToRunAutoDetect = false;
-		}*/
+		needToRunAutoDetect = true;
+		mLocationClient = new LocationClient(applicationContext, this, this);
+		//mLocationClient.connect();
 		
+		connectLocationClient();
+	
 	}
 
 	@Override
 	public void onPause() {
-
+		disconnectLocationClient();
+		
 		super.onPause();
 	}
 	
 	@Override
 	public void onStop() {
-		
-       if (mLocationClient.isConnected()) {
- //   	   mLocationClient.removeLocationUpdates(this);
-        }
 
-        mLocationClient.disconnect();
 
 		super.onStop();
 	}
@@ -1576,13 +1575,7 @@ public class MainFragment extends Fragment implements
 			
 		} else if (key.equals(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER)) {
 			Log.v(TAG, "Detected change in auto-detect server preference. Value is now: " + prefs.getBoolean(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER, true));
-			
-			if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER, true)) {
-				needToRunAutoDetect = true;
-			}
-			else {
-				needToRunAutoDetect = false;
-			}
+
 		}
 	}
 
@@ -2277,15 +2270,33 @@ public class MainFragment extends Fragment implements
 	public void onConnected(Bundle connectionHint) {
 		
         //mLocationClient.requestLocationUpdates(mLocationRequest, this);
-		if (appStarts){
-			appStarts = false;
-			LatLng mCurrentLatLng = getLastLocation();	
-			
+		double savedLatitude = 0;
+		double savedLongitude = 0;
+		if (savedLastLocationCheckedForServer != null){
+			savedLatitude = savedLastLocationCheckedForServer.latitude;
+			savedLongitude = savedLastLocationCheckedForServer.longitude;
+		}
+		
+		LatLng mCurrentLatLng = getLastLocation();
+				
+		if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER, true) && needToRunAutoDetect) {
+
+			if ((app.getSelectedServer() != null) 
+					&& (!LocationUtil.checkPointInBoundingBox(mCurrentLatLng, app.getSelectedServer(), OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))
+					&& (((savedLastLocationCheckedForServer != null) && ((savedLatitude != mCurrentLatLng.latitude) || (savedLongitude != mCurrentLatLng.longitude))) 
+							|| savedLastLocationCheckedForServer == null)){
+				runAutoDetectServer(getLastLocation());
+			}
+			else if (app.getSelectedServer() == null){
+				runAutoDetectServer(getLastLocation());
+			}
+		}
+		else if (app.getSelectedServer() == null) {
+			runAutoDetectServer(getLastLocation());
+		}
+		else {
 			if (mCurrentLatLng != null){
-				if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER, true) && needToRunAutoDetect) {
-					runAutoDetectServer(getLastLocation());
-				}
-				else{
+				if (appStarts){
 					Server selectedServer = app.getSelectedServer();	
 					if ((selectedServer != null) && selectedServer.areBoundsSet()){
 						if (LocationUtil.checkPointInBoundingBox(mCurrentLatLng, selectedServer, OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)){
@@ -2302,7 +2313,10 @@ public class MainFragment extends Fragment implements
 					}
 				}
 			}
-		}	
+		}
+
+		appStarts = false;
+
 	}
 
 	@Override
