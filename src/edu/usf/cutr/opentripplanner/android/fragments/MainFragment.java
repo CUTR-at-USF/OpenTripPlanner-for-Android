@@ -373,7 +373,7 @@ public class MainFragment extends Fragment implements
 			String baseURL = prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, "");
 			Server s = new Server(baseURL);
 			String bounds;
-			setSelectedServer(s);
+			setSelectedServer(s, false);
 			if ((bounds = prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS, null)) != null){
 				s.setBounds(bounds);
 				addBoundariesRectangle(s);
@@ -389,7 +389,7 @@ public class MainFragment extends Fragment implements
 				Server s = new Server(dataSource.getServer(prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)));
 				dataSource.close();
 				
-				setSelectedServer(s);
+				setSelectedServer(s, false);
 				addBoundariesRectangle(s);
 				
 				Log.v(TAG, "Now using OTP server: " + s.getRegion());
@@ -428,14 +428,6 @@ public class MainFragment extends Fragment implements
 		ddlTravelMode.setAdapter(traverseModeAdapter);	
 		
 		
-		if (savedInstanceState == null){
-			ddlOptimization.setItemChecked(0, true);
-			ddlTravelMode.setItemChecked(0, true);
-			showBikeParameters(false);
-			tripDate = Calendar.getInstance().getTime();
-			arriveBy = false;
-		}
-		
 		Server selectedServer = app.getSelectedServer();	
 		if (selectedServer != null){
 			LatLng serverCenter = new LatLng(selectedServer.getCenterLatitude(), selectedServer.getCenterLongitude());
@@ -447,6 +439,15 @@ public class MainFragment extends Fragment implements
 		addInterfaceListeners();
 		
 		addMapListeners();
+		
+		if (savedInstanceState == null){
+			ddlOptimization.setItemChecked(0, true);
+			ddlTravelMode.setItemChecked(0, true);
+			showBikeParameters(false);
+			tripDate = Calendar.getInstance().getTime();
+			arriveBy = false;
+			setTextBoxLocation(getResources().getString(R.string.my_location), true);
+		}
 	}
 	
 	
@@ -1288,9 +1289,11 @@ public class MainFragment extends Fragment implements
 		}
 	}
 	
-	private void setSelectedServer(Server s){
-		restartMap();
-		restartTextBoxes();
+	private void setSelectedServer(Server s, boolean restartUI){
+		if (restartUI){
+			restartMap();
+			restartTextBoxes();
+		}
 		
 		app.setSelectedServer(s);
 	}
@@ -1589,7 +1592,7 @@ public class MainFragment extends Fragment implements
 			updateOverlay(overlayString);
 		} else if (key.equals(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER)) {
 			if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)){
-				setSelectedServer(new Server(prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, "")));
+				setSelectedServer(new Server(prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, "")), true);
 				Log.v(TAG, "Now using custom OTP server: " + prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
 				WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
 
@@ -1604,7 +1607,7 @@ public class MainFragment extends Fragment implements
 					Server s = new Server(dataSource.getServer(prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)));
 					dataSource.close();
 					
-					setSelectedServer(s);
+					setSelectedServer(s, true);
 					addBoundariesRectangle(s);
 
 					LatLng mCurrentLatLng = getLastLocation();
@@ -2009,7 +2012,7 @@ public class MainFragment extends Fragment implements
 	public void onServerSelectorComplete(Server server) {
 		//Update application server
 		if (getActivity() != null){
-			setSelectedServer(server);
+			setSelectedServer(server, true);
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext);
 			
 			if (!prefs.getBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)){		

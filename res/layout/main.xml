@@ -66,7 +66,6 @@
 			android:selectAllOnFocus="true"
 			android:layout_margin="4dp"
 			android:singleLine="true"
-			android:text="My Location"
 			android:drawableRight="@android:drawable/ic_input_get"
 			android:layout_toLeftOf="@id/btnPlanTrip"
 			android:background="@android:drawable/editbox_background">
