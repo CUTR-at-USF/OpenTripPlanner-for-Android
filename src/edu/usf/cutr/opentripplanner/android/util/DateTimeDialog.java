@@ -70,6 +70,12 @@ public class DateTimeDialog extends DialogFragment /* implements DatePickerCompl
 			}
 		};
 		btnCancel.setOnClickListener(oclCancel);
+		
+		ArrayAdapter<ArriveBySpinnerItem> arriveByTypeAdapter = new ArrayAdapter<ArriveBySpinnerItem>(
+				getActivity(),
+				android.R.layout.simple_spinner_dropdown_item,
+				new ArriveBySpinnerItem[] {new ArriveBySpinnerItem("Depart at:", false), new ArriveBySpinnerItem("Arrive at:", true)});
+		spinScheduleType.setAdapter(arriveByTypeAdapter);
 
         return view;
     }
@@ -116,16 +122,6 @@ public class DateTimeDialog extends DialogFragment /* implements DatePickerCompl
     		pickerTime.setCurrentMinute(bundle.getInt(OTPApp.BUNDLE_KEY_TIMEPICKER_SAVED_MINUTE));
     	}
     	
-
-    		
-
-		ArrayAdapter<ArriveBySpinnerItem> arriveByTypeAdapter = new ArrayAdapter<ArriveBySpinnerItem>(
-				getActivity(),
-				android.R.layout.simple_spinner_dropdown_item,
-				new ArriveBySpinnerItem[] {new ArriveBySpinnerItem("Depart at:", false), new ArriveBySpinnerItem("Arrive at:", true)});
-		spinScheduleType.setAdapter(arriveByTypeAdapter);
-		
-
 		
     }
     
