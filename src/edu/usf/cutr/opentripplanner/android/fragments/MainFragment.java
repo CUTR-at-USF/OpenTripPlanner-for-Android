@@ -1642,9 +1642,6 @@ public class MainFragment extends Fragment implements
 	public boolean onOptionsItemSelected(final MenuItem pItem) {
 		OTPApp app = ((OTPApp) getActivity().getApplication());
 		switch (pItem.getItemId()) {
-		case R.id.exit:
-			getActivity().finish();
-			return true;
 		case R.id.gps_settings:
 			Intent myIntent = new Intent(
 					Settings.ACTION_LOCATION_SOURCE_SETTINGS);
