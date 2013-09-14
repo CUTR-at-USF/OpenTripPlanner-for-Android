@@ -18,8 +18,10 @@ package edu.usf.cutr.opentripplanner.android.fragments;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.TimeZone;
 
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.v092snapshot.api.model.Itinerary;
 import org.opentripplanner.v092snapshot.api.model.Leg;
 
@@ -187,6 +189,7 @@ public class DirectionListFragment extends ExpandableListFragment {
 					elv.setAdapter(adapter);
 					
 		    	}
+		    	openIfNonTransit();
 		    	
 				isFragmentFirstLoad = false;
 		    	
@@ -220,6 +223,20 @@ public class DirectionListFragment extends ExpandableListFragment {
 		
 		elv.setGroupIndicator(null); // Get rid of the down arrow
 		
+		openIfNonTransit();
+		
+	}
+	
+	private void openIfNonTransit(){
+		List<Leg> legsList = fragmentListener.getCurrentItinerary();
+		
+		if (legsList.size() == 1){
+			Leg firstLeg = legsList.get(0);
+			TraverseMode traverseMode = TraverseMode.valueOf((String) firstLeg.mode);
+			if (!traverseMode.isTransit()){
+				elv.expandGroup(0);
+			}
+		}
 	}
 	
 	private void setDepartureArrivalHeaders(){
