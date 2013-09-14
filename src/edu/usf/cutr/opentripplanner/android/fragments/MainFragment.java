@@ -199,6 +199,8 @@ public class MainFragment extends Fragment implements
 	private boolean isStartLocationChangedByUser = true;
 	private boolean isEndLocationChangedByUser = true;
 	
+	private boolean requestTripAfterGeocoding = false;
+	
 	private Context applicationContext;
 
 
@@ -589,145 +591,7 @@ public class MainFragment extends Fragment implements
 
 			@Override
 			public void onClick(View v) {
-				LatLng mCurrentLatLng = getLastLocation();
-				String startLocationString = null;
-				String endLocationString = null;
-
-				Boolean isOriginMyLocation = prefs.getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, false);
-				Boolean isDestinationMyLocation = prefs.getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false);
-				
-				panelDisplayDirection.setVisibility(View.INVISIBLE);
-				if (route != null){
-					for (Polyline p : route){
-						p.remove();
-					}
-					route = null;
-				}
-				if (modeMarkers != null){
-					for (Marker m : modeMarkers){
-						m.remove();
-					}
-					modeMarkers = null;
-				}
-
-				
-				if (isOriginMyLocation && isDestinationMyLocation){
-					Toast.makeText(MainFragment.this.applicationContext, applicationContext.getResources().getString(R.string.origin_destination_are_mylocation), Toast.LENGTH_SHORT).show();
-					return;
-				}
-				else if (isOriginMyLocation || isDestinationMyLocation){
-					if (mCurrentLatLng == null){
-						Toast.makeText(MainFragment.this.applicationContext, applicationContext.getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
-						return;
-					}
-					else {
-						if (isOriginMyLocation){
-							startLocationString = mCurrentLatLng.latitude + "," + mCurrentLatLng.longitude;
-							if (endMarker == null){
-								Toast.makeText(MainFragment.this.applicationContext, applicationContext.getResources().getString(R.string.need_to_place_markers_before_planning), Toast.LENGTH_SHORT).show();
-								return;
-							}
-							else{
-								endLocationString = endMarker.getPosition().latitude + "," + endMarker.getPosition().longitude;
-							}
-						}
-						else if (isDestinationMyLocation){
-							endLocationString = mCurrentLatLng.latitude + "," + mCurrentLatLng.longitude;
-							if (startMarker == null){
-								Toast.makeText(MainFragment.this.applicationContext, applicationContext.getResources().getString(R.string.need_to_place_markers_before_planning), Toast.LENGTH_SHORT).show();
-								return;
-							}
-							else{
-								startLocationString = startMarker.getPosition().latitude + "," + startMarker.getPosition().longitude;
-							}
-						}
-					}
-				}
-				else{
-					if ((startMarker == null) || (endMarker == null)){
-						Toast.makeText(MainFragment.this.applicationContext, applicationContext.getResources().getString(R.string.need_to_place_markers_before_planning), Toast.LENGTH_SHORT).show();
-						return;
-					}
-					else{
-						startLocationString = startMarker.getPosition().latitude + "," + startMarker.getPosition().longitude;
-						endLocationString = endMarker.getPosition().latitude + "," + endMarker.getPosition().longitude;
-					}
-				}
-						
-				if (!isStartLocationGeocodingProcessed && !isOriginMyLocation){
-					Toast.makeText(MainFragment.this.applicationContext, applicationContext.getResources().getString(R.string.need_to_place_markers_before_planning), Toast.LENGTH_SHORT).show();
-					return;
-				}
-				else if (!isEndLocationGeocodingProcessed && !isDestinationMyLocation){
-					Toast.makeText(MainFragment.this.applicationContext, applicationContext.getResources().getString(R.string.need_to_place_markers_before_planning), Toast.LENGTH_SHORT).show();
-					return;
-				}
-				
-				
-				Request request = new Request();
-				
-				try {
-					request.setFrom(URLEncoder.encode(startLocationString, "UTF-8"));
-					request.setTo(URLEncoder.encode(endLocationString, "UTF-8"));
-				} catch (UnsupportedEncodingException e1) {
-					e1.printStackTrace();
-				}
-				
-				
-				request.setArriveBy(arriveBy);
-				
-				OptimizeSpinnerItem optimizeSpinnerItem = (OptimizeSpinnerItem) ddlOptimization.getItemAtPosition(ddlOptimization.getCheckedItemPosition());
-				if (optimizeSpinnerItem == null){
-					optimizeSpinnerItem = (OptimizeSpinnerItem) ddlOptimization.getItemAtPosition(0);
-				}
-				
-				request.setOptimize(optimizeSpinnerItem.getOptimizeType());
-				
-				if (optimizeSpinnerItem.getOptimizeType().equals(OptimizeType.TRIANGLE)){
-					request.setTriangleTimeFactor(bikeTriangleMinValue);
-					request.setTriangleSlopeFactor(bikeTriangleMaxValue - bikeTriangleMinValue);
-					request.setTriangleSafetyFactor(1 - bikeTriangleMaxValue);
-				}
-				
-				TraverseModeSpinnerItem traverseModeSpinnerItem = (TraverseModeSpinnerItem) ddlTravelMode.getItemAtPosition(ddlTravelMode.getCheckedItemPosition());				
-				if (traverseModeSpinnerItem == null){
-					traverseModeSpinnerItem = (TraverseModeSpinnerItem) ddlTravelMode.getItemAtPosition(0);
-				}
-				request.setModes(traverseModeSpinnerItem.getTraverseModeSet());
-				
-				
-				Integer defaultMaxWalkInt = applicationContext.getResources().getInteger(R.integer.max_walking_distance);
-
-				try {
-					Double maxWalk = Double.parseDouble(prefs.getString(OTPApp.PREFERENCE_KEY_MAX_WALKING_DISTANCE,
-							defaultMaxWalkInt.toString()));
-					request.setMaxWalkDistance(maxWalk);
-				} catch (NumberFormatException ex) {
-					request.setMaxWalkDistance((double)defaultMaxWalkInt);
-				}
-
-				request.setWheelchair(prefs.getBoolean(OTPApp.PREFERENCE_KEY_WHEEL_ACCESSIBLE,
-						false));
-
-				request.setDateTime(
-						DateFormat.format("MM/dd/yy",
-								tripDate.getTime()).toString(),
-						DateFormat
-								.format("hh:mmaa", tripDate.getTime()).toString());
-
-				request.setShowIntermediateStops(Boolean.TRUE);
-				
-				WeakReference<Activity> weakContext = new WeakReference<Activity>(MainFragment.this.getActivity());
-
-				new TripRequest(weakContext, MainFragment.this.applicationContext, app
-						.getSelectedServer(), MainFragment.this)
-						.execute(request);
-
-				InputMethodManager imm = (InputMethodManager) MainFragment.this.getActivity()
-						.getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.hideSoftInputFromWindow(tbEndLocation.getWindowToken(), 0);
-				imm.hideSoftInputFromWindow(tbStartLocation.getWindowToken(), 0);
-
+				requestTrip();
 			}
 		});
 		
@@ -742,10 +606,15 @@ public class MainFragment extends Fragment implements
 				TextView tv = (TextView) v;
 				if (!hasFocus) {
 					String text = tv.getText().toString();
+					
 					if (!text.isEmpty()){
-						if (v.getId() == R.id.tbStartLocation && !isStartLocationGeocodingProcessed) {
+						if (v.getId() == R.id.tbStartLocation 
+								&& !isStartLocationGeocodingProcessed 
+								&& !prefs.getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true)) {
 							processAddress(true, tv.getText().toString(), false);
-						} else if (v.getId() == R.id.tbEndLocation && !isEndLocationGeocodingProcessed) {
+						} else if (v.getId() == R.id.tbEndLocation 
+								&& !isEndLocationGeocodingProcessed
+								&& !prefs.getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, true)) {
 							processAddress(false, tv.getText().toString(), false);
 						}
 					} else {
@@ -821,20 +690,32 @@ public class MainFragment extends Fragment implements
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,
 					KeyEvent event) {
-				if (v.getId() == R.id.tbStartLocation
-						&& actionId == EditorInfo.IME_ACTION_NEXT
+				if (v.getId() == R.id.tbStartLocation){
+						if (actionId == EditorInfo.IME_ACTION_NEXT
 						|| (event != null
 								&& event.getAction() == KeyEvent.ACTION_DOWN && event
 								.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
-					isRealLostFocus = false;
-					processAddress(true, v.getText().toString(), false);
-				} else if (v.getId() == R.id.tbEndLocation
-						&& actionId == EditorInfo.IME_ACTION_DONE
+							isRealLostFocus = false;
+							if (!isStartLocationGeocodingProcessed
+									&& !prefs.getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true)){
+								processAddress(true, v.getText().toString(), false);
+							}
+						}
+				} else if (v.getId() == R.id.tbEndLocation){
+						if (actionId == EditorInfo.IME_ACTION_DONE
 						|| (event != null
 								&& event.getAction() == KeyEvent.ACTION_DOWN && event
 								.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
-					isRealLostFocus = false;
-					processAddress(false, v.getText().toString(), false);
+							isRealLostFocus = false;
+							if (!isEndLocationGeocodingProcessed
+									&& !prefs.getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, true)){
+								processAddress(false, v.getText().toString(), false);
+								requestTripAfterGeocoding = true;
+							}
+							else{
+								requestTrip();
+							}
+						}
 				}
 				return false;
 			}
@@ -1152,13 +1033,155 @@ public class MainFragment extends Fragment implements
 			bikeTriangleMaxValue = savedInstanceState.getDouble(OTPApp.BUNDLE_KEY_SEEKBAR_MAX_VALUE);
 			bikeTriangleParameters.setSelectedMinValue(bikeTriangleMinValue);
 			bikeTriangleParameters.setSelectedMaxValue(bikeTriangleMaxValue);
-					
+
 			isStartLocationChangedByUser = false;
 			isEndLocationChangedByUser = false;
 		}
 		else{
 			restoredSavedState = false;
 		}
+	}
+	
+	private void requestTrip(){
+		LatLng mCurrentLatLng = getLastLocation();
+		String startLocationString = null;
+		String endLocationString = null;
+
+		Boolean isOriginMyLocation = prefs.getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, false);
+		Boolean isDestinationMyLocation = prefs.getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false);
+		
+		panelDisplayDirection.setVisibility(View.INVISIBLE);
+		if (route != null){
+			for (Polyline p : route){
+				p.remove();
+			}
+			route = null;
+		}
+		if (modeMarkers != null){
+			for (Marker m : modeMarkers){
+				m.remove();
+			}
+			modeMarkers = null;
+		}
+
+		
+		if (isOriginMyLocation && isDestinationMyLocation){
+			Toast.makeText(MainFragment.this.applicationContext, applicationContext.getResources().getString(R.string.origin_destination_are_mylocation), Toast.LENGTH_SHORT).show();
+			return;
+		}
+		else if (isOriginMyLocation || isDestinationMyLocation){
+			if (mCurrentLatLng == null){
+				Toast.makeText(MainFragment.this.applicationContext, applicationContext.getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
+				return;
+			}
+			else {
+				if (isOriginMyLocation){
+					startLocationString = mCurrentLatLng.latitude + "," + mCurrentLatLng.longitude;
+					if (endMarker == null){
+						Toast.makeText(MainFragment.this.applicationContext, applicationContext.getResources().getString(R.string.need_to_place_markers_before_planning), Toast.LENGTH_SHORT).show();
+						return;
+					}
+					else{
+						endLocationString = endMarker.getPosition().latitude + "," + endMarker.getPosition().longitude;
+					}
+				}
+				else if (isDestinationMyLocation){
+					endLocationString = mCurrentLatLng.latitude + "," + mCurrentLatLng.longitude;
+					if (startMarker == null){
+						Toast.makeText(MainFragment.this.applicationContext, applicationContext.getResources().getString(R.string.need_to_place_markers_before_planning), Toast.LENGTH_SHORT).show();
+						return;
+					}
+					else{
+						startLocationString = startMarker.getPosition().latitude + "," + startMarker.getPosition().longitude;
+					}
+				}
+			}
+		}
+		else{
+			if ((startMarker == null) || (endMarker == null)){
+				Toast.makeText(MainFragment.this.applicationContext, applicationContext.getResources().getString(R.string.need_to_place_markers_before_planning), Toast.LENGTH_SHORT).show();
+				return;
+			}
+			else{
+				startLocationString = startMarker.getPosition().latitude + "," + startMarker.getPosition().longitude;
+				endLocationString = endMarker.getPosition().latitude + "," + endMarker.getPosition().longitude;
+			}
+		}
+				
+		if (!isStartLocationGeocodingProcessed && !isOriginMyLocation){
+			Toast.makeText(MainFragment.this.applicationContext, applicationContext.getResources().getString(R.string.need_to_place_markers_before_planning), Toast.LENGTH_SHORT).show();
+			return;
+		}
+		else if (!isEndLocationGeocodingProcessed && !isDestinationMyLocation){
+			Toast.makeText(MainFragment.this.applicationContext, applicationContext.getResources().getString(R.string.need_to_place_markers_before_planning), Toast.LENGTH_SHORT).show();
+			return;
+		}
+		
+		
+		Request request = new Request();
+		
+		try {
+			request.setFrom(URLEncoder.encode(startLocationString, "UTF-8"));
+			request.setTo(URLEncoder.encode(endLocationString, "UTF-8"));
+		} catch (UnsupportedEncodingException e1) {
+			e1.printStackTrace();
+		}
+		
+		
+		request.setArriveBy(arriveBy);
+		
+		OptimizeSpinnerItem optimizeSpinnerItem = (OptimizeSpinnerItem) ddlOptimization.getItemAtPosition(ddlOptimization.getCheckedItemPosition());
+		if (optimizeSpinnerItem == null){
+			optimizeSpinnerItem = (OptimizeSpinnerItem) ddlOptimization.getItemAtPosition(0);
+		}
+		
+		request.setOptimize(optimizeSpinnerItem.getOptimizeType());
+		
+		if (optimizeSpinnerItem.getOptimizeType().equals(OptimizeType.TRIANGLE)){
+			request.setTriangleTimeFactor(bikeTriangleMinValue);
+			request.setTriangleSlopeFactor(bikeTriangleMaxValue - bikeTriangleMinValue);
+			request.setTriangleSafetyFactor(1 - bikeTriangleMaxValue);
+		}
+		
+		TraverseModeSpinnerItem traverseModeSpinnerItem = (TraverseModeSpinnerItem) ddlTravelMode.getItemAtPosition(ddlTravelMode.getCheckedItemPosition());				
+		if (traverseModeSpinnerItem == null){
+			traverseModeSpinnerItem = (TraverseModeSpinnerItem) ddlTravelMode.getItemAtPosition(0);
+		}
+		request.setModes(traverseModeSpinnerItem.getTraverseModeSet());
+		
+		
+		Integer defaultMaxWalkInt = applicationContext.getResources().getInteger(R.integer.max_walking_distance);
+
+		try {
+			Double maxWalk = Double.parseDouble(prefs.getString(OTPApp.PREFERENCE_KEY_MAX_WALKING_DISTANCE,
+					defaultMaxWalkInt.toString()));
+			request.setMaxWalkDistance(maxWalk);
+		} catch (NumberFormatException ex) {
+			request.setMaxWalkDistance((double)defaultMaxWalkInt);
+		}
+
+		request.setWheelchair(prefs.getBoolean(OTPApp.PREFERENCE_KEY_WHEEL_ACCESSIBLE,
+				false));
+
+		request.setDateTime(
+				DateFormat.format("MM/dd/yy",
+						tripDate.getTime()).toString(),
+				DateFormat
+						.format("hh:mmaa", tripDate.getTime()).toString());
+
+		request.setShowIntermediateStops(Boolean.TRUE);
+		
+		WeakReference<Activity> weakContext = new WeakReference<Activity>(MainFragment.this.getActivity());
+
+		new TripRequest(weakContext, MainFragment.this.applicationContext, app
+				.getSelectedServer(), MainFragment.this)
+				.execute(request);
+
+		InputMethodManager imm = (InputMethodManager) MainFragment.this.getActivity()
+				.getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(tbEndLocation.getWindowToken(), 0);
+		imm.hideSoftInputFromWindow(tbStartLocation.getWindowToken(), 0);
+
 	}
 	
 	private GoogleMap retrieveMap(GoogleMap mMap) {
@@ -2080,11 +2103,6 @@ public class MainFragment extends Fragment implements
 		if (getActivity() != null){	
 			if (isStartTextbox){
 				isStartLocationGeocodingProcessed = true;
-				if (isEndLocationGeocodingProcessed){
-					InputMethodManager imm = (InputMethodManager) MainFragment.this.getActivity()
-							.getSystemService(Context.INPUT_METHOD_SERVICE);
-					imm.hideSoftInputFromWindow(tbStartLocation.getWindowToken(), 0);
-				}
 			}
 			else{
 				isEndLocationGeocodingProcessed = true;
@@ -2113,6 +2131,10 @@ public class MainFragment extends Fragment implements
 					else{
 						moveMarker(isStartTextbox, addressesReturn.get(0));
 					}
+					if (requestTripAfterGeocoding){
+						requestTripAfterGeocoding = false;
+						requestTrip();
+					}
 					return;
 				}
 			
@@ -2136,6 +2158,11 @@ public class MainFragment extends Fragment implements
 								Address addr = addressesTemp.get(item);
 								moveMarker(isStartTextbox, addr);
 								Log.v(TAG, "Chosen: " + addressesText[item]);
+								
+								if (requestTripAfterGeocoding){
+									requestTripAfterGeocoding = false;
+									requestTrip();
+								}
 							}
 						});
 				AlertDialog alertGeocoder = geocoderSelector.create();
