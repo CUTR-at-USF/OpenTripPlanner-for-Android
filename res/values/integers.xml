@@ -6,4 +6,7 @@
     <integer name="socket_timeout">15000</integer>
     <integer name="mode_icons_position_vertical_correction">-33</integer>
     <integer name="mode_icons_position_horizontal_correction">-1</integer>
+    <integer name="tiles_maquest_max_zoom">18</integer>
+    <integer name="tiles_mapnik_max_zoom">19</integer>
+    <integer name="tiles_cyclemap_max_zoom">18</integer>
 </resources>

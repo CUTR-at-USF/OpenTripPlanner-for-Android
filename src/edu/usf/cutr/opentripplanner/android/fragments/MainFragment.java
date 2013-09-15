@@ -98,6 +98,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
@@ -255,6 +256,8 @@ public class MainFragment extends Fragment implements
 	
 	private float bearing = 0;
 	private float tilt = 0;
+	
+	private float maxZoomLevel;
 	
 	private Date tripDate;
 
@@ -2295,11 +2298,21 @@ public class MainFragment extends Fragment implements
 				mapType = GoogleMap.MAP_TYPE_SATELLITE;	
 			}
 			mMap.setMapType(mapType);
+			maxZoomLevel = mMap.getMaxZoomLevel();
 		}
 		else{
+			if (overlayString.equals(getResources().getString(R.string.tiles_mapnik))){
+				maxZoomLevel = getResources().getInteger(R.integer.tiles_mapnik_max_zoom);
+			}
+			else{
+				maxZoomLevel = getResources().getInteger(R.integer.tiles_maquest_max_zoom);
+			}
 			mMap.setMapType(GoogleMap.MAP_TYPE_NONE);
 			MyUrlTileProvider mTileProvider = new MyUrlTileProvider(OTPApp.CUSTOM_MAP_TILE_HEIGHT, OTPApp.CUSTOM_MAP_TILE_HEIGHT, overlayString);
 			actualTileOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mTileProvider).zIndex(OTPApp.CUSTOM_MAP_TILE_Z_INDEX));
+		}
+		if (mMap.getCameraPosition().zoom > maxZoomLevel){
+			mMap.moveCamera(CameraUpdateFactory.zoomTo(maxZoomLevel));
 		}
 	}
 	
@@ -2480,6 +2493,9 @@ public class MainFragment extends Fragment implements
 					btnCompass.setVisibility(View.INVISIBLE);
 				}			
 			}
+		}
+		if (position.zoom > maxZoomLevel){
+			mMap.moveCamera(CameraUpdateFactory.zoomTo(maxZoomLevel));
 		}
 	}
 
