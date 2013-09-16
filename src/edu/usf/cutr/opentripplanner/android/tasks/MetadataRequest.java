@@ -33,6 +33,7 @@ import android.widget.Toast;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.R;
 import edu.usf.cutr.opentripplanner.android.listeners.MetadataRequestCompleteListener;
 
@@ -102,7 +103,7 @@ public class MetadataRequest extends AsyncTask<String, Integer, GraphMetadata> {
 	}
 	
 	private GraphMetadata requestMetadata(String serverURL) {
-		String res = context.getResources().getString(R.string.metadata_location);
+		String res = OTPApp.METADATA_LOCATION;
 
 		String u = serverURL + res;
 

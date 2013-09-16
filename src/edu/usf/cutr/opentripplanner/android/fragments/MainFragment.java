@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import org.miscwidgets.widget.Panel;
 import org.opentripplanner.api.ws.GraphMetadata;
@@ -37,7 +36,6 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.v092snapshot.api.model.Itinerary;
 import org.opentripplanner.v092snapshot.api.model.Leg;
-import org.osmdroid.views.overlay.MyLocationOverlay;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -98,7 +96,6 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
@@ -375,7 +372,7 @@ public class MainFragment extends Fragment implements
 		
 		if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)){
 			String baseURL = prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, "");
-			Server s = new Server(baseURL);
+			Server s = new Server(baseURL, applicationContext);
 			String bounds;
 			setSelectedServer(s, false);
 			if ((bounds = prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS, null)) != null){
@@ -404,29 +401,29 @@ public class MainFragment extends Fragment implements
 				getActivity(),
 				android.R.layout.simple_list_item_single_choice,
 				new OptimizeSpinnerItem[] {
-						new OptimizeSpinnerItem("Quickest", OptimizeType.QUICK),
-						new OptimizeSpinnerItem("Safest", OptimizeType.SAFE),
-						new OptimizeSpinnerItem("Fewest Transfers",
+						new OptimizeSpinnerItem(getResources().getString(R.string.optimization_quick), OptimizeType.QUICK),
+						new OptimizeSpinnerItem(getResources().getString(R.string.optimization_safe), OptimizeType.SAFE),
+						new OptimizeSpinnerItem(getResources().getString(R.string.optimization_fewest_transfers),
 								OptimizeType.TRANSFERS) });
 		ddlOptimization.setAdapter(optimizationAdapter);
 
 		ArrayAdapter<TraverseModeSpinnerItem> traverseModeAdapter = new ArrayAdapter<TraverseModeSpinnerItem>(
 				getActivity(), android.R.layout.simple_list_item_single_choice,
 				new TraverseModeSpinnerItem[] {
-						new TraverseModeSpinnerItem("Transit",
+						new TraverseModeSpinnerItem(getResources().getString(R.string.mode_transit),
 								new TraverseModeSet(TraverseMode.TRANSIT,
 										TraverseMode.WALK)),
-						new TraverseModeSpinnerItem("Bus Only",
+						new TraverseModeSpinnerItem(getResources().getString(R.string.mode_bus),
 								new TraverseModeSet(TraverseMode.BUSISH,
 										TraverseMode.WALK)),
-						new TraverseModeSpinnerItem("Train Only",
+						new TraverseModeSpinnerItem(getResources().getString(R.string.mode_train),
 								new TraverseModeSet(TraverseMode.TRAINISH,
 										TraverseMode.WALK)), // not sure
-						new TraverseModeSpinnerItem("Walk Only",
+						new TraverseModeSpinnerItem(getResources().getString(R.string.mode_walk),
 								new TraverseModeSet(TraverseMode.WALK)),
-						new TraverseModeSpinnerItem("Bicycle",
+						new TraverseModeSpinnerItem(getResources().getString(R.string.mode_bicycle),
 								new TraverseModeSet(TraverseMode.BICYCLE)),
-						new TraverseModeSpinnerItem("Transit and Bicycle",
+						new TraverseModeSpinnerItem(getResources().getString(R.string.mode_transit_bicycle),
 								new TraverseModeSet(TraverseMode.TRANSIT,
 										TraverseMode.BICYCLE)) });
 		ddlTravelMode.setAdapter(traverseModeAdapter);	
@@ -488,22 +485,22 @@ public class MainFragment extends Fragment implements
 			public boolean onDrawableTouch(final MotionEvent event) {
 				// mBoundService.updateNotification();
 
-				final CharSequence[] items = { "Current Location",
-						"Contact Address", "Point on Map" };
+				final CharSequence[] items = { getResources().getString(R.string.location_type_current_location),
+						getResources().getString(R.string.location_type_contact), getResources().getString(R.string.location_type_map_point) };
 
 				AlertDialog.Builder builder = new AlertDialog.Builder(MainFragment.this.getActivity());
-				builder.setTitle("Choose Start Location");
+				builder.setTitle(getResources().getString(R.string.choose_location_type_start));
 				builder.setItems(items, new DialogInterface.OnClickListener() {
 
 					public void onClick(DialogInterface dialog, int item) {
-						if (items[item].equals("Current Location")) {	
+						if (items[item].equals(getResources().getString(R.string.location_type_current_location))) {	
 					/*		myActivity = (MyActivity) activity;
 							myActivity.getmLocationClient();
 							Location loc = this.MainFragment.getmLocationClient().getLastLocation();*/
 							LatLng mCurrentLatLng = getLastLocation();
 							if (mCurrentLatLng != null){
 								SharedPreferences.Editor prefsEditor = prefs.edit();
-								setTextBoxLocation("My Location", true);
+								setTextBoxLocation(getResources().getString(R.string.my_location), true);
 								prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true);
 
 								if (mCurrentLatLng != null) {
@@ -520,7 +517,7 @@ public class MainFragment extends Fragment implements
 							}
 							
 							
-						} else if (items[item].equals("Contact Address")) {
+						} else if (items[item].equals(getResources().getString(R.string.location_type_contact))) {
 							Intent intent = new Intent(Intent.ACTION_PICK);
 							intent.setType(ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_TYPE);
 							((MyActivity)MainFragment.this.getActivity()).setButtonStartLocation(true);
@@ -556,22 +553,22 @@ public class MainFragment extends Fragment implements
 			public boolean onDrawableTouch(final MotionEvent event) {
 				// mBoundService.updateNotification();
 
-				final CharSequence[] items = { "Current Location",
-						"Contact Address", "Point on Map" };
+				final CharSequence[] items = { getResources().getString(R.string.location_type_current_location),
+						getResources().getString(R.string.location_type_contact), getResources().getString(R.string.location_type_map_point) };
 
 				AlertDialog.Builder builder = new AlertDialog.Builder(MainFragment.this.getActivity());
-				builder.setTitle("Choose End Location");
+				builder.setTitle(getResources().getString(R.string.choose_location_type_end));
 				builder.setItems(items, new DialogInterface.OnClickListener() {
 
 					public void onClick(DialogInterface dialog, int item) {
-						if (items[item].equals("Current Location")) {	
+						if (items[item].equals(getResources().getString(R.string.location_type_current_location))) {	
 					/*		myActivity = (MyActivity) activity;
 							myActivity.getmLocationClient();
 							Location loc = this.MainFragment.getmLocationClient().getLastLocation();*/
 							LatLng mCurrentLatLng = getLastLocation();
 							if (mCurrentLatLng != null){
 								SharedPreferences.Editor prefsEditor = prefs.edit();
-								setTextBoxLocation("My Location", false);
+								setTextBoxLocation(getResources().getString(R.string.my_location), false);
 								prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, true);
 
 								if (mCurrentLatLng != null) {
@@ -588,7 +585,7 @@ public class MainFragment extends Fragment implements
 							}
 							
 							
-						} else if (items[item].equals("Contact Address")) {
+						} else if (items[item].equals(getResources().getString(R.string.location_type_contact))) {
 							Intent intent = new Intent(Intent.ACTION_PICK);
 							intent.setType(ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_TYPE);
 							((MyActivity)MainFragment.this.getActivity()).setButtonStartLocation(false);
@@ -815,7 +812,7 @@ public class MainFragment extends Fragment implements
 			@Override
 			public void onClick(View arg0) {
 			    FragmentTransaction ft = MainFragment.this.getActivity().getSupportFragmentManager().beginTransaction();
-			    Fragment prev = MainFragment.this.getActivity().getSupportFragmentManager().findFragmentByTag("dialogSelectorDateTime");
+			    Fragment prev = MainFragment.this.getActivity().getSupportFragmentManager().findFragmentByTag(OTPApp.TAG_FRAGMENT_DATE_TIME_DIALOG);
 			    if (prev != null) {
 			        ft.remove(prev);
 			    }
@@ -830,7 +827,7 @@ public class MainFragment extends Fragment implements
 				newFragment.setArguments(bundle);
 				ft.commit();
 
-				newFragment.show(MainFragment.this.getActivity().getSupportFragmentManager(), "dialogSelectorDateTime");
+				newFragment.show(MainFragment.this.getActivity().getSupportFragmentManager(), OTPApp.TAG_FRAGMENT_DATE_TIME_DIALOG);
 		    }
 		};
 		btnDateDialog.setOnClickListener(oclDateDialog);
@@ -1177,8 +1174,8 @@ public class MainFragment extends Fragment implements
 		Request request = new Request();
 		
 		try {
-			request.setFrom(URLEncoder.encode(startLocationString, "UTF-8"));
-			request.setTo(URLEncoder.encode(endLocationString, "UTF-8"));
+			request.setFrom(URLEncoder.encode(startLocationString, OTPApp.URL_ENCODING));
+			request.setTo(URLEncoder.encode(endLocationString, OTPApp.URL_ENCODING));
 		} catch (UnsupportedEncodingException e1) {
 			e1.printStackTrace();
 		}
@@ -1220,10 +1217,10 @@ public class MainFragment extends Fragment implements
 				false));
 
 		request.setDateTime(
-				DateFormat.format("MM/dd/yy",
+				DateFormat.format(OTPApp.FORMAT_OTP_SERVER_DATE_QUERY,
 						tripDate.getTime()).toString(),
 				DateFormat
-						.format("hh:mmaa", tripDate.getTime()).toString());
+						.format(OTPApp.FORMAT_OTP_SERVER_TIME_QUERY, tripDate.getTime()).toString());
 
 		request.setShowIntermediateStops(Boolean.TRUE);
 		
@@ -1273,9 +1270,9 @@ public class MainFragment extends Fragment implements
 					getActivity(),
 					android.R.layout.simple_list_item_single_choice,
 					new OptimizeSpinnerItem[] {
-							new OptimizeSpinnerItem("Quickest", OptimizeType.QUICK),
-							new OptimizeSpinnerItem("Safest", OptimizeType.SAFE),
-							new OptimizeSpinnerItem("Custom trip...", OptimizeType.TRIANGLE) });
+							new OptimizeSpinnerItem(getResources().getString(R.string.optimization_quick), OptimizeType.QUICK),
+							new OptimizeSpinnerItem(getResources().getString(R.string.optimization_safe), OptimizeType.SAFE),
+							new OptimizeSpinnerItem(getResources().getString(R.string.optimization_bike_triangle), OptimizeType.TRIANGLE) });
 			ddlOptimization.setAdapter(optimizationAdapter);
 			ddlOptimization.setItemChecked(2, true);
 		}
@@ -1284,9 +1281,9 @@ public class MainFragment extends Fragment implements
 					getActivity(),
 					android.R.layout.simple_list_item_single_choice,
 					new OptimizeSpinnerItem[] {
-							new OptimizeSpinnerItem("Quickest", OptimizeType.QUICK),
-							new OptimizeSpinnerItem("Safest", OptimizeType.SAFE),
-							new OptimizeSpinnerItem("Fewest Transfers",
+							new OptimizeSpinnerItem(getResources().getString(R.string.optimization_quick), OptimizeType.QUICK),
+							new OptimizeSpinnerItem(getResources().getString(R.string.optimization_safe), OptimizeType.SAFE),
+							new OptimizeSpinnerItem(getResources().getString(R.string.optimization_fewest_transfers),
 									OptimizeType.TRANSFERS) });
 			ddlOptimization.setAdapter(optimizationAdapter);
 			ddlOptimization.setItemChecked(0, true);
@@ -1360,7 +1357,7 @@ public class MainFragment extends Fragment implements
 	
 	private void restartTextBoxes(){
 		SharedPreferences.Editor prefsEditor = prefs.edit();
-		setTextBoxLocation("My Location", true);
+		setTextBoxLocation(getResources().getString(R.string.my_location), true);
 		prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true);
 		prefsEditor.commit();
 		
@@ -1370,7 +1367,7 @@ public class MainFragment extends Fragment implements
 	private void setLocationTb(LatLng latlng, boolean isStartTb){
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols();
 		decimalFormatSymbols.setDecimalSeparator('.');
-		DecimalFormat decimalFormat = new DecimalFormat("#.00000", decimalFormatSymbols);
+		DecimalFormat decimalFormat = new DecimalFormat(OTPApp.FORMAT_COORDINATES, decimalFormatSymbols);
 		if (isStartTb){
 			setTextBoxLocation(decimalFormat.format(latlng.latitude) + ", " + decimalFormat.format(latlng.longitude), true);
 		}
@@ -1637,7 +1634,7 @@ public class MainFragment extends Fragment implements
 			updateOverlay(overlayString);
 		} else if (key.equals(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER)) {
 			if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)){
-				setSelectedServer(new Server(prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, "")), true);
+				setSelectedServer(new Server(prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""), applicationContext), true);
 				Log.v(TAG, "Now using custom OTP server: " + prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
 				WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
 
@@ -1705,7 +1702,7 @@ public class MainFragment extends Fragment implements
 			Server selectedServer = app.getSelectedServer();
 
 			String[] recipients = { selectedServer.getContactEmail(),
-					getString(R.string.email_otp_android_developer) };
+					getString(R.string.feedback_email_android_developer) };
 
 			String uriText = "mailto:";
 			for (int i = 0; i < recipients.length; i++) {
@@ -1713,7 +1710,7 @@ public class MainFragment extends Fragment implements
 			}
 
 			String subject = "";
-			subject += "Android OTP user report OTP trip ";
+			subject += getResources().getString(R.string.feedback_subject);
 			Date d = Calendar.getInstance().getTime();
 			subject += "[" + d.toString() + "]";
 			uriText += "?subject=" + subject;
@@ -1721,7 +1718,7 @@ public class MainFragment extends Fragment implements
 			String content = ((MyActivity)getActivity()).getCurrentRequestString();
 			
 			try {
-				uriText += "&body=" + URLEncoder.encode(content, "UTF-8");
+				uriText += "&body=" + URLEncoder.encode(content, OTPApp.URL_ENCODING);
 			} catch (UnsupportedEncodingException e1) {
 				e1.printStackTrace();
 				return false;
@@ -1731,7 +1728,7 @@ public class MainFragment extends Fragment implements
 
 			Intent sendIntent = new Intent(Intent.ACTION_SENDTO);
 			sendIntent.setData(uri);
-			startActivity(Intent.createChooser(sendIntent, "Send email"));
+			startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.feedback_send_email)));
 
 			break;
 		case R.id.server_info:
@@ -1968,8 +1965,8 @@ public class MainFragment extends Fragment implements
 						modeMarkerOption.title(getResources().getString(R.string.before_distance_bike)
 								+ " " + getResources().getString(R.string.connector_destination) + " " + leg.getTo().name);
 					}
-					modeMarkerOption.snippet(DateTimeConversion.getFormattedDurationTextNoSeconds(leg.duration/1000) + " " + "-" + " " 
-							+ String.format("%.0f", leg.getDistance()) + getResources().getString(R.string.distance_unit));
+					modeMarkerOption.snippet(DateTimeConversion.getFormattedDurationTextNoSeconds(leg.duration/1000, applicationContext) + " " + "-" + " " 
+							+ String.format(OTPApp.FORMAT_DISTANCE_METERS_SHORT, leg.getDistance()) + getResources().getString(R.string.distance_unit));
 				}
 
 				
@@ -2132,7 +2129,7 @@ public class MainFragment extends Fragment implements
 				if(traverseMode.isTransit()){
 					itinerarySummaryList[i] += getString(R.string.before_route) + " " + leg.getRouteShortName();
 					itinerarySummaryList[i] += DateTimeConversion.getTimeWithContext(applicationContext, agencyTimeZoneOffset, Long.parseLong(leg.getStartTime()), true);
-					itinerarySummaryList[i] += " " + "-" + " " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.duration/1000);
+					itinerarySummaryList[i] += " " + "-" + " " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.duration/1000, applicationContext);
 					isTagSet = true;
 					break;
 				}
@@ -2141,16 +2138,16 @@ public class MainFragment extends Fragment implements
 				if (it.legs.size() == 1){
 					TraverseMode traverseMode = TraverseMode.valueOf((String) it.legs.get(0).mode);
 					if (traverseMode.equals(TraverseMode.WALK)){
-						itinerarySummaryList[i] += getString(R.string.before_distance_walk) + " " + String.format("%.0f", it.walkDistance) + getResources().getString(R.string.distance_unit);
-						itinerarySummaryList[i] += " " + getString(R.string.connector_time_full) + " " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.duration/1000);
+						itinerarySummaryList[i] += getString(R.string.before_distance_walk) + " " + String.format(OTPApp.FORMAT_DISTANCE_METERS_SHORT, it.walkDistance) + getResources().getString(R.string.distance_unit);
+						itinerarySummaryList[i] += " " + getString(R.string.connector_time_full) + " " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.duration/1000, applicationContext);
 					}
 					else if (traverseMode.equals(TraverseMode.BICYCLE)){
-						itinerarySummaryList[i] += getString(R.string.before_distance_bike) + " " + String.format("%.0f", it.walkDistance) + getResources().getString(R.string.distance_unit);
-						itinerarySummaryList[i] += " " + getString(R.string.connector_time_full) + " " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.duration/1000);
+						itinerarySummaryList[i] += getString(R.string.before_distance_bike) + " " + String.format(OTPApp.FORMAT_DISTANCE_METERS_SHORT, it.walkDistance) + getResources().getString(R.string.distance_unit);
+						itinerarySummaryList[i] += " " + getString(R.string.connector_time_full) + " " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.duration/1000, applicationContext);
 					}
 				}
 				else{
-					itinerarySummaryList[i] += getString(R.string.total_duration) + " " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.duration/1000);
+					itinerarySummaryList[i] += getString(R.string.total_duration) + " " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.duration/1000, applicationContext);
 				}
 			}
 
@@ -2180,7 +2177,7 @@ public class MainFragment extends Fragment implements
 				geocoderAlert.setTitle(R.string.geocoder_results_title)
 						.setMessage(R.string.geocoder_no_results_message)
 						.setCancelable(false)
-						.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+						.setPositiveButton(getResources().getString(android.R.string.ok), new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 							}
 						});
@@ -2360,9 +2357,9 @@ public class MainFragment extends Fragment implements
             }
         } else {
 			AlertDialog.Builder errorPlay = new AlertDialog.Builder(getActivity());
-			errorPlay.setTitle("Play Services Error ")
+			errorPlay.setTitle(getResources().getString(R.string.play_services_error_title))
 					.setMessage(getResources().getString(R.string.play_services_error) + connectionResult.getErrorCode())
-					.setNeutralButton("OK", null)
+					.setNeutralButton(getResources().getString(android.R.string.ok), null)
 					.create()
 					.show();
         }
@@ -2439,10 +2436,11 @@ public class MainFragment extends Fragment implements
 			setMarker(true, serverCenter, false);
 		}
 
+        /*
         String msg = "Updated Location: " +
                 Double.toString(location.getLatitude()) + "," +
                 Double.toString(location.getLongitude());
-        Toast.makeText(applicationContext, msg, Toast.LENGTH_SHORT).show();
+        Toast.makeText(applicationContext, msg, Toast.LENGTH_SHORT).show();*/
 		
 	}
 

@@ -36,6 +36,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import edu.usf.cutr.opentripplanner.android.OTPApp;
+
 import android.util.Log;
 
 /**
@@ -91,10 +93,10 @@ public class GooglePlaces implements Places{
 		String encodedParamName = "";
 		try {
 			if ((paramLocation != null) && (paramRadius != null)){
-				encodedParamLocation = URLEncoder.encode(paramLocation, "UTF-8");
-				encodedParamRadius = URLEncoder.encode(paramRadius, "UTF-8");
+				encodedParamLocation = URLEncoder.encode(paramLocation, OTPApp.URL_ENCODING);
+				encodedParamRadius = URLEncoder.encode(paramRadius, OTPApp.URL_ENCODING);
 			}
-			encodedParamName = URLEncoder.encode(paramName, "UTF-8");
+			encodedParamName = URLEncoder.encode(paramName, OTPApp.URL_ENCODING);
 		} catch (UnsupportedEncodingException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

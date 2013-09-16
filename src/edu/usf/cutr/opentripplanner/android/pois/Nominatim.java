@@ -37,6 +37,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import edu.usf.cutr.opentripplanner.android.OTPApp;
+
 import android.util.Log;
 
 /**
@@ -87,12 +89,12 @@ public class Nominatim implements Places{
 		String encodedParamRight = "";
 		String encodedParamBottom = "";
 		try {
-			encodedParamName = URLEncoder.encode(paramName, "UTF-8");
+			encodedParamName = URLEncoder.encode(paramName, OTPApp.URL_ENCODING);
 			if ((left != null) && (top != null) && (right != null) && (bottom != null)){
-				encodedParamLeft = URLEncoder.encode(left, "UTF-8");
-				encodedParamTop = URLEncoder.encode(top, "UTF-8");
-				encodedParamRight = URLEncoder.encode(right, "UTF-8");
-				encodedParamBottom = URLEncoder.encode(bottom, "UTF-8");
+				encodedParamLeft = URLEncoder.encode(left, OTPApp.URL_ENCODING);
+				encodedParamTop = URLEncoder.encode(top, OTPApp.URL_ENCODING);
+				encodedParamRight = URLEncoder.encode(right, OTPApp.URL_ENCODING);
+				encodedParamBottom = URLEncoder.encode(bottom, OTPApp.URL_ENCODING);
 			}
 		} catch (UnsupportedEncodingException e1) {
 			// TODO Auto-generated catch block

@@ -46,7 +46,7 @@
             android:layout_marginLeft="5dp"
             android:gravity="center_vertical"
             android:padding="5dp"
-            android:text="@string/step_by_step_from"
+            android:text="@string/step_by_step_header_from"
             android:textColor="#C0C0C0"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -76,7 +76,7 @@
             android:layout_marginLeft="5dp"
             android:gravity="center_vertical"
             android:padding="10dp"
-            android:text="@string/step_by_step_to"
+            android:text="@string/step_by_step_header_to"
             android:textColor="#C0C0C0"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -113,7 +113,7 @@
 	            android:layout_marginLeft="5dp"
 	            android:gravity="center_vertical"
 	            android:padding="10dp"
-           		android:text="@string/step_by_step_departure"
+           		android:text="@string/step_by_step_header_departure"
 	            android:textColor="#C0C0C0"
 	            android:textSize="18sp"
 	            android:textStyle="bold" />
@@ -142,7 +142,7 @@
 	            android:layout_marginLeft="5dp"
 	            android:gravity="center_vertical"
 	            android:padding="10dp"
-           		android:text="@string/step_by_step_arrival"
+           		android:text="@string/step_by_step_header_arrival"
 	            android:textColor="#C0C0C0"
 	            android:textSize="18sp"
 	            android:textStyle="bold" />

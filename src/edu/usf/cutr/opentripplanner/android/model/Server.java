@@ -16,6 +16,8 @@
 
 package edu.usf.cutr.opentripplanner.android.model;
 
+import edu.usf.cutr.opentripplanner.android.R;
+import android.content.Context;
 import android.location.Location;
 
 /**
@@ -86,14 +88,14 @@ public class Server {
 	/*
 	 * Constructor for server with a custom URL
 	 */
-	public Server(String baseURL) {
+	public Server(String baseURL, Context applicationContext) {
 		super();
 		this.baseURL = baseURL;
-		this.region = "Unknown Region";
-		this.bounds = "Unknown Bounds";
-		this.language = "Unknown Language";
-		this.contactName = "Unknown Contact Name";
-		this.contactEmail = "Unknown Contact Email";
+		this.region = applicationContext.getResources().getString(R.string.custom_server_unknown_region);
+		this.bounds = applicationContext.getResources().getString(R.string.custom_server_unknown_bounds);
+		this.language = applicationContext.getResources().getString(R.string.custom_server_unknown_language);
+		this.contactName = applicationContext.getResources().getString(R.string.custom_server_unknown_name);
+		this.contactEmail = applicationContext.getResources().getString(R.string.custom_server_unknown_email);
 	}
 
 	public String getRegion() {

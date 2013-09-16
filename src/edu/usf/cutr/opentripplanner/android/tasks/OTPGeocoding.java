@@ -88,7 +88,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 			progressDialog.setIndeterminate(true);
 	        progressDialog.setCancelable(true);
 			progressDialog = ProgressDialog.show(activity.get(), "",
-					"Processing geocoding. Please wait... ", true);
+					context.getResources().getString(R.string.geocoding_request_progress), true);
 		}
 	}
 
@@ -260,7 +260,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 			geocoderAlert.setTitle(R.string.geocoder_results_title)
 					.setMessage(R.string.geocoder_no_results_message)
 					.setCancelable(false)
-					.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					.setPositiveButton(context.getResources().getString(android.R.string.ok), new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
 						}
 					});

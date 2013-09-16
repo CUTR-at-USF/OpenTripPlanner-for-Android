@@ -16,7 +16,7 @@
         <ListPreference android:title="@string/map_tile_provider" android:key="map_tile_source"></ListPreference>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/feedback" android:key="feedback_options">
-        <Preference android:title="@string/feedback_android_developer" android:key="otp_provider_feedback"/>
+        <Preference android:title="@string/feedback_email_android_developer" android:key="otp_provider_feedback"/>
     </PreferenceCategory>
 </PreferenceScreen> 
     

@@ -44,6 +44,7 @@ import edu.usf.cutr.opentripplanner.android.listeners.ServerCheckerCompleteListe
 import edu.usf.cutr.opentripplanner.android.model.Server;
 import edu.usf.cutr.opentripplanner.android.sqlite.ServersDataSource;
 import edu.usf.cutr.opentripplanner.android.tasks.ServerChecker;
+import edu.usf.cutr.opentripplanner.android.util.DateTimeConversion;
 
 /*
  * Modified by Khoa Tran
@@ -226,7 +227,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 				if (URLUtil.isValidUrl(value)){		
 					WeakReference<Activity> weakContext = new WeakReference<Activity>(SettingsActivity.this);
 					ServerChecker serverChecker = new ServerChecker(weakContext, SettingsActivity.this.getApplicationContext(), SettingsActivity.this, false);
-					serverChecker.execute(new Server(value));
+					serverChecker.execute(new Server(value, SettingsActivity.this.getApplicationContext()));
 					return true;
 				}
 				
@@ -286,12 +287,12 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 			@Override
 			public boolean onPreferenceClick(Preference arg0) {
 				Log.v(TAG, "Provider Feedback Button clicked");
-				String recipient = getString(R.string.email_otp_android_developer);
+				String recipient = getString(R.string.feedback_email_android_developer);
 	        	
 	        	String uriText = "mailto:"+recipient;
 	        	
 	        	String subject = "";
-	            subject += "Android OTP user report problem(s) ";
+	            subject += getResources().getString(R.string.feedback_subject);
 	            Date d = Calendar.getInstance().getTime(); 
 	            subject += "[" + d.toString() + "]";
 	            uriText += "?subject=" + subject;
@@ -300,7 +301,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 
 	        	Intent sendIntent = new Intent(Intent.ACTION_SENDTO);
 	        	sendIntent.setData(uri);
-	        	startActivity(Intent.createChooser(sendIntent, "Send email")); 
+	        	startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.feedback_send_email))); 
 
 				return true;
 			}
@@ -315,9 +316,9 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 		if(mostRecentDate != null){
 			Calendar cal = Calendar.getInstance();
 			cal.setTimeInMillis(mostRecentDate);
-			serverRefreshButton.setSummary("Server List Downloaded on "+ cal.getTime());
+			serverRefreshButton.setSummary(getResources().getString(R.string.server_list_donwload_date_description) + cal.getTime());
 		}else{
-			serverRefreshButton.setSummary("Last Server List Download Unknown");
+			serverRefreshButton.setSummary(getResources().getString(R.string.server_list_donwload_date_unknown));
 		}
 		
 		serverRefreshButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {

@@ -40,7 +40,7 @@ public class DateTimeDialog extends DialogFragment /* implements DatePickerCompl
 		btnOk = (Button) view.findViewById(R.id.btnOk);
 		btnCancel = (Button) view.findViewById(R.id.btnCancel);
 				
-        getDialog().setTitle("Set date and time");
+        getDialog().setTitle(getResources().getString(R.string.date_time_title));
 		getDialog().setCanceledOnTouchOutside(true);
         
 		pickerTime.setIs24HourView(DateFormat.is24HourFormat(getActivity()));
@@ -74,7 +74,7 @@ public class DateTimeDialog extends DialogFragment /* implements DatePickerCompl
 		ArrayAdapter<ArriveBySpinnerItem> arriveByTypeAdapter = new ArrayAdapter<ArriveBySpinnerItem>(
 				getActivity(),
 				android.R.layout.simple_spinner_dropdown_item,
-				new ArriveBySpinnerItem[] {new ArriveBySpinnerItem("Depart at:", false), new ArriveBySpinnerItem("Arrive at:", true)});
+				new ArriveBySpinnerItem[] {new ArriveBySpinnerItem(getResources().getString(R.string.date_time_spinner_depart), false), new ArriveBySpinnerItem(getResources().getString(R.string.date_time_spinner_arrive), true)});
 		spinScheduleType.setAdapter(arriveByTypeAdapter);
 
         return view;

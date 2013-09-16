@@ -102,7 +102,7 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 			geocoderAlert.setTitle(R.string.tripplanner_results_title)
 					.setMessage(R.string.tripplanner_no_results_message)
 					.setCancelable(false)
-					.setPositiveButton(R.string.confirmation, new DialogInterface.OnClickListener() {
+					.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
 						}
 					});
@@ -140,9 +140,9 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 				String msg = response.getError().toString();
 				if (activity.get() != null){
 					AlertDialog.Builder feedback = new AlertDialog.Builder(activity.get());
-					feedback.setTitle("Error Planning Trip");
+					feedback.setTitle(context.getResources().getString(R.string.tripplanner_error_dialog_title));
 					feedback.setMessage(msg);
-					feedback.setNeutralButton("OK", null);
+					feedback.setNeutralButton(context.getResources().getString(android.R.string.ok), null);
 					feedback.create().show();
 				}
 			}
@@ -204,7 +204,7 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 //		HttpClient client = new DefaultHttpClient();
 //		String result = "";
 //		try {
-//			result = Http.get(u).use(client).header("Accept", "application/xml").header("Keep-Alive","timeout=60, max=100").charset("UTF-8").followRedirects(true).asString();
+//			result = Http.get(u).use(client).header("Accept", "application/xml").header("Keep-Alive","timeout=60, max=100").charset(OTPApp.URL_ENCODING).followRedirects(true).asString();
 //			Log.d(TAG, "Result: " + result);
 //		} catch (IOException e) {
 //			// TODO Auto-generated catch block

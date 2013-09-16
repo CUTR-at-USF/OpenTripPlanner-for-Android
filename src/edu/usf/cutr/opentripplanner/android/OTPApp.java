@@ -33,7 +33,14 @@ public class OTPApp extends Application {
 	
 	public static final int CHOOSE_CONTACT_REQUEST_CODE = 1;
 	
+	public static final String METADATA_LOCATION = "/metadata";
+	
+	public static final String URL_ENCODING = "UTF-8";
+	
 	public static final String REFRESH_SERVER_RETURN_KEY = "RefreshServer";
+	
+	public static final String TAG_FRAGMENT_MAIN_FRAGMENT = "mainFragment";
+	public static final String TAG_FRAGMENT_DATE_TIME_DIALOG = "dateTimeDialog";
 	
 	public static final String MAP_TILE_GOOGLE = "Google";
 	public static final String MAP_TILE_GOOGLE_HYBRID = "Google hybrid";
@@ -128,6 +135,14 @@ public class OTPApp extends Application {
 	public static final float defaultMediumZoomLevel = 14;
 	public static final float defaultMyLocationZoomLevel = 16;
 	public static final int defaultPadding = 192;
+	
+    public static final String FORMAT_COORDINATES = "#.00000";
+    public static final String FORMAT_DISTANCE_METERS_SHORT = "%.0f";
+    public static final String FORMAT_DISTANCE_METERS_FULL = "%.2f";
+    public static final String FORMAT_OTP_SERVER_DATE_RESPONSE = "yyyy-MM-dd\'T\'HH:mm:ssZZ";
+	public static final String FORMAT_OTP_SERVER_DATE_QUERY = "MM/dd/yy";
+	public static final String FORMAT_OTP_SERVER_TIME_QUERY = "hh:mmaa";
+
 
 	/**
 	 * Sets the currently selected OTP server

@@ -104,7 +104,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements 
 			progressDialog.setIndeterminate(true);
 	        progressDialog.setCancelable(true);
 			progressDialog = ProgressDialog.show(activity.get(), "",
-					"Detecting optimal server. Please wait...", true);
+					context.getResources().getString(R.string.server_selector_progress), true);
 		}
         
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -188,7 +188,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements 
 		HttpClient client = new DefaultHttpClient();
 		String result = "";
 		try {
-			result = Http.get(url).use(client).charset("UTF-8").followRedirects(true).asString();
+			result = Http.get(url).use(client).charset(OTPApp.URL_ENCODING).followRedirects(true).asString();
 			Log.d(TAG, "Spreadsheet: " + result);
 		} catch (IOException e) {
 			Log.e(TAG, "Unable to download spreadsheet with server list: " + e.getMessage());
@@ -288,7 +288,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements 
 		if (selectedServer != null) {
 			//We've already auto-selected a server
 			Toast.makeText(context.getApplicationContext(), 
-						   "Detected "+selectedServer.getRegion() + ". Change this manually in Settings", 
+					context.getResources().getString(R.string.server_selector_detected) + " "+selectedServer.getRegion() + ". " + context.getResources().getString(R.string.server_selector_server_change_info), 
 						   Toast.LENGTH_SHORT).show();
 			callback.onServerSelectorComplete(selectedServer);
 		} else if (knownServers != null && !knownServers.isEmpty()){
@@ -299,19 +299,19 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements 
 			for (Server server : knownServers) {
 				serverNames.add(server.getRegion());
 			}
-			serverNames.add("Custom Server");
+			serverNames.add(context.getResources().getString(R.string.custom_server_name));
 
 			final CharSequence[] items = serverNames.toArray(new CharSequence[serverNames.size()]);
 			
 			if (activity.get() != null){
 				AlertDialog.Builder builder = new AlertDialog.Builder(activity.get() );
-				builder.setTitle("Choose OpenTripPlanner Server");
+				builder.setTitle(context.getResources().getString(R.string.server_selector_server_info_dialog_title));
 				builder.setItems(items, new DialogInterface.OnClickListener() {
 	
 					public void onClick(DialogInterface dialog, int item) {
 	
 						//If the user selected to enter a custom URL, they are shown this EditText box to enter it
-						if(items[item].equals("Custom Server")) {
+						if(items[item].equals(context.getResources().getString(R.string.custom_server_name))) {
 							SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 	
 							final EditText tbBaseURL = new EditText(activity.get());
@@ -319,9 +319,9 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements 
 							tbBaseURL.setText(actualCustomServer);
 	
 							AlertDialog.Builder urlAlert = new AlertDialog.Builder(activity.get());
-							urlAlert.setTitle("Enter a custom OTP server domain");
+							urlAlert.setTitle(context.getResources().getString(R.string.server_selector_custom_server_alert_title));
 							urlAlert.setView(tbBaseURL);
-							urlAlert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+							urlAlert.setPositiveButton(context.getResources().getString(android.R.string.ok), new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int whichButton) {
 									String value = tbBaseURL.getText().toString().trim();
 									if (URLUtil.isValidUrl(value)){
@@ -329,7 +329,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements 
 										prefsEditor.putString(PREFERENCE_KEY_CUSTOM_SERVER_URL, value);
 	
 										ServerChecker serverChecker = new ServerChecker(activity, context, ServerSelector.this, false);
-										serverChecker.execute(new Server(value));
+										serverChecker.execute(new Server(value, context));
 										prefsEditor.commit();
 									}
 									else{
@@ -377,7 +377,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements 
 			prefsEditor.commit();
 			if (selectedCustomServer){
 				String baseURL = prefs.getString(PREFERENCE_KEY_CUSTOM_SERVER_URL, "");
-				selectedServer = new Server(baseURL);
+				selectedServer = new Server(baseURL, context);
 				callback.onServerSelectorComplete(selectedServer);
 			}
 		}

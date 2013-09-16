@@ -80,16 +80,16 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
 			cancel(true);
 		}
 		
-		String message = "Region:  "
+		String message = context.getResources().getString(R.string.server_checker_info_dialog_region) + " "
 				+ server.getRegion();
-		message += "\nLanguage:  " + server.getLanguage();
-		message += "\nContact:  " + server.getContactName() + " ("
+		message += "\n" + context.getResources().getString(R.string.server_checker_info_dialog_language) + " " + server.getLanguage();
+		message += "\n" + context.getResources().getString(R.string.server_checker_info_dialog_contact) + " " + server.getContactName() + " ("
 				+ server.getContactEmail() + ")";
-		message += "\nURL:  " + server.getBaseURL();
+		message += "\n" + context.getResources().getString(R.string.server_checker_info_dialog_url) + " " + server.getBaseURL();
 
 		// TODO - fix server info bounds
-		message += "\nBounds: " + server.getBounds();
-		message += "\nCurrently reachable: ";
+		message += "\n" + context.getResources().getString(R.string.server_checker_info_dialog_bounds) + " " + server.getBounds();
+		message += "\n" + context.getResources().getString(R.string.server_checker_info_dialog_reachable) + " ";
 
 		int status = 0;
 		try {
@@ -103,15 +103,15 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
 					.getStatusLine().getStatusCode();
 		} catch (IOException e) {
 			Log.e(TAG, "Unable to reach server: " + e.getMessage());
-			message = "Unable to reach server: " + e.getMessage();
+			message = context.getResources().getString(R.string.server_checker_error_message) + " " + e.getMessage();
 			return message;
 		}
 
 		if (status == HttpStatus.SC_OK) {
-			message += "Yes";
+			message += context.getResources().getString(R.string.yes);
 			isWorking = true;
 		} else {
-			message += "No";
+			message += context.getResources().getString(R.string.no);
 		}
 
 		return message;
@@ -139,9 +139,9 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
 		if (showMessage){
 			if (activity.get() != null){
 				AlertDialog.Builder dialog = new AlertDialog.Builder(activity.get());
-				dialog.setTitle("OpenTripPlanner Server Info");
+				dialog.setTitle(context.getResources().getString(R.string.server_checker_info_dialog_title));
 				dialog.setMessage(result);
-				dialog.setNeutralButton("OK", null);
+				dialog.setNeutralButton(context.getResources().getString(android.R.string.ok), null);
 				dialog.create().show();
 			}
 		}

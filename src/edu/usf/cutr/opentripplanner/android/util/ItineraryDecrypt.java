@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.R;
 
 import org.opentripplanner.api.model.AgencyAndId;
@@ -127,14 +128,14 @@ public class ItineraryDecrypt {
 		}
 		
 		// Get appropriate action and icon
-		String action = "Walk";
+		String action = applicationContext.getResources().getString(R.string.mode_walk_action);
 		int icon = R.drawable.mode_walk;
 		TraverseMode mode = TraverseMode.valueOf((String) leg.mode);
 		if(mode.compareTo(TraverseMode.BICYCLE)==0){
-			action = "Bike";
+			action = applicationContext.getResources().getString(R.string.mode_bicycle_action);
 			icon = R.drawable.mode_bicycle;
 		} else if(mode.compareTo(TraverseMode.CAR)==0){
-			action = "Drive";
+			action = applicationContext.getResources().getString(R.string.mode_car_action);
 			icon = R.drawable.icon;
 		}
 
@@ -144,14 +145,12 @@ public class ItineraryDecrypt {
 		Place fromPlace = leg.from;
 		Place toPlace = leg.to;
 		String mainDirectionText = action;
-		mainDirectionText += fromPlace.name==null ? "" : " from " + fromPlace.name;
-		mainDirectionText += toPlace.name==null ? "" : " to " + toPlace.name;
+		mainDirectionText += fromPlace.name==null ? "" : " " + applicationContext.getResources().getString(R.string.step_by_step_from) + " " + fromPlace.name;
+		mainDirectionText += toPlace.name==null ? "" : " " + applicationContext.getResources().getString(R.string.step_by_step_to) + " " + toPlace.name;
 		mainDirectionText += toPlace.stopId==null ? "" : " (" + toPlace.stopId.getAgencyId() + " " + toPlace.stopId.getId() + ")";
 //		double duration = DateTimeConversion.getDuration(leg.startTime, leg.endTime);
 		double totalDistance = leg.distance;
-		DecimalFormat twoDForm = new DecimalFormat("#.##");
-	//	totalDistance = Double.valueOf(twoDForm.format(totalDistance)); -->VREIXO
-		mainDirectionText += "\n[" + String.format("%.2f", totalDistance) + "meters ]";// Double.toString(duration);
+		mainDirectionText += "\n[" + String.format(OTPApp.FORMAT_DISTANCE_METERS_FULL, totalDistance) + applicationContext.getResources().getString(R.string.distance_unit) +" ]";// Double.toString(duration);
 
 		direction.setDirectionText(mainDirectionText);
 
@@ -184,7 +183,7 @@ public class ItineraryDecrypt {
 
 			// Walk East
 			if(relativeDir==null){
-				subDirectionText += action + " ";
+				subDirectionText += action + " " + applicationContext.getResources().getString(R.string.step_by_step_heading) + " ";
 				subDirectionText += absoluteDir.name() + " ";
 			}
 			// (Turn left)/(Continue) 
@@ -196,7 +195,7 @@ public class ItineraryDecrypt {
 					if( rDir.compareTo(RelativeDirection.CONTINUE) != 0 &&
 							rDir.compareTo(RelativeDirection.CIRCLE_CLOCKWISE) !=0 &&
 							rDir.compareTo(RelativeDirection.CIRCLE_COUNTERCLOCKWISE) != 0){
-						subDirectionText += "Turn ";
+						subDirectionText += applicationContext.getResources().getString(R.string.step_by_step_turn) + " ";
 					}
 
 					subDirectionText += relativeDir.name() + " ";
@@ -210,9 +209,9 @@ public class ItineraryDecrypt {
 			//				subDirectionText += "on "+ streetName + " ";
 			//			}
 
-			subDirectionText += "on "+ streetName + " ";
+			subDirectionText += applicationContext.getResources().getString(R.string.step_by_step_connector_street_name) + " "+ streetName + " ";
 
-			subDirectionText += "\n[" + String.format("%.2f", distance) + "meters ]";
+			subDirectionText += "\n[" + String.format(OTPApp.FORMAT_DISTANCE_METERS_FULL, distance) + applicationContext.getResources().getString(R.string.distance_unit) + " ]";
 
 			dir.setDirectionText(subDirectionText);
 
@@ -288,16 +287,16 @@ public class ItineraryDecrypt {
 		if(serviceName==null)
 			serviceName = agencyId;
 
-		offDirectionText += "Get off " + serviceName + " " + mode + " " + route + "\n";
-		offDirectionText += "At " + to.name + " (" + agencyAndIdTo.getAgencyId() + " " + agencyAndIdTo.getId() + ")";
+		offDirectionText += applicationContext.getResources().getString(R.string.step_by_step_transit_get_off) + " " + serviceName + " " + mode + " " + route + "\n";
+		offDirectionText += applicationContext.getResources().getString(R.string.step_by_step_transit_connector_stop_name) + " " + to.name + " (" + agencyAndIdTo.getAgencyId() + " " + agencyAndIdTo.getId() + ")";
 		offDirection.setDirectionText(offDirectionText);
 		offDirection.setIcon(icon);
 
 		// Only onDirection has subdirection (list of stops in between)
 		
-		onDirectionText += "Get on " + serviceName + " " + mode + " " + route + DateTimeConversion.getTimeWithContext(applicationContext, agencyTimeZoneOffset, Long.parseLong(leg.getStartTime()), true) + "\n";
-		onDirectionText += "At " + from.name + " (" + agencyAndIdFrom.getAgencyId() + " " + agencyAndIdFrom.getId() + ")\n";
-		onDirectionText += stopsInBetween.size() + " stops in between";
+		onDirectionText += applicationContext.getResources().getString(R.string.step_by_step_transit_get_on) + " " + serviceName + " " + mode + " " + route + DateTimeConversion.getTimeWithContext(applicationContext, agencyTimeZoneOffset, Long.parseLong(leg.getStartTime()), true) + "\n";
+		onDirectionText += applicationContext.getResources().getString(R.string.step_by_step_transit_connector_stop_name) + " " + from.name + " (" + agencyAndIdFrom.getAgencyId() + " " + agencyAndIdFrom.getId() + ")\n";
+		onDirectionText += stopsInBetween.size() + " " + applicationContext.getResources().getString(R.string.step_by_step_transit_stops_in_between);
 		onDirection.setDirectionText(onDirectionText);
 		onDirection.setIcon(icon);
 
@@ -320,7 +319,6 @@ public class ItineraryDecrypt {
 		onDirection.setSubDirections(subDirections);
 
 		// Distance traveled [distance]
-		DecimalFormat twoDForm = new DecimalFormat("#.##");
 	//	distance = Double.valueOf(twoDForm.format(distance)); -->VREIXO
 		onDirection.setDistanceTraveled(distance);
 
@@ -334,7 +332,6 @@ public class ItineraryDecrypt {
 	 * @return the totalDistance
 	 */
 	public double getTotalDistance() {
-		DecimalFormat twoDForm = new DecimalFormat("#.##");
 	//	totalDistance = Double.valueOf(twoDForm.format(totalDistance));-->VREIXO
 		return totalDistance;
 	}

@@ -25,6 +25,7 @@ import java.util.TimeZone;
 
 import android.content.Context;
 
+import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.R;
 
 /**
@@ -38,7 +39,7 @@ public class DateTimeConversion {
 		DateFormat formatter ; 
 		Date startTime=null, endTime=null; 
 //		2012-03-09T22:46:00-05:00
-		formatter = new SimpleDateFormat("yyyy-MM-dd\'T\'HH:mm:ssZZ");
+		formatter = new SimpleDateFormat(OTPApp.FORMAT_OTP_SERVER_DATE_RESPONSE);
 		try {
 			startTime = (Date)formatter.parse(startTimeText);
 			endTime = (Date)formatter.parse(endTimeText);
@@ -59,7 +60,7 @@ public class DateTimeConversion {
 	 * @param sec
 	 * @return
 	 */
-	public static String getFormattedDurationText(long sec){
+	public static String getFormattedDurationText(long sec, Context applicationContext){
 		String text = "";
 		long h = sec/3600;
 		if (h>=24)
@@ -79,18 +80,18 @@ public class DateTimeConversion {
 	 * @param sec
 	 * @return
 	 */
-	public static String getFormattedDurationTextNoSeconds(long sec){
+	public static String getFormattedDurationTextNoSeconds(long sec, Context applicationContext){
 		String text = "";
 		long h = sec/3600;
 		if (h>=24)
 			return null;
 		long m = (sec%3600)/60;
 		if (h > 0){
-			text += Long.toString(h) + "h" + " ";
-			text += Long.toString(m) + "m" + " ";
+			text += Long.toString(h) + " " + applicationContext.getResources().getString(R.string.short_hours) + " ";
+			text += Long.toString(m) + " " + applicationContext.getResources().getString(R.string.short_minutes) + " ";
 		}
 		else{
-			text += Long.toString(m) + "min" + " ";
+			text += Long.toString(m) + " " + applicationContext.getResources().getString(R.string.long_minutes) + " ";
 		}
 		return text;
 	}
@@ -110,10 +111,10 @@ public class DateTimeConversion {
 				return (" " + applicationContext.getResources().getString(R.string.connector_time) + " " + timeFormat.format(cal.getTime()));	
 			}
 			else if (DateTimeConversion.isTomorrow(cal)){
-				return (" " + "tomorrow" + " " + applicationContext.getResources().getString(R.string.connector_time) + " " + timeFormat.format(cal.getTime()));
+				return (" " + applicationContext.getResources().getString(R.string.next_day) + " " + applicationContext.getResources().getString(R.string.connector_time) + " " + timeFormat.format(cal.getTime()));
 			}
 			else{
-				return (" " + "on" + " " + dateFormat.format(cal.getTime()) +" " + applicationContext.getResources().getString(R.string.connector_time) + " " + timeFormat.format(cal.getTime()));
+				return (" " + applicationContext.getResources().getString(R.string.connector_full_date) + " " + dateFormat.format(cal.getTime()) +" " + applicationContext.getResources().getString(R.string.connector_time) + " " + timeFormat.format(cal.getTime()));
 			}
 		}
 		else{

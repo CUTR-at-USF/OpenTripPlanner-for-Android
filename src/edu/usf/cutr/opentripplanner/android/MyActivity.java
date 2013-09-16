@@ -80,14 +80,14 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 		setContentView(R.layout.activity);
 
 		if (savedInstanceState != null) {
-			mainFragment = (MainFragment) getSupportFragmentManager().findFragmentByTag("mainFragmentTag");//recuperar o tag adecuado e pillar ese fragment
+			mainFragment = (MainFragment) getSupportFragmentManager().findFragmentByTag(OTPApp.TAG_FRAGMENT_MAIN_FRAGMENT);//recuperar o tag adecuado e pillar ese fragment
 			
 	    }
 		
 		if(savedInstanceState==null){
 			FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 			mainFragment = new MainFragment();
-			fragmentTransaction.replace(R.id.mainFragment, mainFragment, "mainFragmentTag");
+			fragmentTransaction.replace(R.id.mainFragment, mainFragment, OTPApp.TAG_FRAGMENT_MAIN_FRAGMENT);
 			fragmentTransaction.commit();
 		}
 		
