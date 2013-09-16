@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright 2011 Marcy Gordon
+ 
+ Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ use this file except in compliance with the License. You may obtain a copy of
+ the License at
+ 
+ http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ License for the specific language governing permissions and limitations under
+ the License.
+-->
+<resources>
+    <string name="yes">Si</string>
+    <string name="no">Non</string>        
+    <string name="step_by_step_title">Indicacións</string>
+    <string name="step_by_step_header_from">De</string>
+    <string name="step_by_step_header_to">A</string>
+    <string name="step_by_step_header_departure">Saída</string>
+    <string name="step_by_step_header_arrival">Chegada</string>
+    <string name="step_by_step_turn">Xire á</string>
+    <string name="step_by_step_heading">en dirección</string>
+    <string name="step_by_step_from">de</string>
+    <string name="step_by_step_to">a</string>
+    <string name="step_by_step_connector_street_name">en</string>
+    <string name="step_by_step_transit_get_on">Sube ao</string>
+    <string name="step_by_step_transit_get_off">Baixa do</string>
+    <string name="step_by_step_transit_connector_stop_name">En</string>
+    <string name="step_by_step_transit_stops_in_between">Paradas ate o destino</string>
+    <string name="need_to_place_marker"><string>"Engada un marcador de posición ..."</string></string>
+    <string name="need_to_place_markers_before_planning"><string>"Primero tes que introducir unha orixe e un destino"</string></string>
+    <string name="start_location_hint">Lugar de orixe</string>
+    <string name="end_location_hint">Lugar de destino</string>
+    <string name="textbox_close_to_marker">Marcador, cerda de</string>
+    <string name="metadata_request_successful">Metadatos descargados correctamente</string>
+    <string name="metadata_request_progress">Obtendo información do servidor escollido. Por favor espera...</string>
+    <string name="geocoding_request_progress">Procesando dirección. Por favor espera...</string>
+    <string name="server_checker_progress">Obtendo información do servidor. Por favor espera...</string>
+    <string name="server_checker_successful">OK: O servidor introducido funciona correctamente.</string>
+    <string name="server_checker_error_message">Non se puido contactar co servidor:</string>
+    <string name="server_checker_info_dialog_title">Información do servidor OTP</string>
+    <string name="server_checker_info_dialog_region">Rexión:</string>
+    <string name="server_checker_info_dialog_language">Idioma:</string>
+    <string name="server_checker_info_dialog_contact">Contacto:</string>
+    <string name="server_checker_info_dialog_url">URL:</string>
+    <string name="server_checker_info_dialog_bounds">Área:</string>
+    <string name="server_checker_info_dialog_reachable">Servidor funcionando:</string>
+    <string name="server_selector_progress">Buscando o servidor óptimo. Por favor espera...</string>
+    <string name="server_selector_detected">Detectado</string>
+    <string name="server_selector_server_change_info">Pode cambiar esto manualmente no menú de opcións</string>
+    <string name="server_selector_server_info_dialog_title">Escolle un servidor OTP</string>
+    <string name="server_selector_custom_server_alert_title">Introduce a dirección dun servidor OTP</string>
+    <string name="custom_server_name">Servidor alternativo</string>
+    <string name="custom_server_not_set">"Servidor alternativo non seleccionado: URL incorrecta"</string>
+    <string name="custom_server_unknown_region">Descoñecida</string>
+    <string name="custom_server_unknown_bounds">Descoñecida</string>
+    <string name="custom_server_unknown_language">Descoñecido</string>
+    <string name="custom_server_unknown_name">Descoñecido</string>
+    <string name="custom_server_unknown_email">email descoñecido</string>
+    <string name="choose_location_type_start">Escolla o lugar de orixe</string>
+    <string name="choose_location_type_end">Escolla o lugar de destino</string>
+    <string name="location_type_current_location">Ubicación actual</string>
+    <string name="location_type_contact">Dirección de un contacto</string>
+    <string name="location_type_map_point">Punto no mapa</string>
+    <string name="mode_transit">Transporte público</string>
+    <string name="mode_car">Coche</string>
+    <string name="mode_car_action">Conduce</string>
+    <string name="mode_bus">Só autobús</string>
+    <string name="mode_train">Só tren</string>
+    <string name="mode_walk">Andando</string>
+    <string name="mode_walk_action">Vai andando</string>
+    <string name="mode_bicycle">Bici</string>
+    <string name="mode_bicycle_action">Vai en bici</string>
+    <string name="mode_transit_bicycle">Transporte público e bici</string>
+    <string name="optimization_quick">Máis rápido</string>
+    <string name="optimization_safe">Máis seguro</string>
+    <string name="optimization_fewest_transfers">Menos transbordos</string>
+    <string name="optimization_bike_triangle">Viaxe personalizada...</string>
+    <string name="enable_gps">Activar GPS</string>
+    <string name="disable_gps">Desactivar GPS</string>
+    <string name="no_gps_signal">Desculpa, non hai sinal GPS</string>
+    <string name="my_location">A miña ubicación</string>
+    <string name="settings">Opcións</string>
+    <string name="feedback">Enviar comentario</string>
+    <string name="feedback_send_email">Enviar mensaxe</string>
+    <string name="feedback_subject">Informe para desarrollador de OTP</string>
+    <string name="server_info">Información do servidor</string>
+    <string name="start_marker_title">Saída</string>
+    <string name="start_marker_activated">Lugar de orixe</string>
+    <string name="start_marker_description">Pulsa para arrastrar...</string>
+    <string name="end_marker_title">Chegada</string>
+    <string name="end_marker_activated">Lugar de destino</string>
+    <string name="end_marker_description">Pulsa para arrastrar...</string>
+    <string name="marker_out_of_boundaries">Lugar situado fóra da área cuberta polo servidor. Marcador non fixado</string>
+    <string name="markers_dialog_title">Escolle o tipo de punto</string>
+    <string name="choose_geocoder">Selecciona a dirección</string>
+    <string name="wheelchair_accessible">Accesible con cadeira de rodas</string>
+    <string name="wheelchair_accessibility_description">Obter rutas accesibéis para cadeira de rodas</string>
+    <string name="maximum_walk">Distancia máxima camiñando</string>
+    <string name="maximum_walk_description">metros</string>
+    <string name="routing_options">Opcións de ruta</string>
+    <string name="map_options">Opcións del mapa</string>
+    <string name="map_tile_provider">Provedor do mapa</string>
+    <string name="custom_server_url">URL servidor alternativo</string>
+    <string name="custom_server_url_description">O servidor da URL funciona correctamente</string>
+    <string name="custom_server_url_error">URL non válida</string>
+    <string name="custom_server_error">Por favor introduce unha nova URL para o servidor alternativo</string>
+    <string name="auto_detect_server">Detectar servidor automáticamente</string>
+    <string name="auto_detect_server_description">Encontrar servidor automáticamente para a ubicación actual</string>
+    <string name="geocoder_results_title">Resultados de direccións</string>
+    <string name="geocoder_no_results_message">Disculpa, non se obteu nengún resultado para esa dirección</string>
+    <string name="tripplanner_progress">"Buscando a mellor ruta. Por favor espera..."</string>   
+    <string name="tripplanner_results_title">Resultados de rutas</string>
+    <string name="tripplanner_no_results_message">Error planeando a ruta</string>
+    <string name="tripplanner_error_dialog_title">Disculpa, non foi posibel atopar unha ruta</string>
+    <string name="date_time_title">Establecer data e hora</string>
+    <string name="date_time_spinner_arrive">Chegar:</string>
+    <string name="date_time_spinner_depart">Saír:</string>
+    <string name="next_day">mañá</string>
+    <string name="short_hours">h</string>
+    <string name="short_minutes">m</string>
+    <string name="short_seconds">s</string>
+    <string name="long_hours">h</string>
+    <string name="long_minutes">min</string>
+    <string name="long_seconds">sec</string>
+    <string name="full_hours">horas</string>
+    <string name="full_minutes">minutos</string>
+    <string name="full_seconds">segundos</string>
+    <string name="connector_stop">de</string>
+    <string name="connector_time">ás</string>
+    <string name="connector_full_date">o</string>
+    <string name="connector_headsign">dir.</string>
+    <string name="connector_destination">a</string>
+    <string name="before_route">Liña</string>
+    <string name="walking_duration">andando</string>
+    <string name="total_duration">tardas</string>
+    <string name="before_distance_bike">Vai en bici</string>
+    <string name="before_distance_walk">Vai andando</string>
+    <string name="distance_unit">m</string>
+    <string name="connector_time_full">tardas</string>
+    <string name="refresh_server_list">Actualizar servidores</string>
+    <string name="server_list_donwload_date_description">Lista de servidores descargada</string>
+    <string name="server_list_donwload_date_unknown">Data de descarga de lista descoñecida</string>
+    <string name="alternative_routes">Seleccionar unha ruta</string>
+    <string name="geocoder_preference_provider_title">Provedor de direccións</string>
+    <string name="geocoder_preference_provider_nominatim">Mapquest Nominatim</string>
+    <string name="geocoder_preference_provider_google_places">Google Places</string>
+    <string name="use_android_geocoder_title">Geocodificador de Android</string>
+    <string name="use_android_geocoder_description">Buscar direccións primeiro con geocodificador de Android</string>
+    <string name="use_intelligent_markers_title">Marcadores intelixentes</string>
+    <string name="use_intelligent_markers_description">Mover os marcadores á dirección que se atope máis perto</string>
+    <string name="info_server_no_server_selected">Non hai nengún servidor seleccionado</string>
+    <string name="info_server_error">Atención: Non se puido obter información do servidor!</string>
+    <string name="selected_custom_server_title">Servidor alternativo</string>
+    <string name="selected_custom_server_description">Usar o servidor aternativo</string>
+    <string name="server_down">Atención: Non se puido contactar co servidor!</string>
+    <string name="origin_destination_are_mylocation">"Non se puido obtener unha ruta: a orixe e o destino son o mesmo"</string>
+    <string name="play_services_error_title">Erro interno de "Play Services"</string>
+    <string name="play_services_error">Non se pode contactar cos servidores de Google Play: a aplicación podería non funcionar correctamente</string>
+    <string name="location_error">Non se puido obter a ubicación actual</string>
+    <string name="header_optimization">Tipo de viaxe</string>
+    <string name="header_travel_mode">Modo de transporte</string>
+    <string name="header_bike_options">Opcións bici</string>
+    <string name="header_bike_options_quick">Rápido</string>
+    <string name="header_bike_options_flat">Plano</string>
+    <string name="header_bike_options_bike_friendly">Bo para bicis</string>
+</resources>
