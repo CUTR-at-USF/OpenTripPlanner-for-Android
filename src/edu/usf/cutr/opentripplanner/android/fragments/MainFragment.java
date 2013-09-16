@@ -449,6 +449,9 @@ public class MainFragment extends Fragment implements
 			arriveBy = false;
 			setTextBoxLocation(getResources().getString(R.string.my_location), true);
 		}
+		
+		String overlayString = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, applicationContext.getResources().getString(R.string.map_tiles_default_server));
+		updateOverlay(overlayString);
 	}
 	
 	
@@ -1501,9 +1504,11 @@ public class MainFragment extends Fragment implements
 	public void onStart() {
 		super.onStart();	
 		
-		String overlayString = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, applicationContext.getResources().getString(R.string.map_tiles_default_server));
-		updateOverlay(overlayString);
-
+		needToRunAutoDetect = true;
+		mLocationClient = new LocationClient(applicationContext, this, this);
+		//mLocationClient.connect();
+		
+		connectLocationClient();
 	}
 	
 	public void connectLocationClient(){
@@ -1589,25 +1594,17 @@ public class MainFragment extends Fragment implements
 		super.onResume();
 		
 		Log.v(TAG, "MainFragment onResume");
-
-		needToRunAutoDetect = true;
-		mLocationClient = new LocationClient(applicationContext, this, this);
-		//mLocationClient.connect();
-		
-		connectLocationClient();
-	
 	}
 
 	@Override
 	public void onPause() {
-		disconnectLocationClient();
 		
 		super.onPause();
 	}
 	
 	@Override
 	public void onStop() {
-
+		disconnectLocationClient();
 
 		super.onStop();
 	}
@@ -2371,27 +2368,32 @@ public class MainFragment extends Fragment implements
         //mLocationClient.requestLocationUpdates(mLocationRequest, this);
 		double savedLatitude = 0;
 		double savedLongitude = 0;
+		float distance[] = new float[1];
+		distance[0] = 0;
 		if (savedLastLocationCheckedForServer != null){
 			savedLatitude = savedLastLocationCheckedForServer.latitude;
 			savedLongitude = savedLastLocationCheckedForServer.longitude;
 		}
 		
-		LatLng mCurrentLatLng = getLastLocation();
-				
-		if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER, true) && needToRunAutoDetect) {
+		Location mCurrentLocation = mLocationClient.getLastLocation();
+		LatLng mCurrentLatLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+		
+		Location.distanceBetween(savedLatitude, savedLongitude, mCurrentLatLng.latitude, mCurrentLatLng.longitude, distance);
 
+		if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER, true) && needToRunAutoDetect) {
+			
 			if ((app.getSelectedServer() != null) 
 					&& (!LocationUtil.checkPointInBoundingBox(mCurrentLatLng, app.getSelectedServer(), OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))
-					&& (((savedLastLocationCheckedForServer != null) && ((savedLatitude != mCurrentLatLng.latitude) || (savedLongitude != mCurrentLatLng.longitude))) 
-							|| savedLastLocationCheckedForServer == null)){
-				runAutoDetectServer(getLastLocation());
+					&& (((savedLastLocationCheckedForServer != null) && (distance[0] > OTPApp.COORDINATES_IMPORTANT_DIFFERENCE)) 
+							|| (savedLastLocationCheckedForServer == null))){
+				runAutoDetectServer(mCurrentLatLng);
 			}
 			else if (app.getSelectedServer() == null){
-				runAutoDetectServer(getLastLocation());
+				runAutoDetectServer(mCurrentLatLng);
 			}
 		}
 		else if (app.getSelectedServer() == null) {
-			runAutoDetectServer(getLastLocation());
+			runAutoDetectServer(mCurrentLatLng);
 		}
 		else {
 			if (mCurrentLatLng != null){
