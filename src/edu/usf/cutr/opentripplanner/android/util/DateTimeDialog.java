@@ -96,11 +96,11 @@ public class DateTimeDialog extends DialogFragment /* implements DatePickerCompl
         	Calendar cal = Calendar.getInstance();
         	if (cal.getTimeInMillis() < tripDate.getTime()){
         		//min time should preceede setted time and setted time will be set with 0 seconds, so we aloud one minute less
-        		pickerDate.setMinDate(cal.getTimeInMillis() - 1000);
+        		pickerDate.setMinDate(cal.getTimeInMillis() - 60000);
         	}
         	else{
         		//min time should preceede setted time and setted time will be set with 0 seconds, so we aloud one minute less
-        		pickerDate.setMinDate(tripDate.getTime() - 1000);
+        		pickerDate.setMinDate(tripDate.getTime() - 60000);
         	}
         	
         	cal.setTime(tripDate);
@@ -113,7 +113,7 @@ public class DateTimeDialog extends DialogFragment /* implements DatePickerCompl
     		}
     		pickerTime.setCurrentHour(cal.get(Calendar.HOUR_OF_DAY));
     		pickerTime.setCurrentMinute(cal.get(Calendar.MINUTE));
-    		pickerDate.updateDate(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_WEEK_IN_MONTH));
+    		pickerDate.updateDate(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
     	}
     	else{
     		//TimePicker state needs to be saved manually because of this bug in Android that affects at least ICS: http://code.google.com/p/android/issues/detail?id=22754
