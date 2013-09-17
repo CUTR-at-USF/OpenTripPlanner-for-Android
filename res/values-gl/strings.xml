@@ -35,7 +35,7 @@
     <string name="need_to_place_markers_before_planning"><string>"Primero tes que introducir unha orixe e un destino"</string></string>
     <string name="start_location_hint">Lugar de orixe</string>
     <string name="end_location_hint">Lugar de destino</string>
-    <string name="textbox_close_to_marker">Marcador, cerda de</string>
+    <string name="textbox_close_to_marker">Marcador, cerca de</string>
     <string name="metadata_request_successful">Metadatos descargados correctamente</string>
     <string name="metadata_request_progress">Obtendo información do servidor escollido. Por favor espera...</string>
     <string name="geocoding_request_progress">Procesando dirección. Por favor espera...</string>
@@ -112,7 +112,7 @@
     <string name="auto_detect_server">Detectar servidor automáticamente</string>
     <string name="auto_detect_server_description">Encontrar servidor automáticamente para a ubicación actual</string>
     <string name="geocoder_results_title">Resultados de direccións</string>
-    <string name="geocoder_no_results_message">Disculpa, non se obteu nengún resultado para esa dirección</string>
+    <string name="geocoder_no_results_message">Disculpa, non se puido obter nengún resultado para esa dirección</string>
     <string name="tripplanner_progress">"Buscando a mellor ruta. Por favor espera..."</string>   
     <string name="tripplanner_results_title">Resultados de rutas</string>
     <string name="tripplanner_no_results_message">Error planeando a ruta</string>
