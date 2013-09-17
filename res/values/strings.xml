@@ -72,7 +72,7 @@
     <string name="mode_car">Car</string>
     <string name="mode_car_action">Drive</string>
     <string name="mode_bus">Bus only</string>
-    <string name="mode_train">Traint only</string>
+    <string name="mode_train">Train only</string>
     <string name="mode_walk">Walk only</string>
     <string name="mode_walk_action">Walk</string>
     <string name="mode_bicycle">Bicycle</string>
