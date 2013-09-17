@@ -190,6 +190,10 @@ public class MainFragment extends Fragment implements
 	
 	private RangeSeekBar<Double> bikeTriangleParameters;
 	private ViewGroup bikeTriangleParametersLayout;	
+	
+	private ViewGroup handleDrawer;	
+	private ViewGroup navigationDrawerLeftPane;	
+
 	private boolean appStarts = true;
 	
 	private boolean isStartLocationGeocodingProcessed = false;
@@ -201,6 +205,8 @@ public class MainFragment extends Fragment implements
 	private boolean requestTripAfterGeocoding = false;
 	
 	private Context applicationContext;
+	
+	private boolean mapFailed;
 
 
 	public LatLng getSavedLastLocation() {
@@ -285,7 +291,7 @@ public class MainFragment extends Fragment implements
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-
+		
 		View mainView = inflater.inflate(R.layout.main, container, false);
 				
 		tbStartLocation = (EditText) mainView
@@ -315,6 +321,8 @@ public class MainFragment extends Fragment implements
 		btnDisplayDirection = (ImageButton) mainView
 				.findViewById(R.id.btnDisplayDirection);
 		
+		handleDrawer = (ViewGroup) mainView.findViewById(R.id.handleDrawer);;	
+		navigationDrawerLeftPane = (ViewGroup) mainView.findViewById(R.id.navigationDrawerLeftPane);
 		panelDisplayDirection = (ViewGroup) mainView.findViewById(R.id.panelDisplayDirection);
 		
 		btnHandle = (ImageButton) mainView.findViewById(R.id.btnHandle);
@@ -338,6 +346,8 @@ public class MainFragment extends Fragment implements
 		
 		applicationContext = getActivity().getApplicationContext();
 		 
+        mMap = retrieveMap(mMap);
+
 		app = ((OTPApp) getActivity().getApplication());
 		
 		prefs = PreferenceManager.getDefaultSharedPreferences(
@@ -352,14 +362,16 @@ public class MainFragment extends Fragment implements
         mLocationRequest.setInterval(OTPApp.UPDATE_INTERVAL);
         mLocationRequest.setFastestInterval(OTPApp.FASTEST_INTERVAL);
         		
-        mMap = retrieveMap(mMap);
-		UiSettings uiSettings = mMap.getUiSettings();
-		mMap.setMyLocationEnabled(true);
-		mMap.setOnCameraChangeListener(this);
-		uiSettings.setMyLocationButtonEnabled(false);
-		uiSettings.setCompassEnabled(false);
-		uiSettings.setAllGesturesEnabled(true);
-		uiSettings.setZoomControlsEnabled(false);
+        if (!mapFailed){
+    		UiSettings uiSettings = mMap.getUiSettings();
+    		mMap.setMyLocationEnabled(true);
+    		mMap.setOnCameraChangeListener(this);
+    		uiSettings.setMyLocationButtonEnabled(false);
+    		uiSettings.setCompassEnabled(false);
+    		uiSettings.setAllGesturesEnabled(true);
+    		uiSettings.setZoomControlsEnabled(false);
+        }
+
 		
 		if (savedInstanceState == null){
 			SharedPreferences.Editor prefsEditor = prefs.edit();
@@ -370,30 +382,32 @@ public class MainFragment extends Fragment implements
 			bikeTriangleParameters.setSelectedMaxValue(OTPApp.BIKE_PARAMETERS_FLAT_DEFAULT_VALUE);
 		}
 		
-		if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)){
-			String baseURL = prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, "");
-			Server s = new Server(baseURL, applicationContext);
-			String bounds;
-			setSelectedServer(s, false);
-			if ((bounds = prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS, null)) != null){
-				s.setBounds(bounds);
-				addBoundariesRectangle(s);
-			}
-			
-			Log.v(TAG, "Now using custom OTP server: " + baseURL);
-		}
-		else{
-			ServersDataSource dataSource = ServersDataSource.getInstance(applicationContext);
-			long serverId = prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0);
-			if (serverId != 0){
-				dataSource.open();
-				Server s = new Server(dataSource.getServer(prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)));
-				dataSource.close();
-				
+		if (!mapFailed){
+			if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)){
+				String baseURL = prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, "");
+				Server s = new Server(baseURL, applicationContext);
+				String bounds;
 				setSelectedServer(s, false);
-				addBoundariesRectangle(s);
+				if ((bounds = prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS, null)) != null){
+					s.setBounds(bounds);
+					addBoundariesRectangle(s);
+				}
 				
-				Log.v(TAG, "Now using OTP server: " + s.getRegion());
+				Log.v(TAG, "Now using custom OTP server: " + baseURL);
+			}
+			else{
+				ServersDataSource dataSource = ServersDataSource.getInstance(applicationContext);
+				long serverId = prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0);
+				if (serverId != 0){
+					dataSource.open();
+					Server s = new Server(dataSource.getServer(prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)));
+					dataSource.close();
+					
+					setSelectedServer(s, false);
+					addBoundariesRectangle(s);
+					
+					Log.v(TAG, "Now using OTP server: " + s.getRegion());
+				}
 			}
 		}
 		
@@ -432,15 +446,18 @@ public class MainFragment extends Fragment implements
 		Server selectedServer = app.getSelectedServer();	
 		if (selectedServer != null){
 			LatLng serverCenter = new LatLng(selectedServer.getCenterLatitude(), selectedServer.getCenterLongitude());
-			mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, OTPApp.defaultInitialZoomLevel));	
+			if (!mapFailed){
+				mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, OTPApp.defaultInitialZoomLevel));			
+			}
 		}
 
 		restoreState(savedInstanceState);
 		
-		addInterfaceListeners();
-		
-		addMapListeners();
-		
+		if (!mapFailed){
+			addInterfaceListeners();
+			addMapListeners();
+		}
+			
 		if (savedInstanceState == null){
 			ddlOptimization.setItemChecked(0, true);
 			ddlTravelMode.setItemChecked(0, true);
@@ -449,9 +466,11 @@ public class MainFragment extends Fragment implements
 			arriveBy = false;
 			setTextBoxLocation(getResources().getString(R.string.my_location), true);
 		}
-		
-		String overlayString = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, applicationContext.getResources().getString(R.string.map_tiles_default_server));
-		updateOverlay(overlayString);
+			
+		if (!mapFailed){
+			String overlayString = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, applicationContext.getResources().getString(R.string.map_tiles_default_server));
+			updateOverlay(overlayString);
+		}
 	}
 	
 	
@@ -1011,7 +1030,7 @@ public class MainFragment extends Fragment implements
 			
 			@Override
 			public void onClick(View v) {
-				drawerLayout.openDrawer(Gravity.START);
+				drawerLayout.openDrawer(Gravity.LEFT);
 			}
 		};
 		btnHandle.setOnClickListener(oclH);
@@ -1022,80 +1041,121 @@ public class MainFragment extends Fragment implements
 		if (savedInstanceState != null){
 			mMap = retrieveMap(mMap);
 			
-			String overlayString = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, applicationContext.getResources().getString(R.string.map_tiles_default_server));
-			updateOverlay(overlayString);
-			
-			restoredSavedState = true;
-			setTextBoxLocation(savedInstanceState.getString(OTPApp.BUNDLE_KEY_TB_START_LOCATION), true);
-			setTextBoxLocation(savedInstanceState.getString(OTPApp.BUNDLE_KEY_TB_END_LOCATION), false);
-			CameraPosition camPosition = savedInstanceState.getParcelable(OTPApp.BUNDLE_KEY_MAP_CAMERA);
-			if (camPosition != null){
-				mMap.moveCamera(CameraUpdateFactory.newCameraPosition(camPosition));
-			}
-			
-			if ((startMarkerPosition = savedInstanceState.getParcelable(OTPApp.BUNDLE_KEY_MAP_START_MARKER_POSITION)) != null){
-				startMarker = addStartEndMarker(startMarkerPosition, true);
-			}
-			if ((endMarkerPosition = savedInstanceState.getParcelable(OTPApp.BUNDLE_KEY_MAP_END_MARKER_POSITION)) != null){
-				endMarker = addStartEndMarker(endMarkerPosition, false);
-			}
-			
-			isStartLocationGeocodingProcessed = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_IS_START_LOCATION_GEOCODING_PROCESSED);
-			isEndLocationGeocodingProcessed = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_IS_END_LOCATION_GEOCODING_PROCESSED);
-			appStarts = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_APP_STARTS);
-			isStartLocationChangedByUser = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_IS_START_LOCATION_CHANGED_BY_USER);
-			isEndLocationChangedByUser = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_IS_END_LOCATION_CHANGED_BY_USER);
-			
-			savedLastLocation = savedInstanceState.getParcelable(OTPApp.BUNDLE_KEY_SAVED_LAST_LOCATION);
-			savedLastLocationCheckedForServer = savedInstanceState.getParcelable(OTPApp.BUNDLE_KEY_SAVED_LAST_LOCATION_CHECKED_FOR_SERVER);
+			if (!mapFailed){
+				boolean mapFailedBefore = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_MAP_FAILED);
+				
+				if (mapFailedBefore){
+					enableUIElements(true);
+					
+		    		UiSettings uiSettings = mMap.getUiSettings();
+		    		mMap.setMyLocationEnabled(true);
+		    		mMap.setOnCameraChangeListener(this);
+		    		uiSettings.setMyLocationButtonEnabled(false);
+		    		uiSettings.setCompassEnabled(false);
+		    		uiSettings.setAllGesturesEnabled(true);
+		    		uiSettings.setZoomControlsEnabled(false);
+		    		
+		    		addInterfaceListeners();
+		    		addMapListeners();
+				}
 
-    		showBikeParameters(false);
-    		
-			ddlTravelMode.setItemChecked(savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE), true);
-        	TraverseModeSpinnerItem traverseModeSpinnerItem = (TraverseModeSpinnerItem) ddlTravelMode.getItemAtPosition(ddlTravelMode.getCheckedItemPosition());			
-        	if (traverseModeSpinnerItem.getTraverseModeSet().contains(TraverseMode.BICYCLE)){
-	    		setBikeOptimizationAdapter(true);
-				ddlOptimization.setItemChecked(savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION), true);
-	    		OptimizeSpinnerItem optimizeSpinnerItem = (OptimizeSpinnerItem) ddlOptimization.getItemAtPosition(ddlOptimization.getCheckedItemPosition());
-	    		if (optimizeSpinnerItem.getOptimizeType().equals(OptimizeType.TRIANGLE)){
-		    		showBikeParameters(true);
-	    		}
-        	}
-			ddlTravelMode.setItemChecked(savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE), true);
+	    		
+				String overlayString = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, applicationContext.getResources().getString(R.string.map_tiles_default_server));
+				updateOverlay(overlayString);
+				
+				restoredSavedState = true;
+				setTextBoxLocation(savedInstanceState.getString(OTPApp.BUNDLE_KEY_TB_START_LOCATION), true);
+				setTextBoxLocation(savedInstanceState.getString(OTPApp.BUNDLE_KEY_TB_END_LOCATION), false);
+				CameraPosition camPosition = savedInstanceState.getParcelable(OTPApp.BUNDLE_KEY_MAP_CAMERA);
+				if (camPosition != null){
+					mMap.moveCamera(CameraUpdateFactory.newCameraPosition(camPosition));
+				}
+				
+				if ((startMarkerPosition = savedInstanceState.getParcelable(OTPApp.BUNDLE_KEY_MAP_START_MARKER_POSITION)) != null){
+					startMarker = addStartEndMarker(startMarkerPosition, true);
+				}
+				if ((endMarkerPosition = savedInstanceState.getParcelable(OTPApp.BUNDLE_KEY_MAP_END_MARKER_POSITION)) != null){
+					endMarker = addStartEndMarker(endMarkerPosition, false);
+				}
+				
+				isStartLocationGeocodingProcessed = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_IS_START_LOCATION_GEOCODING_PROCESSED);
+				isEndLocationGeocodingProcessed = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_IS_END_LOCATION_GEOCODING_PROCESSED);
+				appStarts = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_APP_STARTS);
+				isStartLocationChangedByUser = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_IS_START_LOCATION_CHANGED_BY_USER);
+				isEndLocationChangedByUser = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_IS_END_LOCATION_CHANGED_BY_USER);
+				
+				savedLastLocation = savedInstanceState.getParcelable(OTPApp.BUNDLE_KEY_SAVED_LAST_LOCATION);
+				savedLastLocationCheckedForServer = savedInstanceState.getParcelable(OTPApp.BUNDLE_KEY_SAVED_LAST_LOCATION_CHECKED_FOR_SERVER);
 
-			OTPBundle otpBundle = (OTPBundle) savedInstanceState.getSerializable(OTPApp.BUNDLE_KEY_OTP_BUNDLE);
-			if (otpBundle != null){
-				List<Itinerary> itineraries = otpBundle.getItineraryList(); 
-				getFragmentListener().onItinerariesLoaded(itineraries);
-				getFragmentListener().onItinerarySelected(otpBundle.getCurrentItineraryIndex());
-				fillItinerariesSpinner(itineraries);
-			}
-			showRouteOnMap(getFragmentListener().getCurrentItinerary(), false);
-			
-			Date savedTripDate = (Date) savedInstanceState.getSerializable(OTPApp.BUNDLE_KEY_TRIP_DATE);
-			if (savedTripDate != null){
-				tripDate = savedTripDate;
-			}
-			arriveBy = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_ARRIVE_BY, false);
-			
-			if (savedInstanceState.getString(OTPApp.BUNDLE_KEY_RESULT_TRIP_START_LOCATION) != null){
-				resultTripStartLocation = savedInstanceState.getString(OTPApp.BUNDLE_KEY_RESULT_TRIP_START_LOCATION);
-			}
-			if (savedInstanceState.getString(OTPApp.BUNDLE_KEY_RESULT_TRIP_END_LOCATION) != null){
-				resultTripEndLocation = savedInstanceState.getString(OTPApp.BUNDLE_KEY_RESULT_TRIP_END_LOCATION);
-			}
-			
-			bikeTriangleMinValue = savedInstanceState.getDouble(OTPApp.BUNDLE_KEY_SEEKBAR_MIN_VALUE);
-			bikeTriangleMaxValue = savedInstanceState.getDouble(OTPApp.BUNDLE_KEY_SEEKBAR_MAX_VALUE);
-			bikeTriangleParameters.setSelectedMinValue(bikeTriangleMinValue);
-			bikeTriangleParameters.setSelectedMaxValue(bikeTriangleMaxValue);
+	    		showBikeParameters(false);
+	    		
+				ddlTravelMode.setItemChecked(savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE), true);
+	        	TraverseModeSpinnerItem traverseModeSpinnerItem = (TraverseModeSpinnerItem) ddlTravelMode.getItemAtPosition(ddlTravelMode.getCheckedItemPosition());			
+	        	if (traverseModeSpinnerItem.getTraverseModeSet().contains(TraverseMode.BICYCLE)){
+		    		setBikeOptimizationAdapter(true);
+					ddlOptimization.setItemChecked(savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION), true);
+		    		OptimizeSpinnerItem optimizeSpinnerItem = (OptimizeSpinnerItem) ddlOptimization.getItemAtPosition(ddlOptimization.getCheckedItemPosition());
+		    		if (optimizeSpinnerItem.getOptimizeType().equals(OptimizeType.TRIANGLE)){
+			    		showBikeParameters(true);
+		    		}
+	        	}
+				ddlTravelMode.setItemChecked(savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE), true);
 
-			isStartLocationChangedByUser = false;
-			isEndLocationChangedByUser = false;
+				OTPBundle otpBundle = (OTPBundle) savedInstanceState.getSerializable(OTPApp.BUNDLE_KEY_OTP_BUNDLE);
+				if (otpBundle != null){
+					List<Itinerary> itineraries = otpBundle.getItineraryList(); 
+					getFragmentListener().onItinerariesLoaded(itineraries);
+					getFragmentListener().onItinerarySelected(otpBundle.getCurrentItineraryIndex());
+					fillItinerariesSpinner(itineraries);
+				}
+				showRouteOnMap(getFragmentListener().getCurrentItinerary(), false);
+				
+				Date savedTripDate = (Date) savedInstanceState.getSerializable(OTPApp.BUNDLE_KEY_TRIP_DATE);
+				if (savedTripDate != null){
+					tripDate = savedTripDate;
+				}
+				arriveBy = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_ARRIVE_BY, false);
+				
+				if (savedInstanceState.getString(OTPApp.BUNDLE_KEY_RESULT_TRIP_START_LOCATION) != null){
+					resultTripStartLocation = savedInstanceState.getString(OTPApp.BUNDLE_KEY_RESULT_TRIP_START_LOCATION);
+				}
+				if (savedInstanceState.getString(OTPApp.BUNDLE_KEY_RESULT_TRIP_END_LOCATION) != null){
+					resultTripEndLocation = savedInstanceState.getString(OTPApp.BUNDLE_KEY_RESULT_TRIP_END_LOCATION);
+				}
+				
+				bikeTriangleMinValue = savedInstanceState.getDouble(OTPApp.BUNDLE_KEY_SEEKBAR_MIN_VALUE);
+				bikeTriangleMaxValue = savedInstanceState.getDouble(OTPApp.BUNDLE_KEY_SEEKBAR_MAX_VALUE);
+				bikeTriangleParameters.setSelectedMinValue(bikeTriangleMinValue);
+				bikeTriangleParameters.setSelectedMaxValue(bikeTriangleMaxValue);
+
+				isStartLocationChangedByUser = false;
+				isEndLocationChangedByUser = false;
+			}
 		}
 		else{
 			restoredSavedState = false;
 		}
+	}
+	
+	private void enableUIElements(boolean enable){
+		int visibility;
+		if (enable){
+			setHasOptionsMenu(true);
+			visibility = View.VISIBLE;
+		}
+		else{
+			setHasOptionsMenu(false);
+			visibility = View.INVISIBLE;
+		}
+		tbStartLocation.setVisibility(visibility);
+		tbEndLocation.setVisibility(visibility);
+		btnPlanTrip.setVisibility(visibility);
+		btnCompass.setVisibility(visibility);
+		btnDateDialog.setVisibility(visibility);
+		btnMyLocation.setVisibility(visibility);
+		handleDrawer.setVisibility(visibility);
+		panelDisplayDirection.setVisibility(visibility);
+		navigationDrawerLeftPane.setVisibility(visibility);
 	}
 	
 	private void requestTrip(){
@@ -1242,6 +1302,8 @@ public class MainFragment extends Fragment implements
 	
 	private GoogleMap retrieveMap(GoogleMap mMap) {
 	    // Do a null check to confirm that we have not already instantiated the map.
+		mapFailed = false;
+		
 	    if (mMap == null) {
 	        mMap = ((SupportMapFragment) getFragmentManager().findFragmentById(R.id.map))
 	                            .getMap();
@@ -1250,8 +1312,10 @@ public class MainFragment extends Fragment implements
 		        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(applicationContext);
 		        
 		        if(status!=ConnectionResult.SUCCESS){
+		        	enableUIElements(false);
 		            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, getActivity(), OTPApp.CHECK_GOOGLE_PLAY_REQUEST_CODE);
 		            dialog.show();
+		            mapFailed = true;
 		        }	        
 		    }
 
@@ -1320,7 +1384,7 @@ public class MainFragment extends Fragment implements
 
 	
 	public void runAutoDetectServer(LatLng mCurrentLatLng){
-		if (mCurrentLatLng == null){
+		if ((mCurrentLatLng == null) || (mMap == null)){
 			Toast.makeText(applicationContext, applicationContext.getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
 		}
 		else{
@@ -1332,6 +1396,17 @@ public class MainFragment extends Fragment implements
 			needToRunAutoDetect = false;
 			savedLastLocationCheckedForServer = mCurrentLatLng;
 		}
+	}
+	
+	public void runAutoDetectServerNoLocation(){
+		ServersDataSource dataSource = ServersDataSource.getInstance(applicationContext);
+		WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
+
+		ServerSelector serverSelector = new ServerSelector(weakContext, applicationContext, dataSource, this);
+		LatLng latLngList[] = new LatLng[1];
+		latLngList[0] = null;
+		serverSelector.execute(latLngList);
+		needToRunAutoDetect = false;
 	}
 	
 	private void setSelectedServer(Server s, boolean restartUI){
@@ -1508,6 +1583,39 @@ public class MainFragment extends Fragment implements
 		mLocationClient = new LocationClient(applicationContext, this, this);
 		//mLocationClient.connect();
 		
+		
+		if (mapFailed){
+				mMap = ((SupportMapFragment) getFragmentManager().findFragmentById(R.id.map))
+                        .getMap();
+    // Check if we were successful in obtaining the map.
+				if (mMap != null) {
+					enableUIElements(true);
+					
+		    		UiSettings uiSettings = mMap.getUiSettings();
+		    		mMap.setMyLocationEnabled(true);
+		    		mMap.setOnCameraChangeListener(this);
+		    		uiSettings.setMyLocationButtonEnabled(false);
+		    		uiSettings.setCompassEnabled(false);
+		    		uiSettings.setAllGesturesEnabled(true);
+		    		uiSettings.setZoomControlsEnabled(false);
+		    		
+		    		addInterfaceListeners();
+		    		addMapListeners();
+		    		
+					String overlayString = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, applicationContext.getResources().getString(R.string.map_tiles_default_server));
+					updateOverlay(overlayString);
+					
+					runAutoDetectServerNoLocation();
+				}
+			}
+		
+		/*if (mapFailed){
+			Intent i = this.getActivity().getBaseContext().getPackageManager()
+		             .getLaunchIntentForPackage( this.getActivity().getBaseContext().getPackageName() );
+		i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		startActivity(i);
+		}*/
+		
 		connectLocationClient();
 	}
 	
@@ -1525,43 +1633,48 @@ public class MainFragment extends Fragment implements
 	
 	public void onSaveInstanceState(Bundle bundle){
 		super.onSaveInstanceState(bundle);
-		bundle.putParcelable(OTPApp.BUNDLE_KEY_MAP_CAMERA, mMap.getCameraPosition());
-		bundle.putParcelable(OTPApp.BUNDLE_KEY_MAP_START_MARKER_POSITION, startMarkerPosition);
-		bundle.putParcelable(OTPApp.BUNDLE_KEY_MAP_END_MARKER_POSITION, endMarkerPosition);
-		bundle.putBoolean(OTPApp.BUNDLE_KEY_APP_STARTS, appStarts);
-		bundle.putBoolean(OTPApp.BUNDLE_KEY_IS_START_LOCATION_GEOCODING_PROCESSED, isStartLocationGeocodingProcessed);
-		bundle.putBoolean(OTPApp.BUNDLE_KEY_IS_END_LOCATION_GEOCODING_PROCESSED, isEndLocationGeocodingProcessed);
-		bundle.putBoolean(OTPApp.BUNDLE_KEY_IS_START_LOCATION_CHANGED_BY_USER, isStartLocationChangedByUser);
-		bundle.putBoolean(OTPApp.BUNDLE_KEY_IS_END_LOCATION_CHANGED_BY_USER, isEndLocationChangedByUser);
-		bundle.putString(OTPApp.BUNDLE_KEY_TB_START_LOCATION, tbStartLocation.getText().toString());
-		bundle.putString(OTPApp.BUNDLE_KEY_TB_END_LOCATION, tbEndLocation.getText().toString());
-		bundle.putInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION, ddlOptimization.getCheckedItemPosition());
-		bundle.putInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE, ddlTravelMode.getCheckedItemPosition());
 		
-		bundle.putParcelable(OTPApp.BUNDLE_KEY_SAVED_LAST_LOCATION, savedLastLocation);
-		bundle.putParcelable(OTPApp.BUNDLE_KEY_SAVED_LAST_LOCATION_CHECKED_FOR_SERVER, savedLastLocationCheckedForServer);
-		
-		if (resultTripStartLocation != null){
-			bundle.putString(OTPApp.BUNDLE_KEY_RESULT_TRIP_START_LOCATION, resultTripStartLocation);
-		}
-		if (resultTripEndLocation != null){
-			bundle.putString(OTPApp.BUNDLE_KEY_RESULT_TRIP_END_LOCATION, resultTripEndLocation);
-		}
+		bundle.putBoolean(OTPApp.BUNDLE_KEY_MAP_FAILED, mapFailed);
 
-		bundle.putDouble(OTPApp.BUNDLE_KEY_SEEKBAR_MIN_VALUE, bikeTriangleMinValue);
-		bundle.putDouble(OTPApp.BUNDLE_KEY_SEEKBAR_MAX_VALUE, bikeTriangleMaxValue);
-		
-		bundle.putSerializable(OTPApp.BUNDLE_KEY_TRIP_DATE, tripDate);
-		bundle.putBoolean(OTPApp.BUNDLE_KEY_ARRIVE_BY, arriveBy);
-		
-		if (!fragmentListener.getCurrentItineraryList().isEmpty()){
-			OTPBundle otpBundle = new OTPBundle();
-			otpBundle.setFromText(resultTripStartLocation);
-			otpBundle.setToText(resultTripEndLocation);
-			otpBundle.setItineraryList(fragmentListener.getCurrentItineraryList());
-			otpBundle.setCurrentItineraryIndex(fragmentListener.getCurrentItineraryIndex());
-			otpBundle.setCurrentItinerary(fragmentListener.getCurrentItinerary());
-			bundle.putSerializable(OTPApp.BUNDLE_KEY_OTP_BUNDLE, otpBundle);
+		if (!mapFailed){
+			bundle.putParcelable(OTPApp.BUNDLE_KEY_MAP_CAMERA, mMap.getCameraPosition());
+			bundle.putParcelable(OTPApp.BUNDLE_KEY_MAP_START_MARKER_POSITION, startMarkerPosition);
+			bundle.putParcelable(OTPApp.BUNDLE_KEY_MAP_END_MARKER_POSITION, endMarkerPosition);
+			bundle.putBoolean(OTPApp.BUNDLE_KEY_APP_STARTS, appStarts);
+			bundle.putBoolean(OTPApp.BUNDLE_KEY_IS_START_LOCATION_GEOCODING_PROCESSED, isStartLocationGeocodingProcessed);
+			bundle.putBoolean(OTPApp.BUNDLE_KEY_IS_END_LOCATION_GEOCODING_PROCESSED, isEndLocationGeocodingProcessed);
+			bundle.putBoolean(OTPApp.BUNDLE_KEY_IS_START_LOCATION_CHANGED_BY_USER, isStartLocationChangedByUser);
+			bundle.putBoolean(OTPApp.BUNDLE_KEY_IS_END_LOCATION_CHANGED_BY_USER, isEndLocationChangedByUser);
+			bundle.putString(OTPApp.BUNDLE_KEY_TB_START_LOCATION, tbStartLocation.getText().toString());
+			bundle.putString(OTPApp.BUNDLE_KEY_TB_END_LOCATION, tbEndLocation.getText().toString());
+			bundle.putInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION, ddlOptimization.getCheckedItemPosition());
+			bundle.putInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE, ddlTravelMode.getCheckedItemPosition());
+			
+			bundle.putParcelable(OTPApp.BUNDLE_KEY_SAVED_LAST_LOCATION, savedLastLocation);
+			bundle.putParcelable(OTPApp.BUNDLE_KEY_SAVED_LAST_LOCATION_CHECKED_FOR_SERVER, savedLastLocationCheckedForServer);
+			
+			if (resultTripStartLocation != null){
+				bundle.putString(OTPApp.BUNDLE_KEY_RESULT_TRIP_START_LOCATION, resultTripStartLocation);
+			}
+			if (resultTripEndLocation != null){
+				bundle.putString(OTPApp.BUNDLE_KEY_RESULT_TRIP_END_LOCATION, resultTripEndLocation);
+			}
+
+			bundle.putDouble(OTPApp.BUNDLE_KEY_SEEKBAR_MIN_VALUE, bikeTriangleMinValue);
+			bundle.putDouble(OTPApp.BUNDLE_KEY_SEEKBAR_MAX_VALUE, bikeTriangleMaxValue);
+			
+			bundle.putSerializable(OTPApp.BUNDLE_KEY_TRIP_DATE, tripDate);
+			bundle.putBoolean(OTPApp.BUNDLE_KEY_ARRIVE_BY, arriveBy);
+			
+			if (!fragmentListener.getCurrentItineraryList().isEmpty()){
+				OTPBundle otpBundle = new OTPBundle();
+				otpBundle.setFromText(resultTripStartLocation);
+				otpBundle.setToText(resultTripEndLocation);
+				otpBundle.setItineraryList(fragmentListener.getCurrentItineraryList());
+				otpBundle.setCurrentItineraryIndex(fragmentListener.getCurrentItineraryIndex());
+				otpBundle.setCurrentItinerary(fragmentListener.getCurrentItinerary());
+				bundle.putSerializable(OTPApp.BUNDLE_KEY_OTP_BUNDLE, otpBundle);
+			}
 		}
 
 	}
@@ -1622,7 +1735,7 @@ public class MainFragment extends Fragment implements
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key) {
-		if (key == null) {
+		if ((key == null) || (mMap == null)) {
 			return;
 		}
 		Log.v(TAG, "A preference was changed: " + key);
@@ -2339,85 +2452,91 @@ public class MainFragment extends Fragment implements
          * start a Google Play services activity that can resolve
          * error.
          */
-        if (connectionResult.hasResolution()) {
-            try {
-                // Start an Activity that tries to resolve the error
-                connectionResult.startResolutionForResult(
-                        getActivity(),
-                        OTPApp.CONNECTION_FAILURE_RESOLUTION_REQUEST_CODE);
-                /*
-                 * Thrown if Google Play services canceled the original
-                 * PendingIntent
-                 */
-            } catch (IntentSender.SendIntentException e) {
-                e.printStackTrace();
+    	if (!mapFailed){
+            if (connectionResult.hasResolution()) {
+                try {
+                    // Start an Activity that tries to resolve the error
+                    connectionResult.startResolutionForResult(
+                            getActivity(),
+                            OTPApp.CONNECTION_FAILURE_RESOLUTION_REQUEST_CODE);
+                    /*
+                     * Thrown if Google Play services canceled the original
+                     * PendingIntent
+                     */
+                } catch (IntentSender.SendIntentException e) {
+                    e.printStackTrace();
+                }
+            } else {
+    			AlertDialog.Builder errorPlay = new AlertDialog.Builder(getActivity());
+    			errorPlay.setTitle(getResources().getString(R.string.play_services_error_title))
+    					.setMessage(getResources().getString(R.string.play_services_error) + connectionResult.getErrorCode())
+    					.setNeutralButton(getResources().getString(android.R.string.ok), null)
+    					.create()
+    					.show();
             }
-        } else {
-			AlertDialog.Builder errorPlay = new AlertDialog.Builder(getActivity());
-			errorPlay.setTitle(getResources().getString(R.string.play_services_error_title))
-					.setMessage(getResources().getString(R.string.play_services_error) + connectionResult.getErrorCode())
-					.setNeutralButton(getResources().getString(android.R.string.ok), null)
-					.create()
-					.show();
-        }
+    	}
     }
 
 	@Override
 	public void onConnected(Bundle connectionHint) {
-		
-        //mLocationClient.requestLocationUpdates(mLocationRequest, this);
-		double savedLatitude = 0;
-		double savedLongitude = 0;
-		float distance[] = new float[1];
-		distance[0] = 0;
-		if (savedLastLocationCheckedForServer != null){
-			savedLatitude = savedLastLocationCheckedForServer.latitude;
-			savedLongitude = savedLastLocationCheckedForServer.longitude;
-		}
-		
 		Location mCurrentLocation = mLocationClient.getLastLocation();
-		LatLng mCurrentLatLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
-		
-		Location.distanceBetween(savedLatitude, savedLongitude, mCurrentLatLng.latitude, mCurrentLatLng.longitude, distance);
 
-		if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER, true) && needToRunAutoDetect) {
-			
-			if ((app.getSelectedServer() != null) 
-					&& (!LocationUtil.checkPointInBoundingBox(mCurrentLatLng, app.getSelectedServer(), OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))
-					&& (((savedLastLocationCheckedForServer != null) && (distance[0] > OTPApp.COORDINATES_IMPORTANT_DIFFERENCE)) 
-							|| (savedLastLocationCheckedForServer == null))){
-				runAutoDetectServer(mCurrentLatLng);
-			}
-			else if (app.getSelectedServer() == null){
-				runAutoDetectServer(mCurrentLatLng);
-			}
-		}
-		else if (app.getSelectedServer() == null) {
-			runAutoDetectServer(mCurrentLatLng);
-		}
-		else {
-			if (mCurrentLatLng != null){
-				if (appStarts){
-					Server selectedServer = app.getSelectedServer();	
-					if ((selectedServer != null) && selectedServer.areBoundsSet()){
-						if (LocationUtil.checkPointInBoundingBox(mCurrentLatLng, selectedServer, OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)){
-							mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, OTPApp.defaultInitialZoomLevel));
-						}
-						else{
-							LatLng serverCenter = new LatLng(selectedServer.getCenterLatitude(), selectedServer.getCenterLongitude());
-							mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, OTPApp.defaultInitialZoomLevel));	
-							setMarker(true, serverCenter, false);
-						}
+		if ((!mapFailed)){
+			if (mCurrentLocation != null){
+				//mLocationClient.requestLocationUpdates(mLocationRequest, this);
+				double savedLatitude = 0;
+				double savedLongitude = 0;
+				float distance[] = new float[1];
+				distance[0] = 0;
+				if (savedLastLocationCheckedForServer != null){
+					savedLatitude = savedLastLocationCheckedForServer.latitude;
+					savedLongitude = savedLastLocationCheckedForServer.longitude;
+				}
+				
+				LatLng mCurrentLatLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+				
+				Location.distanceBetween(savedLatitude, savedLongitude, mCurrentLatLng.latitude, mCurrentLatLng.longitude, distance);
+		
+				if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER, true) && needToRunAutoDetect) {
+					
+					if ((app.getSelectedServer() != null) 
+							&& (!LocationUtil.checkPointInBoundingBox(mCurrentLatLng, app.getSelectedServer(), OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))
+							&& (((savedLastLocationCheckedForServer != null) && (distance[0] > OTPApp.COORDINATES_IMPORTANT_DIFFERENCE)) 
+									|| (savedLastLocationCheckedForServer == null))){
+						runAutoDetectServer(mCurrentLatLng);
 					}
-					else{
-						mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, OTPApp.defaultInitialZoomLevel));
+					else if (app.getSelectedServer() == null){
+						runAutoDetectServer(mCurrentLatLng);
 					}
 				}
+				else {
+					if (mCurrentLatLng != null){
+						if (appStarts){
+							Server selectedServer = app.getSelectedServer();	
+							if ((selectedServer != null) && selectedServer.areBoundsSet()){
+								if (LocationUtil.checkPointInBoundingBox(mCurrentLatLng, selectedServer, OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)){
+									mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, OTPApp.defaultInitialZoomLevel));
+								}
+								else{
+									LatLng serverCenter = new LatLng(selectedServer.getCenterLatitude(), selectedServer.getCenterLongitude());
+									mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, OTPApp.defaultInitialZoomLevel));	
+									setMarker(true, serverCenter, false);
+								}
+							}
+							else{
+								mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, OTPApp.defaultInitialZoomLevel));
+							}
+						}
+					}
+				}
+		
+				appStarts = false;
+			}
+			else if (app.getSelectedServer() == null){
+				runAutoDetectServerNoLocation();
 			}
 		}
-
-		appStarts = false;
-
+	        
 	}
 
 	@Override

@@ -70,6 +70,7 @@ public class OTPApp extends Application {
     private static final int FASTEST_INTERVAL_IN_SECONDS = 1;
     public static final long FASTEST_INTERVAL = MILLISECONDS_PER_SECOND * FASTEST_INTERVAL_IN_SECONDS;
     
+    public static final String BUNDLE_KEY_MAP_FAILED = "Map failed";
     public static final String BUNDLE_KEY_MAP_CAMERA = "Map Camera";
     public static final String BUNDLE_KEY_MAP_START_MARKER_POSITION = "Map StartMarkerPosition";
     public static final String BUNDLE_KEY_MAP_END_MARKER_POSITION = "Map EndMarkerPosition";
