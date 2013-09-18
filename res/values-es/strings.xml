@@ -31,13 +31,13 @@
     <string name="step_by_step_transit_get_off">Baja del</string>
     <string name="step_by_step_transit_connector_stop_name">En</string>
     <string name="step_by_step_transit_stops_in_between">Paradas hasta el destino</string>
-    <string name="need_to_place_marker"><string>"Añada un marcador de posición ..."</string></string>
+    <string name="need_to_place_marker"><string>"Añade un marcador de posición ..."</string></string>
     <string name="need_to_place_markers_before_planning"><string>"Primero tienes que introducir un origen y un destino"</string></string>
     <string name="start_location_hint">Lugar de origen</string>
     <string name="end_location_hint">Lugar de destino</string>
-    <string name="textbox_close_to_marker">Marcador, cerda de</string>
+    <string name="textbox_close_to_marker">Marcador, cerca de</string>
     <string name="metadata_request_successful">Metadatos descargados correctamente</string>
-    <string name="metadata_request_progress">Obteniendo información del servidor escogido. Por favor espera...</string>
+    <string name="metadata_request_progress">Obteniendo metadatos del servidor escogido. Por favor espera...</string>
     <string name="geocoding_request_progress">Procesando dirección. Por favor espera...</string>
     <string name="server_checker_progress">Obteniendo información del servidor. Por favor espera...</string>
     <string name="server_checker_successful">OK: El servidor introducido funciona correctamente.</string>
@@ -51,7 +51,7 @@
     <string name="server_checker_info_dialog_reachable">Servidor funcionando:</string>
     <string name="server_selector_progress">Buscando el servidor óptimo. Por favor espera...</string>
     <string name="server_selector_detected">Encontrado</string>
-    <string name="server_selector_server_change_info">Puede cambiar esto manualmente en el menú de opciones</string>
+    <string name="server_selector_server_change_info">Puedes cambiar esto manualmente en el menú de opciones</string>
     <string name="server_selector_server_info_dialog_title">Escoge un servidor OTP</string>
     <string name="server_selector_custom_server_alert_title">Introduce la dirección de un servidor OTP</string>
     <string name="custom_server_name">Servidor alternativo</string>
@@ -61,8 +61,8 @@
     <string name="custom_server_unknown_language">Desoconocido</string>
     <string name="custom_server_unknown_name">Desconocida</string>
     <string name="custom_server_unknown_email">email desconocido</string>
-    <string name="choose_location_type_start">Escoga el lugar de origen</string>
-    <string name="choose_location_type_end">Escoga el lugar de destino</string>
+    <string name="choose_location_type_start">Escoge el lugar de origen</string>
+    <string name="choose_location_type_end">Escoge el lugar de destino</string>
     <string name="location_type_current_location">Ubicación actual</string>
     <string name="location_type_contact">Dirección de un contacto</string>
     <string name="location_type_map_point">Punto en el mapa</string>

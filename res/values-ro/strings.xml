@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright 2011 Marcy Gordon
+ 
+ Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ use this file except in compliance with the License. You may obtain a copy of
+ the License at
+ 
+ http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ License for the specific language governing permissions and limitations under
+ the License.
+-->
+<resources>
+    <string name="yes">Da</string>
+    <string name="no">Nu</string>        
+    <string name="step_by_step_title">Indicații</string>
+    <string name="step_by_step_header_from">De la</string>
+    <string name="step_by_step_header_to">Până la</string>
+    <string name="step_by_step_header_departure">Plecare</string>
+    <string name="step_by_step_header_arrival">Sosire</string>
+    <string name="step_by_step_turn">Virați la</string>
+    <string name="step_by_step_heading">Mergeți spre</string>
+    <string name="step_by_step_from">de la</string>
+    <string name="step_by_step_to">până la</string>
+    <string name="step_by_step_connector_street_name">în</string>
+    <string name="step_by_step_transit_get_on">Urcați în</string>
+    <string name="step_by_step_transit_get_off">Coborâți din</string>
+    <string name="step_by_step_transit_connector_stop_name">În</string>
+    <string name="step_by_step_transit_stops_in_between">Stații până la destinație</string>
+    <string name="need_to_place_marker"><string>"Adăugați un indicator de poziționare ..."</string></string>
+    <string name="need_to_place_markers_before_planning"><string>"Trebuie sa introduceți locul de plecare și destinația"</string></string>
+    <string name="start_location_hint">Plecare</string>
+    <string name="end_location_hint">Destinație</string>
+    <string name="textbox_close_to_marker">Indicator introdus, aproape de</string>
+    <string name="metadata_request_successful">Metadată descărcata corect</string>
+    <string name="metadata_request_progress">Obținând metadate de la serverul ales. Vă rog așteptați...</string>
+    <string name="geocoding_request_progress">Locație în căutare. Vă rog așteptați...</string>
+    <string name="server_checker_progress">Obținând informații de la server. Vă rog așteptați...</string>
+    <string name="server_checker_successful">OK: serverul introdus funcționează corect.</string>
+    <string name="server_checker_error_message">Nu s-a putut contacta serverul:</string>
+    <string name="server_checker_info_dialog_title">Informații de la server OTP</string>
+    <string name="server_checker_info_dialog_region">Regiune:</string>
+    <string name="server_checker_info_dialog_language">Limbă:</string>
+    <string name="server_checker_info_dialog_contact">Contact:</string>
+    <string name="server_checker_info_dialog_url">URL:</string>
+    <string name="server_checker_info_dialog_bounds">Arie:</string>
+    <string name="server_checker_info_dialog_reachable">Server în funcțiune:</string>
+    <string name="server_selector_progress">Căutând serverul optim. Vă rog așteptați...</string>
+    <string name="server_selector_detected">Găsit</string>
+    <string name="server_selector_server_change_info">Puteți să-l schimbați manual în meniul de opțiuni</string>
+    <string name="server_selector_server_info_dialog_title">Alegeți un server OTP</string>
+    <string name="server_selector_custom_server_alert_title">Introduceți adresa serverului OTP</string>
+    <string name="custom_server_name">Server alternativ</string>
+    <string name="custom_server_not_set">"Server alternativ nu selecționat: URL incorect"</string>
+    <string name="custom_server_unknown_region">Necunoscută</string>
+    <string name="custom_server_unknown_bounds">Necunoscută</string>
+    <string name="custom_server_unknown_language">Necunoscută</string>
+    <string name="custom_server_unknown_name">Necunoscut</string>
+    <string name="custom_server_unknown_email">email necunoscut</string>
+    <string name="choose_location_type_start">Alegeți locul de plecare</string>
+    <string name="choose_location_type_end">Alegeți locul de destinație</string>
+    <string name="location_type_current_location">Locația mea</string>
+    <string name="location_type_contact">Adresa unui contact</string>
+    <string name="location_type_map_point">Un puct de pe hartă</string>
+    <string name="mode_transit">Transport public</string>
+    <string name="mode_car">Mașină</string>
+    <string name="mode_car_action">Conduceți</string>
+    <string name="mode_bus">Doar autobuz</string>
+    <string name="mode_train">Doar tren</string>
+    <string name="mode_walk">Pe jos</string>
+    <string name="mode_walk_action">Mergeți pe jos</string>
+    <string name="mode_bicycle">Bicicletă</string>
+    <string name="mode_bicycle_action">Mergeți pe bicicletă</string>
+    <string name="mode_transit_bicycle">Transport public și pe bicicletă</string>
+    <string name="optimization_quick">Mai rapid</string>
+    <string name="optimization_safe">Mai sigur</string>
+    <string name="optimization_fewest_transfers">Mai puține schimbări</string>
+    <string name="optimization_bike_triangle">Călătorie personalizată...</string>
+    <string name="enable_gps">Activați GPS</string>
+    <string name="disable_gps">Dezactivați GPS</string>
+    <string name="no_gps_signal">Ne pare rău, nu există semnal GPS</string>
+    <string name="my_location">Locația mea</string>
+    <string name="settings">Opțiuni</string>
+    <string name="feedback">Trimiteți feedback</string>
+    <string name="feedback_send_email">Trimiteți mesaj</string>
+    <string name="feedback_subject">Informații pentru programator de OTP</string>
+    <string name="server_info">Informații din server</string>
+    <string name="start_marker_title">Plecare</string>
+    <string name="start_marker_activated">Locul de plecare</string>
+    <string name="start_marker_description">Apasă pentru schimbare...</string>
+    <string name="end_marker_title">Destinație</string>
+    <string name="end_marker_activated">Locul de Destinație</string>
+    <string name="end_marker_description">Apasă pentru schimbare...</string>
+    <string name="marker_out_of_boundaries">Loc situat în afara ariei acoperită de server. Indicator nesetat</string>
+    <string name="markers_dialog_title">Alege tipul de punct</string>
+    <string name="choose_geocoder">Selecționați adresa</string>
+    <string name="wheelchair_accessible">Accesibil cu scaun cu rotile</string>
+    <string name="wheelchair_accessibility_description">Obținere rute accesibile pentru scaun cu rotile</string>
+    <string name="maximum_walk">Distanța maximă pe jos</string>
+    <string name="maximum_walk_description">metrii</string>
+    <string name="routing_options">Opțiuni de rute</string>
+    <string name="map_options">Opțiuni de hărți</string>
+    <string name="map_tile_provider">Furnizor de hărți</string>
+    <string name="custom_server_url">URL server alternativ</string>
+    <string name="custom_server_url_description">Serverul URL funcționează corect</string>
+    <string name="custom_server_url_error">URL nevalidă</string>
+    <string name="custom_server_error">Vă rog introduceți o nouă URL pentru serverul alternativ</string>
+    <string name="auto_detect_server">Autodetectare server automat</string>
+    <string name="auto_detect_server_description">Găsire server automat pentru locația actuală</string>
+    <string name="geocoder_results_title">Rezultate de adrese</string>
+    <string name="geocoder_no_results_message">Ne pare rău, nu s-a obținut niciun rezultat pentru această adresă</string>
+    <string name="tripplanner_progress">"Căutând cea mai bună rută. Va rog așteptați..."</string>   
+    <string name="tripplanner_results_title">Rezultate de rute</string>
+    <string name="tripplanner_no_results_message">Eroare planificând ruta</string>
+    <string name="tripplanner_error_dialog_title">Ne pare rău, nu a fost posibil să găsim o rută</string>
+    <string name="date_time_title">Setați ora și data</string>
+    <string name="date_time_spinner_arrive">Sosire:</string>
+    <string name="date_time_spinner_depart">Plecare:</string>
+    <string name="next_day">mâine</string>
+    <string name="short_hours">h</string>
+    <string name="short_minutes">m</string>
+    <string name="short_seconds">s</string>
+    <string name="long_hours">h</string>
+    <string name="long_minutes">min</string>
+    <string name="long_seconds">sec</string>
+    <string name="full_hours">ore</string>
+    <string name="full_minutes">minute</string>
+    <string name="full_seconds">secunde</string>
+    <string name="connector_stop">de la</string>
+    <string name="connector_time">la</string>
+    <string name="connector_full_date">în</string>
+    <string name="connector_headsign">în dir.</string>
+    <string name="connector_destination">la</string>
+    <string name="before_route">Linia</string>
+    <string name="walking_duration">pe jos</string>
+    <string name="total_duration">durație</string>
+    <string name="before_distance_bike">Mergi pe bicicleta</string>
+    <string name="before_distance_walk">Mergi</string>
+    <string name="distance_unit">m</string>
+    <string name="connector_time_full">durație</string>
+    <string name="refresh_server_list">Actualizare servere</string>
+    <string name="server_list_donwload_date_description">Liste de servere descărcate</string>
+    <string name="server_list_donwload_date_unknown">Dată de descărcări de liste necunoscute</string>
+    <string name="alternative_routes">Selecționați o rută</string>
+    <string name="geocoder_preference_provider_title">Furnizor de adrese</string>
+    <string name="geocoder_preference_provider_nominatim">Mapquest Nominatim</string>
+    <string name="geocoder_preference_provider_google_places">Google Places</string>
+    <string name="use_android_geocoder_title">Geocoder de Android</string>
+    <string name="use_android_geocoder_description">Prima oară cautaț adresa cu geocoder de Android</string>
+    <string name="use_intelligent_markers_title">Indicatori inteligenți</string>
+    <string name="use_intelligent_markers_description">Schimbaț indicatorii spre adresa cea mai apropiată</string>
+    <string name="info_server_no_server_selected">Nu s-a selectat nici un server</string>
+    <string name="info_server_error">Atenție: Nu s-au putut obține informații de la server!</string>
+    <string name="selected_custom_server_title">Server alternativ</string>
+    <string name="selected_custom_server_description">Folosiți serverul alternativ</string>
+    <string name="server_down">Atenție: Nu s-a putut contacta serverul!</string>
+    <string name="origin_destination_are_mylocation">"Nu se poate obține o ruta: locul de origine și locul de destinație e acelaș"</string>
+    <string name="play_services_error_title">Eroare internă "Play Services"</string>
+    <string name="play_services_error">Nu se poate contacta cu serverele Google Play: aplicația ar putea să nu funcționeze corect</string>
+    <string name="location_error">No sa putut obține locația actuală</string>
+    <string name="header_optimization">Tipul de călătorii</string>
+    <string name="header_travel_mode">Mod de transport</string>
+    <string name="header_bike_options">Opțiuni bicicletă</string>
+    <string name="header_bike_options_quick">Rapid</string>
+    <string name="header_bike_options_flat">Plat</string>
+    <string name="header_bike_options_bike_friendly">Bun pentru biciclete</string>
+</resources>
