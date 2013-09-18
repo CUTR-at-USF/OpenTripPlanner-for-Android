@@ -66,28 +66,13 @@
 			<artifactId>jackson-annotations</artifactId>
 			<version>2.2.2</version>
 		</dependency>
-
-		<!-- OSM Droid for map -->
-		<dependency>
-			<groupId>org.osmdroid</groupId>
-			<artifactId>osmdroid-android</artifactId>
-			<version>3.0.8</version>
-		</dependency>
 		
 		<!-- OpenCSV, for parsing the OTP Server Directory Google Doc -->
 		<dependency>
     		<groupId>net.sf.opencsv</groupId>
     		<artifactId>opencsv</artifactId>
     		<version>2.3</version>
-		</dependency>
-		
-		<!-- Logging framework, used in OSMDroid -->
-		<dependency>
-    		<groupId>org.slf4j</groupId>
-    		<artifactId>slf4j-android</artifactId>
-    		<version>1.6.1-RC1</version>
-		</dependency>			
-		
+		</dependency>		
 	</dependencies>
 
 	<repositories>
