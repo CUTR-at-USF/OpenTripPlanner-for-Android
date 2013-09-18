@@ -32,7 +32,7 @@
 
 
 		        <TimePicker android:id="@+id/timePicker1" android:layout_width="match_parent" android:layout_height="wrap_content"	   ></TimePicker> 
-   		                <DatePicker android:id="@+id/datePicker1" android:calendarViewShown="true" android:layout_width="match_parent" android:layout_height="wrap_content"></DatePicker>
+   		                <DatePicker android:id="@+id/datePicker1" android:calendarViewShown="false" android:layout_width="match_parent" android:layout_height="wrap_content"></DatePicker>
    		                
 	</LinearLayout>
 		    </ScrollView>
