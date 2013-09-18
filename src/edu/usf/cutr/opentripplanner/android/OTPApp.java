@@ -136,7 +136,6 @@ public class OTPApp extends Application {
 	public static final float defaultInitialZoomLevel = 12;
 	public static final float defaultMediumZoomLevel = 14;
 	public static final float defaultMyLocationZoomLevel = 16;
-	public static final int defaultPadding = 192;
 	
     public static final String FORMAT_COORDINATES = "#.00000";
     public static final String FORMAT_DISTANCE_METERS_SHORT = "%.0f";

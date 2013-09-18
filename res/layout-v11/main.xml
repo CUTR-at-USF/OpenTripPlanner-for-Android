@@ -182,7 +182,7 @@
 		android:layout_gravity="start"
 		android:orientation="vertical"
 		android:clickable="true"
-		android:background="@android:color/background_dark">
+		android:background="@android:color/background_light">
 	
 	    <LinearLayout
 			android:id="@+id/layoutOptimization"

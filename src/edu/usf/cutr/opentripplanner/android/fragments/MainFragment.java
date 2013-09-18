@@ -2004,7 +2004,7 @@ public class MainFragment extends Fragment implements
 			boundsCreator.include(pointA);
 			boundsCreator.include(pointB);
 
-			mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsCreator.build(), OTPApp.defaultPadding));	
+			mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsCreator.build(), getResources().getInteger(R.integer.default_padding)));	
 		}
 	}
 
@@ -2102,7 +2102,7 @@ public class MainFragment extends Fragment implements
 				if (firstTransitMarker != null){
 					firstTransitMarker.showInfoWindow();
 				}
-				mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsCreator.build(), OTPApp.defaultPadding));
+				mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsCreator.build(), getResources().getInteger(R.integer.default_padding)));
 			}
 		}
 	}

@@ -32,7 +32,7 @@
 
 
 		        <TimePicker android:id="@+id/timePicker1" android:layout_width="match_parent" android:layout_height="wrap_content"	   ></TimePicker> 
-   		                <DatePicker android:id="@+id/datePicker1" android:layout_width="match_parent" android:layout_height="wrap_content"></DatePicker>
+   		                <DatePicker android:id="@+id/datePicker1" android:calendarViewShown="true" android:layout_width="match_parent" android:layout_height="wrap_content"></DatePicker>
    		                
 	</LinearLayout>
 		    </ScrollView>
@@ -42,13 +42,31 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_alignParentBottom="true">
-
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dip"
+            android:layout_marginLeft="4dip"
+            android:layout_marginRight="4dip"
+            android:background="?android:attr/dividerVertical"
+            android:layout_alignParentTop="true"/>
+        <View
+            android:id="@+id/ViewHelper"
+            android:layout_width="1dip"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="4dip"
+            android:layout_marginTop="4dip"
+            android:background="?android:attr/dividerVertical" 
+            android:layout_centerHorizontal="true"/>
         <Button
             android:id="@+id/btnCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@id/ViewHelper"
+            android:background="?android:attr/selectableItemBackground"
             android:text="@android:string/cancel" 
             android:layout_alignParentBottom="true"/>
         <Button
@@ -57,8 +75,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
+            android:background="?android:attr/selectableItemBackground"
             android:text="@android:string/ok" 
-            android:layout_alignParentBottom="true"/>
+            android:layout_alignParentBottom="true" 
+            android:layout_toRightOf="@id/ViewHelper"/>
     </RelativeLayout>
 			
 </RelativeLayout>

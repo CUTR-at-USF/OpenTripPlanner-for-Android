@@ -40,20 +40,22 @@
 
 		<ImageButton
 			android:id="@+id/btnPlanTrip"
-			android:layout_height="96dp"
-			android:layout_width="80dp"
+			android:layout_height="60dp"
+			android:layout_width="50dp"
 			android:layout_alignParentRight="true"
 			android:layout_alignTop="@+id/tbStartLocation"
 			android:layout_alignBottom="@+id/tbEndLocation"
+			android:layout_margin="4dp"
 			android:src="@drawable/action_search_dark"
 		    android:background="@drawable/button_layout">
 		</ImageButton>
 		
 		<ImageButton
 			android:id="@+id/btnDateDialog"
-			android:layout_height="60dp"
-			android:layout_width="60dp"
+			android:layout_height="40dp"
+			android:layout_width="40dp"
 			android:layout_below="@+id/btnPlanTrip"
+			android:layout_margin="4dp"
 			android:layout_alignParentRight="true"
 			android:src="@drawable/device_access_time"
 		    android:background="@drawable/button_layout">
@@ -87,19 +89,21 @@
 		
 		<ImageButton
 		    android:id="@+id/btnCompass"
-		    android:layout_width="60dp"
-		    android:layout_height="60dp"
+		    android:layout_width="40dp"
+		    android:layout_height="40dp"
 		    android:layout_alignTop="@id/btnDateDialog"  
+			android:layout_margin="4dp"
 		    android:src="@android:drawable/ic_menu_compass"
 		    android:background="@drawable/button_layout">
 		</ImageButton>
 		
 		<ImageButton
 		    android:id="@+id/btnMyLocation"
-		    android:layout_width="60dp"
-		    android:layout_height="60dp"
+		    android:layout_width="40dp"
+		    android:layout_height="40dp"
 		    android:layout_alignParentRight="true"
 		    android:layout_above="@+id/panelDisplayDirection"
+			android:layout_margin="4dp"
 		    android:src="@drawable/device_access_location_found"
 		    android:background="@drawable/button_layout">
 		</ImageButton>
@@ -107,8 +111,8 @@
 	
 		<RelativeLayout 
 		    android:id="@+id/handleDrawer"
-		    android:layout_width="20dp"
-		    android:layout_height="48dp"
+		    android:layout_width="14dp"
+		    android:layout_height="36dp"
 		    android:layout_alignParentLeft="true"
 		    android:layout_above="@+id/panelDisplayDirection"
 		    android:orientation="vertical"
@@ -138,35 +142,27 @@
 		<RelativeLayout
 			android:id="@id/panelDisplayDirection"
 		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
+		    android:layout_height="45dp"
 		    android:orientation="horizontal"
    		    android:layout_alignParentBottom="true"
+   		    android:layout_centerVertical="false"
+   		    android:layout_centerHorizontal="false"
    		    android:background="@drawable/button_layout">
 	   		    
    			<ImageButton
 				android:id="@+id/btnDisplayDirection"
 			    android:layout_alignParentRight="true"				
-				android:layout_width="56dp"
-				android:layout_height="56dp"
+				android:layout_width="40dp"
+				android:layout_height="40dp"
 				android:src="@drawable/location_directions"
 				android:background="@android:color/transparent">
 			</ImageButton>
-			
- 			<View
-			    android:id="@+id/separator"
-			    android:layout_toLeftOf="@id/btnDisplayDirection"
-			    android:layout_width="1dp"
-			    android:layout_height="40dp"
-   				android:layout_marginTop="8dp"
-   				android:layout_marginBottom="8dp"
-			    android:background="@android:color/darker_gray">
-		    </View>
 			
 			<Spinner
 			    android:id="@+id/itinerarySelection"
 			    android:layout_toLeftOf="@id/separator"
 			    android:layout_width="match_parent"
-			    android:layout_height="48dp"
+			    android:layout_height="wrap_content"
    				android:layout_margin="4dp"
 			    android:prompt="@string/alternative_routes">
 			</Spinner>
@@ -175,21 +171,21 @@
 		
 	</RelativeLayout>
 	
-	<RelativeLayout
+	<LinearLayout
 	    android:id="@+id/navigationDrawerLeftPane"
-   		android:layout_width="280dp"
+   		android:layout_width="200dp"
 		android:layout_height="match_parent"
 		android:layout_gravity="start"
 		android:orientation="vertical"
-		android:clickable="true"
-		android:background="@android:color/background_dark">
+		android:background="@android:color/background_light"
+		android:clickable="true">
 	
 	    <LinearLayout
 			android:id="@+id/layoutOptimization"
 	   		android:layout_width="match_parent"
-			android:layout_height="wrap_content"
+			android:layout_height="112dp"
 			android:orientation="vertical"
-			android:layout_margin="4dp">
+			android:padding="4dp">
 		
 			<TextView
 				android:id="@+id/headerSpinOptimization"
@@ -205,6 +201,7 @@
 		        android:choiceMode="singleChoice"
 		        android:divider="@android:color/holo_blue_light"
 		        android:dividerHeight="1dp"
+				android:background="@android:color/background_light"
 	    	    android:headerDividersEnabled="true"
 	            android:footerDividersEnabled="true"
 	            android:fadeScrollbars="false">
@@ -215,11 +212,9 @@
 	    <LinearLayout
     		android:id="@+id/layoutMode"
 	   		android:layout_width="match_parent"
-			android:layout_height="wrap_content"
+			android:layout_height="112dp"
 			android:orientation="vertical"
-            android:layout_below="@id/layoutOptimization"
-        	android:layout_above="@+id/layoutBike"
-			android:layout_margin="4dp">
+			android:padding="4dp">
 			
 			<TextView
 				android:id="@+id/headerSpinTravelmode"
@@ -235,6 +230,7 @@
 		        android:choiceMode="singleChoice"
 		        android:divider="@android:color/holo_blue_light"
 		        android:dividerHeight="1dp"
+				android:background="@android:color/background_light"
 		        android:headerDividersEnabled="true"
 		        android:footerDividersEnabled="true"
 		        android:fadeScrollbars="false">
@@ -242,7 +238,7 @@
 		     
 	     </LinearLayout>
 	     
-	    <ScrollView
+		    <ScrollView
 	        android:id="@+id/layoutBike"
         	android:layout_width="match_parent"
 			android:layout_height="wrap_content"
@@ -310,7 +306,8 @@
 			
 		</ScrollView>
 	
-	</RelativeLayout>
+	
+	</LinearLayout>
 			
 </android.support.v4.widget.DrawerLayout>
 	     
