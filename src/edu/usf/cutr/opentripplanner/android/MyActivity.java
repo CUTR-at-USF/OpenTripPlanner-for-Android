@@ -48,6 +48,7 @@ import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
  * 
  * @author Khoa Tran
  * @author Sean Barbeau (conversion to Jackson)
+ * @author Vreixo González (update to Google Maps API v2, UI and general app improvements)
  * 
  */
 
