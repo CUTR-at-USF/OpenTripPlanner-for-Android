@@ -23,8 +23,8 @@ import edu.usf.cutr.opentripplanner.android.model.ArriveBySpinnerItem;
 public class DateTimeDialog extends DialogFragment /* implements DatePickerCompleteListener, TimePickerCompleteListener*/{
 
 	private Spinner spinScheduleType;
-//	private TimePicker pickerTime;
-//	private DatePicker pickerDate;
+	private TimePicker pickerTime;
+	private DatePicker pickerDate;
 	private Button btnOk;
 	private Button btnCancel;
 
@@ -35,18 +35,18 @@ public class DateTimeDialog extends DialogFragment /* implements DatePickerCompl
         View view = inflater.inflate(R.layout.date_time_dialog, container);
 		
         spinScheduleType = (Spinner) view.findViewById(R.id.spinScheduleType);
-   //     pickerTime = (TimePicker) view.findViewById(R.id.timePicker1);
-	//	pickerDate = (DatePicker) view.findViewById(R.id.datePicker1);
+        pickerTime = (TimePicker) view.findViewById(R.id.timePicker1);
+		pickerDate = (DatePicker) view.findViewById(R.id.datePicker1);
 		btnOk = (Button) view.findViewById(R.id.btnOk);
 		btnCancel = (Button) view.findViewById(R.id.btnCancel);
 				
         getDialog().setTitle(getResources().getString(R.string.date_time_title));
 		getDialog().setCanceledOnTouchOutside(true);
         
-//		pickerTime.setIs24HourView(DateFormat.is24HourFormat(getActivity()));
+		pickerTime.setIs24HourView(DateFormat.is24HourFormat(getActivity()));
 		
 		//TimePicker state needs to be saved manually because of this bug in Android that affects at least ICS: http://code.google.com/p/android/issues/detail?id=22754
-//		pickerTime.setSaveFromParentEnabled(false);
+		pickerTime.setSaveFromParentEnabled(false);
 		
 		OnClickListener oclOk = new OnClickListener() {
 			
@@ -54,7 +54,7 @@ public class DateTimeDialog extends DialogFragment /* implements DatePickerCompl
 			public void onClick(View v) {
 				Calendar cal = Calendar.getInstance(); 
 
-		//		cal.set(pickerDate.getYear(), pickerDate.getMonth(), pickerDate.getDayOfMonth(), pickerTime.getCurrentHour(), pickerTime.getCurrentMinute());
+				cal.set(pickerDate.getYear(), pickerDate.getMonth(), pickerDate.getDayOfMonth(), pickerTime.getCurrentHour(), pickerTime.getCurrentMinute());
 				ArriveBySpinnerItem selectedSscheduleType = (ArriveBySpinnerItem) spinScheduleType.getSelectedItem();
 				((MyActivity) getActivity()).onDateComplete(cal.getTime(), selectedSscheduleType.getValue());
 				dismiss();
@@ -96,11 +96,11 @@ public class DateTimeDialog extends DialogFragment /* implements DatePickerCompl
         	Calendar cal = Calendar.getInstance();
         	if (cal.getTimeInMillis() < tripDate.getTime()){
         		//min time should preceede setted time and setted time will be set with 0 seconds, so we aloud one minute less
-    //    		pickerDate.setMinDate(cal.getTimeInMillis() - 60000);
+        		pickerDate.setMinDate(cal.getTimeInMillis() - 60000);
         	}
         	else{
         		//min time should preceede setted time and setted time will be set with 0 seconds, so we aloud one minute less
-       // 		pickerDate.setMinDate(tripDate.getTime() - 60000);
+        		pickerDate.setMinDate(tripDate.getTime() - 60000);
         	}
         	
         	cal.setTime(tripDate);
@@ -111,15 +111,15 @@ public class DateTimeDialog extends DialogFragment /* implements DatePickerCompl
     		else{
     			spinScheduleType.setSelection(1);
     		}
-    //		pickerTime.setCurrentHour(cal.get(Calendar.HOUR_OF_DAY));
-//    		pickerTime.setCurrentMinute(cal.get(Calendar.MINUTE));
-//    		pickerDate.updateDate(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
+    		pickerTime.setCurrentHour(cal.get(Calendar.HOUR_OF_DAY));
+    		pickerTime.setCurrentMinute(cal.get(Calendar.MINUTE));
+    		pickerDate.updateDate(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
     	}
     	else{
     		//TimePicker state needs to be saved manually because of this bug in Android that affects at least ICS: http://code.google.com/p/android/issues/detail?id=22754
     		bundle = savedInstanceState;
-//    		pickerTime.setCurrentHour(bundle.getInt(OTPApp.BUNDLE_KEY_TIMEPICKER_SAVED_HOUR));
-//    		pickerTime.setCurrentMinute(bundle.getInt(OTPApp.BUNDLE_KEY_TIMEPICKER_SAVED_MINUTE));
+    		pickerTime.setCurrentHour(bundle.getInt(OTPApp.BUNDLE_KEY_TIMEPICKER_SAVED_HOUR));
+    		pickerTime.setCurrentMinute(bundle.getInt(OTPApp.BUNDLE_KEY_TIMEPICKER_SAVED_MINUTE));
     	}
     	
 		
@@ -130,8 +130,8 @@ public class DateTimeDialog extends DialogFragment /* implements DatePickerCompl
 	public void onSaveInstanceState(Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
 		//TimePicker state needs to be saved manually because of this bug in Android that affects at least ICS: http://code.google.com/p/android/issues/detail?id=22754
-//		savedInstanceState.putInt(OTPApp.BUNDLE_KEY_TIMEPICKER_SAVED_HOUR, pickerTime.getCurrentHour());
-//		savedInstanceState.putInt(OTPApp.BUNDLE_KEY_TIMEPICKER_SAVED_MINUTE, pickerTime.getCurrentMinute());
+		savedInstanceState.putInt(OTPApp.BUNDLE_KEY_TIMEPICKER_SAVED_HOUR, pickerTime.getCurrentHour());
+		savedInstanceState.putInt(OTPApp.BUNDLE_KEY_TIMEPICKER_SAVED_MINUTE, pickerTime.getCurrentMinute());
 	}
 
 
