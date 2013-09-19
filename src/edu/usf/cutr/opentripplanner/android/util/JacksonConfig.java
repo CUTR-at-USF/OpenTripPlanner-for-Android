@@ -216,10 +216,7 @@ public class JacksonConfig {
 		    mapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
 		    mapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
 		    mapper.configure(DeserializationFeature.READ_ENUMS_USING_TO_STRING, true);
-
-			// Tell Jackson to expect the JSON in PascalCase, instead of
-			// camelCase
-			//mapper.setPropertyNamingStrategy(new PropertyNamingStrategy.PascalCaseStrategy());
+		    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		}
 		return mapper;
 	}
