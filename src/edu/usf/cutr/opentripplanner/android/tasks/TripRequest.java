@@ -87,7 +87,7 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 		return totalSize;
 	}
 	
-	protected void  onCancelled(Long result){
+	protected void onCancelled(Long result){
 
 		try{		
 			if (progressDialog != null && progressDialog.isShowing()) {
@@ -128,10 +128,6 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 		if (response != null && response.getPlan() != null && response.getPlan().getItinerary().get(0) != null) {
 			
 			List<Itinerary> itineraries = response.getPlan().getItinerary();
-			
-//			mainFragment.setItineraries(itineraries);
-			
-//			List<Leg> legs = response.getPlan().itinerary.get(0).legs;
 			
 			callback.onTripRequestComplete(itineraries, currentRequestString);
 		} else {
@@ -201,41 +197,11 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 		
 		currentRequestString = u;
 		
-//		HttpClient client = new DefaultHttpClient();
-//		String result = "";
-//		try {
-//			result = Http.get(u).use(client).header("Accept", "application/xml").header("Keep-Alive","timeout=60, max=100").charset(OTPApp.URL_ENCODING).followRedirects(true).asString();
-//			Log.d(TAG, "Result: " + result);
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//			return null;
-//		}
-		
-		//Serializer serializer = new Persister();  //Simple XML
-		
-
-//		Response plan = null;
-//		try {
-//			plan = JacksonConfig.getObjectReaderInstance().readValue(result, Response.class);
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			Log.e(TAG, e.getMessage());
-//			e.printStackTrace();
-//			return null;
-//		}
-//		//TODO - handle errors and error responses
-//		if(plan == null) {
-//			Log.d(TAG, "No response?");
-//			return null;
-//		}
-		
 		HttpURLConnection urlConnection = null;
 		URL url = null;
 		Response plan = null;
 
 		try {
-
 			url = new URL(u);
 
 			disableConnectionReuseIfNecessary(); // For bugs in HttpURLConnection pre-Froyo
