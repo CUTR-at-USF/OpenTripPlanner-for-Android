@@ -16,29 +16,21 @@
 
 package edu.usf.cutr.opentripplanner.android.util;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
-
-import edu.usf.cutr.opentripplanner.android.OTPApp;
-import edu.usf.cutr.opentripplanner.android.R;
 
 import org.opentripplanner.api.model.AgencyAndId;
 import org.opentripplanner.api.model.RelativeDirection;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.patch.Alerts;
 import org.opentripplanner.v092snapshot.api.model.AbsoluteDirection;
-import org.opentripplanner.v092snapshot.api.model.Elevation;
 import org.opentripplanner.v092snapshot.api.model.Leg;
 import org.opentripplanner.v092snapshot.api.model.Place;
 import org.opentripplanner.v092snapshot.api.model.WalkStep;
 
 import android.content.Context;
-import android.text.format.DateFormat;
-
+import edu.usf.cutr.opentripplanner.android.OTPApp;
+import edu.usf.cutr.opentripplanner.android.R;
 import edu.usf.cutr.opentripplanner.android.model.Direction;
 
 /**

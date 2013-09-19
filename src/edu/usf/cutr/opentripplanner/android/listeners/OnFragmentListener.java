@@ -21,12 +21,11 @@ import java.util.List;
 import org.opentripplanner.v092snapshot.api.model.Itinerary;
 import org.opentripplanner.v092snapshot.api.model.Leg;
 
+import android.support.v4.app.Fragment;
+
 import com.google.android.gms.maps.model.LatLng;
 
 import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
-import edu.usf.cutr.opentripplanner.android.sqlite.ServersDataSource;
-
-import android.support.v4.app.Fragment;
 
 /**
  * @author Khoa Tran

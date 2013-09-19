@@ -31,15 +31,13 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import edu.usf.cutr.opentripplanner.android.OTPApp;
-
 import android.util.Log;
+import edu.usf.cutr.opentripplanner.android.OTPApp;
 
 /**
  * @author Khoa Tran

@@ -16,10 +16,8 @@
 
 package edu.usf.cutr.opentripplanner.android.sqlite;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import edu.usf.cutr.opentripplanner.android.OTPApp;

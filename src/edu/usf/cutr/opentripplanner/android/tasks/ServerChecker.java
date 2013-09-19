@@ -18,7 +18,6 @@ import android.util.Log;
 import android.widget.Toast;
 import de.mastacode.http.Http;
 import edu.usf.cutr.opentripplanner.android.R;
-import edu.usf.cutr.opentripplanner.android.SettingsActivity;
 import edu.usf.cutr.opentripplanner.android.listeners.ServerCheckerCompleteListener;
 import edu.usf.cutr.opentripplanner.android.model.Server;
 
