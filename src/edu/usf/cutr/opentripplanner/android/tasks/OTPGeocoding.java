@@ -29,7 +29,6 @@ import java.util.Locale;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -58,7 +57,6 @@ import edu.usf.cutr.opentripplanner.android.pois.Places;
 
 public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 	private static final String TAG = "OTP";
-	private ProgressDialog progressDialog;
 	private WeakReference<Activity> activity;
 	private Context context;
 	private boolean isStartTextbox;
@@ -78,18 +76,10 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 		this.selectedServer = selectedServer;
 		this.placesService = placesService;
 		this.geocodingForMarker = geocodingForMarker;
-		if (activity.get() != null){
-			progressDialog = new ProgressDialog(activity.get());
-		}
 	}
 
 	protected void onPreExecute() {
-		if (activity.get() != null){
-			progressDialog.setIndeterminate(true);
-	        progressDialog.setCancelable(true);
-			progressDialog = ProgressDialog.show(activity.get(), "",
-					context.getResources().getString(R.string.geocoding_request_progress), true);
-		}
+		// Do nothing
 	}
 
 	protected Long doInBackground(String... reqs) {
@@ -247,15 +237,6 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 	
 	protected void  onCancelled(Long result){
 		if (activity.get() != null){
-			try{		
-				if (progressDialog != null && progressDialog.isShowing()) {
-					progressDialog.dismiss();
-				}
-			}catch(Exception e){
-				Log.e(TAG, "Error in Geocoding Cancelled dismissing dialog: " + e);
-			}
-		}
-		if (activity.get() != null){
 			AlertDialog.Builder geocoderAlert = new AlertDialog.Builder(activity.get());
 			geocoderAlert.setTitle(R.string.geocoder_results_title)
 					.setMessage(R.string.geocoder_no_results_message)
@@ -267,23 +248,11 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 
 			AlertDialog alert = geocoderAlert.create();
 			alert.show();
-		}
-
-				
+		}				
 		Log.e(TAG, "No geocoding processed!");
 	}
 
 	protected void onPostExecute(Long result) {
-		if (activity.get() != null){
-			try{		
-				if (progressDialog != null && progressDialog.isShowing()) {
-					progressDialog.dismiss();
-				}
-			}catch(Exception e){
-				Log.e(TAG, "Error in Geocoding PostExecute dismissing dialog: " + e);
-			}
-		}
-		
 		callback.onOTPGeocodingComplete(isStartTextbox, addressesReturn, geocodingForMarker);
 	}
 }
