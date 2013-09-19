@@ -89,11 +89,11 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
 
-		if(address==null || address.equalsIgnoreCase("")) {
+		if (address==null || address.equalsIgnoreCase("")) {
 			return count;
 		}
 
-		if(address.equalsIgnoreCase(context.getString(R.string.my_location))) {
+		if (address.equalsIgnoreCase(context.getString(R.string.my_location))) {
 			String currentLat = reqs[1];
 			String currentLng = reqs[2];
 			LatLng latLng = new LatLng(Double.parseDouble(currentLat), Double.parseDouble(currentLng));
@@ -110,18 +110,17 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 		
 		ArrayList<Address> addresses = null;
 		
-		if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_USE_ANDROID_GEOCODER, true)){
+		if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_USE_ANDROID_GEOCODER, true)) {
 			Geocoder gc = new Geocoder(context);
 			try {
-				if (selectedServer != null){
+				if (selectedServer != null) {
 					addresses = (ArrayList<Address>)gc.getFromLocationName(address, 
 							context.getResources().getInteger(R.integer.geocoder_max_results), 
 							selectedServer.getLowerLeftLatitude(), 
 							selectedServer.getLowerLeftLongitude(), 
 							selectedServer.getUpperRightLatitude(), 
 							selectedServer.getUpperRightLongitude());
-				}
-				else{
+				} else {
 					addresses = (ArrayList<Address>)gc.getFromLocationName(address, 
 							context.getResources().getInteger(R.integer.geocoder_max_results));
 				}
@@ -130,7 +129,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 			}
 		}
 		
-		if ((addresses == null) || addresses.isEmpty()){
+		if ((addresses == null) || addresses.isEmpty()) {
 			addresses = searchPlaces(address);
 			
 			for(int i=0; i<addresses.size(); i++){
@@ -152,7 +151,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 	 * Try to grab the developer key from an unversioned resource file, if it exists
 	 * @return the developer key from an unversioned resource file, or empty string if it doesn't exist
 	 */
-	private String getKeyFromResource(){
+	private String getKeyFromResource() {
 		String strKey = new String("");
 
 		try {
@@ -165,9 +164,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 			}
 
 			strKey = total.toString();
-
 			strKey.trim(); //Remove any whitespace
-
 		} catch (NotFoundException e) {
 			Log.w(TAG, "Warning - didn't find the google places key file:" + e);
 		} catch (IOException e) {
@@ -177,13 +174,13 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 		return strKey;
 	}
 
-	private ArrayList<Address> searchPlaces(String name){
+	private ArrayList<Address> searchPlaces(String name) {
 		HashMap<String, String> params = new HashMap<String, String>();
 		Places p;
 
-		if(placesService.equals(context.getResources().getString(R.string.geocoder_google_places))){
+		if(placesService.equals(context.getResources().getString(R.string.geocoder_google_places))) {
 			params.put(GooglePlaces.PARAM_NAME, name);
-			if (selectedServer != null){
+			if (selectedServer != null) {
 				params.put(GooglePlaces.PARAM_LOCATION, Double.toString(selectedServer.getCenterLatitude()) + "," + Double.toString(selectedServer.getCenterLongitude()));
 				params.put(GooglePlaces.PARAM_RADIUS, Double.toString(selectedServer.getRadius()));
 			}
@@ -192,7 +189,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 			Log.v(TAG, "Using Google Places!");
 		} else {
 			params.put(Nominatim.PARAM_NAME, name);
-			if (selectedServer != null){
+			if (selectedServer != null) {
 				params.put(Nominatim.PARAM_LEFT, Double.toString(selectedServer.getLowerLeftLongitude()));
 				params.put(Nominatim.PARAM_TOP, Double.toString(selectedServer.getLowerLeftLatitude()));
 				params.put(Nominatim.PARAM_RIGHT, Double.toString(selectedServer.getUpperRightLongitude()));
@@ -209,7 +206,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 
 		ArrayList<Address> addresses = new ArrayList<Address>();
 
-		for(int i=0; i<pois.size(); i++){
+		for (int i=0; i<pois.size(); i++) {
 			POI poi = pois.get(i);
 			Log.v(TAG, poi.getName() + " " + poi.getLatitude() + "," + poi.getLongitude());
 			Address addr = new Address(Locale.US);
@@ -218,14 +215,14 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 			String addressLine;
 			
 			if (poi.getAddress() != null) {
-				if (!poi.getAddress().contains(poi.getName())){
+				if (!poi.getAddress().contains(poi.getName())) {
 					addressLine = (poi.getName() + ", " + poi.getAddress());
 				}
-				else{
+				else {
 					addressLine = poi.getAddress();
 				}
 			}
-			else{
+			else {
 				addressLine = poi.getName();
 			}
 			addr.setAddressLine(addr.getMaxAddressLineIndex()+1,addressLine); 
@@ -235,7 +232,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 		return addresses;
 	}
 	
-	protected void  onCancelled(Long result){
+	protected void onCancelled(Long result) {
 		if (activity.get() != null){
 			AlertDialog.Builder geocoderAlert = new AlertDialog.Builder(activity.get());
 			geocoderAlert.setTitle(R.string.geocoder_results_title)
