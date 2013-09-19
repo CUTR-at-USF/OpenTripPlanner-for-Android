@@ -271,8 +271,7 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 	 * Disable HTTP connection reuse which was buggy pre-froyo
 	 */
 	private void disableConnectionReuseIfNecessary() {
-		//if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) {  //TODO - Should change to this once we update to Android 4.1 SDK
-		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.ECLAIR_MR1) {
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) {		
 			System.setProperty("http.keepAlive", "false");
 		}
 	}
