@@ -946,7 +946,6 @@ public class MainFragment extends Fragment implements
 		mMap.setOnMapClickListener(omcl);
 		
 		OnMarkerDragListener omdl = new OnMarkerDragListener() {
-			LatLng markerPreviousPosition;
 			
 			@Override
 			public void onMarkerDrag(Marker marker) {
@@ -965,6 +964,7 @@ public class MainFragment extends Fragment implements
 						else{
 							isStartLocationGeocodingProcessed = true;
 						}
+						startMarkerPosition = markerLatlng;
 					}
 					else if ((endMarker != null) && (marker.hashCode() == endMarker.hashCode())){
 						if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true)){
@@ -973,10 +973,17 @@ public class MainFragment extends Fragment implements
 						else{
 							isEndLocationGeocodingProcessed = true;
 						}
+						endMarkerPosition = markerLatlng;
 					}
 				}
 				else{
-					marker.setPosition(markerPreviousPosition);
+
+					if ((startMarker != null) && (marker.hashCode() == startMarker.hashCode())){
+						marker.setPosition(startMarkerPosition);
+					}
+					else{
+						marker.setPosition(endMarkerPosition);
+					}
 					Toast.makeText(applicationContext, applicationContext.getResources().getString(R.string.marker_out_of_boundaries), Toast.LENGTH_SHORT).show();
 				}
 			}
@@ -987,12 +994,6 @@ public class MainFragment extends Fragment implements
 						.getSystemService(Context.INPUT_METHOD_SERVICE);
 				imm.hideSoftInputFromWindow(tbEndLocation.getWindowToken(), 0);
 				imm.hideSoftInputFromWindow(tbStartLocation.getWindowToken(), 0);
-				
-				LatLng markerLatlng = marker.getPosition();
-
-				if ((app.getSelectedServer() != null) && LocationUtil.checkPointInBoundingBox(markerLatlng, app.getSelectedServer(), OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)){
-					markerPreviousPosition = markerLatlng;
-				}
 			}
 		};
 		mMap.setOnMarkerDragListener(omdl);
