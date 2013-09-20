@@ -7,7 +7,7 @@
         <CheckBoxPreference android:title="@string/auto_detect_server" android:key="auto_detect_server" android:summary="@string/auto_detect_server_description" android:defaultValue="true" android:checked="true"></CheckBoxPreference>
         <Preference android:title="@string/refresh_server_list" android:key="refresh_server_list"/>
         <CheckBoxPreference android:title="@string/selected_custom_server_title" android:key="selected_custom_server" android:defaultValue="false"  android:summary="@string/selected_custom_server_description"></CheckBoxPreference>
-        <EditTextPreference android:key="custom_server_url" android:title="@string/custom_server_url"></EditTextPreference>
+        <EditTextPreference android:key="custom_server_url" android:title="@string/custom_server_url" android:inputType="text|textNoSuggestions"></EditTextPreference>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/map_options" android:key="map_options">
         <CheckBoxPreference android:title="@string/use_intelligent_markers_title" android:key="use_intelligent_markers" android:checked="true"  android:defaultValue="true" android:summary="@string/use_intelligent_markers_description"></CheckBoxPreference>
