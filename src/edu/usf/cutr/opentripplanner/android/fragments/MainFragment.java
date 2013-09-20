@@ -1419,7 +1419,23 @@ public class MainFragment extends Fragment implements
 	}
 	
 	private void restartMap(){
-		mMap.clear();
+		if (startMarker != null){
+			startMarker.remove();
+		}
+		if (endMarker != null){
+			endMarker.remove();
+		}
+		if (modeMarkers != null){
+			for (Marker m : modeMarkers){
+				m.remove();
+			}		}
+		if (route != null){
+			for (Polyline p : route){
+				p.remove();
+			}		}
+		if (boundariesPolyline != null){
+			boundariesPolyline.remove();
+		}
 		
 		startMarker = null;
 		startMarkerPosition = null;
@@ -1428,14 +1444,11 @@ public class MainFragment extends Fragment implements
 		route = null;
 		modeMarkers = null;
 		boundariesPolyline = null;
-		
-		String overlayString = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, applicationContext.getResources().getString(R.string.map_tiles_default_server));
-		updateOverlay(overlayString);
 	}
 	
 	private void restartTextBoxes(){
 		SharedPreferences.Editor prefsEditor = prefs.edit();
-		setTextBoxLocation(getResources().getString(R.string.my_location), true);
+		setTextBoxLocation(applicationContext.getResources().getString(R.string.my_location), true);
 		prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true);
 		prefsEditor.commit();
 		
@@ -1776,6 +1789,15 @@ public class MainFragment extends Fragment implements
 
 		}
 	}
+	
+	public void updateCustomServer(){
+		setSelectedServer(new Server(prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""), applicationContext), true);
+		Log.v(TAG, "Now using custom OTP server: " + prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
+		WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
+
+		MetadataRequest metaRequest = new MetadataRequest(weakContext, applicationContext, this);
+		metaRequest.execute(prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
+	}
 
 	@Override
 	public void onCreateOptionsMenu(Menu pMenu, MenuInflater inflater) {
@@ -1806,7 +1828,7 @@ public class MainFragment extends Fragment implements
 			needToRunAutoDetect = false;
 			getActivity().startActivityForResult(
 					new Intent(getActivity(), SettingsActivity.class),
-					OTPApp.REFRESH_SERVER_LIST_REQUEST_CODE);
+					OTPApp.SETTINGS_REQUEST_CODE);
 			break;
 		case R.id.feedback:
 			Server selectedServer = app.getSelectedServer();

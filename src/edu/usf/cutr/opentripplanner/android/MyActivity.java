@@ -48,7 +48,7 @@ import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
  * 
  * @author Khoa Tran
  * @author Sean Barbeau (conversion to Jackson)
- * @author Vreixo González (update to Google Maps API v2, UI and general app improvements)
+ * @author Vreixo Gonzï¿½lez (update to Google Maps API v2, UI and general app improvements)
  * 
  */
 
@@ -98,9 +98,11 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)
 	{
 		switch(requestCode) {
-		case OTPApp.REFRESH_SERVER_LIST_REQUEST_CODE: 
+		case OTPApp.SETTINGS_REQUEST_CODE: 
 			if (resultCode == RESULT_OK) {
 				boolean shouldRefresh = data.getBooleanExtra(OTPApp.REFRESH_SERVER_RETURN_KEY, false);
+				boolean newCustomServer = data.getBooleanExtra(OTPApp.NEW_CUSTOM_SERVER_RETURN_KEY, false);
+
 				//				Toast.makeText(this, "Should server list refresh? " + shouldRefresh, Toast.LENGTH_LONG).show();
 				if(shouldRefresh){
 					if (mainFragment.getSavedLastLocation() == null){
@@ -110,6 +112,9 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 					else{
 						mainFragment.runAutoDetectServer(mainFragment.getSavedLastLocation());
 					}
+				}
+				if(newCustomServer){
+					mainFragment.updateCustomServer();
 				}
 				break;
 			}
