@@ -917,6 +917,12 @@ public class MainFragment extends Fragment implements
 		bikeTriangleParameters.setOnRangeSeekBarChangeListener(this);
 	}
 	
+	/**
+	 * Sends information of the text boxes to fragment listener class through a
+	 * bundle.
+	 * <p>
+	 * Fragment listener provides intercommunication with other fragments or classes.
+	 */
 	private void saveOTPBundle() {
 		OTPBundle bundle = new OTPBundle();
 		bundle.setFromText(resultTripStartLocation);
@@ -1137,6 +1143,12 @@ public class MainFragment extends Fragment implements
 		}
 	}
 	
+	/**
+	 * Activates/disactivates all the UI, avoiding to take care of the possible
+	 * listeners functions if the application is in a non working state.
+	 * 
+	 * @param enable if true elements will be enabled
+	 */
 	private void enableUIElements(boolean enable){
 		int visibility;
 		if (enable){
@@ -1300,6 +1312,15 @@ public class MainFragment extends Fragment implements
 
 	}
 	
+	/**
+	 * Retrieves a map if the map fragment parameter is null.
+	 * <p>
+	 * If there is an error tries to solve it checking if it was because of
+	 * "Google Play Services" sending the corresponding intent.
+	 * 
+	 * @param mMap map fragment to check if the map is already initialized
+	 * @return initialized map fragment
+	 */
 	private GoogleMap retrieveMap(GoogleMap mMap) {
 	    // Do a null check to confirm that we have not already instantiated the map.
 		mapFailed = false;
@@ -1324,11 +1345,25 @@ public class MainFragment extends Fragment implements
 	    return mMap;
 	}
 	
+	/**
+	 * Wrapper to trigger functions to disable bike parameters and effectively
+	 * show them as inactive (faded).
+	 * 
+	 * @param enable when true parameters are shown
+	 */
 	private void showBikeParameters(boolean enable){
 		setRangeSeekBarStateColors(enable, bikeTriangleParameters);
 		disableEnableControls(enable, bikeTriangleParametersLayout);
 	}
 	
+	/**
+	 * Changes optimization spinner values to show values compatibles with
+	 * bikes or with transit. 
+	 * <p>
+	 * Replaces fewest transfers with safer trip options.
+	 * 
+	 * @param enable when true spinner is set to bike values
+	 */
 	private void setBikeOptimizationAdapter(boolean enable){
 		ArrayAdapter<OptimizeSpinnerItem> optimizationAdapter;
 		
@@ -1357,6 +1392,13 @@ public class MainFragment extends Fragment implements
 		}
 	}
 	
+	/**
+	 * Toggles between standard colors and faded colors for the passed seekbar
+	 * to visually show that it's disabled.
+	 * 
+	 * @param enable when true standard colors are used
+	 * @param seekBar bar that will be toggled
+	 */
 	private void setRangeSeekBarStateColors(boolean enable, RangeSeekBar<Double> seekBar){
 		if (enable){
 			seekBar.setLeftColor(getResources().getColor(R.color.sysRed));
@@ -1371,6 +1413,13 @@ public class MainFragment extends Fragment implements
 		
 	}
 	
+	/**
+	 * Recursively enable/disable all the views contained in a ViewGroup and
+	 * it's descendants. 
+	 * 
+	 * @param enable when true views will be disable
+	 * @param vg a ViewGroup that will be modified
+	 */
 	private void disableEnableControls(boolean enable, ViewGroup vg){
 	    for (int i = 0; i < vg.getChildCount(); i++){
 	       View child = vg.getChildAt(i);
@@ -1382,7 +1431,20 @@ public class MainFragment extends Fragment implements
 	}
 
 
-	
+	/**
+	 * Triggers ServerSelector task to retrieve servers list.
+	 * <p>
+	 * Server list will be downloaded or retrieved from the database.
+	 * <p>
+	 * A valid location should be passed to perform server autodetection if the
+	 * preference is set. If location is null a toast will be displayed
+	 * informing of the error.
+	 * <p>
+	 * It it's not possible or not requested to autodetect the server list will
+	 * be displayed.
+	 * 
+	 * @param mCurrentLatLng location to use if servers should be detected
+	 */
 	public void runAutoDetectServer(LatLng mCurrentLatLng){
 		if ((mCurrentLatLng == null) || (mMap == null)){
 			Toast.makeText(applicationContext, applicationContext.getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
@@ -1398,6 +1460,14 @@ public class MainFragment extends Fragment implements
 		}
 	}
 	
+	/**
+	 * Triggers ServerSelector task to retrieve servers list.
+	 * <p>
+	 * Server list will be downloaded or retrieved from the database.
+	 * <p>
+	 * A servers list will be displayed or a toast informing of the error.
+	 * <p>
+	 */
 	public void runAutoDetectServerNoLocation(){
 		ServersDataSource dataSource = ServersDataSource.getInstance(applicationContext);
 		WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
@@ -1409,6 +1479,17 @@ public class MainFragment extends Fragment implements
 		needToRunAutoDetect = false;
 	}
 	
+	/**
+	 * Registers the server in the OTPApp class.
+	 * <p>
+	 * UI is restored to avoid presence of all server data, removing all
+	 * objects from the map and restarting text boxes to default contents.
+	 * <p>
+	 * OTPApp can be requested calling to getActivity by other fragments.
+	 * 
+	 * @param s
+	 * @param restartUI
+	 */
 	private void setSelectedServer(Server s, boolean restartUI){
 		if (restartUI){
 			restartMap();
@@ -1418,6 +1499,10 @@ public class MainFragment extends Fragment implements
 		app.setSelectedServer(s);
 	}
 	
+	/**
+	 * Removes all map objects and the global variables that reference them in
+	 * this fragment.
+	 */
 	private void restartMap(){
 		mMap.clear();
 		
@@ -1433,6 +1518,14 @@ public class MainFragment extends Fragment implements
 		updateOverlay(overlayString);
 	}
 	
+	/**
+	 * Sets text boxes to initial default locations.
+	 * <p>
+	 * MyLocation for start text box and empty for end text box.
+	 * <p>
+	 * Accordingly preference with key PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION
+	 * is set. 
+	 */
 	private void restartTextBoxes(){
 		SharedPreferences.Editor prefsEditor = prefs.edit();
 		setTextBoxLocation(getResources().getString(R.string.my_location), true);
@@ -1442,6 +1535,12 @@ public class MainFragment extends Fragment implements
 		setTextBoxLocation("", false);
 	}
 	
+	/**
+	 * Writes coordinates of latlng to the selected text box. 
+	 * 
+	 * @param latlng object containing the coordinates to set
+	 * @param isStartTb when true start text box is set otherwise end text box
+	 */
 	private void setLocationTb(LatLng latlng, boolean isStartTb){
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols();
 		decimalFormatSymbols.setDecimalSeparator('.');
@@ -1454,6 +1553,20 @@ public class MainFragment extends Fragment implements
 		}
 	}
 	
+	/**
+	 * Moves or adds (if didn't existed) a start/end marker to latlng position
+	 * and updates its text box.
+	 * <p>
+	 * If preference with key PREFERENCE_KEY_USE_INTELLIGENT_MARKERS is set
+	 * geocoding will be triggered for text boxes.
+	 * <p>
+	 * If the marker does not fit in selected server bounds marker won't be set
+	 * and a warning will be shown.
+	 * 
+	 * @param isStartMarker when true start marker will be set
+	 * @param latlng the location to move on
+	 * @param showMessage whether show or not informative message on success
+	 */
 	private void setMarker(boolean isStartMarker, LatLng latlng, boolean showMessage){
 		SharedPreferences.Editor prefsEditor = prefs.edit();
 		
@@ -1513,6 +1626,15 @@ public class MainFragment extends Fragment implements
 		}
 	}
 	
+	/**
+	 * Updates marker or creates a new one if doesn't exit to the passed latlng
+	 * <p>
+	 * Accordingly updates the field used for save/restore purposes.
+	 *   
+	 * @param isStartMarker if true start marker will be changed, end marker
+	 * otherwise
+	 * @param latLng contains the coordinates of the position to be changed to
+	 */
 	private void setMarkerPosition(boolean isStartMarker, LatLng latLng){
 		if (isStartMarker){
 			if (startMarker == null){
@@ -1534,6 +1656,15 @@ public class MainFragment extends Fragment implements
 		}		
 	}
 	
+	/**
+	 * Creates and adds to the map a new start/end marker.
+	 * <p>
+	 * Accordingly updates the field used for save/restore purposes.
+	 * 
+	 * @param latLng the position to initialize the new marker
+	 * @param isStartMarker if true a start marker will be created
+	 * @return the new marker created
+	 */
 	private Marker addStartEndMarker(LatLng latLng, boolean isStartMarker){
 		MarkerOptions markerOptions = new MarkerOptions().position(latLng)
 														 .draggable(true);
@@ -1563,6 +1694,16 @@ public class MainFragment extends Fragment implements
 		}
 	}
 	
+	/**
+	 * Updates the text box contents to the given location and triggers
+	 * geocoding for that location to update the text box.
+	 * <p>
+	 * This is a wrapper for setLocationTb, processAddres and accordingly change
+	 * the field to control if the text box was changed by the user.
+	 * 
+	 * @param newLatLng
+	 * @param isStartMarker
+	 */
 	private void updateMarkerPosition(LatLng newLatLng, boolean isStartMarker){
 		setLocationTb(newLatLng, isStartMarker);
 		String locationText = getLocationTbText(isStartMarker);
@@ -1619,12 +1760,23 @@ public class MainFragment extends Fragment implements
 		connectLocationClient();
 	}
 	
+	/**
+	 * Connects the LocationClient.
+	 * <p>
+	 * To avoid errors only tries if is not pending for another connection
+	 * request or is disconnected.
+	 */
 	public void connectLocationClient(){
 		if (!mLocationClient.isConnected() && !mLocationClient.isConnecting()){
 			mLocationClient.connect();
 		}
 	}
 	
+	/**
+	 * Disconnects the LocationClient.
+	 * <p>
+	 * To avoid errors only tries if it's connected.
+	 */
 	public void disconnectLocationClient(){
 		if (mLocationClient.isConnected()){
 			mLocationClient.disconnect();
@@ -1679,6 +1831,19 @@ public class MainFragment extends Fragment implements
 
 	}
 
+	/**
+	 * Triggers geocoding for chosen text box with passed text.
+	 * <p>
+	 * If address contents are the String used to identify user's location
+	 * ("MyLocation" for example) user location is passed to know the
+	 * corresponding address. 
+	 * In this case user's location shouldn't be null, if it is a toast is
+	 * shown. 
+	 * 
+	 * @param isStartTextBox
+	 * @param address
+	 * @param geocodingForMarker
+	 */
 	public void processAddress(final boolean isStartTextBox, String address, boolean geocodingForMarker) {
 		WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
 
@@ -1784,7 +1949,8 @@ public class MainFragment extends Fragment implements
 		inflater.inflate(R.menu.menu, pMenu);
 		mGPS = pMenu.getItem(0);
 	}
-
+	
+	@Override
 	public void onPrepareOptionsMenu(final Menu pMenu) {
 		if (isGPSEnabled()) {
 			mGPS.setTitle(R.string.disable_gps);
@@ -1794,6 +1960,7 @@ public class MainFragment extends Fragment implements
 		super.onPrepareOptionsMenu(pMenu);
 	}
 
+	@Override
 	public boolean onOptionsItemSelected(final MenuItem pItem) {
 		OTPApp app = ((OTPApp) getActivity().getApplication());
 		switch (pItem.getItemId()) {
@@ -1869,6 +2036,13 @@ public class MainFragment extends Fragment implements
 		return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 	}
 
+	/**
+	 * Wrapper to other functions: moves the marker to the location included
+	 * in the address, updates text box and zooms to that position.
+	 * 
+	 * @param isStartMarker if true start marker will be changed
+	 * @param addr will location and text information
+	 */
 	public void moveMarker(Boolean isStartMarker, Address addr) {
 		if (isStartMarker) {
 			startAddress = addr;
@@ -1881,6 +2055,17 @@ public class MainFragment extends Fragment implements
 		zoomToGeocodingResult(isStartMarker, addr);
 	}
 	
+	/**
+	 * Wrapper to other functions: moves the marker to the location included
+	 * in the address, updates text box and zooms to that position.
+	 * <p>
+	 * This only happens if the new location is closer than a constant to
+	 * marker previous location. Otherwise address is only used as reference
+	 * and text box is updated to "Marker close to [addr]".
+	 * 
+	 * @param isStartMarker if true start marker will be changed
+	 * @param addr will location and text information
+	 */
 	public void moveMarkerRelative(Boolean isStartMarker, Address addr) {
 		float results[] = new float[1];
 		double addresLat = addr.getLatitude();
@@ -1949,6 +2134,15 @@ public class MainFragment extends Fragment implements
 		}
 	}
 	
+	/**
+	 * Zooms to addr or to addr and the location of the other marker if it's
+	 * not the first marker.
+	 * <p>
+	 * If the other location is "MyLocation" will also be included in zoom.
+	 * 
+	 * @param isStartLocation if true addr is for start location
+	 * @param addr with the location to zoom at
+	 */
 	public void zoomToGeocodingResult(boolean isStartLocation, Address addr) {
 		LatLng latlng = new LatLng(addr.getLatitude(), addr.getLongitude());
 		LatLng mCurrentLatLng = getLastLocation();
@@ -2008,6 +2202,12 @@ public class MainFragment extends Fragment implements
 		}
 	}
 
+	/**
+	 * Updates start/end text box contents to the given text.
+	 * 
+	 * @param text contents to insert
+	 * @param isStartTextBox if true start box will be used
+	 */
 	public void setTextBoxLocation(String text, boolean isStartTextBox) {
 		if (isStartTextBox) {
 			isStartLocationChangedByUser = false;
@@ -2018,6 +2218,25 @@ public class MainFragment extends Fragment implements
 		}
 	}
 
+	/**
+	 * Draws the route on the map.
+	 * <p>
+	 * To indicate the full route a polyline will be drawn using all points in 
+	 * itinerary.
+	 * <p>
+	 * On each method of transportation change a mode marker will be added.
+	 * <p>
+	 * Mode marker for transit step will display stop name, departure time and
+	 * headsign.
+	 * Mode marker for walk/bike connection, guidance to next point and distance and time
+	 * to get there.
+	 * <p>
+	 * Previous routes are removed from the map.
+	 * 
+	 * @param itinerary the information to be drawn
+	 * @param animateCamera if true map will be zoomed to exactly fit the route
+	 * after the drawing
+	 */
 	public void showRouteOnMap(List<Leg> itinerary, boolean animateCamera) {
 		Log.v(TAG,
 				"(TripRequest) legs size = "
@@ -2145,17 +2364,10 @@ public class MainFragment extends Fragment implements
 		return icon;
 	}
 
-	/**
-	 * @return the fragmentListener
-	 */
 	public OnFragmentListener getFragmentListener() {
 		return fragmentListener;
 	}
 
-	/**
-	 * @param fragmentListener
-	 *            the fragmentListener to set
-	 */
 	public void setFragmentListener(OnFragmentListener fragmentListener) {
 		this.fragmentListener = fragmentListener;
 	}
@@ -2384,7 +2596,12 @@ public class MainFragment extends Fragment implements
 		}
 	}
 	
-	
+	/**
+	 * Changes the tiles used to display the map and sets max zoom level.
+	 * 
+	 * @param overlayString tiles URL for custom tiles or description for
+	 * Google ones
+	 */
 	private void updateOverlay(String overlayString){
 		if (actualTileOverlay != null){
 			actualTileOverlay.remove();
@@ -2423,7 +2640,16 @@ public class MainFragment extends Fragment implements
 		}
 	}
 	
-	
+	/**
+	 * Returns last location coordinates.
+	 * <p>
+	 * This is obtained from the Location Client if it's connected and retrurns
+	 * a valid Location. If not saved last location is provided.
+	 * <p>
+	 * On successful call to Location Client saved last location is updated.
+	 * 
+	 * @return a LatLng object with the most updated user coordinates 
+	 */
 	public LatLng getLastLocation() {
 		if (mLocationClient.isConnected()){
 			Location loc = mLocationClient.getLastLocation();
@@ -2565,6 +2791,12 @@ public class MainFragment extends Fragment implements
 		
 	}
 
+	/**
+	 * Draws rectangle in the map to represent the bounds, using selected
+	 * server fields for lower left and upper right coordinates.
+	 * 
+	 * @param server from which coordinates will be pulled
+	 */
 	public void addBoundariesRectangle(Server server){
 		List<LatLng> bounds = new ArrayList<LatLng>();
 		bounds.add(new LatLng(server.getLowerLeftLatitude(), server.getLowerLeftLongitude()));
