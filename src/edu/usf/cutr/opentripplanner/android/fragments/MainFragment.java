@@ -239,7 +239,17 @@ public class MainFragment extends Fragment implements
 
 	ArrayList<String> directionText = new ArrayList<String>();
 
-	private Boolean needToRunAutoDetect = true;
+	private Boolean needToUpdateServersList = false;
+	
+	public Boolean getNeedToUpdateServersList() {
+		return needToUpdateServersList;
+	}
+
+	public void setNeedToUpdateServersList(Boolean needToUpdateServersList) {
+		this.needToUpdateServersList = needToUpdateServersList;
+	}
+	
+	private Boolean needToRunAutoDetect = false;
 	
 	public Boolean getNeedToRunAutoDetect() {
 		return needToRunAutoDetect;
@@ -1453,11 +1463,12 @@ public class MainFragment extends Fragment implements
 			ServersDataSource dataSource = ServersDataSource.getInstance(applicationContext);
 			WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
 	
-			ServerSelector serverSelector = new ServerSelector(weakContext, applicationContext, dataSource, this);
+			ServerSelector serverSelector = new ServerSelector(weakContext, applicationContext, dataSource, this, needToUpdateServersList);
 			serverSelector.execute(mCurrentLatLng);
-			needToRunAutoDetect = false;
 			savedLastLocationCheckedForServer = mCurrentLatLng;
 		}
+		setNeedToRunAutoDetect(false);
+		setNeedToUpdateServersList(false);
 	}
 	
 	/**
@@ -1472,11 +1483,12 @@ public class MainFragment extends Fragment implements
 		ServersDataSource dataSource = ServersDataSource.getInstance(applicationContext);
 		WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
 
-		ServerSelector serverSelector = new ServerSelector(weakContext, applicationContext, dataSource, this);
+		ServerSelector serverSelector = new ServerSelector(weakContext, applicationContext, dataSource, this, needToUpdateServersList);
 		LatLng latLngList[] = new LatLng[1];
 		latLngList[0] = null;
 		serverSelector.execute(latLngList);
-		needToRunAutoDetect = false;
+		setNeedToRunAutoDetect(false);
+		setNeedToUpdateServersList(false);
 	}
 	
 	/**
@@ -1720,7 +1732,6 @@ public class MainFragment extends Fragment implements
 	public void onStart() {
 		super.onStart();	
 		
-		needToRunAutoDetect = true;
 		mLocationClient = new LocationClient(applicationContext, this, this);
 		//mLocationClient.connect();
 		
@@ -1970,7 +1981,6 @@ public class MainFragment extends Fragment implements
 			startActivity(myIntent);
 			break;
 		case R.id.settings:
-			needToRunAutoDetect = false;
 			getActivity().startActivityForResult(
 					new Intent(getActivity(), SettingsActivity.class),
 					OTPApp.REFRESH_SERVER_LIST_REQUEST_CODE);
@@ -2723,7 +2733,10 @@ public class MainFragment extends Fragment implements
 				
 				Location.distanceBetween(savedLatitude, savedLongitude, mCurrentLatLng.latitude, mCurrentLatLng.longitude, distance);
 		
-				if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER, true) && needToRunAutoDetect) {
+				if (needToRunAutoDetect){
+					runAutoDetectServer(mCurrentLatLng);
+				}
+				else if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER, true)) {
 					
 					if ((app.getSelectedServer() != null) 
 							&& (!LocationUtil.checkPointInBoundingBox(mCurrentLatLng, app.getSelectedServer(), OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))
