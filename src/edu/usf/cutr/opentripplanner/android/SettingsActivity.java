@@ -218,7 +218,6 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 			@Override
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
 				String value = (String) newValue;
-				selectedCustomServer.setChecked(false);
 				
 						
 				if (URLUtil.isValidUrl(value)){		
@@ -341,6 +340,9 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 			selectedCustomServer.setEnabled(true);
 			if (selectedCustomServer.isChecked()){
 				prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, true);
+				Intent returnIntent = new Intent();
+				returnIntent.putExtra(OTPApp.NEW_CUSTOM_SERVER_RETURN_KEY, true);
+				setResult(RESULT_OK, returnIntent);
 			}
 			customServerURL.setSummary(getResources().getString(R.string.custom_server_url_description));
 			prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, true);

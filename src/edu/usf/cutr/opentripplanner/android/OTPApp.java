@@ -29,7 +29,7 @@ public class OTPApp extends Application {
 	
 	public static final int CHECK_GOOGLE_PLAY_REQUEST_CODE = 3;
 	
-	public static final int REFRESH_SERVER_LIST_REQUEST_CODE = 2;
+	public static final int SETTINGS_REQUEST_CODE = 2;
 	
 	public static final int CHOOSE_CONTACT_REQUEST_CODE = 1;
 	
@@ -38,7 +38,8 @@ public class OTPApp extends Application {
 	public static final String URL_ENCODING = "UTF-8";
 	
 	public static final String REFRESH_SERVER_RETURN_KEY = "RefreshServer";
-	
+	public static final String NEW_CUSTOM_SERVER_RETURN_KEY = "NewCustomServer";
+
 	public static final String TAG_FRAGMENT_MAIN_FRAGMENT = "mainFragment";
 	public static final String TAG_FRAGMENT_DATE_TIME_DIALOG = "dateTimeDialog";
 	
