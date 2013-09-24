@@ -89,11 +89,12 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements 
      * @param mustRefreshList true if we should download a new list of servers from the Google Doc, false if we should use cached list of servers
      * @param isAutoDetectEnabled true if we should automatically compare the user's current location to the bounding boxes of OTP servers, false if we should prompt the user to pick the OTP server manually
      */
-	public ServerSelector(WeakReference<Activity> activity, Context context, ServersDataSource dataSource, ServerSelectorCompleteListener callback) {
+	public ServerSelector(WeakReference<Activity> activity, Context context, ServersDataSource dataSource, ServerSelectorCompleteListener callback, boolean mustRefreshList) {
 		this.activity = activity;
 		this.context = context;
 		this.dataSource = dataSource;
 		this.callback = callback;
+		this.mustRefreshList = mustRefreshList;
 		if (activity.get() != null){
 			progressDialog = new ProgressDialog(activity.get());
 		}
@@ -111,9 +112,6 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements 
         
 		isAutoDetectEnabled = prefs.getBoolean(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER,
 				true);
-		mustRefreshList = prefs.getBoolean(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER,
-				true);
-        
 	}
 
 
@@ -290,6 +288,11 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements 
 			Toast.makeText(context.getApplicationContext(), 
 					context.getResources().getString(R.string.server_selector_detected) + " "+selectedServer.getRegion() + ". " + context.getResources().getString(R.string.server_selector_server_change_info), 
 						   Toast.LENGTH_SHORT).show();
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+			Editor e = prefs.edit();
+			e.putLong(PREFERENCE_KEY_SELECTED_SERVER, selectedServer.getId());
+			e.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false);
+			e.commit();
 			callback.onServerSelectorComplete(selectedServer);
 		} else if (knownServers != null && !knownServers.isEmpty()){
 			Log.d(TAG, "No server automatically selected.  User will need to choose the OTP server.");
