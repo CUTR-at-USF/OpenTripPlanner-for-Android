@@ -8,7 +8,7 @@ import edu.usf.cutr.opentripplanner.android.model.Server;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- * Evaluates the LocationUtils.checkPointInBoundingBox() method with various bounds
+ * Evaluates the LocationUtil.checkPointInBoundingBox() method with various bounds
  * and locations
  * 
  * @author barbeau
