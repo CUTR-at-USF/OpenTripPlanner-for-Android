@@ -17,7 +17,7 @@ import com.google.android.gms.maps.model.LatLng;
 public class BoundsTest extends AndroidTestCase {
 	
 	public static final String TAG = "BoundsTest";
-    public static final int ACCEPTABLE_ERROR = 10; // meters
+	public static final int ACCEPTABLE_ERROR = 10; // meters
 	Server serverTampa = new Server();
 	
 	@Override
