@@ -112,8 +112,8 @@ public class LocationUtil {
 		Location.distanceBetween(locationLat, locationLon, upLat, upLon, resultUp);
 		Location.distanceBetween(locationLat, locationLon, downLat, downLon, resultDown);
 
-		Location.distanceBetween(upLat, leftLon, upLat, rightLon, resultHorizontal);
-		Location.distanceBetween(upLat, leftLon, downLat, leftLon, resultVertical);
+		Location.distanceBetween(locationLat, leftLon, locationLat, rightLon, resultHorizontal);
+		Location.distanceBetween(upLat, locationLon, downLat, locationLon, resultVertical);
 
 		if(resultLeft[0]+resultRight[0]-resultHorizontal[0] > acceptableError){
 			return false;
