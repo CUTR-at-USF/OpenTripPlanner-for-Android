@@ -651,7 +651,15 @@ public class MainFragment extends Fragment implements
 
 			@Override
 			public void onClick(View v) {
-				requestTrip();
+				isRealLostFocus = false;
+				if (!isEndLocationGeocodingProcessed
+						&& !prefs.getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, true)){
+					processAddress(false, tbEndLocation.getText().toString(), false);
+					requestTripAfterGeocoding = true;
+				}
+				else{
+					requestTrip();
+				}
 			}
 		});
 		
