@@ -2667,9 +2667,10 @@ public class MainFragment extends Fragment implements
 			mMap.setMapType(GoogleMap.MAP_TYPE_NONE);
 			MyUrlTileProvider mTileProvider = new MyUrlTileProvider(OTPApp.CUSTOM_MAP_TILE_HEIGHT, OTPApp.CUSTOM_MAP_TILE_HEIGHT, overlayString);
 			actualTileOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mTileProvider).zIndex(OTPApp.CUSTOM_MAP_TILE_Z_INDEX));
-		}
-		if (mMap.getCameraPosition().zoom > maxZoomLevel){
-			mMap.moveCamera(CameraUpdateFactory.zoomTo(maxZoomLevel));
+			
+			if (mMap.getCameraPosition().zoom > maxZoomLevel){
+				mMap.moveCamera(CameraUpdateFactory.zoomTo(maxZoomLevel));
+			}
 		}
 	}
 	
@@ -2853,6 +2854,11 @@ public class MainFragment extends Fragment implements
 		float newTilt;
 		boolean showButton = false;
 		boolean bearingTiltChanged = false;
+		
+		String overlayString = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, applicationContext.getResources().getString(R.string.map_tiles_default_server));
+		if (overlayString.startsWith(OTPApp.MAP_TILE_GOOGLE)){
+			maxZoomLevel = mMap.getMaxZoomLevel();
+		}
 		
 		if ((newBearing = position.bearing) != bearing){
 			bearingTiltChanged = true;
