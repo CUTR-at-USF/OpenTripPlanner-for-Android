@@ -2,7 +2,8 @@ package edu.usf.cutr.opentripplanner.android.util;
 
 import java.util.Calendar;
 import java.util.Date;
-
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.text.format.DateFormat;
@@ -28,7 +29,8 @@ public class DateTimeDialog extends DialogFragment /* implements DatePickerCompl
 	private Button btnOk;
 	private Button btnCancel;
 
-    @Override
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
     	
@@ -46,7 +48,9 @@ public class DateTimeDialog extends DialogFragment /* implements DatePickerCompl
 		pickerTime.setIs24HourView(DateFormat.is24HourFormat(getActivity()));
 		
 		//TimePicker state needs to be saved manually because of this bug in Android that affects at least ICS: http://code.google.com/p/android/issues/detail?id=22754
-		pickerTime.setSaveFromParentEnabled(false);
+	    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+	        pickerTime.setSaveFromParentEnabled(false);
+	    }			
 		
 		OnClickListener oclOk = new OnClickListener() {
 			
@@ -82,7 +86,8 @@ public class DateTimeDialog extends DialogFragment /* implements DatePickerCompl
     
     
     
-    @Override
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	@Override
     public void onActivityCreated(Bundle savedInstanceState){
     	super.onActivityCreated(savedInstanceState);
     	
@@ -94,15 +99,17 @@ public class DateTimeDialog extends DialogFragment /* implements DatePickerCompl
         	boolean arriveBy = bundle.getBoolean(OTPApp.BUNDLE_KEY_ARRIVE_BY);
 
         	Calendar cal = Calendar.getInstance();
-        	if (cal.getTimeInMillis() < tripDate.getTime()){
-        		//min time should preceede setted time and setted time will be set with 0 seconds, so we aloud one minute less
-        		pickerDate.setMinDate(cal.getTimeInMillis() - 60000);
-        	}
-        	else{
-        		//min time should preceede setted time and setted time will be set with 0 seconds, so we aloud one minute less
-        		pickerDate.setMinDate(tripDate.getTime() - 60000);
-        	}
-        	
+    	    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+	        	if (cal.getTimeInMillis() < tripDate.getTime()){
+	        		//min time should preceede setted time and setted time will be set with 0 seconds, so we aloud one minute less
+	        		pickerDate.setMinDate(cal.getTimeInMillis() - 60000);
+	        	}
+	        	else{
+	        		//min time should preceede setted time and setted time will be set with 0 seconds, so we aloud one minute less
+	        		pickerDate.setMinDate(tripDate.getTime() - 60000);
+	        	}
+    	    }		
+
         	cal.setTime(tripDate);
         	
     		if (!arriveBy){

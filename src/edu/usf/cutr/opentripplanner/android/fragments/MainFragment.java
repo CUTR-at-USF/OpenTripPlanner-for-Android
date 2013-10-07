@@ -60,6 +60,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.DrawerLayout.DrawerListener;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -675,7 +676,7 @@ public class MainFragment extends Fragment implements
 				if (!hasFocus) {
 					String text = tv.getText().toString();
 					
-					if (!text.isEmpty()){
+					if (!TextUtils.isEmpty(text)){
 						if (v.getId() == R.id.tbStartLocation 
 								&& !isStartLocationGeocodingProcessed 
 								&& !prefs.getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true)) {
