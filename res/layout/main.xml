@@ -182,7 +182,7 @@
 		android:layout_gravity="start"
 		android:orientation="vertical"
 		android:clickable="true"
-		android:background="@android:color/background_dark">
+		android:background="@android:color/background_light">
 	
 	    <LinearLayout
 			android:id="@+id/layoutOptimization"
@@ -203,7 +203,6 @@
 		        android:layout_width="match_parent"
 		        android:layout_height="wrap_content"
 		        android:choiceMode="singleChoice"
-		        android:divider="@android:color/holo_blue_light"
 		        android:dividerHeight="1dp"
 	    	    android:headerDividersEnabled="true"
 	            android:footerDividersEnabled="true"
@@ -233,7 +232,6 @@
 		        android:layout_width="match_parent"
 		        android:layout_height="wrap_content"
 		        android:choiceMode="singleChoice"
-		        android:divider="@android:color/holo_blue_light"
 		        android:dividerHeight="1dp"
 		        android:headerDividersEnabled="true"
 		        android:footerDividersEnabled="true"

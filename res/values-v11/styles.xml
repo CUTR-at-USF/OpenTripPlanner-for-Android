@@ -1,0 +1,4 @@
+<resources>
+	<style name="MyTheme" parent="@android:style/Theme.Holo.Light.NoActionBar">
+	</style>
+</resources>
