@@ -142,11 +142,9 @@
 		<RelativeLayout
 			android:id="@id/panelDisplayDirection"
 		    android:layout_width="fill_parent"
-		    android:layout_height="45dp"
+		    android:layout_height="wrap_content"
 		    android:orientation="horizontal"
    		    android:layout_alignParentBottom="true"
-   		    android:layout_centerVertical="false"
-   		    android:layout_centerHorizontal="false"
    		    android:background="@drawable/button_layout">
 	   		    
    			<ImageButton
@@ -160,9 +158,9 @@
 			
 			<Spinner
 			    android:id="@+id/itinerarySelection"
-			    android:layout_toLeftOf="@id/separator"
+			    android:layout_toLeftOf="@id/btnDisplayDirection"
 			    android:layout_width="match_parent"
-			    android:layout_height="wrap_content"
+			    android:layout_height="40dp"
    				android:layout_margin="4dp"
 			    android:prompt="@string/alternative_routes">
 			</Spinner>
@@ -171,21 +169,21 @@
 		
 	</RelativeLayout>
 	
-	<LinearLayout
+	<RelativeLayout
 	    android:id="@+id/navigationDrawerLeftPane"
    		android:layout_width="200dp"
 		android:layout_height="match_parent"
 		android:layout_gravity="start"
 		android:orientation="vertical"
-		android:background="@android:color/background_light"
-		android:clickable="true">
+		android:clickable="true"
+		android:background="@android:color/background_light">
 	
 	    <LinearLayout
 			android:id="@+id/layoutOptimization"
 	   		android:layout_width="match_parent"
 			android:layout_height="112dp"
 			android:orientation="vertical"
-			android:padding="4dp">
+			android:layout_margin="4dp">
 		
 			<TextView
 				android:id="@+id/headerSpinOptimization"
@@ -213,7 +211,9 @@
 	   		android:layout_width="match_parent"
 			android:layout_height="112dp"
 			android:orientation="vertical"
-			android:padding="4dp">
+            android:layout_below="@id/layoutOptimization"
+        	android:layout_above="@+id/layoutBike"
+			android:layout_margin="4dp">
 			
 			<TextView
 				android:id="@+id/headerSpinTravelmode"
@@ -236,7 +236,7 @@
 		     
 	     </LinearLayout>
 	     
-		    <ScrollView
+	    <ScrollView
 	        android:id="@+id/layoutBike"
         	android:layout_width="match_parent"
 			android:layout_height="wrap_content"
@@ -304,8 +304,7 @@
 			
 		</ScrollView>
 	
-	
-	</LinearLayout>
+	</RelativeLayout>
 			
 </android.support.v4.widget.DrawerLayout>
 	     
