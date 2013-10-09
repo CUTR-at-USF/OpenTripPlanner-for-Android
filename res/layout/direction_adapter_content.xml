@@ -17,7 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dip"
         android:layout_toRightOf="@+id/iconLine"
-        android:textColor="#ff000000"
+   		android:textColor="@android:color/black"
         android:textSize="24sp" />
 
     <Button
