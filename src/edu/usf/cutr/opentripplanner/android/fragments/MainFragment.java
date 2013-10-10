@@ -258,6 +258,8 @@ public class MainFragment extends Fragment implements
 	public void setNeedToRunAutoDetect(Boolean needToRunAutoDetect) {
 		this.needToRunAutoDetect = needToRunAutoDetect;
 	}
+	
+	private boolean appResumed;
 
 	private OnFragmentListener fragmentListener;
 
@@ -873,9 +875,13 @@ public class MainFragment extends Fragment implements
 //		    				   Toast.LENGTH_SHORT).show();
 		    	fragmentListener.onItinerarySelected(position);
 		    	
-		    	if (!restoredSavedState){
+	    		if (!appResumed){
 			    	showRouteOnMap(fragmentListener.getCurrentItinerary(), true);
-		    	}
+	    		}
+	    		else{
+			    	showRouteOnMap(fragmentListener.getCurrentItinerary(), false);
+			    	appResumed = false;
+	    		}
 		    }
 
 		    @Override
@@ -1895,6 +1901,7 @@ public class MainFragment extends Fragment implements
 	@Override
 	public void onResume() {
 		super.onResume();
+		appResumed = true;
 		
 		Log.v(TAG, "MainFragment onResume");
 	}
