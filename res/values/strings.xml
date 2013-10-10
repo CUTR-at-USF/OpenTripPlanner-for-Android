@@ -15,8 +15,6 @@
  the License.
 -->
 <resources>
-    <string name="app_name">OpenTripPlanner</string>
-    <string name="servers_spreadsheet_url"><![CDATA[https://spreadsheets.google.com/spreadsheet/pub?hl=en_US&hl=en_US&key=0AgWy8ujaGosCdDhxTC04cUZNeHo0eGFBQTBpU2dxN0E&single=true&gid=0&output=csv]]></string>
     <string name="yes">Yes</string>
     <string name="no">No</string>        
     <string name="step_by_step_title">Directions</string>
@@ -33,8 +31,8 @@
     <string name="step_by_step_transit_get_off">Get off</string>
     <string name="step_by_step_transit_connector_stop_name">At</string>
     <string name="step_by_step_transit_stops_in_between">Stops in between</string>
-    <string name="need_to_place_marker"><string>"Add a position marker..."</string></string>
-    <string name="need_to_place_markers_before_planning"><string>"You need to set origin and destination first"</string></string>
+    <string name="need_to_place_marker">"Add a position marker..."</string>
+    <string name="need_to_place_markers_before_planning">"You need to set origin and destination first"</string>
     <string name="start_location_hint">Start location</string>
     <string name="end_location_hint">End location</string>
     <string name="textbox_close_to_marker">Marker, close to</string>

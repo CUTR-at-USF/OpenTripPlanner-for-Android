@@ -37,6 +37,5 @@
     <string name="feedback_email_android_developer">opentripplanner@cutr.usf.edu</string>
     <string name="geocoder_nominatim">MapQuest Nominatim</string>
     <string name="geocoder_google_places">Google Places</string>
-    <string name="geocoder_google_places">Google Places</string>
     <string name="custom_server_url_hint">http://a.otp.org/opentripplanner-api-webapp/ws</string>    
 </resources>
