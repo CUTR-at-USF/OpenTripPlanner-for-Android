@@ -31,8 +31,8 @@
     <string name="step_by_step_transit_get_off">Coborâți din</string>
     <string name="step_by_step_transit_connector_stop_name">În</string>
     <string name="step_by_step_transit_stops_in_between">Stații până la destinație</string>
-    <string name="need_to_place_marker"><string>"Adăugați un indicator de poziționare ..."</string></string>
-    <string name="need_to_place_markers_before_planning"><string>"Trebuie sa introduceți locul de plecare și destinația"</string></string>
+    <string name="need_to_place_marker">"Adăugați un indicator de poziționare ..."</string>
+    <string name="need_to_place_markers_before_planning">"Trebuie sa introduceți locul de plecare și destinația"</string>
     <string name="start_location_hint">Plecare</string>
     <string name="end_location_hint">Destinație</string>
     <string name="textbox_close_to_marker">Indicator introdus, aproape de</string>

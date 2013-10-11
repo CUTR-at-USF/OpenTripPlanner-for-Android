@@ -31,8 +31,8 @@
     <string name="step_by_step_transit_get_off">Baixe do</string>
     <string name="step_by_step_transit_connector_stop_name">Em</string>
     <string name="step_by_step_transit_stops_in_between">Paradas até destinação</string>
-    <string name="need_to_place_marker"><string>"Acrescente um marcador de posição ..."</string></string>
-    <string name="need_to_place_markers_before_planning"><string>"Primeiro tem de introduzir uma origem e uma destinação"</string></string>
+    <string name="need_to_place_marker">"Acrescente um marcador de posição ..."</string>
+    <string name="need_to_place_markers_before_planning">"Primeiro tem de introduzir uma origem e uma destinação"</string>
     <string name="start_location_hint">Local de origem</string>
     <string name="end_location_hint">Local de destinação</string>
     <string name="textbox_close_to_marker">Marcador, perto de</string>
