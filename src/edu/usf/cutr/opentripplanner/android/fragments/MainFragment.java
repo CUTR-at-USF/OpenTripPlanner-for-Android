@@ -2517,7 +2517,7 @@ public class MainFragment extends Fragment implements
 
 		}
 		
-		ArrayAdapter<String> itineraryAdapter = new ArrayAdapter<String>(this.getActivity().getApplicationContext(), android.R.layout.simple_spinner_item, itinerarySummaryList);
+		ArrayAdapter<String> itineraryAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, itinerarySummaryList);
 	
 		itineraryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		itinerarySelectionSpinner.setAdapter(itineraryAdapter);
