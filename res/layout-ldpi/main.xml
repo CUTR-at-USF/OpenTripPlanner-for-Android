@@ -86,16 +86,7 @@
 	        android:layout_toLeftOf="@id/btnPlanTrip"
 		    android:background="@android:drawable/editbox_background">
 		</EditText>
-		
-		<ImageButton
-		    android:id="@+id/btnCompass"
-		    android:layout_width="40dp"
-		    android:layout_height="40dp"
-		    android:layout_alignTop="@id/btnDateDialog"  
-			android:layout_margin="4dp"
-		    android:src="@android:drawable/ic_menu_compass"
-		    android:background="@drawable/button_layout">
-		</ImageButton>
+
 		
 		<ImageButton
 		    android:id="@+id/btnMyLocation"

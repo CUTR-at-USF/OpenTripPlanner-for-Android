@@ -37,6 +37,7 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.v092snapshot.api.model.Itinerary;
 import org.opentripplanner.v092snapshot.api.model.Leg;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -51,6 +52,7 @@ import android.location.Address;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
@@ -62,6 +64,7 @@ import android.support.v4.widget.DrawerLayout.DrawerListener;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -76,6 +79,8 @@ import android.view.View.OnFocusChangeListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.view.ViewTreeObserver;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -217,7 +222,6 @@ public class MainFragment extends Fragment implements
 
 	private ImageButton btnDisplayDirection;
 	
-	private ImageButton btnCompass;
 	private ImageButton btnMyLocation;
 	
 	private ImageButton btnHandle;
@@ -302,7 +306,29 @@ public class MainFragment extends Fragment implements
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		
-		View mainView = inflater.inflate(R.layout.main, container, false);
+		final View mainView = inflater.inflate(R.layout.main, container, false);
+		
+		ViewTreeObserver vto = mainView.getViewTreeObserver(); 
+		vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() { 
+		    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+			@Override 
+		    public void onGlobalLayout() { 
+		        mainView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+				int locationtbEndLocation[] = new int[2];
+				tbEndLocation.getLocationInWindow(locationtbEndLocation);
+				int locationItinerarySelectionSpinner[] = new int[2];
+				itinerarySelectionSpinner.getLocationInWindow(locationItinerarySelectionSpinner);
+				int locationbtnHandle[] = new int[2];
+				btnHandle.getLocationInWindow(locationbtnHandle);
+				DisplayMetrics metrics = MainFragment.this.getResources().getDisplayMetrics();
+				int windowHeight = metrics.heightPixels;
+				int paddingMargin = MainFragment.this.getResources().getInteger(R.integer.map_padding_margin);
+				mMap.setPadding(locationbtnHandle[0] + btnHandle.getWidth()/2 + paddingMargin,
+						locationtbEndLocation[1] + tbEndLocation.getHeight()/2 + paddingMargin,
+						0,
+						windowHeight - locationItinerarySelectionSpinner[1] + paddingMargin);
+		    } 
+		});
 				
 		tbStartLocation = (EditText) mainView
 				.findViewById(R.id.tbStartLocation);
@@ -323,7 +349,6 @@ public class MainFragment extends Fragment implements
 				
 		bikeTriangleParametersLayout.addView(bikeTriangleParameters, params);
 		
-		btnCompass = (ImageButton) mainView.findViewById(R.id.btnCompass);
 		btnMyLocation = (ImageButton) mainView.findViewById(R.id.btnMyLocation);
 		
 		btnDateDialog = (ImageButton) mainView.findViewById(R.id.btnDateDialog);
@@ -348,6 +373,16 @@ public class MainFragment extends Fragment implements
 
 		return mainView;
 	}
+	
+	
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+	private static void removeOnGlobalLayoutListener(View v, ViewTreeObserver.OnGlobalLayoutListener listener){
+	    if (Build.VERSION.SDK_INT < 16) {
+	        v.getViewTreeObserver().removeGlobalOnLayoutListener(listener);
+	    } else {
+	        v.getViewTreeObserver().removeOnGlobalLayoutListener(listener);
+	    }
+	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -371,16 +406,6 @@ public class MainFragment extends Fragment implements
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequest.setInterval(OTPApp.UPDATE_INTERVAL);
         mLocationRequest.setFastestInterval(OTPApp.FASTEST_INTERVAL);
-        		
-        if (!mapFailed){
-    		UiSettings uiSettings = mMap.getUiSettings();
-    		mMap.setMyLocationEnabled(true);
-    		mMap.setOnCameraChangeListener(this);
-    		uiSettings.setMyLocationButtonEnabled(false);
-    		uiSettings.setCompassEnabled(false);
-    		uiSettings.setAllGesturesEnabled(true);
-    		uiSettings.setZoomControlsEnabled(false);
-        }
 
 		
 		if (savedInstanceState == null){
@@ -463,10 +488,6 @@ public class MainFragment extends Fragment implements
 
 		restoreState(savedInstanceState);
 		
-		if (!mapFailed){
-			addInterfaceListeners();
-			addMapListeners();
-		}
 			
 		if (savedInstanceState == null){
 			ddlOptimization.setItemChecked(0, true);
@@ -478,9 +499,25 @@ public class MainFragment extends Fragment implements
 		}
 			
 		if (!mapFailed){
-			String overlayString = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, applicationContext.getResources().getString(R.string.map_tiles_default_server));
-			updateOverlay(overlayString);
+			initializeMapInterface(mMap);
 		}
+	}
+	
+	
+	private void initializeMapInterface(GoogleMap mMap){
+		UiSettings uiSettings = mMap.getUiSettings();
+		mMap.setMyLocationEnabled(true);
+		mMap.setOnCameraChangeListener(this);
+		uiSettings.setMyLocationButtonEnabled(false);
+		uiSettings.setCompassEnabled(true);
+		uiSettings.setAllGesturesEnabled(true);
+		uiSettings.setZoomControlsEnabled(false);
+		
+		String overlayString = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, applicationContext.getResources().getString(R.string.map_tiles_default_server));
+		updateOverlay(overlayString);
+		
+		addMapListeners();
+		addInterfaceListeners();
 	}
 	
 	
@@ -812,13 +849,6 @@ public class MainFragment extends Fragment implements
 				mMap.animateCamera(CameraUpdateFactory.newCameraPosition(newCameraPosition));
 			}
 		};
-		btnCompass.setOnClickListener(oclCompass);
-		
-		if ((bearing != 0) || (tilt != 0)){
-			btnCompass.setVisibility(View.VISIBLE);
-		} else {
-			btnCompass.setVisibility(View.INVISIBLE);
-		}
 		
 		OnClickListener oclMyLocation = new OnClickListener() {
 			@Override
@@ -1064,21 +1094,13 @@ public class MainFragment extends Fragment implements
 				if (mapFailedBefore){
 					enableUIElements(true);
 					
-		    		UiSettings uiSettings = mMap.getUiSettings();
-		    		mMap.setMyLocationEnabled(true);
-		    		mMap.setOnCameraChangeListener(this);
-		    		uiSettings.setMyLocationButtonEnabled(false);
-		    		uiSettings.setCompassEnabled(false);
-		    		uiSettings.setAllGesturesEnabled(true);
-		    		uiSettings.setZoomControlsEnabled(false);
-		    		
-		    		addInterfaceListeners();
-		    		addMapListeners();
+					initializeMapInterface(mMap);
 				}
 
-	    		
-				String overlayString = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, applicationContext.getResources().getString(R.string.map_tiles_default_server));
-				updateOverlay(overlayString);
+	    		if (!mapFailedBefore){
+					String overlayString = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, applicationContext.getResources().getString(R.string.map_tiles_default_server));
+					updateOverlay(overlayString);
+	    		}
 				
 				restoredSavedState = true;
 				setTextBoxLocation(savedInstanceState.getString(OTPApp.BUNDLE_KEY_TB_START_LOCATION), true);
@@ -1173,7 +1195,6 @@ public class MainFragment extends Fragment implements
 		tbStartLocation.setVisibility(visibility);
 		tbEndLocation.setVisibility(visibility);
 		btnPlanTrip.setVisibility(visibility);
-		btnCompass.setVisibility(visibility);
 		btnDateDialog.setVisibility(visibility);
 		btnMyLocation.setVisibility(visibility);
 		handleDrawer.setVisibility(visibility);
@@ -1757,19 +1778,7 @@ public class MainFragment extends Fragment implements
 				if (mMap != null) {
 					enableUIElements(true);
 					
-		    		UiSettings uiSettings = mMap.getUiSettings();
-		    		mMap.setMyLocationEnabled(true);
-		    		mMap.setOnCameraChangeListener(this);
-		    		uiSettings.setMyLocationButtonEnabled(false);
-		    		uiSettings.setCompassEnabled(false);
-		    		uiSettings.setAllGesturesEnabled(true);
-		    		uiSettings.setZoomControlsEnabled(false);
-		    		
-		    		addInterfaceListeners();
-		    		addMapListeners();
-		    		
-					String overlayString = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, applicationContext.getResources().getString(R.string.map_tiles_default_server));
-					updateOverlay(overlayString);
+					initializeMapInterface(mMap);
 					
 					runAutoDetectServerNoLocation();
 				}
@@ -2849,38 +2858,6 @@ public class MainFragment extends Fragment implements
 
 	@Override
 	public void onCameraChange(CameraPosition position) {
-		float newBearing;
-		float newTilt;
-		boolean showButton = false;
-		boolean bearingTiltChanged = false;
-		
-		if ((newBearing = position.bearing) != bearing){
-			bearingTiltChanged = true;
-			bearing = newBearing;
-			if (newBearing != 0){
-				showButton = true;
-			}
-		}
-		if ((newTilt = position.tilt) != tilt){
-			bearingTiltChanged = true;
-			tilt = newTilt;
-			if (newTilt != 0){
-				showButton = true;
-			}
-		}
-		
-		if (bearingTiltChanged){
-			if (showButton){
-				if (!btnCompass.isShown()){
-					btnCompass.setVisibility(View.VISIBLE);
-				}
-			}
-			else{
-				if (btnCompass.isShown()){
-					btnCompass.setVisibility(View.INVISIBLE);
-				}			
-			}
-		}
 		if (position.zoom > maxZoomLevel){
 			mMap.moveCamera(CameraUpdateFactory.zoomTo(maxZoomLevel));
 		}
