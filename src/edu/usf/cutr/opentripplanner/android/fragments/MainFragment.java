@@ -475,7 +475,6 @@ public class MainFragment extends Fragment implements
 			ddlOptimization.setItemChecked(0, true);
 			ddlTravelMode.setItemChecked(0, true);
 			showBikeParameters(false);
-			tripDate = Calendar.getInstance().getTime();
 			arriveBy = false;
 			setTextBoxLocation(getResources().getString(R.string.my_location), true);
 		}
@@ -864,8 +863,16 @@ public class MainFragment extends Fragment implements
 			    // Create and show the dialog.
 			    DateTimeDialog newFragment = new DateTimeDialog();
 			    
+			    Date dateDialogDate;
+			    if (tripDate == null){
+			    	dateDialogDate = Calendar.getInstance().getTime();
+			    }
+			    else{
+			    	dateDialogDate = tripDate;
+			    }
+			    
 				Bundle bundle = new Bundle();
-				bundle.putSerializable(OTPApp.BUNDLE_KEY_TRIP_DATE, tripDate);
+				bundle.putSerializable(OTPApp.BUNDLE_KEY_TRIP_DATE, dateDialogDate);
 				bundle.putBoolean(OTPApp.BUNDLE_KEY_ARRIVE_BY, arriveBy);
 				newFragment.setArguments(bundle);
 				ft.commit();
@@ -1316,12 +1323,20 @@ public class MainFragment extends Fragment implements
 
 		request.setWheelchair(prefs.getBoolean(OTPApp.PREFERENCE_KEY_WHEEL_ACCESSIBLE,
 				false));
+		
+		Date requestTripDate;
+		if (tripDate == null){
+			requestTripDate = Calendar.getInstance().getTime();
+		}
+		else{
+			requestTripDate = tripDate;
+		}
 
 		request.setDateTime(
 				DateFormat.format(OTPApp.FORMAT_OTP_SERVER_DATE_QUERY,
-						tripDate.getTime()).toString(),
+						requestTripDate.getTime()).toString(),
 				DateFormat
-						.format(OTPApp.FORMAT_OTP_SERVER_TIME_QUERY, tripDate.getTime()).toString());
+						.format(OTPApp.FORMAT_OTP_SERVER_TIME_QUERY, requestTripDate.getTime()).toString());
 
 		request.setShowIntermediateStops(Boolean.TRUE);
 		
@@ -1335,7 +1350,8 @@ public class MainFragment extends Fragment implements
 				.getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(tbEndLocation.getWindowToken(), 0);
 		imm.hideSoftInputFromWindow(tbStartLocation.getWindowToken(), 0);
-
+		
+		tripDate = null;
 	}
 	
 	/**
