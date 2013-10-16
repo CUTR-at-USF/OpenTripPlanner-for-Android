@@ -46,7 +46,12 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LevelListDrawable;
 import android.location.Address;
 import android.location.Location;
 import android.location.LocationManager;
@@ -59,10 +64,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.DrawerLayout.DrawerListener;
+import android.text.BoringLayout.Metrics;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -2337,9 +2344,18 @@ public class MainFragment extends Fragment implements
 				
 				List<LatLng> points = LocationUtil.decodePoly(leg.legGeometry
 						.getPoints());
-				MarkerOptions modeMarkerOption = new MarkerOptions().position(points.get(0))
-						                                        .icon(BitmapDescriptorFactory.fromResource(getPathIcon(leg.mode)));
 				
+				float scaleFactor = getResources().getFraction(R.fraction.scaleFactor, 1, 1);
+				 
+				Drawable d= getResources().getDrawable(getPathIcon(leg.mode));
+				BitmapDrawable bd=(BitmapDrawable) d.getCurrent();
+				Bitmap b=bd.getBitmap();
+				Bitmap bhalfsize=Bitmap.createScaledBitmap(b, (int)(b.getWidth()/scaleFactor), (int)(b.getHeight()/scaleFactor), false);
+				
+				MarkerOptions modeMarkerOption = new MarkerOptions().position(points.get(0))
+						                                        .icon(BitmapDescriptorFactory.fromBitmap(bhalfsize));
+
+
 				TraverseMode traverseMode = TraverseMode.valueOf((String) leg.mode);
 
 				if (traverseMode.isTransit()){
@@ -2373,6 +2389,7 @@ public class MainFragment extends Fragment implements
 					}
 				}
 				PolylineOptions options = new PolylineOptions().addAll(points)
+						   .width(5 * scaleFactor)
 						   .color(OTPApp.COLOR_ROUTE_LINE);
 				Polyline routeLine = mMap.addPolyline(options);
 				route.add(routeLine);
