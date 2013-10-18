@@ -41,7 +41,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 	public static final String COLUMN_CONTACT_EMAIL = "ContactEmail";
 
 	private static final String DATABASE_NAME = "OTPServers.db";
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 	
 	private static MySQLiteHelper mInstance = null;
 
