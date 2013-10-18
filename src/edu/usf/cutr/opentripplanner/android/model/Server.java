@@ -16,6 +16,8 @@
 
 package edu.usf.cutr.opentripplanner.android.model;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import edu.usf.cutr.opentripplanner.android.R;
 import android.content.Context;
 import android.location.Location;
@@ -32,19 +34,37 @@ public class Server {
 	private String region;
 	private String baseURL;
 	private String bounds;
+	private String center;
+	private String zoom;
 	private String language;
 	private String contactName;
 	private String contactEmail;
 
 	private double lowerLeftLatitude, lowerLeftLongitude, upperRightLatitude, upperRightLongitude;
 
-	private double centerLatitude, centerLongitude;  //for Google Places
+	private double geometricalCenterLatitude, geometricalCenterLongitude;  //for Google Places
+	
+	private double centerLatitude, centerLongitude;  
+	
+	private float initialZoom;   
 	
 	private boolean boundsSet = false;
 
 	public boolean areBoundsSet() {
 		return boundsSet;
 	}
+	
+	private boolean centerSet = false;
+	
+	public boolean isCenterSet(){
+		return centerSet;
+	}
+
+	private boolean zoomSet = false;
+
+	public boolean isZoomSet() {
+		return zoomSet;
+	} 
 
 	public Server() {
 		super();
@@ -57,29 +77,35 @@ public class Server {
 		setRegion(s.getRegion());
 		setBaseURL(s.getBaseURL());
 		setBounds(s.getBounds());  // do extra string processing to set lowerleft and upperright
+		setCenter(s.getCenter());
+		setZoom(s.getZoom());
 		setLanguage(s.getLanguage());
 		setContactName(s.getContactName());
 		setContactEmail(s.getContactEmail());
 	}
 
 	public Server(Long d, String region, String baseURL, String bounds,
-			String language, String contactName, String contactEmail) {
+			String language, String contactName, String contactEmail, String center, String zoom) {
 		super();
 		setDate(d);
 		setRegion(region);
 		setBaseURL(baseURL);
 		setBounds(bounds);  // do extra string processing to set lowerleft and upperright
+		setCenter(center); 
+		setZoom(zoom);
 		setLanguage(language);
 		setContactName(contactName);
 		setContactEmail(contactEmail);
 	}
 	
 	public Server(String region, String baseURL, String bounds,
-			String language, String contactName, String contactEmail) {
+			String language, String contactName, String contactEmail, String center, String zoom) {
 		super();
 		setRegion(region);
 		setBaseURL(baseURL);
 		setBounds(bounds);  // do extra string processing to set lowerleft and upperright
+		setCenter(center);
+		setZoom(zoom);
 		setLanguage(language);
 		setContactName(contactName);
 		setContactEmail(contactEmail);
@@ -112,6 +138,30 @@ public class Server {
 
 	public void setBaseURL(String baseURL) {
 		this.baseURL = baseURL;
+	}
+	
+	public String getZoom() {
+		return zoom;
+	}
+
+	public void setZoom(String zoom) {
+		zoomSet = true;
+		this.zoom = zoom;
+
+		setInitialZoom(Float.parseFloat(zoom));
+	}
+
+	public String getCenter() {
+		return center;
+	}
+
+	public void setCenter(String center) {
+		centerSet = true;
+		this.center = center;
+		String[] tokens = center.split(",");
+
+		setCenterLatitude(Double.parseDouble(tokens[0]));
+		setCenterLongitude(Double.parseDouble(tokens[1]));
 	}
 
 	public String getBounds() {
@@ -238,23 +288,37 @@ public class Server {
 	 */
 	public double getRadius() {
 		float[] results = new float[3];
-		Location.distanceBetween(centerLatitude, centerLongitude, lowerLeftLatitude, lowerLeftLongitude, results);
+		Location.distanceBetween(geometricalCenterLatitude, geometricalCenterLongitude, lowerLeftLatitude, lowerLeftLongitude, results);
 		return results[0];
 	}
 
 	/**
-	 * @return the centerLatitude
+	 * @return the geometricalCenterLatitude
+	 */
+	public double getGeometricalCenterLatitude() {
+		geometricalCenterLatitude = (lowerLeftLatitude + upperRightLatitude)/2;
+		return geometricalCenterLatitude;
+	}
+
+	/**
+	 * @return the geometricalCenterLongitude
+	 */
+	public double getGeometricalCenterLongitude() {
+		geometricalCenterLongitude = (lowerLeftLongitude + upperRightLongitude)/2;
+		return geometricalCenterLongitude;
+	}
+	
+	/**
+	 * @return the geometricalCenterLatitude
 	 */
 	public double getCenterLatitude() {
-		centerLatitude = (lowerLeftLatitude + upperRightLatitude)/2;
 		return centerLatitude;
 	}
 
 	/**
-	 * @return the centerLongitude
+	 * @return the geometricalCenterLongitude
 	 */
 	public double getCenterLongitude() {
-		centerLongitude = (lowerLeftLongitude + upperRightLongitude)/2;
 		return centerLongitude;
 	}
 
@@ -271,4 +335,21 @@ public class Server {
 	public void setContactName(String contactName) {
 		this.contactName = contactName;
 	}
+
+	public void setCenterLatitude(double centerLatitude) {
+		this.centerLatitude = centerLatitude;
+	}
+
+	public void setCenterLongitude(double centerLongitude) {
+		this.centerLongitude = centerLongitude;
+	}
+
+	public float getInitialZoom() {
+		return initialZoom;
+	}
+
+	public void setInitialZoom(float initialZoom) {
+		this.initialZoom = initialZoom;
+	}
+	
 }

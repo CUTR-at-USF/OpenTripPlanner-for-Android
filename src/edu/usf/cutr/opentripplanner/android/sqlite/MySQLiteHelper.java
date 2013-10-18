@@ -34,6 +34,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 	public static final String COLUMN_REGION = "Region";
 	public static final String COLUMN_BASEURL = "BaseURL";
 	public static final String COLUMN_BOUNDS = "Bounds";
+	public static final String COLUMN_CENTER = "Center";
+	public static final String COLUMN_ZOOM = "Zoom";
 	public static final String COLUMN_LANGUAGE = "Language";
 	public static final String COLUMN_CONTACT_NAME = "ContactName";
 	public static final String COLUMN_CONTACT_EMAIL = "ContactEmail";
@@ -53,7 +55,9 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_BOUNDS + " TEXT NOT NULL, "
 			+ COLUMN_LANGUAGE + " TEXT NOT NULL, "
 			+ COLUMN_CONTACT_NAME + " TEXT NOT NULL, "
-			+ COLUMN_CONTACT_EMAIL + " TEXT NOT NULL"
+			+ COLUMN_CONTACT_EMAIL + " TEXT NOT NULL, "
+			+ COLUMN_CENTER + " TEXT NOT NULL, "
+			+ COLUMN_ZOOM + " TEXT NOT NULL"
 			+ ");";
 
 	private MySQLiteHelper(Context context) {

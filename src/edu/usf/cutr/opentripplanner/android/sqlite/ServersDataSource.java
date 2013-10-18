@@ -48,7 +48,9 @@ public class ServersDataSource {
 			MySQLiteHelper.COLUMN_BOUNDS,
 			MySQLiteHelper.COLUMN_LANGUAGE,
 			MySQLiteHelper.COLUMN_CONTACT_NAME,
-			MySQLiteHelper.COLUMN_CONTACT_EMAIL};
+			MySQLiteHelper.COLUMN_CONTACT_EMAIL,
+			MySQLiteHelper.COLUMN_CENTER,
+			MySQLiteHelper.COLUMN_ZOOM};
 
 	private static final String TAG = "OTP";
 	
@@ -83,6 +85,8 @@ public class ServersDataSource {
 		values.put(MySQLiteHelper.COLUMN_REGION, s.getRegion());
 		values.put(MySQLiteHelper.COLUMN_BASEURL, s.getBaseURL());
 		values.put(MySQLiteHelper.COLUMN_BOUNDS, s.getBounds());
+		values.put(MySQLiteHelper.COLUMN_CENTER, s.getCenter());
+		values.put(MySQLiteHelper.COLUMN_ZOOM, s.getZoom());
 		values.put(MySQLiteHelper.COLUMN_LANGUAGE, s.getLanguage());
 		values.put(MySQLiteHelper.COLUMN_CONTACT_NAME, s.getContactName());
 		values.put(MySQLiteHelper.COLUMN_CONTACT_EMAIL, s.getContactEmail());
@@ -189,6 +193,8 @@ public class ServersDataSource {
 		server.setLanguage(cursor.getString(5));
 		server.setContactName(cursor.getString(6));
 		server.setContactEmail(cursor.getString(7));
+		server.setCenter(cursor.getString(8));
+		server.setZoom(cursor.getString(9));
 		
 		Log.d(OTPApp.TAG, "Retrieved '" + server.getRegion() + "' server date from SQLLite - " + addedOn);
 		
