@@ -4,7 +4,8 @@
     <integer name="max_walking_distance">1600</integer>
     <integer name="connection_timeout">15000</integer>
     <integer name="socket_timeout">15000</integer>
-    <integer name="default_padding">192</integer>
+    <integer name="default_padding">140</integer>
+    <integer name="map_padding_margin">5</integer>
     <integer name="mode_icons_position_vertical_correction">-33</integer>
     <integer name="mode_icons_position_horizontal_correction">-1</integer>
     <integer name="tiles_maquest_max_zoom">18</integer>
