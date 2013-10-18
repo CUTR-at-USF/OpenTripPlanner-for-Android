@@ -465,9 +465,8 @@ public class MainFragment extends Fragment implements
 		
 		Server selectedServer = app.getSelectedServer();	
 		if (selectedServer != null){
-			LatLng serverCenter = new LatLng(selectedServer.getCenterLatitude(), selectedServer.getCenterLongitude());
 			if (!mapFailed){
-				mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, OTPApp.defaultInitialZoomLevel));			
+				mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(getServerCenter(selectedServer), getServerInitialZoom(selectedServer)));			
 			}
 		}
 
@@ -1992,10 +1991,9 @@ public class MainFragment extends Fragment implements
 					addBoundariesRectangle(s);
 
 					LatLng mCurrentLatLng = getLastLocation();
-					LatLng serverCenter = new LatLng(s.getCenterLatitude(), s.getCenterLongitude());
 					if (((mCurrentLatLng != null) && !LocationUtil.checkPointInBoundingBox(mCurrentLatLng, s, OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)) || (mCurrentLatLng == null)){
-						mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, OTPApp.defaultInitialZoomLevel));	
-						setMarker(true, serverCenter, false);
+						mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getServerCenter(s), getServerInitialZoom(s)));	
+						setMarker(true, getServerCenter(s), false);
 					}
 				}
 			}
@@ -2465,12 +2463,11 @@ public class MainFragment extends Fragment implements
 				LatLng mCurrentLatLng = getLastLocation();
 				
 				if ((mCurrentLatLng != null) && (LocationUtil.checkPointInBoundingBox(mCurrentLatLng, server, OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))){
-					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, OTPApp.defaultInitialZoomLevel));
+					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, getServerInitialZoom(server)));
 				}
 				else{
-					LatLng serverCenter = new LatLng(server.getCenterLatitude(), server.getCenterLongitude());
-					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, OTPApp.defaultInitialZoomLevel));
-					setMarker(true, serverCenter, false);
+					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getServerCenter(server), getServerInitialZoom(server)));
+					setMarker(true, getServerCenter(server), false);
 				}
 				
 				addBoundariesRectangle(server);
@@ -2664,16 +2661,14 @@ public class MainFragment extends Fragment implements
 			
 			addBoundariesRectangle(selectedServer);
 			
-			LatLng serverCenter = new LatLng(selectedServer.getCenterLatitude(), selectedServer.getCenterLongitude());
-			
 			LatLng mCurrentLatLng = getLastLocation();
 			
 			if ((mCurrentLatLng != null) && (LocationUtil.checkPointInBoundingBox(mCurrentLatLng, selectedServer, OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))){
-				mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, OTPApp.defaultInitialZoomLevel));
+				mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, getServerInitialZoom(selectedServer)));
 			}
 			else{
-				mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, OTPApp.defaultInitialZoomLevel));
-				setMarker(true, serverCenter, false);
+				mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getServerCenter(selectedServer), getServerInitialZoom(selectedServer)));
+				setMarker(true, getServerCenter(selectedServer), false);
 			}
 		}
 	}
@@ -2827,16 +2822,15 @@ public class MainFragment extends Fragment implements
 							Server selectedServer = app.getSelectedServer();	
 							if ((selectedServer != null) && selectedServer.areBoundsSet()){
 								if (LocationUtil.checkPointInBoundingBox(mCurrentLatLng, selectedServer, OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)){
-									mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, OTPApp.defaultInitialZoomLevel));
+									mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, getServerInitialZoom(selectedServer)));
 								}
 								else{
-									LatLng serverCenter = new LatLng(selectedServer.getCenterLatitude(), selectedServer.getCenterLongitude());
-									mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, OTPApp.defaultInitialZoomLevel));	
-									setMarker(true, serverCenter, false);
+									mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getServerCenter(selectedServer), getServerInitialZoom(selectedServer)));	
+									setMarker(true, getServerCenter(selectedServer), false);
 								}
 							}
 							else{
-								mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, OTPApp.defaultInitialZoomLevel));
+								mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, getServerInitialZoom(selectedServer)));
 							}
 						}
 					}
@@ -2861,12 +2855,11 @@ public class MainFragment extends Fragment implements
 		Server selectedServer = app.getSelectedServer();	
         
         if ((mCurrentLatLng != null) && (selectedServer != null) && (LocationUtil.checkPointInBoundingBox(mCurrentLatLng, selectedServer, OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))){
-			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, OTPApp.defaultInitialZoomLevel));
+			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, getServerInitialZoom(selectedServer)));
 		}
 		else if ((selectedServer != null) && selectedServer.areBoundsSet()){
-			LatLng serverCenter = new LatLng(selectedServer.getCenterLatitude(), selectedServer.getCenterLongitude());
-			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(serverCenter, OTPApp.defaultInitialZoomLevel));
-			setMarker(true, serverCenter, false);
+			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getServerCenter(selectedServer), getServerInitialZoom(selectedServer)));
+			setMarker(true, getServerCenter(selectedServer), false);
 		}
 
         /*
@@ -2895,6 +2888,24 @@ public class MainFragment extends Fragment implements
 						 .addAll(bounds)
 						 .color(Color.GRAY);
 		boundariesPolyline = mMap.addPolyline(boundariesPolylineOptions);
+	}
+	
+	public float getServerInitialZoom(Server s){
+		if (s.isZoomSet()){
+			return s.getInitialZoom();
+		}
+		else{
+			return OTPApp.defaultInitialZoomLevel;
+		}
+	}
+	
+	public LatLng getServerCenter(Server s){
+		if (s.isCenterSet()){
+			return new LatLng(s.getCenterLatitude(), s.getCenterLongitude());
+		}
+		else{
+			return new LatLng(s.getGeometricalCenterLatitude(), s.getGeometricalCenterLongitude());
+		}
 	}
 
 	@Override

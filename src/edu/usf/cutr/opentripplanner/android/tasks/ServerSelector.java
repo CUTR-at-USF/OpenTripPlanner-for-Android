@@ -204,7 +204,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements 
 				}
 				
 				
-				Server s = new Server(currentTime, e[0], e[1], e[2], e[3], e[4], e[5]);
+				Server s = new Server(currentTime, e[0], e[1], e[2], e[3], e[4], e[5], e[6], e[7]);
 				serverList.add(s);
 			}
 		} catch (IOException e) {

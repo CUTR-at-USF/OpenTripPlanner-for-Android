@@ -181,7 +181,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 		if(placesService.equals(context.getResources().getString(R.string.geocoder_google_places))) {
 			params.put(GooglePlaces.PARAM_NAME, name);
 			if (selectedServer != null) {
-				params.put(GooglePlaces.PARAM_LOCATION, Double.toString(selectedServer.getCenterLatitude()) + "," + Double.toString(selectedServer.getCenterLongitude()));
+				params.put(GooglePlaces.PARAM_LOCATION, Double.toString(selectedServer.getGeometricalCenterLatitude()) + "," + Double.toString(selectedServer.getGeometricalCenterLongitude()));
 				params.put(GooglePlaces.PARAM_RADIUS, Double.toString(selectedServer.getRadius()));
 			}
 			p = new GooglePlaces(getKeyFromResource());
