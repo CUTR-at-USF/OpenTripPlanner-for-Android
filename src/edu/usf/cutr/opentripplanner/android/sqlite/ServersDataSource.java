@@ -111,9 +111,12 @@ public class ServersDataSource {
 	
 	public Server getServer(Long id) {
 		Log.v(TAG, "Server deleted with id: " + id);
+		Server newServer = null;
+		
 		Cursor cursor = database.query(MySQLiteHelper.TABLE_SERVERS, allColumns, MySQLiteHelper.COLUMN_ID + " = " + id, null, null, null, null);
-		cursor.moveToFirst();
-		Server newServer = cursorToServer(cursor);
+		if (cursor.moveToFirst()){
+			newServer = cursorToServer(cursor);
+		}
 		cursor.close();
 		
 		return newServer;
