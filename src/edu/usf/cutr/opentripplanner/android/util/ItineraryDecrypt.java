@@ -137,8 +137,8 @@ public class ItineraryDecrypt {
 		Place fromPlace = leg.from;
 		Place toPlace = leg.to;
 		String mainDirectionText = action;
-		mainDirectionText += fromPlace.name==null ? "" : " " + applicationContext.getResources().getString(R.string.step_by_step_from) + " " + fromPlace.name;
-		mainDirectionText += toPlace.name==null ? "" : " " + applicationContext.getResources().getString(R.string.step_by_step_to) + " " + toPlace.name;
+		mainDirectionText += fromPlace.name==null ? "" : " " + applicationContext.getResources().getString(R.string.step_by_step_from) + " " + getLocalizedStreetName(fromPlace.name);
+		mainDirectionText += toPlace.name==null ? "" : " " + applicationContext.getResources().getString(R.string.step_by_step_to) + " " + getLocalizedStreetName(toPlace.name);
 		mainDirectionText += toPlace.stopId==null ? "" : " (" + toPlace.stopId.getAgencyId() + " " + toPlace.stopId.getId() + ")";
 //		double duration = DateTimeConversion.getDuration(leg.startTime, leg.endTime);
 		double totalDistance = leg.distance;
@@ -163,8 +163,10 @@ public class ItineraryDecrypt {
 			dir.setDistanceTraveled(distance);
 
 			RelativeDirection relativeDir = step.relativeDirection;
+			String relativeDirString = getLocalizedRelativeDir(relativeDir);
 			String streetName = step.streetName;
 			AbsoluteDirection absoluteDir = step.absoluteDirection;
+			String absoluteDirString = getLocalizedAbsoluteDir(absoluteDir);
 			String exit = step.exit;
 			boolean isStayOn = (step.stayOn==null ? false : step.stayOn);
 			boolean isBogusName = (step.bogusName==null ? false : step.bogusName);
@@ -176,7 +178,7 @@ public class ItineraryDecrypt {
 			// Walk East
 			if(relativeDir==null){
 				subDirectionText += action + " " + applicationContext.getResources().getString(R.string.step_by_step_heading) + " ";
-				subDirectionText += absoluteDir.name() + " ";
+				subDirectionText += absoluteDirString + " ";
 			}
 			// (Turn left)/(Continue) 
 			else {
@@ -190,9 +192,9 @@ public class ItineraryDecrypt {
 						subDirectionText += applicationContext.getResources().getString(R.string.step_by_step_turn) + " ";
 					}
 
-					subDirectionText += relativeDir.name() + " ";
+					subDirectionText += relativeDirString + " ";
 				} else {
-					subDirectionText += relativeDir.name() + " ";
+					subDirectionText += relativeDirString + " ";
 				}
 			}
 
@@ -200,9 +202,9 @@ public class ItineraryDecrypt {
 			//			if(!isBogusName) {
 			//				subDirectionText += "on "+ streetName + " ";
 			//			}
-
-			subDirectionText += applicationContext.getResources().getString(R.string.step_by_step_connector_street_name) + " "+ streetName + " ";
-
+			
+			subDirectionText += applicationContext.getResources().getString(R.string.step_by_step_connector_street_name) + " "+ getLocalizedStreetName(streetName) + " ";
+			
 			subDirectionText += "\n[" + String.format(OTPApp.FORMAT_DISTANCE_METERS_FULL, distance) + applicationContext.getResources().getString(R.string.distance_unit) + " ]";
 
 			dir.setDirectionText(subDirectionText);
@@ -216,6 +218,145 @@ public class ItineraryDecrypt {
 		direction.setSubDirections(subDirections);
 
 		return direction;
+	}
+	
+	// Dirty fix to avoid the presence of names for unnamed streets (as road, track, etc.) for other languages than English
+	private String getLocalizedStreetName(String streetName){
+		if (streetName != null){
+			if (streetName.equals("bike path")){
+				return applicationContext.getResources().getString(R.string.street_type_bike_path);
+	        }
+	        else if (streetName.equals("open area")){
+				return applicationContext.getResources().getString(R.string.street_type_open_area);
+	        }
+	        else if (streetName.equals("path")){
+				return applicationContext.getResources().getString(R.string.street_type_path);
+	        }
+	        else if (streetName.equals("bridleway")){
+				return applicationContext.getResources().getString(R.string.street_type_bridleway);
+	        }
+	        else if (streetName.equals("footpath")){
+				return applicationContext.getResources().getString(R.string.street_type_footpath);
+	        }
+	        else if (streetName.equals("platform")){
+				return applicationContext.getResources().getString(R.string.street_type_platform);
+	        }
+	        else if (streetName.equals("footbridge")){
+				return applicationContext.getResources().getString(R.string.street_type_footbridge);
+	        }
+	        else if (streetName.equals("underpass")){
+				return applicationContext.getResources().getString(R.string.street_type_underpass);
+	        }
+	        else if (streetName.equals("road")){
+				return applicationContext.getResources().getString(R.string.street_type_road);
+	        }
+	        else if (streetName.equals("ramp")){
+				return applicationContext.getResources().getString(R.string.street_type_ramp);
+	        }
+	        else if (streetName.equals("link")){
+				return applicationContext.getResources().getString(R.string.street_type_link);
+	        }
+	        else if (streetName.equals("service road")){
+				return applicationContext.getResources().getString(R.string.street_type_service_road);
+	        }
+	        else if (streetName.equals("alley")){
+				return applicationContext.getResources().getString(R.string.street_type_alley);
+	        }
+	        else if (streetName.equals("parking aisle")){
+				return applicationContext.getResources().getString(R.string.street_type_parking_aisle);
+	        }
+	        else if (streetName.equals("byway")){
+				return applicationContext.getResources().getString(R.string.street_type_byway);
+	        }
+	        else if (streetName.equals("track")){
+				return applicationContext.getResources().getString(R.string.street_type_track);
+	        }
+	        else if (streetName.equals("sidewalk")){
+				return applicationContext.getResources().getString(R.string.street_type_sidewalk);
+	        }
+	        else if (streetName.equals("steps")){
+				return applicationContext.getResources().getString(R.string.street_type_steps);
+	        }
+	        else{
+	        	return streetName;
+	        }
+		}
+        return null;
+	}
+	
+	private String getLocalizedRelativeDir(RelativeDirection relDir){
+		if (relDir != null){
+			if (relDir.equals(RelativeDirection.CIRCLE_CLOCKWISE)){
+				return applicationContext.getResources().getString(R.string.dir_relative_circle_clockwise);
+			}
+			else if (relDir.equals(RelativeDirection.CIRCLE_COUNTERCLOCKWISE)){
+				return applicationContext.getResources().getString(R.string.dir_relative_circle_counterclockwise);
+			}
+			else if (relDir.equals(RelativeDirection.CONTINUE)){
+				return applicationContext.getResources().getString(R.string.dir_relative_continue);
+			}
+			else if (relDir.equals(RelativeDirection.DEPART)){
+				return applicationContext.getResources().getString(R.string.dir_relative_depart);
+			}
+			else if (relDir.equals(RelativeDirection.ELEVATOR)){
+				return applicationContext.getResources().getString(R.string.dir_relative_elevator);
+			}
+			else if (relDir.equals(RelativeDirection.HARD_LEFT)){
+				return applicationContext.getResources().getString(R.string.dir_relative_hard_left);
+			}
+			else if (relDir.equals(RelativeDirection.HARD_RIGHT)){
+				return applicationContext.getResources().getString(R.string.dir_relative_hard_right);
+			}
+			else if (relDir.equals(RelativeDirection.LEFT)){
+				return applicationContext.getResources().getString(R.string.dir_relative_left);
+			}
+			else if (relDir.equals(RelativeDirection.RIGHT)){
+				return applicationContext.getResources().getString(R.string.dir_relative_right);
+			}
+			else if (relDir.equals(RelativeDirection.SLIGHTLY_LEFT)){
+				return applicationContext.getResources().getString(R.string.dir_relative_slightly_left);
+			}
+			else if (relDir.equals(RelativeDirection.SLIGHTLY_RIGHT)){
+				return applicationContext.getResources().getString(R.string.dir_relative_slightly_right);
+			}
+			else if (relDir.equals(RelativeDirection.UTURN_LEFT)){
+				return applicationContext.getResources().getString(R.string.dir_relative_uturn_left);
+			}
+			else if (relDir.equals(RelativeDirection.UTURN_RIGHT)){
+				return applicationContext.getResources().getString(R.string.dir_relative_uturn_right);
+			}
+		}
+		return null;
+	}
+	
+	private String getLocalizedAbsoluteDir(AbsoluteDirection absDir){
+		if (absDir != null){
+			if (absDir.equals(AbsoluteDirection.EAST)){
+				return applicationContext.getResources().getString(R.string.dir_absolute_east);
+			}
+			else if (absDir.equals(AbsoluteDirection.NORTH)){
+				return applicationContext.getResources().getString(R.string.dir_absolute_north);
+			}
+			else if (absDir.equals(AbsoluteDirection.NORTHEAST)){
+				return applicationContext.getResources().getString(R.string.dir_absolute_northeast);
+			}
+			else if (absDir.equals(AbsoluteDirection.NORTHWEST)){
+				return applicationContext.getResources().getString(R.string.dir_absolute_northwest);
+			}
+			else if (absDir.equals(AbsoluteDirection.SOUTH)){
+				return applicationContext.getResources().getString(R.string.dir_absolute_south);
+			}
+			else if (absDir.equals(AbsoluteDirection.SOUTHEAST)){
+				return applicationContext.getResources().getString(R.string.dir_absolute_southeast);
+			}
+			else if (absDir.equals(AbsoluteDirection.SOUTHWEST)){
+				return applicationContext.getResources().getString(R.string.dir_absolute_southwest);
+			}
+			else if (absDir.equals(AbsoluteDirection.WEST)){
+				return applicationContext.getResources().getString(R.string.dir_absolute_west);
+			}
+		}
+		return null;
 	}
 
 	private ArrayList<Direction> decryptTransit(Leg leg){
