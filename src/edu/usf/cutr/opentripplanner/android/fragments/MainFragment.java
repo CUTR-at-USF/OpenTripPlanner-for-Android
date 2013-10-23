@@ -335,10 +335,12 @@ public class MainFragment extends Fragment implements
 				DisplayMetrics metrics = MainFragment.this.getResources().getDisplayMetrics();
 				int windowHeight = metrics.heightPixels;
 				int paddingMargin = MainFragment.this.getResources().getInteger(R.integer.map_padding_margin);
-				mMap.setPadding(locationbtnHandle[0] + btnHandle.getWidth()/2 + paddingMargin,
-						locationtbEndLocation[1] + tbEndLocation.getHeight()/2 + paddingMargin,
-						0,
-						windowHeight - locationItinerarySelectionSpinner[1] + paddingMargin);
+				if (mMap != null){
+					mMap.setPadding(locationbtnHandle[0] + btnHandle.getWidth()/2 + paddingMargin,
+							locationtbEndLocation[1] + tbEndLocation.getHeight()/2 + paddingMargin,
+							0,
+							windowHeight - locationItinerarySelectionSpinner[1] + paddingMargin);
+				}
 		    } 
 		});
 				
