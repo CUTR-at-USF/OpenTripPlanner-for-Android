@@ -325,7 +325,7 @@ public class MainFragment extends Fragment implements
 		    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 			@Override 
 		    public void onGlobalLayout() { 
-		        mainView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+		        MainFragment.removeOnGlobalLayoutListener(mainView, this);
 				int locationtbEndLocation[] = new int[2];
 				tbEndLocation.getLocationInWindow(locationtbEndLocation);
 				int locationItinerarySelectionSpinner[] = new int[2];
