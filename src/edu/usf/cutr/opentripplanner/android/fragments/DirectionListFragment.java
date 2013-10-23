@@ -244,22 +244,23 @@ public class DirectionListFragment extends ExpandableListFragment {
 	 	Itinerary firstItinerary = fragmentListener.getCurrentItineraryList().get(fragmentListener.getCurrentItineraryIndex());
 		
 		int agencyTimeZoneOffset = 0;
+		long startTimeInSeconds = -1;
+		long endTimeInSeconds = -1;
 		
 		for (Leg leg : firstItinerary.legs){
+			if (startTimeInSeconds == -1){
+				startTimeInSeconds = Long.parseLong(leg.getStartTime());
+			}
 			if (leg.getAgencyTimeZoneOffset() != 0){
 				agencyTimeZoneOffset = leg.getAgencyTimeZoneOffset();
 			}
+			endTimeInSeconds = Long.parseLong(leg.getEndTime());
 		}
 		
-		Calendar calStart = firstItinerary.startTime;
-		calStart.setTimeZone(TimeZone.getTimeZone("GMT"));
 		
-		departureTimeHeader.setText(DateTimeConversion.getTimeWithContext(getActivity().getApplicationContext(), agencyTimeZoneOffset, calStart.getTimeInMillis(), false));
+		departureTimeHeader.setText(DateTimeConversion.getTimeWithContext(getActivity().getApplicationContext(), agencyTimeZoneOffset, startTimeInSeconds, false));
 		
-		Calendar calEnd = firstItinerary.endTime;
-		calEnd.setTimeZone(TimeZone.getTimeZone("GMT"));
-		
-		arrivalTimeHeader.setText(DateTimeConversion.getTimeWithContext(getActivity().getApplicationContext(), agencyTimeZoneOffset, calEnd.getTimeInMillis(), false));
+		arrivalTimeHeader.setText(DateTimeConversion.getTimeWithContext(getActivity().getApplicationContext(), agencyTimeZoneOffset, endTimeInSeconds, false));
 	}
 
 	@Override
