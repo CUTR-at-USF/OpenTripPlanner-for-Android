@@ -79,7 +79,7 @@ public class DirectionExpandableListAdapter extends BaseExpandableListAdapter {
     public TextView getGenericView() {
         // Layout parameters for the ExpandableListView
         AbsListView.LayoutParams lp = new AbsListView.LayoutParams(
-                ViewGroup.LayoutParams.FILL_PARENT, 64);
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
         TextView textView = new TextView(context);
         textView.setLayoutParams(lp);
