@@ -444,13 +444,14 @@ public class MainFragment extends Fragment implements
 				long serverId = prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0);
 				if (serverId != 0){
 					dataSource.open();
-					Server s = new Server(dataSource.getServer(prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)));
+					Server s = dataSource.getServer(prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0));
 					dataSource.close();
 					
-					setSelectedServer(s, false);
-					addBoundariesRectangle(s);
-					
-					Log.v(TAG, "Now using OTP server: " + s.getRegion());
+					if (s != null){
+						setSelectedServer(s, false);
+						addBoundariesRectangle(s);
+						Log.v(TAG, "Now using OTP server: " + s.getRegion());
+					}
 				}
 			}
 		}
