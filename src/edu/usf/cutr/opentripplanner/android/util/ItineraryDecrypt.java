@@ -277,7 +277,7 @@ public class ItineraryDecrypt {
 		// Get on HART BUS 6
 		String serviceName = agencyName;
 		if(serviceName==null)
-			serviceName = agencyId;
+			serviceName = "";
 
 		offDirectionText += applicationContext.getResources().getString(R.string.step_by_step_transit_get_off) + " " + serviceName + " " + mode + " " + route + "\n";
 		offDirectionText += applicationContext.getResources().getString(R.string.step_by_step_transit_connector_stop_name) + " " + to.name + " (" + agencyAndIdTo.getAgencyId() + " " + agencyAndIdTo.getId() + ")";
