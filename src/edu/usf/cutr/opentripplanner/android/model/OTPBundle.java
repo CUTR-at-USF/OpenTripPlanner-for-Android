@@ -37,6 +37,8 @@ public class OTPBundle implements Serializable{
 	private List<Leg> currentItinerary;
 	private List<Itinerary> itineraryList;
 	private int currentItineraryIndex;
+	private int currentStepIndex;
+	private boolean fromInfoWindow = false;
 	
 	public OTPBundle(){
 		
@@ -148,5 +150,17 @@ public class OTPBundle implements Serializable{
 	 */
 	public void setCurrentItineraryIndex(int currentItineraryIndex) {
 		this.currentItineraryIndex = currentItineraryIndex;
+	}
+	public int getCurrentStepIndex() {
+		return currentStepIndex;
+	}
+	public void setCurrentStepIndex(int currentStepIndex) {
+		this.currentStepIndex = currentStepIndex;
+	}
+	public boolean isFromInfoWindow() {
+		return fromInfoWindow;
+	}
+	public void setFromInfoWindow(boolean fromInfoWindow) {
+		this.fromInfoWindow = fromInfoWindow;
 	}
 }

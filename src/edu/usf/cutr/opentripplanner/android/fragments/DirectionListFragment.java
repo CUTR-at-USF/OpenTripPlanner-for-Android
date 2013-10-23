@@ -219,6 +219,13 @@ public class DirectionListFragment extends ExpandableListFragment {
 		
 		openIfNonTransit();
 		
+		if (savedInstanceState == null){
+			if (otpBundle.isFromInfoWindow()){
+				elv.expandGroup(otpBundle.getCurrentStepIndex());
+				elv.setSelectedGroup(otpBundle.getCurrentStepIndex());
+				otpBundle.setFromInfoWindow(false);
+			}
+		}
 	}
 	
 	private void openIfNonTransit(){

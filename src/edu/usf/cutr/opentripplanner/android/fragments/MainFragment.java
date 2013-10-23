@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.miscwidgets.widget.Panel;
 import org.opentripplanner.api.ws.GraphMetadata;
@@ -110,6 +112,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
@@ -1109,6 +1112,27 @@ public class MainFragment extends Fragment implements
 			}
 		};
 		btnHandle.setOnClickListener(oclH);
+		
+		OnInfoWindowClickListener omliwcl = new OnInfoWindowClickListener() {
+			
+			@Override
+			public void onInfoWindowClick(Marker modeMarker) {
+				saveOTPBundle();
+				OTPBundle otpBundle = getFragmentListener().getOTPBundle();
+				Matcher matcher = Pattern.compile("\\d+").matcher(modeMarker.getTitle());
+				if(matcher.find()){
+					String numberString = modeMarker.getTitle().substring(0, matcher.end());
+					//Step indexes shown to the user are in a scale starting by 1 but instructions steps internally start by 0
+					int currentStepIndex = Integer.parseInt(numberString) - 1;
+					otpBundle.setCurrentStepIndex(currentStepIndex);
+					otpBundle.setFromInfoWindow(true);
+					getFragmentListener().setOTPBundle(otpBundle);
+					getFragmentListener().onSwitchedToDirectionFragment();		
+				}
+							
+			}
+		};
+		mMap.setOnInfoWindowClickListener(omliwcl);
 	}
 	
 	
@@ -2342,8 +2366,10 @@ public class MainFragment extends Fragment implements
 
 
 			int agencyTimeZoneOffset = 0;
+			int stepIndex = 0;
 			
 			for (Leg leg : itinerary) {
+				stepIndex++;
 				
 				if (leg.getAgencyTimeZoneOffset() != 0){
 					agencyTimeZoneOffset = leg.getAgencyTimeZoneOffset();
@@ -2368,18 +2394,18 @@ public class MainFragment extends Fragment implements
 				if (traverseMode.isTransit()){
 
 					
-					modeMarkerOption.title(leg.getFrom().name + " " + DateTimeConversion.getTimeWithContext(applicationContext, agencyTimeZoneOffset, Long.parseLong(leg.getStartTime()), true));
+					modeMarkerOption.title(stepIndex + ". " + leg.getFrom().name + " " + DateTimeConversion.getTimeWithContext(applicationContext, agencyTimeZoneOffset, Long.parseLong(leg.getStartTime()), true));
 					if (leg.getHeadsign() != null){
 						modeMarkerOption.snippet(leg.getHeadsign());
 					}
 				}
 				else{
 					if (traverseMode.equals(TraverseMode.WALK)){
-						modeMarkerOption.title(getResources().getString(R.string.before_distance_walk)
+						modeMarkerOption.title(stepIndex + ". " + getResources().getString(R.string.before_distance_walk)
 								+ " " + getResources().getString(R.string.connector_destination) + " " + leg.getTo().name);
 					}
 					else if (traverseMode.equals(TraverseMode.BICYCLE)){
-						modeMarkerOption.title(getResources().getString(R.string.before_distance_bike)
+						modeMarkerOption.title(stepIndex + ". " + getResources().getString(R.string.before_distance_bike)
 								+ " " + getResources().getString(R.string.connector_destination) + " " + leg.getTo().name);
 					}
 					modeMarkerOption.snippet(DateTimeConversion.getFormattedDurationTextNoSeconds(leg.duration/1000, applicationContext) + " " + "-" + " " 
@@ -2391,6 +2417,9 @@ public class MainFragment extends Fragment implements
 				modeMarkers.add(modeMarker);
 				
 				if(traverseMode.isTransit()){
+					//because on transit two step-by-step indications are generated (get on / get off)
+					stepIndex++;
+					
 					if (firstTransitMarker == null){
 						firstTransitMarker = modeMarker;
 					}
