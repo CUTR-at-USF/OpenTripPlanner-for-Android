@@ -278,13 +278,8 @@ public class MainFragment extends Fragment implements
 
 	private boolean isRealLostFocus = true;
 	
-	private boolean restoredSavedState = false;
-
 	public static final String TAG = "OTP";
-	
-	private float bearing = 0;
-	private float tilt = 0;
-	
+
 	private float maxZoomLevel;
 	
 	private Date tripDate;
@@ -388,6 +383,7 @@ public class MainFragment extends Fragment implements
 	}
 	
 	
+	@SuppressWarnings("deprecation")
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	private static void removeOnGlobalLayoutListener(View v, ViewTreeObserver.OnGlobalLayoutListener listener){
 	    if (Build.VERSION.SDK_INT < 16) {
@@ -843,16 +839,6 @@ public class MainFragment extends Fragment implements
 		} else {
 			panelDisplayDirection.setVisibility(View.VISIBLE);
 		}
-
-		
-		OnClickListener oclCompass = new OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				CameraPosition oldCameraPosition = mMap.getCameraPosition();
-				CameraPosition newCameraPosition = new CameraPosition(oldCameraPosition.target, oldCameraPosition.zoom, 0, 0);
-				mMap.animateCamera(CameraUpdateFactory.newCameraPosition(newCameraPosition));
-			}
-		};
 		
 		OnClickListener oclMyLocation = new OnClickListener() {
 			@Override
@@ -1176,7 +1162,6 @@ public class MainFragment extends Fragment implements
 					updateOverlay(overlayString);
 	    		}
 				
-				restoredSavedState = true;
 				setTextBoxLocation(savedInstanceState.getString(OTPApp.BUNDLE_KEY_TB_START_LOCATION), true);
 				setTextBoxLocation(savedInstanceState.getString(OTPApp.BUNDLE_KEY_TB_END_LOCATION), false);
 				CameraPosition camPosition = savedInstanceState.getParcelable(OTPApp.BUNDLE_KEY_MAP_CAMERA);
@@ -1244,9 +1229,6 @@ public class MainFragment extends Fragment implements
 				isStartLocationChangedByUser = false;
 				isEndLocationChangedByUser = false;
 			}
-		}
-		else{
-			restoredSavedState = false;
 		}
 	}
 	
