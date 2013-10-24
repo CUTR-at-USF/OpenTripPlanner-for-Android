@@ -213,7 +213,10 @@ public class MainFragment extends Fragment implements
 	private boolean isStartLocationChangedByUser = true;
 	private boolean isEndLocationChangedByUser = true;
 	
-	private boolean requestTripAfterGeocoding = false;
+	private boolean requestTripAfterStartGeocoding = false;
+	private boolean requestTripAfterEndGeocoding = false;
+	private boolean requestTripAfterStartEndGeocoding = false;
+	private boolean geocodingBeenRequested = false;
 	
 	private Context applicationContext;
 	
@@ -696,15 +699,7 @@ public class MainFragment extends Fragment implements
 
 			@Override
 			public void onClick(View v) {
-				isRealLostFocus = false;
-				if (!isEndLocationGeocodingProcessed
-						&& !prefs.getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, true)){
-					processAddress(false, tbEndLocation.getText().toString(), false);
-					requestTripAfterGeocoding = true;
-				}
-				else{
-					requestTrip();
-				}
+				processRequestTrip();
 			}
 		});
 		
@@ -811,6 +806,7 @@ public class MainFragment extends Fragment implements
 							isRealLostFocus = false;
 							if (!isStartLocationGeocodingProcessed
 									&& !prefs.getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true)){
+								geocodingBeenRequested = true;
 								processAddress(true, v.getText().toString(), false);
 							}
 						}
@@ -819,15 +815,7 @@ public class MainFragment extends Fragment implements
 						|| (event != null
 								&& event.getAction() == KeyEvent.ACTION_DOWN && event
 								.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
-							isRealLostFocus = false;
-							if (!isEndLocationGeocodingProcessed
-									&& !prefs.getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, true)){
-								processAddress(false, v.getText().toString(), false);
-								requestTripAfterGeocoding = true;
-							}
-							else{
-								requestTrip();
-							}
+							processRequestTrip();
 						}
 				}
 				return false;
@@ -983,6 +971,43 @@ public class MainFragment extends Fragment implements
 	    });
 		
 		bikeTriangleParameters.setOnRangeSeekBarChangeListener(this);
+	}
+	
+	/**
+	 * Wrapper to call request trip, triggering geocoding processes if it's
+	 * necessary.
+	 */
+	private void processRequestTrip(){
+		isRealLostFocus = false;
+		if (!isEndLocationGeocodingProcessed
+				&& !prefs.getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, true)
+				&& !geocodingBeenRequested){
+			requestTripAfterEndGeocoding = true;
+			geocodingBeenRequested = true;
+			processAddress(false, tbEndLocation.getText().toString(), false);
+		}
+		else if (!isStartLocationGeocodingProcessed
+				&& !prefs.getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true)
+				&& !geocodingBeenRequested){
+			requestTripAfterStartGeocoding = true;
+			geocodingBeenRequested = true;
+			processAddress(true, tbStartLocation.getText().toString(), false);
+		}
+		else if (!isStartLocationGeocodingProcessed
+				&& !prefs.getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true)
+				&& !isEndLocationGeocodingProcessed
+				&& !prefs.getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, true)
+				&& !geocodingBeenRequested){
+			requestTripAfterStartGeocoding = true;
+			requestTripAfterEndGeocoding = true;
+			requestTripAfterStartEndGeocoding = true;
+			geocodingBeenRequested = true;
+			processAddress(true, tbStartLocation.getText().toString(), false);
+			processAddress(false, tbEndLocation.getText().toString(), false);
+		}
+		else{
+			requestTrip();
+		}	
 	}
 	
 	/**
@@ -2596,10 +2621,8 @@ public class MainFragment extends Fragment implements
 					else{
 						moveMarker(isStartTextbox, addressesReturn.get(0));
 					}
-					if (requestTripAfterGeocoding){
-						requestTripAfterGeocoding = false;
-						requestTrip();
-					}
+					geocodingBeenRequested = false;
+					requestTripAfterGeocoding();
 					return;
 				}
 			
@@ -2623,11 +2646,8 @@ public class MainFragment extends Fragment implements
 								Address addr = addressesTemp.get(item);
 								moveMarker(isStartTextbox, addr);
 								Log.v(TAG, "Chosen: " + addressesText[item]);
-								
-								if (requestTripAfterGeocoding){
-									requestTripAfterGeocoding = false;
-									requestTrip();
-								}
+								geocodingBeenRequested = false;
+								MainFragment.this.requestTripAfterGeocoding();
 							}
 						});
 				AlertDialog alertGeocoder = geocoderSelector.create();
@@ -2635,6 +2655,31 @@ public class MainFragment extends Fragment implements
 			}catch(Exception e){
 				Log.e(TAG, "Error in Main Fragment Geocoding callback: " + e);
 			}
+		}
+	}
+	
+	/**
+	 * Checks if a trip was requested, and requested geocoding done.
+	 * <p>
+	 * If it's necessary request will be processed and control variables
+	 * restarted.
+	 */
+	private void requestTripAfterGeocoding(){
+		if (requestTripAfterStartGeocoding){
+			requestTripAfterStartGeocoding = false;
+			if (!requestTripAfterStartEndGeocoding){
+				requestTrip();
+			}
+		}
+		else if (requestTripAfterEndGeocoding){
+			requestTripAfterEndGeocoding = false;
+			if (!requestTripAfterStartEndGeocoding){
+				requestTrip();
+			}		
+		}
+		else if (requestTripAfterStartEndGeocoding){
+			requestTripAfterStartEndGeocoding = false;
+			requestTrip();
 		}
 	}
 
