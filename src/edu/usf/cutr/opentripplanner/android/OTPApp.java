@@ -38,7 +38,8 @@ public class OTPApp extends Application {
 	public static final String URL_ENCODING = "UTF-8";
 	
 	public static final String REFRESH_SERVER_RETURN_KEY = "RefreshServer";
-	public static final String NEW_CUSTOM_SERVER_RETURN_KEY = "NewCustomServer";
+	public static final String CHANGED_SELECTED_CUSTOM_SERVER_RETURN_KEY = "ChangedSelectedCustomServer";
+	public static final String CHANGED_MAP_TILE_PROVIDER_RETURN_KEY = "ChangedMapTileProvider";
 
 	public static final String TAG_FRAGMENT_MAIN_FRAGMENT = "mainFragment";
 	public static final String TAG_FRAGMENT_DATE_TIME_DIALOG = "dateTimeDialog";
@@ -105,6 +106,7 @@ public class OTPApp extends Application {
     public static final String BUNDLE_KEY_TIMEPICKER_SAVED_HOUR = "timepicker hours";
     public static final String BUNDLE_KEY_TIMEPICKER_SAVED_MINUTE = "timepicker minutes";
 
+    public static final String BUNDLE_KEY_SETTINGS_INTENT = "timepicker minutes";
     
     public static final int COLOR_ROUTE_LINE = 0x7F0000FF;
 

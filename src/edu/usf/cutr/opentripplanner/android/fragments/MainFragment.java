@@ -48,13 +48,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.LevelListDrawable;
 import android.location.Address;
 import android.location.Location;
 import android.location.LocationManager;
@@ -68,7 +65,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.DrawerLayout.DrawerListener;
-import android.text.BoringLayout.Metrics;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -164,7 +160,7 @@ import edu.usf.cutr.opentripplanner.android.util.RightDrawableOnTouchListener;
  */
 
 public class MainFragment extends Fragment implements
-		OnSharedPreferenceChangeListener, ServerSelectorCompleteListener,
+		ServerSelectorCompleteListener,
 		TripRequestCompleteListener, MetadataRequestCompleteListener,
 		OTPGeocodingListener, LocationListener,
 		DateCompleteListener, OnRangeSeekBarChangeListener<Double>,
@@ -411,7 +407,6 @@ public class MainFragment extends Fragment implements
 		
 		prefs = PreferenceManager.getDefaultSharedPreferences(
 				applicationContext);
-		prefs.registerOnSharedPreferenceChangeListener(this);
 		
 		locationManager = (LocationManager) getActivity()
 				.getSystemService(Context.LOCATION_SERVICE);
@@ -1995,57 +1990,38 @@ public class MainFragment extends Fragment implements
 		super.onDestroy();
 	}
 
-	@Override
-	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
-			String key) {
-		if ((key == null) || (mMap == null)) {
-			return;
+	
+	public void updateSelectedServer(){
+		if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)){
+			setSelectedServer(new Server(prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""), applicationContext), true);
+			Log.v(TAG, "Now using custom OTP server: " + prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
+			WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
+
+			MetadataRequest metaRequest = new MetadataRequest(weakContext, applicationContext, this);
+			metaRequest.execute(prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
 		}
-		Log.v(TAG, "A preference was changed: " + key);
-		if (key.equals(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE)) {
-			String overlayString = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, applicationContext.getResources().getString(R.string.map_tiles_default_server));
-			updateOverlay(overlayString);
-		} else if (key.equals(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER)) {
-			if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)){
-				setSelectedServer(new Server(prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""), applicationContext), true);
-				Log.v(TAG, "Now using custom OTP server: " + prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
-				WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
+		else{
+			long serverId = prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0);
+			if (serverId != 0){
+				ServersDataSource dataSource = ServersDataSource.getInstance(applicationContext);
+				dataSource.open();
+				Server s = new Server(dataSource.getServer(prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)));
+				dataSource.close();
+				
+				setSelectedServer(s, true);
+				addBoundariesRectangle(s);
 
-				MetadataRequest metaRequest = new MetadataRequest(weakContext, applicationContext, this);
-				metaRequest.execute(prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
-			}
-			else{
-				long serverId = prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0);
-				if (serverId != 0){
-					ServersDataSource dataSource = ServersDataSource.getInstance(applicationContext);
-					dataSource.open();
-					Server s = new Server(dataSource.getServer(prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)));
-					dataSource.close();
-					
-					setSelectedServer(s, true);
-					addBoundariesRectangle(s);
-
-					LatLng mCurrentLatLng = getLastLocation();
-					if (((mCurrentLatLng != null) && !LocationUtil.checkPointInBoundingBox(mCurrentLatLng, s, OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)) || (mCurrentLatLng == null)){
-						mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getServerCenter(s), getServerInitialZoom(s)));	
-						setMarker(true, getServerCenter(s), false);
-					}
+				LatLng mCurrentLatLng = getLastLocation();
+				
+				if ((mCurrentLatLng != null) && (LocationUtil.checkPointInBoundingBox(mCurrentLatLng, s, OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))){
+					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, getServerInitialZoom(s)));
+				}
+				else{
+					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getServerCenter(s), getServerInitialZoom(s)));
+					setMarker(true, getServerCenter(s), false);
 				}
 			}
-			
-		} else if (key.equals(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER)) {
-			Log.v(TAG, "Detected change in auto-detect server preference. Value is now: " + prefs.getBoolean(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER, true));
-
 		}
-	}
-	
-	public void updateCustomServer(){
-		setSelectedServer(new Server(prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""), applicationContext), true);
-		Log.v(TAG, "Now using custom OTP server: " + prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
-		WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
-
-		MetadataRequest metaRequest = new MetadataRequest(weakContext, applicationContext, this);
-		metaRequest.execute(prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
 	}
 
 	@Override
@@ -2497,21 +2473,7 @@ public class MainFragment extends Fragment implements
 		//Update application server
 		if (getActivity() != null){
 			setSelectedServer(server, true);
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext);
-			
-			if (!prefs.getBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)){		
-				LatLng mCurrentLatLng = getLastLocation();
-				
-				if ((mCurrentLatLng != null) && (LocationUtil.checkPointInBoundingBox(mCurrentLatLng, server, OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))){
-					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, getServerInitialZoom(server)));
-				}
-				else{
-					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getServerCenter(server), getServerInitialZoom(server)));
-					setMarker(true, getServerCenter(server), false);
-				}
-				
-				addBoundariesRectangle(server);
-			}
+			updateSelectedServer();
 		}
 	}
 
@@ -2719,7 +2681,10 @@ public class MainFragment extends Fragment implements
 	 * @param overlayString tiles URL for custom tiles or description for
 	 * Google ones
 	 */
-	private void updateOverlay(String overlayString){
+	public void updateOverlay(String overlayString){
+		if (overlayString == null){
+			overlayString = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, applicationContext.getResources().getString(R.string.map_tiles_default_server));
+		}
 		if (actualTileOverlay != null){
 			actualTileOverlay.remove();
 		}
