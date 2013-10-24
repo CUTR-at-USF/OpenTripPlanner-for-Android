@@ -57,10 +57,20 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 	private EditTextPreference maxWalkingDistance;
 	
 	private final String TAG = "OTP";
+	
+	private Intent returnIntent;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		returnIntent = new Intent();
+
+		if (savedInstanceState != null){
+			if ((returnIntent = savedInstanceState.getParcelable(OTPApp.BUNDLE_KEY_SETTINGS_INTENT)) != null){
+				setResult(RESULT_OK, returnIntent);
+			}
+		}
 		
 		addPreferencesFromResource(R.xml.preferences);
 
@@ -156,6 +166,10 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
 				String value = (String) newValue;
 				
+				
+				returnIntent.putExtra(OTPApp.CHANGED_MAP_TILE_PROVIDER_RETURN_KEY, true);
+				setResult(RESULT_OK, returnIntent);
+				
 				if (value.equals(getResources().getString(R.string.tiles_mapnik))){
 					mapTileProvider.setSummary(getResources().getString(R.string.mapnik));
 				}
@@ -231,7 +245,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 				
 				customServerURL.setSummary(getResources().getString(R.string.custom_server_url_error));
 						
-				Intent returnIntent = new Intent();
+				
 				setResult(RESULT_OK, returnIntent);
 				return false;
 			}
@@ -251,7 +265,8 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 				}
 				
 				Log.v(TAG, "Custom server Button clicked");
-				Intent returnIntent = new Intent();
+				
+				returnIntent.putExtra(OTPApp.CHANGED_SELECTED_CUSTOM_SERVER_RETURN_KEY, true);
 				setResult(RESULT_OK, returnIntent);
 				
 				return true;
@@ -321,7 +336,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 			@Override
 			public boolean onPreferenceClick(Preference arg0) {
 				Log.v(TAG, "Server Refresh Button clicked");
-				Intent returnIntent = new Intent();
+				
 				returnIntent.putExtra(OTPApp.REFRESH_SERVER_RETURN_KEY, true);
 				setResult(RESULT_OK, returnIntent);
 				finish();
@@ -338,12 +353,9 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 		SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
 		if (isWorking){
 			selectedCustomServer.setEnabled(true);
-			if (selectedCustomServer.isChecked()){
-				prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, true);
-				Intent returnIntent = new Intent();
-				returnIntent.putExtra(OTPApp.NEW_CUSTOM_SERVER_RETURN_KEY, true);
-				setResult(RESULT_OK, returnIntent);
-			}
+			selectedCustomServer.setChecked(true);
+			returnIntent.putExtra(OTPApp.CHANGED_SELECTED_CUSTOM_SERVER_RETURN_KEY, true);
+			setResult(RESULT_OK, returnIntent);
 			customServerURL.setSummary(getResources().getString(R.string.custom_server_url_description));
 			prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, true);
 		}
@@ -358,4 +370,16 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 		
 		prefsEditor.commit();
 	}
+
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		
+		if (returnIntent != null){
+			outState.putParcelable(OTPApp.BUNDLE_KEY_SETTINGS_INTENT, returnIntent);
+		}
+	}
+	
+	
 }

@@ -101,15 +101,19 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 		case OTPApp.SETTINGS_REQUEST_CODE: 
 			if (resultCode == RESULT_OK) {
 				boolean shouldRefresh = data.getBooleanExtra(OTPApp.REFRESH_SERVER_RETURN_KEY, false);
-				boolean newCustomServer = data.getBooleanExtra(OTPApp.NEW_CUSTOM_SERVER_RETURN_KEY, false);
+				boolean changedSelectedCustomServer = data.getBooleanExtra(OTPApp.CHANGED_SELECTED_CUSTOM_SERVER_RETURN_KEY, false);
+				boolean changedTileProvider = data.getBooleanExtra(OTPApp.CHANGED_MAP_TILE_PROVIDER_RETURN_KEY, false);
 
 				//				Toast.makeText(this, "Should server list refresh? " + shouldRefresh, Toast.LENGTH_LONG).show();
 				if(shouldRefresh){
 					mainFragment.setNeedToRunAutoDetect(true);
 					mainFragment.setNeedToUpdateServersList(true);
 				}
-				if(newCustomServer){
-					mainFragment.updateCustomServer();
+				if(changedSelectedCustomServer){
+					mainFragment.updateSelectedServer();
+				}
+				if(changedTileProvider){
+					mainFragment.updateOverlay(null);
 				}
 				break;
 			}
