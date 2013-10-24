@@ -127,6 +127,8 @@ public class MetadataRequest extends AsyncTask<String, Integer, GraphMetadata> {
 
 			urlConnection = (HttpURLConnection) url.openConnection();
 			urlConnection.setRequestProperty("Accept", "application/json");
+			urlConnection.setConnectTimeout(context.getResources().getInteger(R.integer.connection_timeout));
+			urlConnection.setReadTimeout(context.getResources().getInteger(R.integer.socket_timeout));
 
 			// plan = serializer.read(Response.class, result);
 			plan = mapper.readValue(urlConnection.getInputStream(),
