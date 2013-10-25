@@ -145,7 +145,7 @@ public class OTPApp extends Application {
     public static final String FORMAT_DISTANCE_METERS_FULL = "%.2f";
     public static final String FORMAT_OTP_SERVER_DATE_RESPONSE = "yyyy-MM-dd\'T\'HH:mm:ssZZ";
 	public static final String FORMAT_OTP_SERVER_DATE_QUERY = "MM/dd/yy";
-	public static final String FORMAT_OTP_SERVER_TIME_QUERY = "hh:mmaa";
+	public static final String FORMAT_OTP_SERVER_TIME_QUERY = "kk:mm";
 
 
 	/**
