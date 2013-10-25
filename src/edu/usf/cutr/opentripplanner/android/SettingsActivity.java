@@ -352,6 +352,8 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 	public void onServerCheckerComplete(String result, boolean isWorking) {
 		SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
 		if (isWorking){
+			autoDetectServer.setChecked(false);
+			autoDetectServer.setEnabled(false);
 			selectedCustomServer.setEnabled(true);
 			selectedCustomServer.setChecked(true);
 			returnIntent.putExtra(OTPApp.CHANGED_SELECTED_CUSTOM_SERVER_RETURN_KEY, true);
