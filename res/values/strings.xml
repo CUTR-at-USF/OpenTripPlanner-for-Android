@@ -36,7 +36,7 @@
     <string name="start_location_hint">Start location</string>
     <string name="end_location_hint">End location</string>
     <string name="textbox_close_to_marker">Marker, close to</string>
-    <string name="metadata_request_successful">Metadata dowloaded correctly</string>
+    <string name="metadata_request_successful">Metadata downloaded correctly</string>
     <string name="metadata_request_progress">Getting graph metadata. Please wait...</string>
     <string name="geocoding_request_progress">Processing geocoding. Please wait...</string>
     <string name="server_checker_progress">Getting server info. Please wait...</string>
@@ -55,7 +55,7 @@
     <string name="server_selector_server_info_dialog_title">Choose OpenTripPlanner Server</string>
     <string name="server_selector_custom_server_alert_title">Enter a custom OTP server domain</string>
     <string name="custom_server_name">Custom server</string>
-    <string name="custom_server_not_set">"Cumstom server not set: incorrect URL"</string>
+    <string name="custom_server_not_set">"Custom server not set: incorrect URL"</string>
     <string name="custom_server_unknown_region">Unknown</string>
     <string name="custom_server_unknown_bounds">Unknown</string>
     <string name="custom_server_unknown_language">Unknown</string>
