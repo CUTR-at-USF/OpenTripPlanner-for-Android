@@ -26,6 +26,7 @@ import java.util.ArrayList;
 public class Direction {
 	
 	private int icon;
+	private int directionIndex;
     private String directionText;
     private ArrayList<Direction> subDirections = null;
     private double distanceTraveled;
@@ -95,6 +96,14 @@ public class Direction {
 	 */
 	public void setSubDirections(ArrayList<Direction> subDirections) {
 		this.subDirections = subDirections;
+	}
+
+	public int getDirectionIndex() {
+		return directionIndex;
+	}
+
+	public void setDirectionIndex(int directionIndex) {
+		this.directionIndex = directionIndex;
 	}
 
 }

@@ -16,9 +16,10 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="edu.usf.cutr.opentripplanner.android"
-    android:versionCode="7"
-    android:versionName="2.0.0" >
-    <uses-sdk android:minSdkVersion="8" />
+    android:versionCode="8"
+    android:versionName="2.0.1" >
+    <uses-sdk android:minSdkVersion="8" 
+              android:targetSdkVersion="16"/>
     
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -49,12 +50,13 @@
     <application
         android:name=".OTPApp"  
         android:icon="@drawable/ic_launcher_opentripplanner"
-        android:label="@string/app_name">
+        android:label="@string/app_name"
+        android:allowBackup="true">
         <activity
             android:name=".MyActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
-            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+        	android:theme="@style/MyTheme"
             android:windowSoftInputMode="stateHidden" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -63,11 +65,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".SettingsActivity" 
-        	android:theme="@android:style/Theme.Holo.Light.NoActionBar"
-        	android:windowSoftInputMode="stateHidden"/>
-        <activity android:name=".DirectionActivity" 
-            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
-            android:windowSoftInputMode="stateHidden">
+        	android:theme="@style/MyTheme"
+        	android:windowSoftInputMode="stateHidden" >
         </activity>
 
         <service android:name=".NavigationService" />
