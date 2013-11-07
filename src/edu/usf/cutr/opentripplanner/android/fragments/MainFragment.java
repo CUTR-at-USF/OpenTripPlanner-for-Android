@@ -2832,49 +2832,71 @@ public class MainFragment extends Fragment implements
 				LatLng mCurrentLatLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
 				
 				Location.distanceBetween(savedLatitude, savedLongitude, mCurrentLatLng.latitude, mCurrentLatLng.longitude, distance);
-		
-				if (needToRunAutoDetect){
+				
+				if (!checkServersAreUpdated()){
 					runAutoDetectServer(mCurrentLatLng);
 				}
-				else if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER, true)) {
-					
-					if ((app.getSelectedServer() != null) 
-							&& (!LocationUtil.checkPointInBoundingBox(mCurrentLatLng, app.getSelectedServer(), OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))
-							&& (((savedLastLocationCheckedForServer != null) && (distance[0] > OTPApp.COORDINATES_IMPORTANT_DIFFERENCE)) 
-									|| (savedLastLocationCheckedForServer == null))){
+				else{
+					if (needToRunAutoDetect){
 						runAutoDetectServer(mCurrentLatLng);
 					}
-					else if (app.getSelectedServer() == null){
-						runAutoDetectServer(mCurrentLatLng);
+					else if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER, true)) {
+						
+						if ((app.getSelectedServer() != null) 
+								&& (!LocationUtil.checkPointInBoundingBox(mCurrentLatLng, app.getSelectedServer(), OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))
+								&& (((savedLastLocationCheckedForServer != null) && (distance[0] > OTPApp.COORDINATES_IMPORTANT_DIFFERENCE)) 
+										|| (savedLastLocationCheckedForServer == null))){
+							runAutoDetectServer(mCurrentLatLng);
+						}
+						else if (app.getSelectedServer() == null){
+							runAutoDetectServer(mCurrentLatLng);
+						}
 					}
-				}
-				else {
-					if (mCurrentLatLng != null){
-						if (appStarts){
-							Server selectedServer = app.getSelectedServer();	
-							if ((selectedServer != null) && selectedServer.areBoundsSet()){
-								if (LocationUtil.checkPointInBoundingBox(mCurrentLatLng, selectedServer, OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)){
-									mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, getServerInitialZoom(selectedServer)));
+					else {
+						if (mCurrentLatLng != null){
+							if (appStarts){
+								Server selectedServer = app.getSelectedServer();	
+								if ((selectedServer != null) && selectedServer.areBoundsSet()){
+									if (LocationUtil.checkPointInBoundingBox(mCurrentLatLng, selectedServer, OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)){
+										mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, getServerInitialZoom(selectedServer)));
+									}
+									else{
+										mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getServerCenter(selectedServer), getServerInitialZoom(selectedServer)));	
+										setMarker(true, getServerCenter(selectedServer), false);
+									}
 								}
 								else{
-									mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getServerCenter(selectedServer), getServerInitialZoom(selectedServer)));	
-									setMarker(true, getServerCenter(selectedServer), false);
+									mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, getServerInitialZoom(selectedServer)));
 								}
-							}
-							else{
-								mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, getServerInitialZoom(selectedServer)));
 							}
 						}
 					}
+			
+					appStarts = false;
 				}
-		
-				appStarts = false;
 			}
 			else if (app.getSelectedServer() == null){
 				runAutoDetectServerNoLocation();
 			}
 		}
 	        
+	}
+	
+	private boolean checkServersAreUpdated(){
+		ServersDataSource dataSource = ServersDataSource.getInstance(applicationContext);
+		dataSource.open();
+		boolean result;
+		Calendar threeDaysBefore = Calendar.getInstance();
+		threeDaysBefore.add(Calendar.DAY_OF_MONTH, -3);
+		if (threeDaysBefore.getTime().getTime() > dataSource.getMostRecentDate()){
+			result = false;
+		}
+		else{
+			result = true;
+		}
+		dataSource.close();
+		
+		return result;
 	}
 
 	@Override

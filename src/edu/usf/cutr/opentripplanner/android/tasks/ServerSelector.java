@@ -170,6 +170,14 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements 
 		}
 		Log.v(TAG, shown);
 		dataSource.close();
+		
+		dataSource.open();
+		Calendar threeDaysBefore = Calendar.getInstance();
+		threeDaysBefore.add(Calendar.DAY_OF_MONTH, -3);
+		if (threeDaysBefore.getTime().getTime() > dataSource.getMostRecentDate()){
+			servers = null;
+		}
+		dataSource.close();
 //		Toast.makeText(activity.getApplicationContext(), shown, Toast.LENGTH_SHORT).show();
 		
 		return servers;
