@@ -143,7 +143,7 @@ public class DirectionExpandableListAdapter extends BaseExpandableListAdapter {
         }
         
         Direction dir = data[groupPosition];
-        holder.txtDirection.setText(dir.getDirectionText());
+        holder.txtDirection.setText(dir.getDirectionIndex() + ". " + dir.getDirectionText());
         holder.imgIcon.setImageResource(dir.getIcon());
         
         return row;
