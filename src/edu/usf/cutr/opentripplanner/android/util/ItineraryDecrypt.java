@@ -82,7 +82,9 @@ public class ItineraryDecrypt {
 	}
 
 	private void convertToDirectionList(){
+		int index = 0;
 		for(Leg leg: legs){
+			index++;
 			setTotalDistance(getTotalDistance() + leg.distance);
 
 			TraverseMode traverseMode = TraverseMode.valueOf((String) leg.mode);
@@ -91,6 +93,7 @@ public class ItineraryDecrypt {
 				if(dir == null){
 					continue;
 				}
+				dir.setDirectionIndex(index);
 				addDirection(dir);
 			} else{
 				ArrayList<Direction> directions = decryptTransit(leg);
@@ -99,10 +102,15 @@ public class ItineraryDecrypt {
 				}
 
 				if(directions.get(0)!=null){
+					directions.get(0).setDirectionIndex(index);
 					addDirection(directions.get(0));
 				}
 
 				if(directions.get(1)!=null){
+					if (directions.get(0)!=null){
+						index++;
+					}
+					directions.get(1).setDirectionIndex(index);
 					addDirection(directions.get(1));
 				}
 			}
