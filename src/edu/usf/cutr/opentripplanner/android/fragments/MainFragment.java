@@ -2885,10 +2885,10 @@ public class MainFragment extends Fragment implements
 		ServersDataSource dataSource = ServersDataSource.getInstance(applicationContext);
 		dataSource.open();
 		boolean result;
-		Calendar threeDaysBefore = Calendar.getInstance();
-		threeDaysBefore.add(Calendar.DAY_OF_MONTH, -3);
+		Calendar someDaysBefore = Calendar.getInstance();
+		someDaysBefore.add(Calendar.DAY_OF_MONTH, - OTPApp.EXPIRATION_DAYS_FOR_SERVER_LIST);
 		Long serversUpdateDate = dataSource.getMostRecentDate();
-		if ((serversUpdateDate != null) && (threeDaysBefore.getTime().getTime() > serversUpdateDate)){
+		if ((serversUpdateDate != null) && (someDaysBefore.getTime().getTime() > serversUpdateDate)){
 			result = false;
 		}
 		else{

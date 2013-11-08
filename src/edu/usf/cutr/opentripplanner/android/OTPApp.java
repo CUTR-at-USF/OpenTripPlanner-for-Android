@@ -135,6 +135,8 @@ public class OTPApp extends Application {
 	
 	public static final String TAG = "OTP";
 	
+	public static final int EXPIRATION_DAYS_FOR_SERVER_LIST = 3;
+	
 	public static final float defaultZoomStep = 1;
 	public static final float defaultInitialZoomLevel = 12;
 	public static final float defaultMediumZoomLevel = 14;

@@ -175,10 +175,10 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements 
 		dataSource.close();
 		
 		dataSource.open();
-		Calendar threeDaysBefore = Calendar.getInstance();
-		threeDaysBefore.add(Calendar.DAY_OF_MONTH, -3);
+		Calendar someDaysBefore = Calendar.getInstance();
+		someDaysBefore.add(Calendar.DAY_OF_MONTH, - OTPApp.EXPIRATION_DAYS_FOR_SERVER_LIST);
 		Long serversUpdateDate = dataSource.getMostRecentDate();
-		if ((serversUpdateDate != null) && (threeDaysBefore.getTime().getTime() > serversUpdateDate)){
+		if ((serversUpdateDate != null) && (someDaysBefore.getTime().getTime() > serversUpdateDate)){
 			servers = null;
 		}
 		dataSource.close();
