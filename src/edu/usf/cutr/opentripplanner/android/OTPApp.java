@@ -60,7 +60,7 @@ public class OTPApp extends Application {
     public static final double BIKE_PARAMETERS_MAX_VALUE = 1.0;
 
     public static final int CHECK_BOUNDS_ACCEPTABLE_ERROR = 1000;
-    public static final float COORDINATES_IMPORTANT_DIFFERENCE = 2f;
+    public static final float COORDINATES_IMPORTANT_DIFFERENCE = 2000f;
     
     public static final int CUSTOM_TILES_MAX_ZOOM_LEVEL = 20;
     //in meters
