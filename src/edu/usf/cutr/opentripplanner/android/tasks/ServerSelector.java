@@ -27,6 +27,7 @@ import java.io.StringReader;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.http.client.HttpClient;
@@ -302,7 +303,10 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements 
 			for (Server server : knownServers) {
 				serverNames.add(server.getRegion());
 			}
-			serverNames.add(context.getResources().getString(R.string.custom_server_name));
+			
+			Collections.sort(serverNames);
+			
+			serverNames.add(0,context.getResources().getString(R.string.custom_server_name));
 
 			final CharSequence[] items = serverNames.toArray(new CharSequence[serverNames.size()]);
 			
