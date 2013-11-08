@@ -60,7 +60,7 @@ public class OTPApp extends Application {
     public static final double BIKE_PARAMETERS_MAX_VALUE = 1.0;
 
     public static final int CHECK_BOUNDS_ACCEPTABLE_ERROR = 1000;
-    public static final float COORDINATES_IMPORTANT_DIFFERENCE = 2f;
+    public static final float COORDINATES_IMPORTANT_DIFFERENCE = 2000f;
     
     public static final int CUSTOM_TILES_MAX_ZOOM_LEVEL = 20;
     //in meters
@@ -134,6 +134,8 @@ public class OTPApp extends Application {
 	private static Server selectedServer;
 	
 	public static final String TAG = "OTP";
+	
+	public static final int EXPIRATION_DAYS_FOR_SERVER_LIST = 3;
 	
 	public static final float defaultZoomStep = 1;
 	public static final float defaultInitialZoomLevel = 12;
