@@ -1542,7 +1542,7 @@ public class MainFragment extends Fragment implements
 	 * 
 	 * @param mCurrentLatLng location to use if servers should be detected
 	 */
-	public void runAutoDetectServer(LatLng mCurrentLatLng){
+	public void runAutoDetectServer(LatLng mCurrentLatLng, boolean showDialog){
 		if ((mCurrentLatLng == null) || (mMap == null)){
 			Toast.makeText(applicationContext, applicationContext.getResources().getString(R.string.location_error), Toast.LENGTH_LONG).show();
 		}
@@ -1550,7 +1550,7 @@ public class MainFragment extends Fragment implements
 			ServersDataSource dataSource = ServersDataSource.getInstance(applicationContext);
 			WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
 	
-			ServerSelector serverSelector = new ServerSelector(weakContext, applicationContext, dataSource, this, needToUpdateServersList);
+			ServerSelector serverSelector = new ServerSelector(weakContext, applicationContext, dataSource, this, needToUpdateServersList, showDialog);
 			serverSelector.execute(mCurrentLatLng);
 			savedLastLocationCheckedForServer = mCurrentLatLng;
 		}
@@ -1566,11 +1566,11 @@ public class MainFragment extends Fragment implements
 	 * A servers list will be displayed or a toast informing of the error.
 	 * <p>
 	 */
-	public void runAutoDetectServerNoLocation(){
+	public void runAutoDetectServerNoLocation(boolean showDialog){
 		ServersDataSource dataSource = ServersDataSource.getInstance(applicationContext);
 		WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
 
-		ServerSelector serverSelector = new ServerSelector(weakContext, applicationContext, dataSource, this, needToUpdateServersList);
+		ServerSelector serverSelector = new ServerSelector(weakContext, applicationContext, dataSource, this, needToUpdateServersList, showDialog);
 		LatLng latLngList[] = new LatLng[1];
 		latLngList[0] = null;
 		serverSelector.execute(latLngList);
@@ -1845,7 +1845,7 @@ public class MainFragment extends Fragment implements
 					
 					initializeMapInterface(mMap);
 					
-					runAutoDetectServerNoLocation();
+					runAutoDetectServerNoLocation(true);
 				}
 			}
 		
@@ -2834,11 +2834,11 @@ public class MainFragment extends Fragment implements
 				Location.distanceBetween(savedLatitude, savedLongitude, mCurrentLatLng.latitude, mCurrentLatLng.longitude, distance);
 				
 				if (!checkServersAreUpdated()){
-					runAutoDetectServer(mCurrentLatLng);
+					runAutoDetectServer(mCurrentLatLng, false);
 				}
 				else{
 					if (needToRunAutoDetect){
-						runAutoDetectServer(mCurrentLatLng);
+						runAutoDetectServer(mCurrentLatLng, true);
 					}
 					else if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER, true)) {
 						
@@ -2846,10 +2846,10 @@ public class MainFragment extends Fragment implements
 								&& (!LocationUtil.checkPointInBoundingBox(mCurrentLatLng, app.getSelectedServer(), OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))
 								&& (((savedLastLocationCheckedForServer != null) && (distance[0] > OTPApp.COORDINATES_IMPORTANT_DIFFERENCE)) 
 										|| (savedLastLocationCheckedForServer == null))){
-							runAutoDetectServer(mCurrentLatLng);
+							runAutoDetectServer(mCurrentLatLng, false);
 						}
 						else if (app.getSelectedServer() == null){
-							runAutoDetectServer(mCurrentLatLng);
+							runAutoDetectServer(mCurrentLatLng, true);
 						}
 					}
 					else {
@@ -2876,7 +2876,7 @@ public class MainFragment extends Fragment implements
 				}
 			}
 			else if (app.getSelectedServer() == null){
-				runAutoDetectServerNoLocation();
+				runAutoDetectServerNoLocation(true);
 			}
 		}
 	        
@@ -2888,7 +2888,8 @@ public class MainFragment extends Fragment implements
 		boolean result;
 		Calendar threeDaysBefore = Calendar.getInstance();
 		threeDaysBefore.add(Calendar.DAY_OF_MONTH, -3);
-		if (threeDaysBefore.getTime().getTime() > dataSource.getMostRecentDate()){
+		Long serversUpdateDate = dataSource.getMostRecentDate();
+		if ((serversUpdateDate != null) && (threeDaysBefore.getTime().getTime() > serversUpdateDate)){
 			result = false;
 		}
 		else{

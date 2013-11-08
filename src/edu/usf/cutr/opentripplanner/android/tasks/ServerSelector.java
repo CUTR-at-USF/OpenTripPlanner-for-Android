@@ -78,7 +78,8 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements 
 	private boolean isAutoDetectEnabled = true;
 	private ServerSelectorCompleteListener callback;
 	private boolean selectedCustomServer;
-  
+	private boolean showDialog;
+
     public ServersDataSource dataSource = null;
     
     /**
@@ -88,20 +89,22 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements 
      * @param callback
      * @param mustRefreshList true if we should download a new list of servers from the Google Doc, false if we should use cached list of servers
      * @param isAutoDetectEnabled true if we should automatically compare the user's current location to the bounding boxes of OTP servers, false if we should prompt the user to pick the OTP server manually
+     * @param showDialog true if a progress dialog is requested
      */
-	public ServerSelector(WeakReference<Activity> activity, Context context, ServersDataSource dataSource, ServerSelectorCompleteListener callback, boolean mustRefreshList) {
+	public ServerSelector(WeakReference<Activity> activity, Context context, ServersDataSource dataSource, ServerSelectorCompleteListener callback, boolean mustRefreshList, boolean showDialog) {
 		this.activity = activity;
 		this.context = context;
 		this.dataSource = dataSource;
 		this.callback = callback;
 		this.mustRefreshList = mustRefreshList;
-		if (activity.get() != null){
+		this.showDialog = showDialog;
+		if ((activity.get() != null) && showDialog){
 			progressDialog = new ProgressDialog(activity.get());
 		}
 	}
 
 	protected void onPreExecute() {
-		if (activity.get() != null){
+		if ((activity.get() != null) && showDialog){
 			progressDialog.setIndeterminate(true);
 	        progressDialog.setCancelable(true);
 			progressDialog = ProgressDialog.show(activity.get(), "",
@@ -174,7 +177,8 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements 
 		dataSource.open();
 		Calendar threeDaysBefore = Calendar.getInstance();
 		threeDaysBefore.add(Calendar.DAY_OF_MONTH, -3);
-		if (threeDaysBefore.getTime().getTime() > dataSource.getMostRecentDate()){
+		Long serversUpdateDate = dataSource.getMostRecentDate();
+		if ((serversUpdateDate != null) && (threeDaysBefore.getTime().getTime() > serversUpdateDate)){
 			servers = null;
 		}
 		dataSource.close();
@@ -281,7 +285,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements 
 	}
 
 	protected void onPostExecute(Long result) {
-		if (activity.get() != null){
+		if ((activity.get() != null) && showDialog){
 			try{
 				if (progressDialog != null && progressDialog.isShowing()) {
 					progressDialog.dismiss();
@@ -293,10 +297,23 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements 
         
 		if (selectedServer != null) {
 			//We've already auto-selected a server
-			Toast.makeText(context.getApplicationContext(), 
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+			long serverId = prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0);
+			Server s = null;
+			boolean serverIsChanged = true;
+			if (serverId != 0){
+				dataSource.open();
+				s = dataSource.getServer(prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0));
+				dataSource.close();
+			}
+			if (s != null){
+				serverIsChanged = !(s.getRegion().equals(selectedServer.getRegion()));
+			}
+			if (showDialog || serverIsChanged){
+				Toast.makeText(context.getApplicationContext(), 
 					context.getResources().getString(R.string.server_selector_detected) + " "+selectedServer.getRegion() + ". " + context.getResources().getString(R.string.server_selector_server_change_info), 
 						   Toast.LENGTH_SHORT).show();
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+			}
 			Editor e = prefs.edit();
 			e.putLong(PREFERENCE_KEY_SELECTED_SERVER, selectedServer.getId());
 			e.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false);
