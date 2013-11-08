@@ -306,7 +306,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long> implements 
 			
 			Collections.sort(serverNames);
 			
-			serverNames.add(context.getResources().getString(R.string.custom_server_name));
+			serverNames.add(0,context.getResources().getString(R.string.custom_server_name));
 
 			final CharSequence[] items = serverNames.toArray(new CharSequence[serverNames.size()]);
 			
