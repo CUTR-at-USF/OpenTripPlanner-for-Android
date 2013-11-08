@@ -148,6 +148,7 @@ import edu.usf.cutr.opentripplanner.android.tasks.ServerSelector;
 import edu.usf.cutr.opentripplanner.android.tasks.TripRequest;
 import edu.usf.cutr.opentripplanner.android.util.DateTimeConversion;
 import edu.usf.cutr.opentripplanner.android.util.DateTimeDialog;
+import edu.usf.cutr.opentripplanner.android.util.ItineraryDecrypt;
 import edu.usf.cutr.opentripplanner.android.util.LocationUtil;
 import edu.usf.cutr.opentripplanner.android.util.RangeSeekBar;
 import edu.usf.cutr.opentripplanner.android.util.RangeSeekBar.OnRangeSeekBarChangeListener;
@@ -2377,9 +2378,7 @@ public class MainFragment extends Fragment implements
 				TraverseMode traverseMode = TraverseMode.valueOf((String) leg.mode);
 
 				if (traverseMode.isTransit()){
-
-					
-					modeMarkerOption.title(stepIndex + ". " + leg.getFrom().name + " " + DateTimeConversion.getTimeWithContext(applicationContext, agencyTimeZoneOffset, Long.parseLong(leg.getStartTime()), true));
+					modeMarkerOption.title(stepIndex + ". " + ItineraryDecrypt.getLocalizedStreetName(leg.getFrom().name, applicationContext.getResources()) + " " + DateTimeConversion.getTimeWithContext(applicationContext, agencyTimeZoneOffset, Long.parseLong(leg.getStartTime()), true));
 					if (leg.getHeadsign() != null){
 						modeMarkerOption.snippet(leg.getHeadsign());
 					}
@@ -2387,11 +2386,11 @@ public class MainFragment extends Fragment implements
 				else{
 					if (traverseMode.equals(TraverseMode.WALK)){
 						modeMarkerOption.title(stepIndex + ". " + getResources().getString(R.string.before_distance_walk)
-								+ " " + getResources().getString(R.string.connector_destination) + " " + leg.getTo().name);
+								+ " " + getResources().getString(R.string.connector_destination) + " " +  ItineraryDecrypt.getLocalizedStreetName(leg.getTo().name, applicationContext.getResources()));
 					}
 					else if (traverseMode.equals(TraverseMode.BICYCLE)){
 						modeMarkerOption.title(stepIndex + ". " + getResources().getString(R.string.before_distance_bike)
-								+ " " + getResources().getString(R.string.connector_destination) + " " + leg.getTo().name);
+								+ " " + getResources().getString(R.string.connector_destination) + " " +  ItineraryDecrypt.getLocalizedStreetName(leg.getTo().name, applicationContext.getResources()));
 					}
 					modeMarkerOption.snippet(DateTimeConversion.getFormattedDurationTextNoSeconds(leg.duration/1000, applicationContext) + " " + "-" + " " 
 							+ String.format(OTPApp.FORMAT_DISTANCE_METERS_SHORT, leg.getDistance()) + getResources().getString(R.string.distance_unit));
