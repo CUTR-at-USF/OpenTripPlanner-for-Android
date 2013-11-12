@@ -49,6 +49,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -944,6 +945,8 @@ public class MainFragment extends Fragment implements
 		    		setBikeOptimizationAdapter(false);
 		    		showBikeParameters(false);
 	        	}
+	        	
+	        	btnPlanTrip.setImageBitmap(BitmapFactory.decodeResource(getResources(), ItineraryDecrypt.getModeIcon(traverseModeSpinnerItem.getTraverseModeSet())));
 	        }
 	    });
 		
@@ -953,7 +956,7 @@ public class MainFragment extends Fragment implements
 
 	        	OptimizeSpinnerItem optimizeSpinnerItem = (OptimizeSpinnerItem) ddlOptimization.getItemAtPosition(position);				
 	        	showBikeParameters(optimizeSpinnerItem.getOptimizeType().equals(OptimizeType.TRIANGLE));
-
+	        	
 	        }
 	    });
 		

@@ -22,6 +22,7 @@ import java.util.List;
 import org.opentripplanner.api.model.AgencyAndId;
 import org.opentripplanner.api.model.RelativeDirection;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.patch.Alerts;
 import org.opentripplanner.v092snapshot.api.model.AbsoluteDirection;
 import org.opentripplanner.v092snapshot.api.model.Leg;
@@ -129,16 +130,16 @@ public class ItineraryDecrypt {
 		}
 		
 		// Get appropriate action and icon
+		// Get appropriate action and icon
 		String action = applicationContext.getResources().getString(R.string.mode_walk_action);
-		int icon = R.drawable.mode_walk;
 		TraverseMode mode = TraverseMode.valueOf((String) leg.mode);
+		int icon = getModeIcon(new TraverseModeSet(mode));
 		if(mode.compareTo(TraverseMode.BICYCLE)==0){
 			action = applicationContext.getResources().getString(R.string.mode_bicycle_action);
-			icon = R.drawable.mode_bicycle;
 		} else if(mode.compareTo(TraverseMode.CAR)==0){
 			action = applicationContext.getResources().getString(R.string.mode_car_action);
-			icon = R.drawable.icon;
 		}
+
 
 		direction.setIcon(icon);
 
@@ -379,18 +380,7 @@ public class ItineraryDecrypt {
 
 		//		set icon
 		TraverseMode mode = TraverseMode.valueOf((String) leg.mode);
-		int icon = R.drawable.mode_bus;
-		if(mode.compareTo(TraverseMode.RAIL)==0){
-			icon = R.drawable.mode_rail;
-		} else if(mode.compareTo(TraverseMode.FERRY)==0){
-			icon = R.drawable.mode_ferry;
-		} else if(mode.compareTo(TraverseMode.GONDOLA)==0){
-			icon = R.drawable.mode_gondola;
-		} else if(mode.compareTo(TraverseMode.SUBWAY)==0){
-			icon = R.drawable.mode_subway;
-		} else if(mode.compareTo(TraverseMode.TRAM)==0){
-			icon = R.drawable.mode_tram;
-		}
+		int icon = getModeIcon(new TraverseModeSet(mode));
 
 		onDirection.setIcon(icon);
 
@@ -468,6 +458,34 @@ public class ItineraryDecrypt {
 		directions.add(offDirection);
 
 		return directions;
+	}
+	
+	public static int getModeIcon(TraverseModeSet mode){
+		if (mode.contains(TraverseMode.FERRY) && 
+				mode.contains(TraverseMode.BUSISH) &&
+					mode.contains(TraverseMode.TRAINISH)){
+			return R.drawable.mode_transit;
+		}
+		else if(mode.contains(TraverseMode.BUSISH)){
+			return R.drawable.mode_bus;
+		}
+		else if(mode.contains(TraverseMode.TRAINISH)){
+			return R.drawable.mode_train;
+		} else if(mode.contains(TraverseMode.FERRY)){
+			return R.drawable.mode_ferry;
+		} else if(mode.contains(TraverseMode.GONDOLA)){
+			return R.drawable.mode_ferry;
+		} else if(mode.contains(TraverseMode.SUBWAY)){
+			return R.drawable.mode_metro;
+		} else if(mode.contains(TraverseMode.TRAM)){
+			return R.drawable.mode_train;
+		}else if(mode.contains(TraverseMode.WALK)){
+			return R.drawable.mode_walk;
+		}else if(mode.contains(TraverseMode.BICYCLE)){
+			return R.drawable.mode_bike;
+		}else {
+			return R.drawable.icon;
+		}
 	}
 
 	/**
