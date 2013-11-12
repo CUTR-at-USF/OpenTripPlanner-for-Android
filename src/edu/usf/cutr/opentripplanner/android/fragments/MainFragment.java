@@ -204,7 +204,6 @@ public class MainFragment extends Fragment implements
 	private RangeSeekBar<Double> bikeTriangleParameters;
 	private ViewGroup bikeTriangleParametersLayout;	
 	
-	private ViewGroup handleDrawer;	
 	private ViewGroup navigationDrawerLeftPane;	
 
 	private boolean appStarts = true;
@@ -366,7 +365,6 @@ public class MainFragment extends Fragment implements
 		btnDisplayDirection = (ImageButton) mainView
 				.findViewById(R.id.btnDisplayDirection);
 		
-		handleDrawer = (ViewGroup) mainView.findViewById(R.id.handleDrawer);;	
 		navigationDrawerLeftPane = (ViewGroup) mainView.findViewById(R.id.navigationDrawerLeftPane);
 		panelDisplayDirection = (ViewGroup) mainView.findViewById(R.id.panelDisplayDirection);
 		
@@ -1257,7 +1255,6 @@ public class MainFragment extends Fragment implements
 		btnPlanTrip.setVisibility(visibility);
 		btnDateDialog.setVisibility(visibility);
 		btnMyLocation.setVisibility(visibility);
-		handleDrawer.setVisibility(visibility);
 		panelDisplayDirection.setVisibility(visibility);
 		navigationDrawerLeftPane.setVisibility(visibility);
 	}
