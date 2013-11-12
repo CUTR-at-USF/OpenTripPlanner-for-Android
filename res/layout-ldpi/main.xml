@@ -40,8 +40,10 @@
 
 		<ImageButton
 			android:id="@+id/btnPlanTrip"
-			android:layout_height="45dp"
+			android:layout_height="match_parent"
 			android:layout_width="45dp"
+			android:layout_alignTop="@+id/tbStartLocation"
+			android:layout_alignBottom="@+id/tbEndLocation"
 			android:layout_alignParentRight="true"
 			android:src="@drawable/mode_transit"
 		    android:background="@drawable/button_layout">
@@ -58,7 +60,7 @@
 		</ImageButton>
 	    
 		<EditText
-			android:id="@+id/tbStartLocation"
+			android:id="@id/tbStartLocation"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"		
 			android:selectAllOnFocus="true"
@@ -70,7 +72,7 @@
 	     </EditText>
 	
 		<EditText
-		    android:id="@+id/tbEndLocation"
+		    android:id="@id/tbEndLocation"
 		    android:layout_width="match_parent"
 	 		android:layout_below="@+id/tbStartLocation"
 		    android:layout_height="wrap_content"
@@ -89,7 +91,7 @@
 			android:layout_height="45dp"
 			android:layout_width="45dp"
 		    android:layout_alignParentRight="true"
-		    android:layout_below="@id/btnDateDialog"
+		    android:layout_above="@+id/panelDisplayDirection"
 		    android:src="@drawable/device_access_location_found"
 		    android:background="@drawable/button_layout">
 		</ImageButton>
@@ -100,7 +102,7 @@
 		    android:layout_width="14dp"
 		    android:layout_height="38dp"
 		    android:layout_alignParentLeft="true"
-		    android:layout_above="@+id/panelDisplayDirection"
+		    android:layout_above="@id/panelDisplayDirection"
 		    android:orientation="vertical"
 		    android:layout_marginTop="4dp"
 		    android:layout_marginBottom="4dp"
