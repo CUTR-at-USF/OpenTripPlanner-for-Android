@@ -2378,9 +2378,11 @@ public class MainFragment extends Fragment implements
 				TraverseMode traverseMode = TraverseMode.valueOf((String) leg.mode);
 
 				if (traverseMode.isTransit()){
-					modeMarkerOption.title(stepIndex + ". " + ItineraryDecrypt.getLocalizedStreetName(leg.getFrom().name, applicationContext.getResources()) + " " + DateTimeConversion.getTimeWithContext(applicationContext, agencyTimeZoneOffset, Long.parseLong(leg.getStartTime()), true));
+					modeMarkerOption.title(stepIndex + ". " + getResources().getString(R.string.before_route) + " " + leg.getRouteShortName() 
+										             + " " + getResources().getString(R.string.connector_stop) + " " + ItineraryDecrypt.getLocalizedStreetName(leg.getFrom().name, applicationContext.getResources()));
 					if (leg.getHeadsign() != null){
-						modeMarkerOption.snippet(leg.getHeadsign());
+						modeMarkerOption.snippet( DateTimeConversion.getTimeWithContext(applicationContext, agencyTimeZoneOffset, Long.parseLong(leg.getStartTime()), false)
+								                  + " " + getResources().getString(R.string.step_by_step_to) + " " + leg.getHeadsign());
 					}
 				}
 				else{
@@ -2528,7 +2530,6 @@ public class MainFragment extends Fragment implements
 		for(int i=0; i<itinerarySummaryList.length; i++){
 			boolean isTagSet = false;
 			Itinerary it = itineraryList.get(i);
-			itinerarySummaryList[i] = Integer.toString(i+1) + ".   ";//Shown index is i + 1, to use 1-based indexes for the UI instead of 0-base
 			for (Leg leg : it.legs){
 				TraverseMode traverseMode = TraverseMode.valueOf((String) leg.mode);
 				//OTP can't handle more than two timezones per request, so this is safe
@@ -2536,9 +2537,10 @@ public class MainFragment extends Fragment implements
 					agencyTimeZoneOffset = leg.getAgencyTimeZoneOffset();
 				}
 				if(traverseMode.isTransit()){
-					itinerarySummaryList[i] += getString(R.string.before_route) + " " + leg.getRouteShortName();
-					itinerarySummaryList[i] += DateTimeConversion.getTimeWithContext(applicationContext, agencyTimeZoneOffset, Long.parseLong(leg.getStartTime()), true);
-					itinerarySummaryList[i] += " " + "-" + " " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.duration/1000, applicationContext);
+					itinerarySummaryList[i] = DateTimeConversion.getTimeWithContext(applicationContext, agencyTimeZoneOffset, Long.parseLong(leg.getStartTime()), false);
+					itinerarySummaryList[i] += ". " + getResources().getString(R.string.before_route) + " " + leg.getRouteShortName();
+					itinerarySummaryList[i] += " -" + DateTimeConversion.getFormattedDurationTextNoSeconds(it.duration/1000, applicationContext) + "- ";
+					itinerarySummaryList[i] += leg.getHeadsign();
 					isTagSet = true;
 					break;
 				}
@@ -2547,11 +2549,11 @@ public class MainFragment extends Fragment implements
 				if (it.legs.size() == 1){
 					TraverseMode traverseMode = TraverseMode.valueOf((String) it.legs.get(0).mode);
 					if (traverseMode.equals(TraverseMode.WALK)){
-						itinerarySummaryList[i] += getString(R.string.before_distance_walk) + " " + String.format(OTPApp.FORMAT_DISTANCE_METERS_SHORT, it.walkDistance) + getResources().getString(R.string.distance_unit);
+						itinerarySummaryList[i] = getString(R.string.before_distance_walk) + " " + String.format(OTPApp.FORMAT_DISTANCE_METERS_SHORT, it.walkDistance) + getResources().getString(R.string.distance_unit);
 						itinerarySummaryList[i] += " " + getString(R.string.connector_time_full) + " " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.duration/1000, applicationContext);
 					}
 					else if (traverseMode.equals(TraverseMode.BICYCLE)){
-						itinerarySummaryList[i] += getString(R.string.before_distance_bike) + " " + String.format(OTPApp.FORMAT_DISTANCE_METERS_SHORT, it.walkDistance) + getResources().getString(R.string.distance_unit);
+						itinerarySummaryList[i] = getString(R.string.before_distance_bike) + " " + String.format(OTPApp.FORMAT_DISTANCE_METERS_SHORT, it.walkDistance) + getResources().getString(R.string.distance_unit);
 						itinerarySummaryList[i] += " " + getString(R.string.connector_time_full) + " " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.duration/1000, applicationContext);
 					}
 				}
