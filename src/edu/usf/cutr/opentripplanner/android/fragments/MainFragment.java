@@ -45,6 +45,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
@@ -2640,8 +2641,6 @@ public class MainFragment extends Fragment implements
 					geocodingBeenRequested = false;
 					return;
 				}
-				
-				restartTextBoxLocation(isStartTextbox);
 			
 				AlertDialog.Builder geocoderSelector = new AlertDialog.Builder(
 						getActivity());
@@ -2667,6 +2666,12 @@ public class MainFragment extends Fragment implements
 							}
 						});
 				AlertDialog alertGeocoder = geocoderSelector.create();
+				alertGeocoder.setOnDismissListener(new OnDismissListener() {
+					@Override
+					public void onDismiss(DialogInterface dialog) {
+						restartTextBoxLocation(isStartTextbox);
+					}
+				});
 				alertGeocoder.show();
 			}catch(Exception e){
 				Log.e(TAG, "Error in Main Fragment Geocoding callback: " + e);
