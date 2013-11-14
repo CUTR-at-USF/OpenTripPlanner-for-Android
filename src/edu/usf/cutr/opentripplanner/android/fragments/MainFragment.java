@@ -1249,7 +1249,7 @@ public class MainFragment extends Fragment implements
 		}
 		else{
 			setHasOptionsMenu(false);
-			visibility = View.GONE;
+			visibility = View.INVISIBLE;
 		}
 		tbStartLocation.setVisibility(visibility);
 		tbEndLocation.setVisibility(visibility);
@@ -1281,7 +1281,7 @@ public class MainFragment extends Fragment implements
 			btnHandle.requestLayout();
 		}
 		else{
-			panelDisplayDirection.setVisibility(View.GONE);
+			panelDisplayDirection.setVisibility(View.INVISIBLE);
 			RelativeLayout.LayoutParams paramsMyLocation = (android.widget.RelativeLayout.LayoutParams) btnMyLocation.getLayoutParams();
 			paramsMyLocation.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
 			btnMyLocation.setLayoutParams(paramsMyLocation);
