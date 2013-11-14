@@ -2408,6 +2408,7 @@ public class MainFragment extends Fragment implements
 					
 					if (firstTransitMarker == null){
 						firstTransitMarker = modeMarker;
+						firstTransitMarker.showInfoWindow();
 					}
 				}
 				PolylineOptions options = new PolylineOptions().addAll(points)
@@ -2422,9 +2423,6 @@ public class MainFragment extends Fragment implements
 
 			}
 			if (animateCamera){
-				if (firstTransitMarker != null){
-					firstTransitMarker.showInfoWindow();
-				}
 				mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsCreator.build(), getResources().getInteger(R.integer.default_padding)));
 			}
 		}
