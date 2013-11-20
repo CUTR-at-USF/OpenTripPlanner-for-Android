@@ -34,7 +34,7 @@ import edu.usf.cutr.opentripplanner.android.R;
  */
 
 public class DateTimeConversion {
-	public static double getDuration(String startTimeText, String endTimeText){
+	public static double getDuration(String startTimeText, String endTimeText) {
 		double duration=0;
 		DateFormat formatter ; 
 		Date startTime=null, endTime=null; 
@@ -60,10 +60,10 @@ public class DateTimeConversion {
 	 * @param sec
 	 * @return
 	 */
-	public static String getFormattedDurationText(long sec, Context applicationContext){
+	public static String getFormattedDurationText(long sec, Context applicationContext) {
 		String text = "";
 		long h = sec/3600;
-		if (h>=24)
+		if (h >= 24)
 			return null;
 		long m = (sec%3600)/60;
 		long s = (sec%3600)%60;
@@ -80,23 +80,23 @@ public class DateTimeConversion {
 	 * @param sec
 	 * @return
 	 */
-	public static String getFormattedDurationTextNoSeconds(long sec, Context applicationContext){
+	public static String getFormattedDurationTextNoSeconds(long sec, Context applicationContext) {
 		String text = "";
 		long h = sec/3600;
-		if (h>=24)
+		if (h >= 24)
 			return null;
 		long m = (sec%3600)/60;
-		if (h > 0){
+		if (h > 0) {
 			text += Long.toString(h) + applicationContext.getResources().getString(R.string.short_hours);
 			text += " " + Long.toString(m) + applicationContext.getResources().getString(R.string.short_minutes);
 		}
-		else{
+		else {
 			text += Long.toString(m) + " " + applicationContext.getResources().getString(R.string.long_minutes);
 		}
 		return text;
 	}
 	
-	public static String getTimeWithContext(Context applicationContext, int offsetGMT, long time, boolean inLine){
+	public static String getTimeWithContext(Context applicationContext, int offsetGMT, long time, boolean inLine) {
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 		DateFormat timeFormat = android.text.format.DateFormat.getTimeFormat(applicationContext);
 		DateFormat dateFormat = android.text.format.DateFormat.getDateFormat(applicationContext);
@@ -106,8 +106,8 @@ public class DateTimeConversion {
 		cal.setTimeInMillis(time);
 		cal.add(Calendar.MILLISECOND, offsetGMT);
 		
-		if (inLine){
-			if (DateTimeConversion.isToday(cal)){
+		if (inLine) {
+			if (DateTimeConversion.isToday(cal)) {
 				return (" " + applicationContext.getResources().getString(R.string.connector_time) + " " + timeFormat.format(cal.getTime()));	
 			}
 			else if (DateTimeConversion.isTomorrow(cal)){
@@ -118,7 +118,7 @@ public class DateTimeConversion {
 			}
 		}
 		else{
-			if (DateTimeConversion.isToday(cal)){
+			if (DateTimeConversion.isToday(cal)) {
 				return (timeFormat.format(cal.getTime()));	
 			}
 			else{
