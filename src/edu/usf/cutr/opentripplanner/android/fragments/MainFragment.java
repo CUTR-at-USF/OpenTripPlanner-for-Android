@@ -45,6 +45,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
@@ -2306,6 +2307,38 @@ public class MainFragment extends Fragment implements
 			tbEndLocation.setText(text);
 		}
 	}
+	
+	/**
+	 * Resets start/end text box to previous valid address.
+	 * 
+	 * @param isStartTextBox if true start box will be used
+	 */
+	private void restartTextBoxLocation(boolean isStartTextBox) {
+		if (isStartTextBox) {
+			if (startAddress != null){
+				isStartLocationChangedByUser = false;
+				tbStartLocation.setText(addressToString(startAddress));	
+			}
+		} else {
+			if (endAddress != null){
+				isEndLocationChangedByUser = false;
+				tbEndLocation.setText(addressToString(endAddress));
+			}
+		}
+	}
+	
+	/**
+	 * Returns address in string format.
+	 * <p>
+	 * Lines used are first and second.
+	 * 
+	 * @param add the address to transform
+	 */
+	private String addressToString(Address add) {
+		return ((add.getAddressLine(0) != null) ? add.getAddressLine(0) : "")
+		+ ", "
+		+ ((add.getAddressLine(1) != null) ? add.getAddressLine(1) : "");
+	}
 
 	/**
 	 * Draws the route on the map.
@@ -2502,17 +2535,13 @@ public class MainFragment extends Fragment implements
 			myActivity.setCurrentRequestString(currentRequestString);
 			
 			if ((startAddress != null) && (prefs.getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true))){
-				resultTripStartLocation = ((startAddress.getAddressLine(0) != null) ? startAddress.getAddressLine(0) : "")
-						+ ", "
-						+ ((startAddress.getAddressLine(1) != null) ? startAddress.getAddressLine(1) : "");
+				resultTripStartLocation = addressToString(startAddress);
 			}
 			else{
 				resultTripStartLocation = tbStartLocation.getText().toString();
 			}
 			if ((endAddress != null) && (prefs.getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true))){
-				resultTripEndLocation = ((endAddress.getAddressLine(0) != null) ? endAddress.getAddressLine(0) : "")
-						+ ", "
-						+ ((endAddress.getAddressLine(1) != null) ? endAddress.getAddressLine(1) : "");
+				resultTripEndLocation = addressToString(endAddress);
 			}
 			else{
 				resultTripEndLocation = tbEndLocation.getText().toString();
@@ -2592,6 +2621,8 @@ public class MainFragment extends Fragment implements
 						});
 		
 				if (addressesReturn.isEmpty()) {
+					geocodingBeenRequested = false;
+					restartTextBoxLocation(isStartTextbox);
 					AlertDialog alert = geocoderAlert.create();
 					alert.show();
 					return;
@@ -2602,8 +2633,10 @@ public class MainFragment extends Fragment implements
 					else{
 						moveMarker(isStartTextbox, addressesReturn.get(0));
 					}
+					if (geocodingBeenRequested) {
+						requestTripAfterGeocoding();
+					}
 					geocodingBeenRequested = false;
-					requestTripAfterGeocoding();
 					return;
 				}
 			
@@ -2627,16 +2660,22 @@ public class MainFragment extends Fragment implements
 								Address addr = addressesTemp.get(item);
 								moveMarker(isStartTextbox, addr);
 								Log.v(TAG, "Chosen: " + addressesText[item]);
-								geocodingBeenRequested = false;
 								MainFragment.this.requestTripAfterGeocoding();
 							}
 						});
 				AlertDialog alertGeocoder = geocoderSelector.create();
+				alertGeocoder.setOnDismissListener(new OnDismissListener() {
+					@Override
+					public void onDismiss(DialogInterface dialog) {
+						restartTextBoxLocation(isStartTextbox);
+					}
+				});
 				alertGeocoder.show();
 			}catch(Exception e){
 				Log.e(TAG, "Error in Main Fragment Geocoding callback: " + e);
 			}
 		}
+		geocodingBeenRequested = false;
 	}
 	
 	/**
