@@ -2598,7 +2598,7 @@ public class MainFragment extends Fragment implements
 				}
 				if(traverseMode.isTransit()){
 					itinerarySummaryList[i] = DateTimeConversion.getTimeWithContext(applicationContext, agencyTimeZoneOffset, Long.parseLong(leg.getStartTime()), false);
-					itinerarySummaryList[i] += ". " + getResources().getString(R.string.before_route) + " " + leg.getRouteShortName();
+					itinerarySummaryList[i] += " " + getResources().getString(R.string.before_route) + " " + leg.getRouteShortName();
 					itinerarySummaryList[i] += " - " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.duration/1000, applicationContext);
 					if (leg.getHeadsign() != null){
 						itinerarySummaryList[i] += " - " + leg.getHeadsign();
