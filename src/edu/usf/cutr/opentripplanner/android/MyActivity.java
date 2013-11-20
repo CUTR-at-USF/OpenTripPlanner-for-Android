@@ -147,14 +147,12 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 	
 	@Override
 	public void onItinerariesLoaded(List<Itinerary> itineraries) {
-		// TODO Auto-generated method stub
 		currentItineraryList.clear();
 		currentItineraryList.addAll(itineraries);
 	}
 
 	@Override
 	public void onItinerarySelected(int i) {
-		// TODO Auto-generated method stub
 		if(i >= currentItineraryList.size()) return;
 		
 		currentItineraryIndex = i;
@@ -164,13 +162,11 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 
 	@Override
 	public List<Leg> getCurrentItinerary() {
-		// TODO Auto-generated method stub
 		return currentItinerary;
 	}
 
 	@Override
 	public void onSwitchedToDirectionFragment() {
-		// TODO Auto-generated method stub
 		FragmentManager fm = getSupportFragmentManager();
 		FragmentTransaction transaction = fm.beginTransaction();
 
@@ -184,13 +180,11 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 
 	@Override
 	public OTPBundle getOTPBundle() {
-		// TODO Auto-generated method stub
 		return bundle;
 	}
 
 	@Override
 	public void setOTPBundle(OTPBundle b) {
-		// TODO Auto-generated method stub
 		this.bundle = b;
 		this.bundle.setCurrentItineraryIndex(currentItineraryIndex);
 		this.bundle.setItineraryList(currentItineraryList);
@@ -198,7 +192,6 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 
 	@Override
 	public void onSwitchedToMainFragment(Fragment f) {
-		// TODO Auto-generated method stub
 		FragmentManager fm = getSupportFragmentManager();
 		FragmentTransaction transaction = fm.beginTransaction();
 		transaction.remove(f);
@@ -226,13 +219,11 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener{
 
 	@Override
 	public List<Itinerary> getCurrentItineraryList() {
-		// TODO Auto-generated method stub
 		return currentItineraryList;
 	}
 
 	@Override
 	public int getCurrentItineraryIndex() {
-		// TODO Auto-generated method stub
 		return currentItineraryIndex;
 	}
 
