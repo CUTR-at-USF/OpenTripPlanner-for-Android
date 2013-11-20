@@ -87,8 +87,8 @@ public class DateTimeConversion {
 			return null;
 		long m = (sec%3600)/60;
 		if (h > 0){
-			text += Long.toString(h) + " " + applicationContext.getResources().getString(R.string.short_hours);
-			text += Long.toString(m) + " " + applicationContext.getResources().getString(R.string.short_minutes);
+			text += Long.toString(h) + applicationContext.getResources().getString(R.string.short_hours);
+			text += Long.toString(m) + applicationContext.getResources().getString(R.string.short_minutes);
 		}
 		else{
 			text += Long.toString(m) + " " + applicationContext.getResources().getString(R.string.long_minutes);
