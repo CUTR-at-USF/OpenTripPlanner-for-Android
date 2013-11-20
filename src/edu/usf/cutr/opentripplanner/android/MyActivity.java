@@ -46,6 +46,7 @@ import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
 /**
  * Main Activity for the OTP for Android app
  * 
+ * @author Marcy Gordon
  * @author Khoa Tran
  * @author Sean Barbeau (conversion to Jackson)
  * @author Vreixo Gonz�lez (update to Google Maps API v2, UI and general app improvements)
