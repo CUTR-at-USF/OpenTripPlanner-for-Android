@@ -17,7 +17,6 @@
 package edu.usf.cutr.opentripplanner.android.fragments;
 
 import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS;
-
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.net.URLEncoder;
@@ -29,7 +28,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.miscwidgets.widget.Panel;
 import org.opentripplanner.api.ws.GraphMetadata;
 import org.opentripplanner.api.ws.Request;
@@ -38,7 +36,8 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.v092snapshot.api.model.Itinerary;
 import org.opentripplanner.v092snapshot.api.model.Leg;
-
+import android.animation.LayoutTransition;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -50,6 +49,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -100,7 +100,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
-
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -125,7 +124,6 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
-
 import edu.usf.cutr.opentripplanner.android.MyActivity;
 import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.R;
@@ -204,7 +202,6 @@ public class MainFragment extends Fragment implements
 	private RangeSeekBar<Double> bikeTriangleParameters;
 	private ViewGroup bikeTriangleParametersLayout;	
 	
-	private ViewGroup handleDrawer;	
 	private ViewGroup navigationDrawerLeftPane;	
 
 	private boolean appStarts = true;
@@ -310,6 +307,7 @@ public class MainFragment extends Fragment implements
 		setHasOptionsMenu(true);
 	}
 
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -366,7 +364,6 @@ public class MainFragment extends Fragment implements
 		btnDisplayDirection = (ImageButton) mainView
 				.findViewById(R.id.btnDisplayDirection);
 		
-		handleDrawer = (ViewGroup) mainView.findViewById(R.id.handleDrawer);;	
 		navigationDrawerLeftPane = (ViewGroup) mainView.findViewById(R.id.navigationDrawerLeftPane);
 		panelDisplayDirection = (ViewGroup) mainView.findViewById(R.id.panelDisplayDirection);
 		
@@ -380,6 +377,13 @@ public class MainFragment extends Fragment implements
 		itinerarySelectionSpinner = (Spinner) mainView.findViewById(R.id.itinerarySelection);
 
 		Log.v(TAG, "finish onStart()");
+		
+	    if (Build.VERSION.SDK_INT > 11) {
+			LayoutTransition l = new LayoutTransition();
+			ViewGroup mainButtons = (ViewGroup) mainView
+					.findViewById(R.id.content_frame);
+			mainButtons.setLayoutTransition(l);
+		}
 
 		return mainView;
 	}
@@ -836,11 +840,7 @@ public class MainFragment extends Fragment implements
 		btnDisplayDirection.setOnClickListener(oclDisplayDirection);
 
 		// Do NOT show direction icon if there is no direction yet
-		if (getFragmentListener().getCurrentItinerary().isEmpty()) {
-			panelDisplayDirection.setVisibility(View.INVISIBLE);
-		} else {
-			panelDisplayDirection.setVisibility(View.VISIBLE);
-		}
+		toggleItinerarySelectionSpinner(!getFragmentListener().getCurrentItinerary().isEmpty());
 		
 		OnClickListener oclMyLocation = new OnClickListener() {
 			@Override
@@ -945,6 +945,8 @@ public class MainFragment extends Fragment implements
 		    		setBikeOptimizationAdapter(false);
 		    		showBikeParameters(false);
 	        	}
+	        	
+	        	btnPlanTrip.setImageBitmap(BitmapFactory.decodeResource(getResources(), ItineraryDecrypt.getModeIcon(traverseModeSpinnerItem.getTraverseModeSet())));
 	        }
 	    });
 		
@@ -954,7 +956,7 @@ public class MainFragment extends Fragment implements
 
 	        	OptimizeSpinnerItem optimizeSpinnerItem = (OptimizeSpinnerItem) ddlOptimization.getItemAtPosition(position);				
 	        	showBikeParameters(optimizeSpinnerItem.getOptimizeType().equals(OptimizeType.TRIANGLE));
-
+	        	
 	        }
 	    });
 		
@@ -1255,9 +1257,41 @@ public class MainFragment extends Fragment implements
 		btnPlanTrip.setVisibility(visibility);
 		btnDateDialog.setVisibility(visibility);
 		btnMyLocation.setVisibility(visibility);
-		handleDrawer.setVisibility(visibility);
-		panelDisplayDirection.setVisibility(visibility);
 		navigationDrawerLeftPane.setVisibility(visibility);
+		toggleItinerarySelectionSpinner(enable);
+	}
+	
+	/**
+	 * Shows/hides itinerary drop down list of map main view.
+	 * <p>
+	 * Moves related buttons for MyLocation and the handle to show the left
+	 * panel accordingly.
+	 * 
+	 * @param show if true drop down list will be shown
+	 */
+	private void toggleItinerarySelectionSpinner(boolean show){
+		if (show){
+			panelDisplayDirection.setVisibility(View.VISIBLE);
+			RelativeLayout.LayoutParams paramsMyLocation = (android.widget.RelativeLayout.LayoutParams) btnMyLocation.getLayoutParams();
+			paramsMyLocation.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+			btnMyLocation.setLayoutParams(paramsMyLocation);
+			RelativeLayout.LayoutParams paramsHandle = (android.widget.RelativeLayout.LayoutParams) btnHandle.getLayoutParams();
+			paramsHandle.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+			btnHandle.setLayoutParams(paramsHandle);
+			btnMyLocation.requestLayout();
+			btnHandle.requestLayout();
+		}
+		else{
+			panelDisplayDirection.setVisibility(View.INVISIBLE);
+			RelativeLayout.LayoutParams paramsMyLocation = (android.widget.RelativeLayout.LayoutParams) btnMyLocation.getLayoutParams();
+			paramsMyLocation.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+			btnMyLocation.setLayoutParams(paramsMyLocation);
+			RelativeLayout.LayoutParams paramsHandle = (android.widget.RelativeLayout.LayoutParams) btnHandle.getLayoutParams();
+			paramsHandle.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+			btnHandle.setLayoutParams(paramsHandle);
+			btnMyLocation.requestLayout();
+			btnHandle.requestLayout();
+		}
 	}
 	
 	private void requestTrip(){
@@ -1268,7 +1302,8 @@ public class MainFragment extends Fragment implements
 		Boolean isOriginMyLocation = prefs.getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, false);
 		Boolean isDestinationMyLocation = prefs.getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false);
 		
-		panelDisplayDirection.setVisibility(View.INVISIBLE);
+		toggleItinerarySelectionSpinner(false);
+		
 		if (route != null){
 			for (Polyline p : route){
 				p.remove();
@@ -2521,9 +2556,7 @@ public class MainFragment extends Fragment implements
 			String currentRequestString) {
 		if (getActivity() != null){
 			fillItinerariesSpinner(itineraries);
-			if (!itineraries.isEmpty()){
-				panelDisplayDirection.setVisibility(View.VISIBLE);
-			}
+			toggleItinerarySelectionSpinner(!itineraries.isEmpty());
 			
 			showRouteOnMap(itineraries.get(0).legs, true);
 			OnFragmentListener ofl = getFragmentListener();

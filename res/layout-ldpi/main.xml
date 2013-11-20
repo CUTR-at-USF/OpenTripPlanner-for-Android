@@ -40,22 +40,20 @@
 
 		<ImageButton
 			android:id="@+id/btnPlanTrip"
-			android:layout_height="60dp"
-			android:layout_width="50dp"
-			android:layout_alignParentRight="true"
+			android:layout_height="match_parent"
+			android:layout_width="45dp"
 			android:layout_alignTop="@+id/tbStartLocation"
 			android:layout_alignBottom="@+id/tbEndLocation"
-			android:layout_margin="4dp"
-			android:src="@drawable/action_search_dark"
+			android:layout_alignParentRight="true"
+			android:src="@drawable/mode_transit"
 		    android:background="@drawable/button_layout">
 		</ImageButton>
 		
 		<ImageButton
 			android:id="@+id/btnDateDialog"
-			android:layout_height="40dp"
-			android:layout_width="40dp"
+			android:layout_height="45dp"
+			android:layout_width="45dp"
 			android:layout_below="@+id/btnPlanTrip"
-			android:layout_margin="4dp"
 			android:layout_alignParentRight="true"
 			android:src="@drawable/device_access_time"
 		    android:background="@drawable/button_layout">
@@ -76,7 +74,7 @@
 		<EditText
 		    android:id="@id/tbEndLocation"
 		    android:layout_width="match_parent"
-	 		android:layout_below="@id/tbStartLocation"
+	 		android:layout_below="@+id/tbStartLocation"
 		    android:layout_height="wrap_content"
 		    android:layout_margin="4dp"
 		    android:hint="@string/end_location_hint"
@@ -90,68 +88,61 @@
 		
 		<ImageButton
 		    android:id="@+id/btnMyLocation"
-		    android:layout_width="40dp"
-		    android:layout_height="40dp"
+			android:layout_height="45dp"
+			android:layout_width="45dp"
 		    android:layout_alignParentRight="true"
 		    android:layout_above="@+id/panelDisplayDirection"
-			android:layout_margin="4dp"
 		    android:src="@drawable/device_access_location_found"
 		    android:background="@drawable/button_layout">
 		</ImageButton>
 		
 	
-		<RelativeLayout 
-		    android:id="@+id/handleDrawer"
+		<ImageButton
+		    android:id="@+id/btnHandle"
 		    android:layout_width="14dp"
-		    android:layout_height="36dp"
+		    android:layout_height="38dp"
 		    android:layout_alignParentLeft="true"
-		    android:layout_above="@+id/panelDisplayDirection"
+		    android:layout_above="@id/panelDisplayDirection"
 		    android:orientation="vertical"
 		    android:layout_marginTop="4dp"
-		    android:layout_marginBottom="4dp">
-	    
-			<ImageButton
-			    android:id="@+id/btnHandle"
-			    android:layout_width="match_parent"
-			    android:layout_height="match_parent"
-			    android:src="@drawable/handle_layout"
-			    android:background="@android:color/transparent">
-			</ImageButton>
-			
-			<ImageView
-			    android:id="@+id/icHandle"
-			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
-			    android:src="@drawable/ic_navigation_drawer"
-			    android:layout_centerVertical="true"
-			    android:background="@android:color/transparent">
-			</ImageView>
-			
-		</RelativeLayout>
+		    android:layout_marginBottom="4dp"
+		    android:src="@drawable/ic_navigation_drawer"
+		    android:background="@drawable/handle_layout">
+		</ImageButton>
 			
 				
 		<RelativeLayout
 			android:id="@id/panelDisplayDirection"
-		    android:layout_width="fill_parent"
+		    android:layout_width="match_parent"
 		    android:layout_height="wrap_content"
 		    android:orientation="horizontal"
    		    android:layout_alignParentBottom="true"
-   		    android:background="@drawable/button_layout">
+   		    android:background="@drawable/button_bottom_layout">
 	   		    
    			<ImageButton
 				android:id="@+id/btnDisplayDirection"
 			    android:layout_alignParentRight="true"				
-				android:layout_width="40dp"
-				android:layout_height="40dp"
+				android:layout_width="56dp"
+				android:layout_height="56dp"
 				android:src="@drawable/location_directions"
 				android:background="@android:color/transparent">
 			</ImageButton>
 			
+ 			<View
+			    android:id="@+id/separator"
+			    android:layout_toLeftOf="@id/btnDisplayDirection"
+			    android:layout_width="1dp"
+			    android:layout_height="40dp"
+   				android:layout_marginTop="8dp"
+   				android:layout_marginBottom="8dp"
+			    android:background="@android:color/darker_gray">
+		    </View>
+			
 			<Spinner
 			    android:id="@+id/itinerarySelection"
-			    android:layout_toLeftOf="@id/btnDisplayDirection"
+			    android:layout_toLeftOf="@id/separator"
 			    android:layout_width="match_parent"
-			    android:layout_height="40dp"
+			    android:layout_height="45dp"
    				android:layout_margin="4dp"
 			    android:prompt="@string/alternative_routes">
 			</Spinner>
@@ -162,7 +153,7 @@
 	
 	<RelativeLayout
 	    android:id="@+id/navigationDrawerLeftPane"
-   		android:layout_width="200dp"
+   		android:layout_width="280dp"
 		android:layout_height="match_parent"
 		android:layout_gravity="start"
 		android:orientation="vertical"
@@ -172,7 +163,7 @@
 	    <LinearLayout
 			android:id="@+id/layoutOptimization"
 	   		android:layout_width="match_parent"
-			android:layout_height="112dp"
+			android:layout_height="wrap_content"
 			android:orientation="vertical"
 			android:layout_margin="4dp">
 		
@@ -200,7 +191,7 @@
 	    <LinearLayout
     		android:id="@+id/layoutMode"
 	   		android:layout_width="match_parent"
-			android:layout_height="112dp"
+			android:layout_height="wrap_content"
 			android:orientation="vertical"
             android:layout_below="@id/layoutOptimization"
         	android:layout_above="@+id/layoutBike"
