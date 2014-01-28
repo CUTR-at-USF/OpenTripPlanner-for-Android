@@ -115,7 +115,7 @@
     <string name="geocoder_no_results_message">Spiacenti, non è stata trovata alcuna posizione per l\'indirizzo specificato.</string>
     <string name="tripplanner_progress">"Generazione percorso. Attendere..."</string>   
     <string name="tripplanner_results_title">Percorsi trovati</string>
-    <string name="tripplanner_no_results_message">Errore in fase di calcolo percorso</string>
+    <string name="tripplanner_error_dialog_title">Percorso non tovato</string>
     <string name="tripplanner_error_request_timeout">Il Server non risponde, si prega di provare in seguito</string>
     <string name="tripplanner_error_system">Il server non funziona, si prega di provare in seguito</string>
     <string name="tripplanner_error_outside_bounds">L'origine o la destinazione sono al di là dei limiti</string>
