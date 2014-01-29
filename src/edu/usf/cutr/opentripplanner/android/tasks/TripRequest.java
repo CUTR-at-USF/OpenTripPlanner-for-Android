@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.opentripplanner.api.ws.Message;
 import org.opentripplanner.api.ws.Request;
 import org.opentripplanner.v092snapshot.api.model.Itinerary;
 import org.opentripplanner.v092snapshot.api.ws.Response;
@@ -100,7 +101,7 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 		if (activity.get() != null){
 			AlertDialog.Builder geocoderAlert = new AlertDialog.Builder(activity.get());
 			geocoderAlert.setTitle(R.string.tripplanner_results_title)
-					.setMessage(R.string.tripplanner_no_results_message)
+					.setMessage(R.string.tripplanner_error_request_timeout)
 					.setCancelable(false)
 					.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
@@ -132,8 +133,14 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 			callback.onTripRequestComplete(itineraries, currentRequestString);
 		} else {
 			// TODO - handle errors here?
-			if(response != null && response.getError() != null) {
-				String msg = response.getError().toString();
+			int errorCode =  response.getError().getId();
+
+			if(response != null && response.getError() != null && errorCode != Message.PLAN_OK.getId()) {
+
+				String msg = getErrorMessage(response.getError().getId());
+				if (msg == null){
+					msg = response.getError().getMsg();
+				}
 				if (activity.get() != null){
 					AlertDialog.Builder feedback = new AlertDialog.Builder(activity.get());
 					feedback.setTitle(context.getResources().getString(R.string.tripplanner_error_dialog_title));
@@ -143,6 +150,60 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 				}
 			}
 			Log.e(TAG, "No route to display!");
+		}
+	}
+	
+	private String getErrorMessage(int errorCode){
+		if (errorCode == Message.SYSTEM_ERROR.getId()){
+			return (context.getResources().getString(R.string.tripplanner_error_system));
+		}
+		else if (errorCode == Message.OUTSIDE_BOUNDS.getId()){
+			return (context.getResources().getString(R.string.tripplanner_error_outside_bounds));
+		}
+		else if (errorCode == Message.PATH_NOT_FOUND.getId()){
+			return (context.getResources().getString(R.string.tripplanner_error_path_not_found));
+		}
+		else if (errorCode == Message.NO_TRANSIT_TIMES.getId()){
+			return (context.getResources().getString(R.string.tripplanner_error_no_transit_times));
+		}
+		else if (errorCode == Message.REQUEST_TIMEOUT.getId()){
+			return (context.getResources().getString(R.string.tripplanner_error_request_timeout));
+		}
+		else if (errorCode == Message.BOGUS_PARAMETER.getId()){
+			return (context.getResources().getString(R.string.tripplanner_error_bogus_parameter));
+		}
+		else if (errorCode == Message.GEOCODE_FROM_NOT_FOUND.getId()){
+			return (context.getResources().getString(R.string.tripplanner_error_geocode_from_not_found));
+		}
+		else if (errorCode == Message.GEOCODE_TO_NOT_FOUND.getId()){
+			return (context.getResources().getString(R.string.tripplanner_error_geocode_to_not_found));
+		}
+		else if (errorCode == Message.GEOCODE_FROM_TO_NOT_FOUND.getId()){
+			return (context.getResources().getString(R.string.tripplanner_error_geocode_from_to_not_found));
+		}
+		else if (errorCode == Message.TOO_CLOSE.getId()){
+			return (context.getResources().getString(R.string.tripplanner_error_too_close));
+		}
+		else if (errorCode == Message.LOCATION_NOT_ACCESSIBLE.getId()){
+			return (context.getResources().getString(R.string.tripplanner_error_location_not_accessible));
+		}
+		else if (errorCode == Message.GEOCODE_FROM_AMBIGUOUS.getId()){
+			return (context.getResources().getString(R.string.tripplanner_error_geocode_from_ambiguous));
+		}
+		else if (errorCode == Message.GEOCODE_TO_AMBIGUOUS.getId()){
+			return (context.getResources().getString(R.string.tripplanner_error_geocode_to_ambiguous));
+		}
+		else if (errorCode == Message.GEOCODE_FROM_TO_AMBIGUOUS.getId()){
+			return (context.getResources().getString(R.string.tripplanner_error_geocode_from_to_ambiguous));
+		}
+		else if (errorCode == Message.UNDERSPECIFIED_TRIANGLE.getId()
+				 || errorCode == Message.TRIANGLE_NOT_AFFINE.getId()
+				 || errorCode == Message.TRIANGLE_OPTIMIZE_TYPE_NOT_SET.getId()
+				 || errorCode == Message.TRIANGLE_VALUES_NOT_SET.getId()){
+			return(context.getResources().getString(R.string.tripplanner_error_triangle));
+		}
+		else {
+			return null;
 		}
 	}
 	
