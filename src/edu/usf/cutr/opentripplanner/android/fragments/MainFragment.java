@@ -2620,7 +2620,7 @@ public class MainFragment extends Fragment implements
 					}
 				}
 				else{
-					itinerarySummaryList[i] += getString(R.string.total_duration) + " " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.duration/1000, applicationContext);
+					itinerarySummaryList[i] = getString(R.string.total_duration) + " " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.duration/1000, applicationContext);
 				}
 			}
 
