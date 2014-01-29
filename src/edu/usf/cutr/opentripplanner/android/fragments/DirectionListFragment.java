@@ -142,19 +142,20 @@ public class DirectionListFragment extends ExpandableListFragment {
 		Spinner itinerarySelectionSpinner = (Spinner) header.findViewById(R.id.itinerarySelection);
 		
 		String[] itinerarySummaryList = new String[itineraryList.size()];
-
+		
+		boolean isTransitIsTagSet = false;
 		for(int i=0; i<itinerarySummaryList.length; i++){
-			boolean isTagSet = false;
+			isTransitIsTagSet = false;
 			Itinerary it = itineraryList.get(i);
 			for (Leg leg : it.legs){
 				TraverseMode traverseMode = TraverseMode.valueOf((String) leg.mode);
 				if(traverseMode.isTransit()){
 					itinerarySummaryList[i] = getResources().getString(R.string.before_route) + " " + leg.getRouteShortName() + ". ";
-					isTagSet = true;
+					isTransitIsTagSet = true;
 					break;
 				}
 			}
-			if (!isTagSet){
+			if (!isTransitIsTagSet){
 				itinerarySummaryList[i] = Integer.toString(i+1) + ".   ";//Shown index is i + 1, to use 1-based indexes for the UI instead of 0-based
 			}
 		}
@@ -162,7 +163,9 @@ public class DirectionListFragment extends ExpandableListFragment {
 		for(int i=0; i<itinerarySummaryList.length; i++){
 			Itinerary it = itineraryList.get(i);
 			itinerarySummaryList[i] += getString(R.string.total_duration) + " " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.duration/1000, getActivity().getApplicationContext());
-			itinerarySummaryList[i] +=  "   " + getString(R.string.walking_duration) + " " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.walkTime, getActivity().getApplicationContext());
+			if (isTransitIsTagSet){
+				itinerarySummaryList[i] +=  "   " + getString(R.string.walking_duration) + " " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.walkTime, getActivity().getApplicationContext());
+			}
 		}
 		
 		ArrayAdapter<String> itineraryAdapter = new ArrayAdapter<String>(activity, android.R.layout.simple_spinner_item, itinerarySummaryList);
