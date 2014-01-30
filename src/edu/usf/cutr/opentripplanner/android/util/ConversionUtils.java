@@ -24,7 +24,6 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import android.content.Context;
-
 import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.R;
 
@@ -33,8 +32,8 @@ import edu.usf.cutr.opentripplanner.android.R;
  *
  */
 
-public class DateTimeConversion {
-	public static double getDuration(String startTimeText, String endTimeText) {
+public class ConversionUtils {
+	public static double getDuration(String startTimeText, String endTimeText){
 		double duration=0;
 		DateFormat formatter ; 
 		Date startTime=null, endTime=null; 
@@ -60,10 +59,28 @@ public class DateTimeConversion {
 	 * @param sec
 	 * @return
 	 */
-	public static String getFormattedDurationText(long sec, Context applicationContext) {
+	public static String getFormattedDistance(Double meters, Context applicationContext){
+		String text = "";
+
+		if (meters < 1000){
+			text += String.format(OTPApp.FORMAT_DISTANCE_METERS, meters) + " " + applicationContext.getResources().getString(R.string.distance_meters);
+		}
+		else{
+			meters = meters / 1000;
+			text += String.format(OTPApp.FORMAT_DISTANCE_KILOMETERS, meters) + " " + applicationContext.getResources().getString(R.string.distance_kilometers);
+		}
+		return text;
+	}
+	
+	/**
+	 * 
+	 * @param sec
+	 * @return
+	 */
+	public static String getFormattedDurationText(long sec, Context applicationContext){
 		String text = "";
 		long h = sec/3600;
-		if (h >= 24)
+		if (h>=24)
 			return null;
 		long m = (sec%3600)/60;
 		long s = (sec%3600)%60;
@@ -80,23 +97,28 @@ public class DateTimeConversion {
 	 * @param sec
 	 * @return
 	 */
-	public static String getFormattedDurationTextNoSeconds(long sec, Context applicationContext) {
+	public static String getFormattedDurationTextNoSeconds(long sec, Context applicationContext){
 		String text = "";
 		long h = sec/3600;
-		if (h >= 24)
+		if (h>=24)
 			return null;
 		long m = (sec%3600)/60;
-		if (h > 0) {
-			text += Long.toString(h) + applicationContext.getResources().getString(R.string.short_hours);
-			text += " " + Long.toString(m) + applicationContext.getResources().getString(R.string.short_minutes);
+		if (h > 0){
+			text += Long.toString(h) + " " + applicationContext.getResources().getString(R.string.short_hours);
+			text += Long.toString(m) + " " + applicationContext.getResources().getString(R.string.short_minutes);
 		}
-		else {
-			text += Long.toString(m) + " " + applicationContext.getResources().getString(R.string.long_minutes);
+		else{
+			if (m == 0){
+				text += Long.toString(m) + " " + applicationContext.getResources().getString(R.string.long_minutes);
+			}
+			else{
+				text += Long.toString(m) + " " + applicationContext.getResources().getString(R.string.long_minutes);
+			}
 		}
 		return text;
 	}
 	
-	public static String getTimeWithContext(Context applicationContext, int offsetGMT, long time, boolean inLine) {
+	public static String getTimeWithContext(Context applicationContext, int offsetGMT, long time, boolean inLine){
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 		DateFormat timeFormat = android.text.format.DateFormat.getTimeFormat(applicationContext);
 		DateFormat dateFormat = android.text.format.DateFormat.getDateFormat(applicationContext);
@@ -106,11 +128,11 @@ public class DateTimeConversion {
 		cal.setTimeInMillis(time);
 		cal.add(Calendar.MILLISECOND, offsetGMT);
 		
-		if (inLine) {
-			if (DateTimeConversion.isToday(cal)) {
+		if (inLine){
+			if (ConversionUtils.isToday(cal)){
 				return (" " + applicationContext.getResources().getString(R.string.connector_time) + " " + timeFormat.format(cal.getTime()));	
 			}
-			else if (DateTimeConversion.isTomorrow(cal)){
+			else if (ConversionUtils.isTomorrow(cal)){
 				return (" " + applicationContext.getResources().getString(R.string.next_day) + " " + applicationContext.getResources().getString(R.string.connector_time) + " " + timeFormat.format(cal.getTime()));
 			}
 			else{
@@ -118,7 +140,7 @@ public class DateTimeConversion {
 			}
 		}
 		else{
-			if (DateTimeConversion.isToday(cal)) {
+			if (ConversionUtils.isToday(cal)){
 				return (timeFormat.format(cal.getTime()));	
 			}
 			else{

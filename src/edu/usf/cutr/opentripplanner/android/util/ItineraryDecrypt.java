@@ -152,7 +152,7 @@ public class ItineraryDecrypt {
 		mainDirectionText += toPlace.stopId==null ? "" : " (" + toPlace.stopId.getAgencyId() + " " + toPlace.stopId.getId() + ")";
 //		double duration = DateTimeConversion.getDuration(leg.startTime, leg.endTime);
 		double totalDistance = leg.distance;
-		mainDirectionText += "\n[" + String.format(OTPApp.FORMAT_DISTANCE_METERS_FULL, totalDistance) + applicationContext.getResources().getString(R.string.distance_unit) +" ]";// Double.toString(duration);
+		mainDirectionText += "\n[" + ConversionUtils.getFormattedDistance(totalDistance, applicationContext) +" ]";// Double.toString(duration);
 
 		direction.setDirectionText(mainDirectionText);
 
@@ -215,7 +215,7 @@ public class ItineraryDecrypt {
 			
 			subDirectionText += applicationContext.getResources().getString(R.string.step_by_step_connector_street_name) + " "+ getLocalizedStreetName(streetName, applicationContext.getResources()) + " ";
 			
-			subDirectionText += "\n[" + String.format(OTPApp.FORMAT_DISTANCE_METERS_FULL, distance) + applicationContext.getResources().getString(R.string.distance_unit) + " ]";
+			subDirectionText += "\n[" + ConversionUtils.getFormattedDistance(distance, applicationContext) + " ]";
 
 			dir.setDirectionText(subDirectionText);
 
@@ -426,7 +426,7 @@ public class ItineraryDecrypt {
 
 		// Only onDirection has subdirection (list of stops in between)
 		
-		onDirectionText += applicationContext.getResources().getString(R.string.step_by_step_transit_get_on) + " " + serviceName + " " + mode + " " + route + DateTimeConversion.getTimeWithContext(applicationContext, agencyTimeZoneOffset, Long.parseLong(leg.getStartTime()), true) + "\n";
+		onDirectionText += applicationContext.getResources().getString(R.string.step_by_step_transit_get_on) + " " + serviceName + " " + mode + " " + route + ConversionUtils.getTimeWithContext(applicationContext, agencyTimeZoneOffset, Long.parseLong(leg.getStartTime()), true) + "\n";
 		onDirectionText += applicationContext.getResources().getString(R.string.step_by_step_transit_connector_stop_name) + " " + from.name + " (" + agencyAndIdFrom.getAgencyId() + " " + agencyAndIdFrom.getId() + ")\n";
 		onDirectionText += stopsInBetween.size() + " " + applicationContext.getResources().getString(R.string.step_by_step_transit_stops_in_between);
 		onDirection.setDirectionText(onDirectionText);
@@ -514,7 +514,7 @@ public class ItineraryDecrypt {
 		Leg legEnd = legs.get(legs.size()-1);
 		String endTimeText = legEnd.endTime;
 
-		totalTimeTraveled = DateTimeConversion.getDuration(startTimeText, endTimeText);
+		totalTimeTraveled = ConversionUtils.getDuration(startTimeText, endTimeText);
 
 		return totalTimeTraveled;
 	}

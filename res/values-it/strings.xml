@@ -118,7 +118,7 @@
     <string name="tripplanner_error_dialog_title">Percorso non tovato</string>
     <string name="tripplanner_error_request_timeout">Il Server non risponde, si prega di provare in seguito</string>
     <string name="tripplanner_error_system">Il server non funziona, si prega di provare in seguito</string>
-    <string name="tripplanner_error_outside_bounds">L'origine o la destinazione sono al di là dei limiti</string>
+    <string name="tripplanner_error_outside_bounds">"L'origine o la destinazione sono al di là dei limiti"</string>
     <string name="tripplanner_error_path_not_found">"Non esistono percorsi disponibili per i criteri selezionati"</string>
     <string name="tripplanner_error_no_transit_times">I tempi di percorrenza per la data selezionata non sono definiti nel server</string>
     <string name="tripplanner_error_bogus_parameter">Richiesta non corretta, si prega di provare con parametri differenti</string>
@@ -127,9 +127,9 @@
     <string name="tripplanner_error_geocode_from_to_not_found">Origine e destinazione non trovata</string>
     <string name="tripplanner_error_too_close">Il percorso è troppo breve</string>
     <string name="tripplanner_error_location_not_accessible">Il luogo scelto non è accessibile</string>
-    <string name="tripplanner_error_geocode_from_ambiguous">L'origine è ambigua</string>
+    <string name="tripplanner_error_geocode_from_ambiguous">"L'origine è ambigua"</string>
     <string name="tripplanner_error_geocode_to_ambiguous">La destinazione è ambiga</string>
-    <string name="tripplanner_error_geocode_from_to_ambiguous">L'origine e la destinazione sono ambigui</string>
+    <string name="tripplanner_error_geocode_from_to_ambiguous">"L'origine e la destinazione sono ambigui"</string>
     <string name="tripplanner_error_triangle">I parametri per la bici sono errati, si prega di provare di nuovo con valori diversi</string>
     <string name="date_time_title">Impostare data e ora</string>
     <string name="date_time_spinner_arrive">Arrivo alle:</string>

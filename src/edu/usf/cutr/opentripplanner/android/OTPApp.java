@@ -143,8 +143,8 @@ public class OTPApp extends Application {
 	public static final float defaultMyLocationZoomLevel = 16;
 	
     public static final String FORMAT_COORDINATES = "#.00000";
-    public static final String FORMAT_DISTANCE_METERS_SHORT = "%.0f";
-    public static final String FORMAT_DISTANCE_METERS_FULL = "%.2f";
+    public static final String FORMAT_DISTANCE_METERS = "%.0f";
+    public static final String FORMAT_DISTANCE_KILOMETERS = "%.1f";
     public static final String FORMAT_OTP_SERVER_DATE_RESPONSE = "yyyy-MM-dd\'T\'HH:mm:ssZZ";
 	public static final String FORMAT_OTP_SERVER_DATE_QUERY = "MM/dd/yy";
 	public static final String FORMAT_OTP_SERVER_TIME_QUERY = "kk:mm";
