@@ -145,7 +145,7 @@ import edu.usf.cutr.opentripplanner.android.tasks.OTPGeocoding;
 import edu.usf.cutr.opentripplanner.android.tasks.ServerChecker;
 import edu.usf.cutr.opentripplanner.android.tasks.ServerSelector;
 import edu.usf.cutr.opentripplanner.android.tasks.TripRequest;
-import edu.usf.cutr.opentripplanner.android.util.DateTimeConversion;
+import edu.usf.cutr.opentripplanner.android.util.ConversionUtils;
 import edu.usf.cutr.opentripplanner.android.util.DateTimeDialog;
 import edu.usf.cutr.opentripplanner.android.util.ItineraryDecrypt;
 import edu.usf.cutr.opentripplanner.android.util.LocationUtil;
@@ -2449,7 +2449,7 @@ public class MainFragment extends Fragment implements
 					modeMarkerOption.title(stepIndex + ". " + getResources().getString(R.string.before_route) + " " + leg.getRouteShortName() 
 										             + " " + getResources().getString(R.string.connector_stop) + " " + ItineraryDecrypt.getLocalizedStreetName(leg.getFrom().name, applicationContext.getResources()));
 					if (leg.getHeadsign() != null){
-						modeMarkerOption.snippet( DateTimeConversion.getTimeWithContext(applicationContext, agencyTimeZoneOffset, Long.parseLong(leg.getStartTime()), false)
+						modeMarkerOption.snippet( ConversionUtils.getTimeWithContext(applicationContext, agencyTimeZoneOffset, Long.parseLong(leg.getStartTime()), false)
 								                  + " " + getResources().getString(R.string.step_by_step_to) + " " + leg.getHeadsign());
 					}
 				}
@@ -2462,8 +2462,8 @@ public class MainFragment extends Fragment implements
 						modeMarkerOption.title(stepIndex + ". " + getResources().getString(R.string.before_distance_bike)
 								+ " " + getResources().getString(R.string.connector_destination) + " " +  ItineraryDecrypt.getLocalizedStreetName(leg.getTo().name, applicationContext.getResources()));
 					}
-					modeMarkerOption.snippet(DateTimeConversion.getFormattedDurationTextNoSeconds(leg.duration/1000, applicationContext) + " " + "-" + " " 
-							+ String.format(OTPApp.FORMAT_DISTANCE_METERS_SHORT, leg.getDistance()) + getResources().getString(R.string.distance_unit));
+					modeMarkerOption.snippet(ConversionUtils.getFormattedDurationTextNoSeconds(leg.duration/1000, applicationContext) + " " + "-" + " " 
+							+ ConversionUtils.getFormattedDistance(leg.getDistance(), applicationContext));
 				}
 
 				
@@ -2588,7 +2588,7 @@ public class MainFragment extends Fragment implements
 		int agencyTimeZoneOffset = 0;
 		
 		for(int i=0; i<itinerarySummaryList.length; i++){
-			boolean isTagSet = false;
+			boolean isTransitIsTagSet = false;
 			Itinerary it = itineraryList.get(i);
 			for (Leg leg : it.legs){
 				TraverseMode traverseMode = TraverseMode.valueOf((String) leg.mode);
@@ -2597,31 +2597,19 @@ public class MainFragment extends Fragment implements
 					agencyTimeZoneOffset = leg.getAgencyTimeZoneOffset();
 				}
 				if(traverseMode.isTransit()){
-					itinerarySummaryList[i] = DateTimeConversion.getTimeWithContext(applicationContext, agencyTimeZoneOffset, Long.parseLong(leg.getStartTime()), false);
-					itinerarySummaryList[i] += " " + getResources().getString(R.string.before_route) + " " + leg.getRouteShortName();
-					itinerarySummaryList[i] += " - " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.duration/1000, applicationContext);
+					itinerarySummaryList[i] = ConversionUtils.getTimeWithContext(applicationContext, agencyTimeZoneOffset, Long.parseLong(leg.getStartTime()), false);
+					itinerarySummaryList[i] += ". " + getResources().getString(R.string.before_route) + " " + leg.getRouteShortName();
+					itinerarySummaryList[i] += " - " + ConversionUtils.getFormattedDurationTextNoSeconds(it.duration/1000, applicationContext);
 					if (leg.getHeadsign() != null){
 						itinerarySummaryList[i] += " - " + leg.getHeadsign();
 					}
-					isTagSet = true;
+					isTransitIsTagSet = true;
 					break;
 				}
 			}
-			if (!isTagSet){
-				if (it.legs.size() == 1){
-					TraverseMode traverseMode = TraverseMode.valueOf((String) it.legs.get(0).mode);
-					if (traverseMode.equals(TraverseMode.WALK)){
-						itinerarySummaryList[i] = getString(R.string.before_distance_walk) + " " + String.format(OTPApp.FORMAT_DISTANCE_METERS_SHORT, it.walkDistance) + getResources().getString(R.string.distance_unit);
-						itinerarySummaryList[i] += " " + getString(R.string.connector_time_full) + " " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.duration/1000, applicationContext);
-					}
-					else if (traverseMode.equals(TraverseMode.BICYCLE)){
-						itinerarySummaryList[i] = getString(R.string.before_distance_bike) + " " + String.format(OTPApp.FORMAT_DISTANCE_METERS_SHORT, it.walkDistance) + getResources().getString(R.string.distance_unit);
-						itinerarySummaryList[i] += " " + getString(R.string.connector_time_full) + " " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.duration/1000, applicationContext);
-					}
-				}
-				else{
-					itinerarySummaryList[i] = getString(R.string.total_duration) + " " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.duration/1000, applicationContext);
-				}
+			if (!isTransitIsTagSet){
+				itinerarySummaryList[i] = Integer.toString(i+1) + ".   ";//Shown index is i + 1, to use 1-based indexes for the UI instead of 0-based					
+				itinerarySummaryList[i] += ConversionUtils.getFormattedDistance(it.walkDistance, applicationContext) + " " + "-" + " " + ConversionUtils.getFormattedDurationTextNoSeconds(it.duration/1000, applicationContext);
 			}
 
 		}

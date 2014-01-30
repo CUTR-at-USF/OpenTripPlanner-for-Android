@@ -41,7 +41,7 @@ import edu.usf.cutr.opentripplanner.android.listeners.ServerCheckerCompleteListe
 import edu.usf.cutr.opentripplanner.android.model.Server;
 import edu.usf.cutr.opentripplanner.android.sqlite.ServersDataSource;
 import edu.usf.cutr.opentripplanner.android.tasks.ServerChecker;
-import edu.usf.cutr.opentripplanner.android.util.DateTimeConversion;
+import edu.usf.cutr.opentripplanner.android.util.ConversionUtils;;
 
 /*
  * Modified by Khoa Tran
@@ -327,7 +327,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 		if(mostRecentDate != null){
 			Calendar cal = Calendar.getInstance();
 			cal.setTimeInMillis(mostRecentDate);
-			serverRefreshButton.setSummary(getResources().getString(R.string.server_list_donwload_date_description) + DateTimeConversion.getTimeWithContext(this.getApplicationContext(), cal.getTimeZone().getOffset(cal.getTimeInMillis()), cal.getTimeInMillis(), true));
+			serverRefreshButton.setSummary(getResources().getString(R.string.server_list_donwload_date_description) + ConversionUtils.getTimeWithContext(this.getApplicationContext(), cal.getTimeZone().getOffset(cal.getTimeInMillis()), cal.getTimeInMillis(), true));
 		}else{
 			serverRefreshButton.setSummary(getResources().getString(R.string.server_list_donwload_date_unknown));
 		}

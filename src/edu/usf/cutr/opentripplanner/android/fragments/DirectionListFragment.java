@@ -42,7 +42,7 @@ import edu.usf.cutr.opentripplanner.android.R;
 import edu.usf.cutr.opentripplanner.android.listeners.OnFragmentListener;
 import edu.usf.cutr.opentripplanner.android.model.Direction;
 import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
-import edu.usf.cutr.opentripplanner.android.util.DateTimeConversion;
+import edu.usf.cutr.opentripplanner.android.util.ConversionUtils;
 import edu.usf.cutr.opentripplanner.android.util.DirectionExpandableListAdapter;
 import edu.usf.cutr.opentripplanner.android.util.ExpandableListFragment;
 import edu.usf.cutr.opentripplanner.android.util.ItineraryDecrypt;
@@ -162,9 +162,9 @@ public class DirectionListFragment extends ExpandableListFragment {
 		
 		for(int i=0; i<itinerarySummaryList.length; i++){
 			Itinerary it = itineraryList.get(i);
-			itinerarySummaryList[i] += getString(R.string.total_duration) + " " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.duration/1000, getActivity().getApplicationContext());
+			itinerarySummaryList[i] += getString(R.string.total_duration) + " " + ConversionUtils.getFormattedDurationTextNoSeconds(it.duration/1000, getActivity().getApplicationContext());
 			if (isTransitIsTagSet){
-				itinerarySummaryList[i] +=  "   " + getString(R.string.walking_duration) + " " + DateTimeConversion.getFormattedDurationTextNoSeconds(it.walkTime, getActivity().getApplicationContext());
+				itinerarySummaryList[i] +=  "   " + getString(R.string.walking_duration) + " " + ConversionUtils.getFormattedDurationTextNoSeconds(it.walkTime, getActivity().getApplicationContext());
 			}
 		}
 		
@@ -277,9 +277,9 @@ public class DirectionListFragment extends ExpandableListFragment {
 		}
 		
 		
-		departureTimeHeader.setText(DateTimeConversion.getTimeWithContext(getActivity().getApplicationContext(), agencyTimeZoneOffset, startTimeInSeconds, false));
+		departureTimeHeader.setText(ConversionUtils.getTimeWithContext(getActivity().getApplicationContext(), agencyTimeZoneOffset, startTimeInSeconds, false));
 		
-		arrivalTimeHeader.setText(DateTimeConversion.getTimeWithContext(getActivity().getApplicationContext(), agencyTimeZoneOffset, endTimeInSeconds, false));
+		arrivalTimeHeader.setText(ConversionUtils.getTimeWithContext(getActivity().getApplicationContext(), agencyTimeZoneOffset, endTimeInSeconds, false));
 	}
 
 	@Override
