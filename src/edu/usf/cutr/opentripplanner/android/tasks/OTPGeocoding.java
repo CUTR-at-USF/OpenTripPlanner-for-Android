@@ -49,6 +49,7 @@ import edu.usf.cutr.opentripplanner.android.pois.GooglePlaces;
 import edu.usf.cutr.opentripplanner.android.pois.Nominatim;
 import edu.usf.cutr.opentripplanner.android.pois.POI;
 import edu.usf.cutr.opentripplanner.android.pois.Places;
+import edu.usf.cutr.opentripplanner.android.util.LocationUtil;
 
 /**
  * @author Khoa Tran
@@ -129,6 +130,8 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 			}
 		}
 		
+		addresses = filterAddressesBBox(addresses);
+		
 		if ((addresses == null) || addresses.isEmpty()) {
 			addresses = searchPlaces(address);
 			
@@ -141,10 +144,34 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 				}
 			}
 		}
+		
+		addresses = filterAddressesBBox(addresses);
 
 		addressesReturn.addAll(addresses);
 
 		return count;
+	}
+	
+	/**
+	 * Filters the addresses obtained in geocoding process, removing the
+	 * results outside server limits.
+	 * 
+	 * @param the list of addresses to filter
+	 * @return a new list filtered
+	 */
+	private ArrayList<Address> filterAddressesBBox(ArrayList<Address> addresses){
+		if (!(addresses == null || addresses.isEmpty())){
+			ArrayList<Address> addressesFiltered = new ArrayList<Address>(addresses);
+			
+			for (Address address : addressesFiltered){
+				if (!LocationUtil.checkPointInBoundingBox(new LatLng(address.getLatitude(), address.getLongitude()), selectedServer, OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)){
+					addressesFiltered.remove(address);
+				}
+			}
+			
+			return addressesFiltered;
+		}
+		return addresses;
 	}
 
 	/**
