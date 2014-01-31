@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -99,7 +98,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 			String currentLng = reqs[2];
 			LatLng latLng = new LatLng(Double.parseDouble(currentLat), Double.parseDouble(currentLng));
 			
-			Address addressReturn = new Address(Locale.US);
+			Address addressReturn = new Address(context.getResources().getConfiguration().locale);
 			addressReturn.setLatitude(latLng.latitude);
 			addressReturn.setLongitude(latLng.longitude);
 			addressReturn.setAddressLine(addressReturn.getMaxAddressLineIndex()+1, context.getString(R.string.my_location));
@@ -236,7 +235,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 		for (int i=0; i<pois.size(); i++) {
 			POI poi = pois.get(i);
 			Log.v(TAG, poi.getName() + " " + poi.getLatitude() + "," + poi.getLongitude());
-			Address addr = new Address(Locale.US);
+			Address addr = new Address(context.getResources().getConfiguration().locale);
 			addr.setLatitude(poi.getLatitude());
 			addr.setLongitude(poi.getLongitude());
 			String addressLine;
