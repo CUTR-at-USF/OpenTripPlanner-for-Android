@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -49,6 +48,7 @@ import edu.usf.cutr.opentripplanner.android.pois.GooglePlaces;
 import edu.usf.cutr.opentripplanner.android.pois.Nominatim;
 import edu.usf.cutr.opentripplanner.android.pois.POI;
 import edu.usf.cutr.opentripplanner.android.pois.Places;
+import edu.usf.cutr.opentripplanner.android.util.LocationUtil;
 
 /**
  * @author Khoa Tran
@@ -98,7 +98,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 			String currentLng = reqs[2];
 			LatLng latLng = new LatLng(Double.parseDouble(currentLat), Double.parseDouble(currentLng));
 			
-			Address addressReturn = new Address(Locale.US);
+			Address addressReturn = new Address(context.getResources().getConfiguration().locale);
 			addressReturn.setLatitude(latLng.latitude);
 			addressReturn.setLongitude(latLng.longitude);
 			addressReturn.setAddressLine(addressReturn.getMaxAddressLineIndex()+1, context.getString(R.string.my_location));
@@ -129,6 +129,8 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 			}
 		}
 		
+		addresses = filterAddressesBBox(addresses);
+		
 		if ((addresses == null) || addresses.isEmpty()) {
 			addresses = searchPlaces(address);
 			
@@ -141,10 +143,34 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 				}
 			}
 		}
+		
+		addresses = filterAddressesBBox(addresses);
 
 		addressesReturn.addAll(addresses);
 
 		return count;
+	}
+	
+	/**
+	 * Filters the addresses obtained in geocoding process, removing the
+	 * results outside server limits.
+	 * 
+	 * @param the list of addresses to filter
+	 * @return a new list filtered
+	 */
+	private ArrayList<Address> filterAddressesBBox(ArrayList<Address> addresses){
+		if (!(addresses == null || addresses.isEmpty())){
+			ArrayList<Address> addressesFiltered = new ArrayList<Address>(addresses);
+			
+			for (Address address : addressesFiltered){
+				if (!LocationUtil.checkPointInBoundingBox(new LatLng(address.getLatitude(), address.getLongitude()), selectedServer, OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)){
+					addressesFiltered.remove(address);
+				}
+			}
+			
+			return addressesFiltered;
+		}
+		return addresses;
 	}
 
 	/**
@@ -209,7 +235,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 		for (int i=0; i<pois.size(); i++) {
 			POI poi = pois.get(i);
 			Log.v(TAG, poi.getName() + " " + poi.getLatitude() + "," + poi.getLongitude());
-			Address addr = new Address(Locale.US);
+			Address addr = new Address(context.getResources().getConfiguration().locale);
 			addr.setLatitude(poi.getLatitude());
 			addr.setLongitude(poi.getLongitude());
 			String addressLine;
