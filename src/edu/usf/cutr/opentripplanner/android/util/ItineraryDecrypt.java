@@ -50,8 +50,6 @@ public class ItineraryDecrypt {
 	private double totalTimeTraveled = 0;
 	
 	private Context applicationContext;
-	
-	int agencyTimeZoneOffset = 0;
 
 	public ItineraryDecrypt(List<Leg> legs, Context applicationContext){
 		this.legs.addAll(legs);
@@ -124,10 +122,6 @@ public class ItineraryDecrypt {
 		Direction direction = new Direction();
 
 		//		http://opentripplanner.usf.edu/opentripplanner-api-webapp/ws/plan?optimize=QUICK&time=09:24pm&arriveBy=false&wheelchair=false&maxWalkDistance=7600.0&fromPlace=28.033389%2C+-82.521034&toPlace=28.064709%2C+-82.471618&date=03/07/12&mode=WALK,TRAM,SUBWAY,RAIL,BUS,FERRY,CABLE_CAR,GONDOLA,FUNICULAR,TRANSIT,TRAINISH,BUSISH
-		
-		if (leg.getAgencyTimeZoneOffset() != 0){
-			this.agencyTimeZoneOffset = leg.getAgencyTimeZoneOffset();
-		}
 		
 		// Get appropriate action and icon
 		// Get appropriate action and icon
@@ -374,10 +368,6 @@ public class ItineraryDecrypt {
 		Direction onDirection = new Direction();
 		Direction offDirection = new Direction(); 
 		
-		if (leg.getAgencyTimeZoneOffset() != 0){
-			this.agencyTimeZoneOffset = leg.getAgencyTimeZoneOffset();
-		}
-
 		//		set icon
 		TraverseMode mode = TraverseMode.valueOf((String) leg.mode);
 		int icon = getModeIcon(new TraverseModeSet(mode));
@@ -426,7 +416,7 @@ public class ItineraryDecrypt {
 
 		// Only onDirection has subdirection (list of stops in between)
 		
-		onDirectionText += applicationContext.getResources().getString(R.string.step_by_step_transit_get_on) + " " + serviceName + " " + mode + " " + route + ConversionUtils.getTimeWithContext(applicationContext, agencyTimeZoneOffset, Long.parseLong(leg.getStartTime()), true) + "\n";
+		onDirectionText += applicationContext.getResources().getString(R.string.step_by_step_transit_get_on) + " " + serviceName + " " + mode + " " + route + ConversionUtils.getTimeWithContext(applicationContext, leg.getAgencyTimeZoneOffset(), Long.parseLong(leg.getStartTime()), true) + "\n";
 		onDirectionText += applicationContext.getResources().getString(R.string.step_by_step_transit_connector_stop_name) + " " + from.name + " (" + agencyAndIdFrom.getAgencyId() + " " + agencyAndIdFrom.getId() + ")\n";
 		onDirectionText += stopsInBetween.size() + " " + applicationContext.getResources().getString(R.string.step_by_step_transit_stops_in_between);
 		onDirection.setDirectionText(onDirectionText);

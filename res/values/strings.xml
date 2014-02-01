@@ -111,6 +111,8 @@
     <string name="custom_server_error">"Please provide a new URL for a working OTP server"</string>
     <string name="auto_detect_server">Auto detect OTP Server</string>
     <string name="auto_detect_server_description">Automatically selects an OpenTripPlanner server based on current location</string>
+    <string name="use_device_timezone">"Use device timezone"</string>
+    <string name="use_device_timezone_description">"Always use user's timzeone regardless remote server's local time"</string>
     <string name="geocoder_results_title">Geocoder Results</string>
     <string name="geocoder_no_results_message">Sorry, a geographical location for this address could not be found.</string>
     <string name="tripplanner_progress">"Generating trip. Please wait..."</string>   

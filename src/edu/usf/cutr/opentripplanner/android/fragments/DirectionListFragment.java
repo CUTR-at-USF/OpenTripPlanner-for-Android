@@ -260,26 +260,18 @@ public class DirectionListFragment extends ExpandableListFragment {
 	}
 	
 	private void setDepartureArrivalHeaders(){
-	 	Itinerary firstItinerary = fragmentListener.getCurrentItineraryList().get(fragmentListener.getCurrentItineraryIndex());
+	 	Itinerary actualItinerary = fragmentListener.getCurrentItineraryList().get(fragmentListener.getCurrentItineraryIndex());
 		
-		int agencyTimeZoneOffset = 0;
-		long startTimeInSeconds = -1;
-		long endTimeInSeconds = -1;
+		if (!actualItinerary.legs.isEmpty()){
+			Leg firstLeg = actualItinerary.legs.get(0); 
+			int agencyTimeZoneOffset = firstLeg.getAgencyTimeZoneOffset();
+			long startTimeInSeconds = Long.parseLong(firstLeg.getStartTime());
+			long endTimeInSeconds = Long.parseLong(firstLeg.getEndTime());
 		
-		for (Leg leg : firstItinerary.legs){
-			if (startTimeInSeconds == -1){
-				startTimeInSeconds = Long.parseLong(leg.getStartTime());
-			}
-			if (leg.getAgencyTimeZoneOffset() != 0){
-				agencyTimeZoneOffset = leg.getAgencyTimeZoneOffset();
-			}
-			endTimeInSeconds = Long.parseLong(leg.getEndTime());
+			departureTimeHeader.setText(ConversionUtils.getTimeWithContext(getActivity().getApplicationContext(), agencyTimeZoneOffset, startTimeInSeconds, false));
+			
+			arrivalTimeHeader.setText(ConversionUtils.getTimeWithContext(getActivity().getApplicationContext(), agencyTimeZoneOffset, endTimeInSeconds, false));
 		}
-		
-		
-		departureTimeHeader.setText(ConversionUtils.getTimeWithContext(getActivity().getApplicationContext(), agencyTimeZoneOffset, startTimeInSeconds, false));
-		
-		arrivalTimeHeader.setText(ConversionUtils.getTimeWithContext(getActivity().getApplicationContext(), agencyTimeZoneOffset, endTimeInSeconds, false));
 	}
 
 	@Override

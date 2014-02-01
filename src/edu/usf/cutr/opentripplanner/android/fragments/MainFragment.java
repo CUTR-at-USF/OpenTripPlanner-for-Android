@@ -2416,18 +2416,11 @@ public class MainFragment extends Fragment implements
 		if (!itinerary.isEmpty()) {
 			List<LatLng> allGeoPoints = new ArrayList<LatLng>();
 			LatLngBounds.Builder boundsCreator = LatLngBounds.builder();
-			
 
-
-			int agencyTimeZoneOffset = 0;
 			int stepIndex = 0;
 			
 			for (Leg leg : itinerary) {
 				stepIndex++;
-				
-				if (leg.getAgencyTimeZoneOffset() != 0){
-					agencyTimeZoneOffset = leg.getAgencyTimeZoneOffset();
-				}
 				
 				List<LatLng> points = LocationUtil.decodePoly(leg.legGeometry
 						.getPoints());
@@ -2449,7 +2442,7 @@ public class MainFragment extends Fragment implements
 					modeMarkerOption.title(stepIndex + ". " + getResources().getString(R.string.before_route) + " " + leg.getRouteShortName() 
 										             + " " + getResources().getString(R.string.connector_stop) + " " + ItineraryDecrypt.getLocalizedStreetName(leg.getFrom().name, applicationContext.getResources()));
 					if (leg.getHeadsign() != null){
-						modeMarkerOption.snippet( ConversionUtils.getTimeWithContext(applicationContext, agencyTimeZoneOffset, Long.parseLong(leg.getStartTime()), false)
+						modeMarkerOption.snippet( ConversionUtils.getTimeWithContext(applicationContext, leg.getAgencyTimeZoneOffset(), Long.parseLong(leg.getStartTime()), false)
 								                  + " " + getResources().getString(R.string.step_by_step_to) + " " + leg.getHeadsign());
 					}
 				}
@@ -2555,6 +2548,7 @@ public class MainFragment extends Fragment implements
 	public void onTripRequestComplete(List<Itinerary> itineraries,
 			String currentRequestString) {
 		if (getActivity() != null){
+			ConversionUtils.fixTimezoneOffsets(itineraries, prefs.getBoolean(OTPApp.PREFERENCE_KEY_USE_DEVICE_TIMEZONE, false));
 			fillItinerariesSpinner(itineraries);
 			toggleItinerarySelectionSpinner(!itineraries.isEmpty());
 			
@@ -2584,20 +2578,14 @@ public class MainFragment extends Fragment implements
 	
 	private void fillItinerariesSpinner(List<Itinerary> itineraryList){
 		String[] itinerarySummaryList = new String[itineraryList.size()];
-
-		int agencyTimeZoneOffset = 0;
 		
 		for(int i=0; i<itinerarySummaryList.length; i++){
 			boolean isTransitIsTagSet = false;
 			Itinerary it = itineraryList.get(i);
 			for (Leg leg : it.legs){
 				TraverseMode traverseMode = TraverseMode.valueOf((String) leg.mode);
-				//OTP can't handle more than two timezones per request, so this is safe
-				if (leg.getAgencyTimeZoneOffset() != 0){
-					agencyTimeZoneOffset = leg.getAgencyTimeZoneOffset();
-				}
 				if(traverseMode.isTransit()){
-					itinerarySummaryList[i] = ConversionUtils.getTimeWithContext(applicationContext, agencyTimeZoneOffset, Long.parseLong(leg.getStartTime()), false);
+					itinerarySummaryList[i] = ConversionUtils.getTimeWithContext(applicationContext, leg.getAgencyTimeZoneOffset(), Long.parseLong(leg.getStartTime()), false);
 					itinerarySummaryList[i] += ". " + getResources().getString(R.string.before_route) + " " + leg.getRouteShortName();
 					itinerarySummaryList[i] += " - " + ConversionUtils.getFormattedDurationTextNoSeconds(it.duration/1000, applicationContext);
 					if (leg.getHeadsign() != null){
