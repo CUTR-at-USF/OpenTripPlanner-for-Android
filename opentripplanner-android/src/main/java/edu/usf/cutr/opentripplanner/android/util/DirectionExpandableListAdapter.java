@@ -16,12 +16,6 @@
 
 package edu.usf.cutr.opentripplanner.android.util;
 
-import java.util.ArrayList;
-
-import edu.usf.cutr.opentripplanner.android.R;
-
-import edu.usf.cutr.opentripplanner.android.model.Direction;
-
 import android.app.Activity;
 import android.content.Context;
 import android.view.Gravity;
@@ -33,16 +27,23 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
+import edu.usf.cutr.opentripplanner.android.R;
+import edu.usf.cutr.opentripplanner.android.model.Direction;
+
 /**
  * @author Khoa Tran
- *
  */
 
-public class DirectionExpandableListAdapter extends BaseExpandableListAdapter {    
+public class DirectionExpandableListAdapter extends BaseExpandableListAdapter {
+
     Context context;
-    int layoutResourceId;    
+
+    int layoutResourceId;
+
     Direction data[] = null;
-    
+
     public DirectionExpandableListAdapter(Context context, int layoutResourceId, Direction[] data) {
         this.layoutResourceId = layoutResourceId;
         this.context = context;
@@ -51,12 +52,12 @@ public class DirectionExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public Object getChild(int groupPosition, int childPosition) {
-    	ArrayList<Direction> subDirections = data[groupPosition].getSubDirections();
-    	
-    	if(subDirections!=null && !subDirections.isEmpty()){
-    		return subDirections.get(childPosition);
-    	}
-    	
+        ArrayList<Direction> subDirections = data[groupPosition].getSubDirections();
+
+        if (subDirections != null && !subDirections.isEmpty()) {
+            return subDirections.get(childPosition);
+        }
+
         return null;
     }
 
@@ -67,15 +68,15 @@ public class DirectionExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getChildrenCount(int groupPosition) {
-    	ArrayList<Direction> subDirections = data[groupPosition].getSubDirections();
-    	
-    	if(subDirections!=null){
-    		return subDirections.size();
-    	}
-    	
+        ArrayList<Direction> subDirections = data[groupPosition].getSubDirections();
+
+        if (subDirections != null) {
+            return subDirections.size();
+        }
+
         return 0;
     }
-    
+
     public TextView getGenericView() {
         // Layout parameters for the ExpandableListView
         AbsListView.LayoutParams lp = new AbsListView.LayoutParams(
@@ -95,9 +96,9 @@ public class DirectionExpandableListAdapter extends BaseExpandableListAdapter {
             View convertView, ViewGroup parent) {
         TextView textView = getGenericView();
         Direction subDirection = (Direction) getChild(groupPosition, childPosition);
-        
+
         String text = subDirection == null ? "null here" : subDirection.getDirectionText();
-        
+
         textView.setText(text);
         return textView;
     }
@@ -122,32 +123,29 @@ public class DirectionExpandableListAdapter extends BaseExpandableListAdapter {
             ViewGroup parent) {
 //        TextView textView = getGenericView();
 //        textView.setText(getGroup(groupPosition).toString());
-        
+
         View row = convertView;
         DirectionHolder holder = null;
-        
-        if(row == null)
-        {
-            LayoutInflater inflater = ((Activity)context).getLayoutInflater();
+
+        if (row == null) {
+            LayoutInflater inflater = ((Activity) context).getLayoutInflater();
             row = inflater.inflate(layoutResourceId, parent, false);
-            
+
             holder = new DirectionHolder();
-            holder.imgIcon = (ImageView)row.findViewById(R.id.imgIcon);
-            holder.txtDirection = (TextView)row.findViewById(R.id.directionText);
-            
+            holder.imgIcon = (ImageView) row.findViewById(R.id.imgIcon);
+            holder.txtDirection = (TextView) row.findViewById(R.id.directionText);
+
             row.setTag(holder);
+        } else {
+            holder = (DirectionHolder) row.getTag();
         }
-        else
-        {
-            holder = (DirectionHolder)row.getTag();
-        }
-        
+
         Direction dir = data[groupPosition];
         holder.txtDirection.setText(dir.getDirectionIndex() + ". " + dir.getDirectionText());
         holder.imgIcon.setImageResource(dir.getIcon());
-        
+
         return row;
-        
+
 //        return textView;
     }
 
@@ -160,10 +158,11 @@ public class DirectionExpandableListAdapter extends BaseExpandableListAdapter {
     public boolean hasStableIds() {
         return true;
     }
-    
-    static class DirectionHolder
-    {
+
+    static class DirectionHolder {
+
         ImageView imgIcon;
+
         TextView txtDirection;
     }
 }

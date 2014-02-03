@@ -16,7 +16,7 @@
 -->
 <resources>
     <string name="yes">Oui</string>
-    <string name="no">Non</string>        
+    <string name="no">Non</string>
     <string name="step_by_step_title">Indications</string>
     <string name="step_by_step_header_from">De</string>
     <string name="step_by_step_header_to">À</string>
@@ -113,7 +113,7 @@
     <string name="auto_detect_server_description">Trouver serveur automatiquement por la position actuelle</string>
     <string name="geocoder_results_title">Résultats des directions</string>
     <string name="geocoder_no_results_message">Désolé, aucun résultat pour cette direction</string>
-    <string name="tripplanner_progress">"En cherchant le meilleur itinéraire. S'il vous plaît attendez..."</string>   
+    <string name="tripplanner_progress">"En cherchant le meilleur itinéraire. S'il vous plaît attendez..."</string>
     <string name="tripplanner_results_title">"Résultats d'itinéraires"</string>
     <string name="tripplanner_no_results_message">"Erreur de planification d'itinéraire"</string>
     <string name="tripplanner_error_dialog_title">"Désolé, aucun itinéraire n'a été trouvé"</string>

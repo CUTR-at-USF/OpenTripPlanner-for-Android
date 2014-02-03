@@ -1,23 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="@string/routing_options" android:key="routing_options">
-        <CheckBoxPreference android:key="wheelchair_accessible" android:defaultValue="false" android:summary="@string/wheelchair_accessibility_description" android:title="@string/wheelchair_accessible"></CheckBoxPreference>
-        <EditTextPreference android:key="max_walking_distance" android:defaultValue="@integer/max_walking_distance" android:title="@string/maximum_walk" android:numeric="integer"></EditTextPreference>
-        <CheckBoxPreference android:title="@string/auto_detect_server" android:key="auto_detect_server" android:summary="@string/auto_detect_server_description" android:defaultValue="true" android:checked="true"></CheckBoxPreference>
-        <Preference android:title="@string/refresh_server_list" android:key="refresh_server_list"/>
-        <CheckBoxPreference android:title="@string/selected_custom_server_title" android:key="selected_custom_server" android:defaultValue="false"  android:summary="@string/selected_custom_server_description"></CheckBoxPreference>
-        <EditTextPreference android:key="custom_server_url" android:title="@string/custom_server_url" android:inputType="text|textNoSuggestions" android:hint="@string/custom_server_url_hint"></EditTextPreference>
-        <CheckBoxPreference android:title="@string/use_device_timezone" android:key="use_device_timezone" android:defaultValue="false"  android:summary="@string/use_device_timezone_description"></CheckBoxPreference>
+        xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+            android:title="@string/routing_options"
+            android:key="routing_options">
+        <CheckBoxPreference
+                android:key="wheelchair_accessible"
+                android:defaultValue="false"
+                android:summary="@string/wheelchair_accessibility_description"
+                android:title="@string/wheelchair_accessible"></CheckBoxPreference>
+        <EditTextPreference
+                android:key="max_walking_distance"
+                android:defaultValue="@integer/max_walking_distance"
+                android:title="@string/maximum_walk"
+                android:numeric="integer"></EditTextPreference>
+        <CheckBoxPreference
+                android:title="@string/auto_detect_server"
+                android:key="auto_detect_server"
+                android:summary="@string/auto_detect_server_description"
+                android:defaultValue="true"
+                android:checked="true"></CheckBoxPreference>
+        <Preference
+                android:title="@string/refresh_server_list"
+                android:key="refresh_server_list"/>
+        <CheckBoxPreference
+                android:title="@string/selected_custom_server_title"
+                android:key="selected_custom_server"
+                android:defaultValue="false"
+                android:summary="@string/selected_custom_server_description"></CheckBoxPreference>
+        <EditTextPreference
+                android:key="custom_server_url"
+                android:title="@string/custom_server_url"
+                android:inputType="text|textNoSuggestions"
+                android:hint="@string/custom_server_url_hint"></EditTextPreference>
+        <CheckBoxPreference
+                android:title="@string/use_device_timezone"
+                android:key="use_device_timezone"
+                android:defaultValue="false"
+                android:summary="@string/use_device_timezone_description"></CheckBoxPreference>
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/map_options" android:key="map_options">
-        <CheckBoxPreference android:title="@string/use_intelligent_markers_title" android:key="use_intelligent_markers" android:checked="true"  android:defaultValue="true" android:summary="@string/use_intelligent_markers_description"></CheckBoxPreference>
-        <CheckBoxPreference android:title="@string/use_android_geocoder_title" android:key="use_android_geocoder" android:checked="true"  android:defaultValue="true" android:summary="@string/use_android_geocoder_description"></CheckBoxPreference>
-        <ListPreference android:title="@string/geocoder_preference_provider_title" android:key="geocoder_provider"></ListPreference>
-        <ListPreference android:title="@string/map_tile_provider" android:key="map_tile_source"></ListPreference>
+    <PreferenceCategory
+            android:title="@string/map_options"
+            android:key="map_options">
+        <CheckBoxPreference
+                android:title="@string/use_intelligent_markers_title"
+                android:key="use_intelligent_markers"
+                android:checked="true"
+                android:defaultValue="true"
+                android:summary="@string/use_intelligent_markers_description"></CheckBoxPreference>
+        <CheckBoxPreference
+                android:title="@string/use_android_geocoder_title"
+                android:key="use_android_geocoder"
+                android:checked="true"
+                android:defaultValue="true"
+                android:summary="@string/use_android_geocoder_description"></CheckBoxPreference>
+        <ListPreference
+                android:title="@string/geocoder_preference_provider_title"
+                android:key="geocoder_provider"></ListPreference>
+        <ListPreference
+                android:title="@string/map_tile_provider"
+                android:key="map_tile_source"></ListPreference>
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/feedback" android:key="feedback_options">
-        <Preference android:title="@string/feedback_email_android_developer" android:key="otp_provider_feedback"/>
+    <PreferenceCategory
+            android:title="@string/feedback"
+            android:key="feedback_options">
+        <Preference
+                android:title="@string/feedback_email_android_developer"
+                android:key="otp_provider_feedback"/>
     </PreferenceCategory>
 </PreferenceScreen> 
     

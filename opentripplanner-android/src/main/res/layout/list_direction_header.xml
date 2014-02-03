@@ -1,171 +1,171 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical" >
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:orientation="vertical">
 
     <RelativeLayout
-        android:id="@+id/layout1"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:padding="2dp"
-        android:orientation="horizontal" >
-
-        <ImageButton
-            android:id="@+id/btnDisplayMap"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:padding="5dp"
-            android:background="@null"
-            android:src="@android:drawable/ic_menu_mapmode" />
-
-        <TextView
-            android:id="@+id/titleHeader"
+            android:id="@+id/layout1"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_toRightOf="@+id/btnDisplayMap"
-            android:gravity="left"      
-            android:padding="5dp"                
-            android:text="@string/step_by_step_title"
-            android:textColor="#000000"
-            android:textSize="22sp"
-            android:textStyle="bold" />
-        
+            android:padding="2dp"
+            android:orientation="horizontal">
+
+        <ImageButton
+                android:id="@+id/btnDisplayMap"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:padding="5dp"
+                android:background="@null"
+                android:src="@android:drawable/ic_menu_mapmode"/>
+
+        <TextView
+                android:id="@+id/titleHeader"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_toRightOf="@+id/btnDisplayMap"
+                android:gravity="left"
+                android:padding="5dp"
+                android:text="@string/step_by_step_title"
+                android:textColor="#000000"
+                android:textSize="22sp"
+                android:textStyle="bold"/>
+
     </RelativeLayout>
 
     <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="horizontal" >
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="horizontal">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:gravity="center_vertical"
-            android:padding="5dp"
-            android:text="@string/step_by_step_header_from"
-            android:textColor="#C0C0C0"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:gravity="center_vertical"
+                android:padding="5dp"
+                android:text="@string/step_by_step_header_from"
+                android:textColor="#C0C0C0"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
 
         <TextView
-            android:id="@+id/fromHeader"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:gravity="center_vertical"
-            android:padding="5dp"
-            android:textColor="#000000"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:singleLine="true" />
+                android:id="@+id/fromHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:gravity="center_vertical"
+                android:padding="5dp"
+                android:textColor="#000000"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:singleLine="true"/>
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="horizontal"
-	    android:baselineAligned="false" >
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="horizontal"
+            android:baselineAligned="false">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:gravity="center_vertical"
-            android:padding="10dp"
-            android:text="@string/step_by_step_header_to"
-            android:textColor="#C0C0C0"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:gravity="center_vertical"
+                android:padding="10dp"
+                android:text="@string/step_by_step_header_to"
+                android:textColor="#C0C0C0"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
 
         <TextView
-            android:id="@+id/toHeader"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:gravity="center_vertical"
-            android:padding="10dp"
-            android:textColor="#000000"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:singleLine="true" />
-        
+                android:id="@+id/toHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:gravity="center_vertical"
+                android:padding="10dp"
+                android:textColor="#000000"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:singleLine="true"/>
+
     </LinearLayout>
-    
+
     <LinearLayout
-	    android:layout_width="fill_parent"
-	    android:layout_height="fill_parent"
-	    android:orientation="horizontal"
-	    android:baselineAligned="false" >
-        
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="horizontal"
+            android:baselineAligned="false">
+
         <LinearLayout
-		    android:layout_width="0dp"
-		    android:layout_height="fill_parent"
-		    android:orientation="horizontal"
-		    android:layout_weight="1" >
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:orientation="horizontal"
+                android:layout_weight="1">
 
-	        <TextView
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:layout_marginLeft="5dp"
-	            android:gravity="center_vertical"
-	            android:padding="10dp"
-           		android:text="@string/step_by_step_header_departure"
-	            android:textColor="#C0C0C0"
-	            android:textSize="18sp"
-	            android:textStyle="bold" />
-	
-	        <TextView
-	            android:id="@+id/departureTimeHeader"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:gravity="center_vertical"
-	            android:padding="10dp"
-	            android:textColor="#000000"
-	            android:textSize="18sp"
-	            android:textStyle="bold" />
-	        
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:gravity="center_vertical"
+                    android:padding="10dp"
+                    android:text="@string/step_by_step_header_departure"
+                    android:textColor="#C0C0C0"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
+
+            <TextView
+                    android:id="@+id/departureTimeHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:padding="10dp"
+                    android:textColor="#000000"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
+
         </LinearLayout>
-        
+
         <LinearLayout
-		    android:layout_width="0dp"
-		    android:layout_height="fill_parent"
-		    android:orientation="horizontal" 
-		    android:layout_weight="1" >
-	       
-	        <TextView
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:layout_marginLeft="5dp"
-	            android:gravity="center_vertical"
-	            android:padding="10dp"
-           		android:text="@string/step_by_step_header_arrival"
-	            android:textColor="#C0C0C0"
-	            android:textSize="18sp"
-	            android:textStyle="bold" />
-	
-	        <TextView
-	            android:id="@+id/arrivalTimeHeader"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:gravity="center_vertical"
-	            android:padding="10dp"
-	            android:textColor="#000000"
-	            android:textSize="18sp"
-	            android:textStyle="bold" />
-	        
-	        </LinearLayout>
-	        
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:orientation="horizontal"
+                android:layout_weight="1">
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:gravity="center_vertical"
+                    android:padding="10dp"
+                    android:text="@string/step_by_step_header_arrival"
+                    android:textColor="#C0C0C0"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
+
+            <TextView
+                    android:id="@+id/arrivalTimeHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:padding="10dp"
+                    android:textColor="#000000"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
+
+        </LinearLayout>
+
     </LinearLayout>
 
     <Spinner
-        android:id="@+id/itinerarySelection"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:prompt="@string/alternative_routes" >
+            android:id="@+id/itinerarySelection"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:prompt="@string/alternative_routes">
     </Spinner>
 
 </LinearLayout>

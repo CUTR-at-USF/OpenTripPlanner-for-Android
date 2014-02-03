@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/lineItem"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:gravity="center_vertical" >
+                android:id="@+id/lineItem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical">
 
     <ImageView
-        android:id="@+id/iconLine"
-        android:layout_width="48dip"
-        android:layout_height="48dip"
-        android:layout_alignParentLeft="true" />
+            android:id="@+id/iconLine"
+            android:layout_width="48dip"
+            android:layout_height="48dip"
+            android:layout_alignParentLeft="true"/>
 
     <TextView
-        android:id="@+id/textLine"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dip"
-        android:layout_toRightOf="@+id/iconLine"
-   		android:textColor="@android:color/black"
-        android:textSize="24sp" />
+            android:id="@+id/textLine"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dip"
+            android:layout_toRightOf="@+id/iconLine"
+            android:textColor="@android:color/black"
+            android:textSize="24sp"/>
 
     <Button
-        android:id="@+id/buttonLine"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:gravity="center"
-        android:text="Delete" />
+            android:id="@+id/buttonLine"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:gravity="center"
+            android:text="Delete"/>
 
 </RelativeLayout>

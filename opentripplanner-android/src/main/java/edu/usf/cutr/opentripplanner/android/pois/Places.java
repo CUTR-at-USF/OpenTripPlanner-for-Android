@@ -21,9 +21,9 @@ import java.util.HashMap;
 
 /**
  * @author Khoa Tran
- *
  */
 
 public interface Places {
-	public ArrayList<POI> getPlaces(HashMap<String, String> params);
+
+    public ArrayList<POI> getPlaces(HashMap<String, String> params);
 }

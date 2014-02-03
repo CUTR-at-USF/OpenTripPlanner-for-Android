@@ -16,16 +16,16 @@
 
 package edu.usf.cutr.opentripplanner.android.listeners;
 
-import java.util.ArrayList;
-
 import android.location.Address;
 
+import java.util.ArrayList;
+
 /**
- * 
  * @author Khoa Tran
- *
  */
 
 public interface OTPGeocodingListener {
-	public void onOTPGeocodingComplete(boolean isStartTextbox, ArrayList<Address> addressesReturn, boolean geocodingForMarker);
+
+    public void onOTPGeocodingComplete(boolean isStartTextbox, ArrayList<Address> addressesReturn,
+            boolean geocodingForMarker);
 }
