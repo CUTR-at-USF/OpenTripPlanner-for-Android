@@ -2448,10 +2448,11 @@ public class MainFragment extends Fragment implements
 				if (traverseMode.isTransit()){
 					modeMarkerOption.title(stepIndex + ". " + getResources().getString(R.string.before_route) + " " + leg.getRouteShortName() 
 										             + " " + getResources().getString(R.string.connector_stop) + " " + ItineraryDecrypt.getLocalizedStreetName(leg.getFrom().name, applicationContext.getResources()));
+					String modeMarkerSnippet = ConversionUtils.getTimeWithContext(applicationContext, agencyTimeZoneOffset, Long.parseLong(leg.getStartTime()), false);
 					if (leg.getHeadsign() != null){
-						modeMarkerOption.snippet( ConversionUtils.getTimeWithContext(applicationContext, agencyTimeZoneOffset, Long.parseLong(leg.getStartTime()), false)
-								                  + " " + getResources().getString(R.string.step_by_step_to) + " " + leg.getHeadsign());
+						modeMarkerSnippet += " " + getResources().getString(R.string.step_by_step_to) + " " + leg.getHeadsign();
 					}
+					modeMarkerOption.snippet(modeMarkerSnippet);
 				}
 				else{
 					if (traverseMode.equals(TraverseMode.WALK)){
