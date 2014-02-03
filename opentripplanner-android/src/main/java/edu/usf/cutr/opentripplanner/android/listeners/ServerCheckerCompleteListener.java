@@ -17,7 +17,7 @@
 package edu.usf.cutr.opentripplanner.android.listeners;
 
 public interface ServerCheckerCompleteListener {
-	
-	public void onServerCheckerComplete(String result, boolean isWorking);
+
+    public void onServerCheckerComplete(String result, boolean isWorking);
 
 }

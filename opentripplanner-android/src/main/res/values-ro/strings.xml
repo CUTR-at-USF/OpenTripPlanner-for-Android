@@ -16,7 +16,7 @@
 -->
 <resources>
     <string name="yes">Da</string>
-    <string name="no">Nu</string>        
+    <string name="no">Nu</string>
     <string name="step_by_step_title">Indicații</string>
     <string name="step_by_step_header_from">De la</string>
     <string name="step_by_step_header_to">Până la</string>
@@ -113,7 +113,7 @@
     <string name="auto_detect_server_description">Găsire server automat pentru locația actuală</string>
     <string name="geocoder_results_title">Rezultate de adrese</string>
     <string name="geocoder_no_results_message">Ne pare rău, nu s-a obținut niciun rezultat pentru această adresă</string>
-    <string name="tripplanner_progress">"Căutând cea mai bună rută. Va rog așteptați..."</string>   
+    <string name="tripplanner_progress">"Căutând cea mai bună rută. Va rog așteptați..."</string>
     <string name="tripplanner_results_title">Rezultate de rute</string>
     <string name="tripplanner_no_results_message">Eroare planificând ruta</string>
     <string name="tripplanner_error_dialog_title">Ne pare rău, nu a fost posibil să găsim o rută</string>

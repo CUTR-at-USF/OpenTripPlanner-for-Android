@@ -16,340 +16,353 @@
 
 package edu.usf.cutr.opentripplanner.android.model;
 
-import com.google.android.gms.maps.model.LatLng;
-
-import edu.usf.cutr.opentripplanner.android.R;
 import android.content.Context;
 import android.location.Location;
 
+import edu.usf.cutr.opentripplanner.android.R;
+
 /**
  * Modified by Khoa Tran
- *
  */
 
 public class Server {
 
-	private long id;
-	private Long date;
-	private String region;
-	private String baseURL;
-	private String bounds;
-	private String center;
-	private String zoom;
-	private String language;
-	private String contactName;
-	private String contactEmail;
+    private long id;
 
-	private double lowerLeftLatitude, lowerLeftLongitude, upperRightLatitude, upperRightLongitude;
+    private Long date;
 
-	private double geometricalCenterLatitude, geometricalCenterLongitude;  //for Google Places
-	
-	private double centerLatitude, centerLongitude;  
-	
-	private float initialZoom;   
-	
-	private boolean boundsSet = false;
+    private String region;
 
-	public boolean areBoundsSet() {
-		return boundsSet;
-	}
-	
-	private boolean centerSet = false;
-	
-	public boolean isCenterSet(){
-		return centerSet;
-	}
+    private String baseURL;
 
-	private boolean zoomSet = false;
+    private String bounds;
 
-	public boolean isZoomSet() {
-		return zoomSet;
-	} 
+    private String center;
 
-	public Server() {
-		super();
-	}
-	
-	public Server(Server s) {
-		super();
-		setId(s.getId());
-		setDate(s.getDate());
-		setRegion(s.getRegion());
-		setBaseURL(s.getBaseURL());
-		setBounds(s.getBounds());  // do extra string processing to set lowerleft and upperright
-		setCenter(s.getCenter());
-		setZoom(s.getZoom());
-		setLanguage(s.getLanguage());
-		setContactName(s.getContactName());
-		setContactEmail(s.getContactEmail());
-	}
+    private String zoom;
 
-	public Server(Long d, String region, String baseURL, String bounds,
-			String language, String contactName, String contactEmail, String center, String zoom) {
-		super();
-		setDate(d);
-		setRegion(region);
-		setBaseURL(baseURL);
-		setBounds(bounds);  // do extra string processing to set lowerleft and upperright
-		setCenter(center); 
-		setZoom(zoom);
-		setLanguage(language);
-		setContactName(contactName);
-		setContactEmail(contactEmail);
-	}
-	
-	public Server(String region, String baseURL, String bounds,
-			String language, String contactName, String contactEmail, String center, String zoom) {
-		super();
-		setRegion(region);
-		setBaseURL(baseURL);
-		setBounds(bounds);  // do extra string processing to set lowerleft and upperright
-		setCenter(center);
-		setZoom(zoom);
-		setLanguage(language);
-		setContactName(contactName);
-		setContactEmail(contactEmail);
-	}
+    private String language;
 
-	/*
-	 * Constructor for server with a custom URL
-	 */
-	public Server(String baseURL, Context applicationContext) {
-		super();
-		this.baseURL = baseURL;
-		this.region = applicationContext.getResources().getString(R.string.custom_server_unknown_region);
-		this.bounds = applicationContext.getResources().getString(R.string.custom_server_unknown_bounds);
-		this.language = applicationContext.getResources().getString(R.string.custom_server_unknown_language);
-		this.contactName = applicationContext.getResources().getString(R.string.custom_server_unknown_name);
-		this.contactEmail = applicationContext.getResources().getString(R.string.custom_server_unknown_email);
-	}
+    private String contactName;
 
-	public String getRegion() {
-		return region;
-	}
+    private String contactEmail;
 
-	public void setRegion(String region) {
-		this.region = region;
-	}
+    private double lowerLeftLatitude, lowerLeftLongitude, upperRightLatitude, upperRightLongitude;
 
-	public String getBaseURL() {
-		return baseURL;
-	}
+    private double geometricalCenterLatitude, geometricalCenterLongitude;  //for Google Places
 
-	public void setBaseURL(String baseURL) {
-		this.baseURL = baseURL;
-	}
-	
-	public String getZoom() {
-		return zoom;
-	}
+    private double centerLatitude, centerLongitude;
 
-	public void setZoom(String zoom) {
-		zoomSet = true;
-		this.zoom = zoom;
+    private float initialZoom;
 
-		setInitialZoom(Float.parseFloat(zoom));
-	}
+    private boolean boundsSet = false;
 
-	public String getCenter() {
-		return center;
-	}
+    public boolean areBoundsSet() {
+        return boundsSet;
+    }
 
-	public void setCenter(String center) {
-		centerSet = true;
-		this.center = center;
-		String[] tokens = center.split(",");
+    private boolean centerSet = false;
 
-		setCenterLatitude(Double.parseDouble(tokens[0]));
-		setCenterLongitude(Double.parseDouble(tokens[1]));
-	}
+    public boolean isCenterSet() {
+        return centerSet;
+    }
 
-	public String getBounds() {
-		return bounds;
-	}
+    private boolean zoomSet = false;
 
-	public void setBounds(String bounds) {
-		boundsSet = true;
-		this.bounds = bounds;
-		String[] tokens = bounds.split(",");
+    public boolean isZoomSet() {
+        return zoomSet;
+    }
 
-		setLowerLeftLatitude(Double.parseDouble(tokens[0]));
-		setLowerLeftLongitude(Double.parseDouble(tokens[1]));
-		setUpperRightLatitude(Double.parseDouble(tokens[2]));
-		setUpperRightLongitude(Double.parseDouble(tokens[3]));
-	}
+    public Server() {
+        super();
+    }
 
-	public String getLanguage() {
-		return language;
-	}
+    public Server(Server s) {
+        super();
+        setId(s.getId());
+        setDate(s.getDate());
+        setRegion(s.getRegion());
+        setBaseURL(s.getBaseURL());
+        setBounds(s.getBounds());  // do extra string processing to set lowerleft and upperright
+        setCenter(s.getCenter());
+        setZoom(s.getZoom());
+        setLanguage(s.getLanguage());
+        setContactName(s.getContactName());
+        setContactEmail(s.getContactEmail());
+    }
 
-	public void setLanguage(String language) {
-		this.language = language;
-	}
+    public Server(Long d, String region, String baseURL, String bounds,
+            String language, String contactName, String contactEmail, String center, String zoom) {
+        super();
+        setDate(d);
+        setRegion(region);
+        setBaseURL(baseURL);
+        setBounds(bounds);  // do extra string processing to set lowerleft and upperright
+        setCenter(center);
+        setZoom(zoom);
+        setLanguage(language);
+        setContactName(contactName);
+        setContactEmail(contactEmail);
+    }
 
-	public String getContactEmail() {
-		return contactEmail;
-	}
+    public Server(String region, String baseURL, String bounds,
+            String language, String contactName, String contactEmail, String center, String zoom) {
+        super();
+        setRegion(region);
+        setBaseURL(baseURL);
+        setBounds(bounds);  // do extra string processing to set lowerleft and upperright
+        setCenter(center);
+        setZoom(zoom);
+        setLanguage(language);
+        setContactName(contactName);
+        setContactEmail(contactEmail);
+    }
 
-	public void setContactEmail(String contactEmail) {
-		this.contactEmail = contactEmail;
-	}
+    /*
+     * Constructor for server with a custom URL
+     */
+    public Server(String baseURL, Context applicationContext) {
+        super();
+        this.baseURL = baseURL;
+        this.region = applicationContext.getResources()
+                .getString(R.string.custom_server_unknown_region);
+        this.bounds = applicationContext.getResources()
+                .getString(R.string.custom_server_unknown_bounds);
+        this.language = applicationContext.getResources()
+                .getString(R.string.custom_server_unknown_language);
+        this.contactName = applicationContext.getResources()
+                .getString(R.string.custom_server_unknown_name);
+        this.contactEmail = applicationContext.getResources()
+                .getString(R.string.custom_server_unknown_email);
+    }
 
-	public String toString() {
-		return region;
-	}
+    public String getRegion() {
+        return region;
+    }
 
-	/**
-	 * @return the id
-	 */
-	public long getId() {
-		return id;
-	}
+    public void setRegion(String region) {
+        this.region = region;
+    }
 
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(long id) {
-		this.id = id;
-	}
+    public String getBaseURL() {
+        return baseURL;
+    }
 
-	/**
-	 * @return the date
-	 */
-	public Long getDate() {
-		return date;
-	}
+    public void setBaseURL(String baseURL) {
+        this.baseURL = baseURL;
+    }
 
-	/**
-	 * @param date the date to set
-	 */
-	public void setDate(Long date) {
-		this.date = date;
-	}
-	
-	/**
-	 * @return the lowerLeftLatitude
-	 */
-	public double getLowerLeftLatitude() {
-		return lowerLeftLatitude;
-	}
+    public String getZoom() {
+        return zoom;
+    }
 
-	/**
-	 * @param lowerLeftLatitude the lowerLeftLatitude to set
-	 */
-	public void setLowerLeftLatitude(double lowerLeftLatitude) {
-		this.lowerLeftLatitude = lowerLeftLatitude;
-	}
+    public void setZoom(String zoom) {
+        zoomSet = true;
+        this.zoom = zoom;
 
-	/**
-	 * @return the lowerLeftLongitude
-	 */
-	public double getLowerLeftLongitude() {
-		return lowerLeftLongitude;
-	}
+        setInitialZoom(Float.parseFloat(zoom));
+    }
 
-	/**
-	 * @param lowerLeftLongitude the lowerLeftLongitude to set
-	 */
-	public void setLowerLeftLongitude(double lowerLeftLongitude) {
-		this.lowerLeftLongitude = lowerLeftLongitude;
-	}
+    public String getCenter() {
+        return center;
+    }
 
-	/**
-	 * @return the upperRightLatitude
-	 */
-	public double getUpperRightLatitude() {
-		return upperRightLatitude;
-	}
+    public void setCenter(String center) {
+        centerSet = true;
+        this.center = center;
+        String[] tokens = center.split(",");
 
-	/**
-	 * @param upperRightLatitude the upperRightLatitude to set
-	 */
-	public void setUpperRightLatitude(double upperRightLatitude) {
-		this.upperRightLatitude = upperRightLatitude;
-	}
+        setCenterLatitude(Double.parseDouble(tokens[0]));
+        setCenterLongitude(Double.parseDouble(tokens[1]));
+    }
 
-	/**
-	 * @return the upperRightLongitude
-	 */
-	public double getUpperRightLongitude() {
-		return upperRightLongitude;
-	}
+    public String getBounds() {
+        return bounds;
+    }
 
-	/**
-	 * @param upperRightLongitude the upperRightLongitude to set
-	 */
-	public void setUpperRightLongitude(double upperRightLongitude) {
-		this.upperRightLongitude = upperRightLongitude;
-	}
+    public void setBounds(String bounds) {
+        boundsSet = true;
+        this.bounds = bounds;
+        String[] tokens = bounds.split(",");
 
-	/**
-	 * @return the radius
-	 */
-	public double getRadius() {
-		float[] results = new float[3];
-		Location.distanceBetween(geometricalCenterLatitude, geometricalCenterLongitude, lowerLeftLatitude, lowerLeftLongitude, results);
-		return results[0];
-	}
+        setLowerLeftLatitude(Double.parseDouble(tokens[0]));
+        setLowerLeftLongitude(Double.parseDouble(tokens[1]));
+        setUpperRightLatitude(Double.parseDouble(tokens[2]));
+        setUpperRightLongitude(Double.parseDouble(tokens[3]));
+    }
 
-	/**
-	 * @return the geometricalCenterLatitude
-	 */
-	public double getGeometricalCenterLatitude() {
-		geometricalCenterLatitude = (lowerLeftLatitude + upperRightLatitude)/2;
-		return geometricalCenterLatitude;
-	}
+    public String getLanguage() {
+        return language;
+    }
 
-	/**
-	 * @return the geometricalCenterLongitude
-	 */
-	public double getGeometricalCenterLongitude() {
-		geometricalCenterLongitude = (lowerLeftLongitude + upperRightLongitude)/2;
-		return geometricalCenterLongitude;
-	}
-	
-	/**
-	 * @return the geometricalCenterLatitude
-	 */
-	public double getCenterLatitude() {
-		return centerLatitude;
-	}
+    public void setLanguage(String language) {
+        this.language = language;
+    }
 
-	/**
-	 * @return the geometricalCenterLongitude
-	 */
-	public double getCenterLongitude() {
-		return centerLongitude;
-	}
+    public String getContactEmail() {
+        return contactEmail;
+    }
 
-	/**
-	 * @return the contactName
-	 */
-	public String getContactName() {
-		return contactName;
-	}
+    public void setContactEmail(String contactEmail) {
+        this.contactEmail = contactEmail;
+    }
 
-	/**
-	 * @param contactName the contactName to set
-	 */
-	public void setContactName(String contactName) {
-		this.contactName = contactName;
-	}
+    public String toString() {
+        return region;
+    }
 
-	public void setCenterLatitude(double centerLatitude) {
-		this.centerLatitude = centerLatitude;
-	}
+    /**
+     * @return the id
+     */
+    public long getId() {
+        return id;
+    }
 
-	public void setCenterLongitude(double centerLongitude) {
-		this.centerLongitude = centerLongitude;
-	}
+    /**
+     * @param id the id to set
+     */
+    public void setId(long id) {
+        this.id = id;
+    }
 
-	public float getInitialZoom() {
-		return initialZoom;
-	}
+    /**
+     * @return the date
+     */
+    public Long getDate() {
+        return date;
+    }
 
-	public void setInitialZoom(float initialZoom) {
-		this.initialZoom = initialZoom;
-	}
-	
+    /**
+     * @param date the date to set
+     */
+    public void setDate(Long date) {
+        this.date = date;
+    }
+
+    /**
+     * @return the lowerLeftLatitude
+     */
+    public double getLowerLeftLatitude() {
+        return lowerLeftLatitude;
+    }
+
+    /**
+     * @param lowerLeftLatitude the lowerLeftLatitude to set
+     */
+    public void setLowerLeftLatitude(double lowerLeftLatitude) {
+        this.lowerLeftLatitude = lowerLeftLatitude;
+    }
+
+    /**
+     * @return the lowerLeftLongitude
+     */
+    public double getLowerLeftLongitude() {
+        return lowerLeftLongitude;
+    }
+
+    /**
+     * @param lowerLeftLongitude the lowerLeftLongitude to set
+     */
+    public void setLowerLeftLongitude(double lowerLeftLongitude) {
+        this.lowerLeftLongitude = lowerLeftLongitude;
+    }
+
+    /**
+     * @return the upperRightLatitude
+     */
+    public double getUpperRightLatitude() {
+        return upperRightLatitude;
+    }
+
+    /**
+     * @param upperRightLatitude the upperRightLatitude to set
+     */
+    public void setUpperRightLatitude(double upperRightLatitude) {
+        this.upperRightLatitude = upperRightLatitude;
+    }
+
+    /**
+     * @return the upperRightLongitude
+     */
+    public double getUpperRightLongitude() {
+        return upperRightLongitude;
+    }
+
+    /**
+     * @param upperRightLongitude the upperRightLongitude to set
+     */
+    public void setUpperRightLongitude(double upperRightLongitude) {
+        this.upperRightLongitude = upperRightLongitude;
+    }
+
+    /**
+     * @return the radius
+     */
+    public double getRadius() {
+        float[] results = new float[3];
+        Location.distanceBetween(geometricalCenterLatitude, geometricalCenterLongitude,
+                lowerLeftLatitude, lowerLeftLongitude, results);
+        return results[0];
+    }
+
+    /**
+     * @return the geometricalCenterLatitude
+     */
+    public double getGeometricalCenterLatitude() {
+        geometricalCenterLatitude = (lowerLeftLatitude + upperRightLatitude) / 2;
+        return geometricalCenterLatitude;
+    }
+
+    /**
+     * @return the geometricalCenterLongitude
+     */
+    public double getGeometricalCenterLongitude() {
+        geometricalCenterLongitude = (lowerLeftLongitude + upperRightLongitude) / 2;
+        return geometricalCenterLongitude;
+    }
+
+    /**
+     * @return the geometricalCenterLatitude
+     */
+    public double getCenterLatitude() {
+        return centerLatitude;
+    }
+
+    /**
+     * @return the geometricalCenterLongitude
+     */
+    public double getCenterLongitude() {
+        return centerLongitude;
+    }
+
+    /**
+     * @return the contactName
+     */
+    public String getContactName() {
+        return contactName;
+    }
+
+    /**
+     * @param contactName the contactName to set
+     */
+    public void setContactName(String contactName) {
+        this.contactName = contactName;
+    }
+
+    public void setCenterLatitude(double centerLatitude) {
+        this.centerLatitude = centerLatitude;
+    }
+
+    public void setCenterLongitude(double centerLongitude) {
+        this.centerLongitude = centerLongitude;
+    }
+
+    public float getInitialZoom() {
+        return initialZoom;
+    }
+
+    public void setInitialZoom(float initialZoom) {
+        this.initialZoom = initialZoom;
+    }
+
 }

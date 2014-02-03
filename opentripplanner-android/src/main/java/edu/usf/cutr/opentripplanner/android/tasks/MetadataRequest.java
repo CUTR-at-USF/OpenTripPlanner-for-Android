@@ -16,10 +16,7 @@
 
 package edu.usf.cutr.opentripplanner.android.tasks;
 
-import java.io.IOException;
-import java.lang.ref.WeakReference;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.opentripplanner.api.ws.GraphMetadata;
 
@@ -31,7 +28,10 @@ import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.lang.ref.WeakReference;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.R;
@@ -39,123 +39,133 @@ import edu.usf.cutr.opentripplanner.android.listeners.MetadataRequestCompleteLis
 
 /**
  * @author Khoa Tran
- *
  */
 
 public class MetadataRequest extends AsyncTask<String, Integer, GraphMetadata> {
-	private GraphMetadata metadata;
-	private static final String TAG = "OTP";
-	private ProgressDialog progressDialog;
-	private WeakReference<Activity> activity;
-	private Context context;
-	
-	private MetadataRequestCompleteListener callback;
-	
-	private static ObjectMapper mapper = null;
 
-	public MetadataRequest(WeakReference<Activity> activity, Context context, MetadataRequestCompleteListener callback) {
-		this.activity = activity;
-		this.context = context;
-		this.callback = callback;
-		if (activity.get() != null){
-			progressDialog = new ProgressDialog(activity.get());
-		}	
-	}
+    private GraphMetadata metadata;
 
-	protected void onPreExecute() {
-		if (activity.get() != null){
-			progressDialog.setIndeterminate(true);
-	        progressDialog.setCancelable(true);
-			progressDialog = ProgressDialog.show(activity.get(),"",
-					context.getResources().getString(R.string.metadata_request_progress), true);
-		}
-	}
+    private static final String TAG = "OTP";
 
-	protected GraphMetadata doInBackground(String... reqs) {
-		int count = reqs.length;
-		for (int i = 0; i < count; i++) {
-			String serverURL = reqs[0];
-			metadata = requestMetadata(serverURL);
-			// publishProgress((int) ((i / (float) count) * 100));
-		}
-		return metadata;
-	}
+    private ProgressDialog progressDialog;
 
-	protected void onPostExecute(GraphMetadata metadata) {
-		if (activity.get() != null){
-			try{
-				if (progressDialog != null && progressDialog.isShowing()) {
-					progressDialog.dismiss();
-				}
-			}catch(Exception e){
-				Log.e(TAG, "Error in Metadata Request PostExecute dismissing dialog: " + e);
-			}
-		}		
+    private WeakReference<Activity> activity;
 
-		if (metadata != null) {
-			Toast.makeText(context, context.getResources().getString(R.string.metadata_request_successful), Toast.LENGTH_SHORT).show();
-			callback.onMetadataRequestComplete(metadata);
-		} else {
-			Toast.makeText(context, context.getResources().getString(R.string.info_server_error), Toast.LENGTH_SHORT).show();
+    private Context context;
 
-			Log.e(TAG, "No metadata!");
-		}
-	}
-	
-	private GraphMetadata requestMetadata(String serverURL) {
-		String res = OTPApp.METADATA_LOCATION;
+    private MetadataRequestCompleteListener callback;
 
-		String u = serverURL + res;
+    private static ObjectMapper mapper = null;
 
-		Log.d(TAG, "URL: " + u);
-			
-		HttpURLConnection urlConnection = null;
-		URL url = null;
-		GraphMetadata plan = null;
+    public MetadataRequest(WeakReference<Activity> activity, Context context,
+            MetadataRequestCompleteListener callback) {
+        this.activity = activity;
+        this.context = context;
+        this.callback = callback;
+        if (activity.get() != null) {
+            progressDialog = new ProgressDialog(activity.get());
+        }
+    }
 
-		try {
+    protected void onPreExecute() {
+        if (activity.get() != null) {
+            progressDialog.setIndeterminate(true);
+            progressDialog.setCancelable(true);
+            progressDialog = ProgressDialog.show(activity.get(), "",
+                    context.getResources().getString(R.string.metadata_request_progress), true);
+        }
+    }
 
-			url = new URL(u);
+    protected GraphMetadata doInBackground(String... reqs) {
+        int count = reqs.length;
+        for (int i = 0; i < count; i++) {
+            String serverURL = reqs[0];
+            metadata = requestMetadata(serverURL);
+            // publishProgress((int) ((i / (float) count) * 100));
+        }
+        return metadata;
+    }
 
-			disableConnectionReuseIfNecessary(); // For bugs in HttpURLConnection pre-Froyo
+    protected void onPostExecute(GraphMetadata metadata) {
+        if (activity.get() != null) {
+            try {
+                if (progressDialog != null && progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error in Metadata Request PostExecute dismissing dialog: " + e);
+            }
+        }
 
-			// Serializer serializer = new Persister();
-			
-			if(mapper == null){
-				mapper = new ObjectMapper();
-			}
+        if (metadata != null) {
+            Toast.makeText(context,
+                    context.getResources().getString(R.string.metadata_request_successful),
+                    Toast.LENGTH_SHORT).show();
+            callback.onMetadataRequestComplete(metadata);
+        } else {
+            Toast.makeText(context, context.getResources().getString(R.string.info_server_error),
+                    Toast.LENGTH_SHORT).show();
 
-			urlConnection = (HttpURLConnection) url.openConnection();
-			urlConnection.setRequestProperty("Accept", "application/json");
-			urlConnection.setConnectTimeout(context.getResources().getInteger(R.integer.connection_timeout));
-			urlConnection.setReadTimeout(context.getResources().getInteger(R.integer.socket_timeout));
+            Log.e(TAG, "No metadata!");
+        }
+    }
 
-			// plan = serializer.read(Response.class, result);
-			plan = mapper.readValue(urlConnection.getInputStream(),
-					GraphMetadata.class);
-			
-		} catch (IOException e) {
-			Log.e(TAG, "Error fetching JSON or XML: " + e);
-			e.printStackTrace();
-			// Reset timestamps to show there was an error
-			// requestStartTime = 0;
-			// requestEndTime = 0;
-		} finally {
-			if (urlConnection != null) {
-				urlConnection.disconnect();
-			}
-		}
+    private GraphMetadata requestMetadata(String serverURL) {
+        String res = OTPApp.METADATA_LOCATION;
 
-		return plan;
-	}
-	
-	/**
-	 * Disable HTTP connection reuse which was buggy pre-froyo
-	 */
-	private void disableConnectionReuseIfNecessary() {
-		//if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) {  //Should change to this once we update to Android 4.1 SDK
-		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.ECLAIR_MR1) {
-			System.setProperty("http.keepAlive", "false");
-		}
-	}
+        String u = serverURL + res;
+
+        Log.d(TAG, "URL: " + u);
+
+        HttpURLConnection urlConnection = null;
+        URL url = null;
+        GraphMetadata plan = null;
+
+        try {
+
+            url = new URL(u);
+
+            disableConnectionReuseIfNecessary(); // For bugs in HttpURLConnection pre-Froyo
+
+            // Serializer serializer = new Persister();
+
+            if (mapper == null) {
+                mapper = new ObjectMapper();
+            }
+
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestProperty("Accept", "application/json");
+            urlConnection.setConnectTimeout(
+                    context.getResources().getInteger(R.integer.connection_timeout));
+            urlConnection
+                    .setReadTimeout(context.getResources().getInteger(R.integer.socket_timeout));
+
+            // plan = serializer.read(Response.class, result);
+            plan = mapper.readValue(urlConnection.getInputStream(),
+                    GraphMetadata.class);
+
+        } catch (IOException e) {
+            Log.e(TAG, "Error fetching JSON or XML: " + e);
+            e.printStackTrace();
+            // Reset timestamps to show there was an error
+            // requestStartTime = 0;
+            // requestEndTime = 0;
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+        }
+
+        return plan;
+    }
+
+    /**
+     * Disable HTTP connection reuse which was buggy pre-froyo
+     */
+    private void disableConnectionReuseIfNecessary() {
+        //if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) {  //Should change to this once we update to Android 4.1 SDK
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.ECLAIR_MR1) {
+            System.setProperty("http.keepAlive", "false");
+        }
+    }
 }

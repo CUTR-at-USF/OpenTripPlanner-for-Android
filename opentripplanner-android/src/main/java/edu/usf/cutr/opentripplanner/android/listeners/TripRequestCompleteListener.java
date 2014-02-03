@@ -16,16 +16,15 @@
 
 package edu.usf.cutr.opentripplanner.android.listeners;
 
-import java.util.List;
-
 import org.opentripplanner.v092snapshot.api.model.Itinerary;
 
+import java.util.List;
+
 /**
- * 
  * @author Khoa Tran
- *
  */
 
 public interface TripRequestCompleteListener {
-	public void onTripRequestComplete(List<Itinerary> itineraries, String currentRequestString);
+
+    public void onTripRequestComplete(List<Itinerary> itineraries, String currentRequestString);
 }

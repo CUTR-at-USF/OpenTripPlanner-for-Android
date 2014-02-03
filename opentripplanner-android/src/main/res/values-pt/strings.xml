@@ -16,7 +16,7 @@
 -->
 <resources>
     <string name="yes">Sim</string>
-    <string name="no">Não</string>        
+    <string name="no">Não</string>
     <string name="step_by_step_title">Direcções</string>
     <string name="step_by_step_header_from">De</string>
     <string name="step_by_step_header_to">Até</string>
@@ -113,7 +113,7 @@
     <string name="auto_detect_server_description">Encontrar automaticamente servidor para a localização actual</string>
     <string name="geocoder_results_title">Resultados de endereços</string>
     <string name="geocoder_no_results_message">Lamentamos, mas não é possível obter nenhum resultado para este endereço</string>
-    <string name="tripplanner_progress">"A calcular a melhor rota, por favor aguarde..."</string>   
+    <string name="tripplanner_progress">"A calcular a melhor rota, por favor aguarde..."</string>
     <string name="tripplanner_results_title">Resultados de rotas</string>
     <string name="tripplanner_no_results_message">Erro a calcular a rota</string>
     <string name="tripplanner_error_dialog_title">Lamentamos, não foi possível calcular uma rota</string>
@@ -167,5 +167,5 @@
     <string name="header_bike_options">Opções de bicicleta</string>
     <string name="header_bike_options_quick">Rápido</string>
     <string name="header_bike_options_flat">Plano</string>
-    <string name="header_bike_options_bike_friendly">Apropriado para bicicletas</string> 
+    <string name="header_bike_options_bike_friendly">Apropriado para bicicletas</string>
 </resources>

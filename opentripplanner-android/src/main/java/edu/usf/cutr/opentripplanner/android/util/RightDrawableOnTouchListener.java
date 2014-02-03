@@ -24,17 +24,20 @@ import android.view.View.OnTouchListener;
 import android.widget.TextView;
 
 public abstract class RightDrawableOnTouchListener implements OnTouchListener {
+
     Drawable drawable;
+
     private int fuzz = 10;
 
     /**
-     * @param keyword
+     * @param view
      */
     public RightDrawableOnTouchListener(TextView view) {
         super();
         final Drawable[] drawables = view.getCompoundDrawables();
-        if (drawables != null && drawables.length == 4)
+        if (drawables != null && drawables.length == 4) {
             this.drawable = drawables[2];
+        }
     }
 
     /*
@@ -48,8 +51,10 @@ public abstract class RightDrawableOnTouchListener implements OnTouchListener {
             final int x = (int) event.getX();
             final int y = (int) event.getY();
             final Rect bounds = drawable.getBounds();
-            if (x >= (v.getRight() - bounds.width() - fuzz) && x <= (v.getRight() - v.getPaddingRight() + fuzz)
-                    && y >= (v.getPaddingTop() - fuzz) && y <= (v.getHeight() - v.getPaddingBottom()) + fuzz) {
+            if (x >= (v.getRight() - bounds.width() - fuzz) && x <= (
+                    v.getRight() - v.getPaddingRight() + fuzz)
+                    && y >= (v.getPaddingTop() - fuzz)
+                    && y <= (v.getHeight() - v.getPaddingBottom()) + fuzz) {
                 return onDrawableTouch(event);
             }
         }

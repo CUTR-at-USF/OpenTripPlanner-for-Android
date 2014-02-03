@@ -21,10 +21,11 @@ import edu.usf.cutr.opentripplanner.android.model.Server;
 /**
  * Interface that is used to list for the event of an OTP
  * server being selected, either manually or automatically
- * 
+ *
  * @author Khoa Tran
  */
 
 public interface ServerSelectorCompleteListener {
-	public void onServerSelectorComplete(Server server);
+
+    public void onServerSelectorComplete(Server server);
 }

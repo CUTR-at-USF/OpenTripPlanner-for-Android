@@ -16,47 +16,47 @@
 
 package edu.usf.cutr.opentripplanner.android.listeners;
 
-import java.util.List;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.opentripplanner.v092snapshot.api.model.Itinerary;
 import org.opentripplanner.v092snapshot.api.model.Leg;
 
 import android.support.v4.app.Fragment;
 
-import com.google.android.gms.maps.model.LatLng;
+import java.util.List;
 
 import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
 
 /**
  * @author Khoa Tran
- *
  */
 
 public interface OnFragmentListener {
-	public void onItinerariesLoaded(List<Itinerary> itineraries);
-	
-	public void onItinerarySelected(int i);
-	
-	public List<Leg> getCurrentItinerary();
-	
-	public List<Itinerary> getCurrentItineraryList();
-	
-	public int getCurrentItineraryIndex();
-	
-	public void onSwitchedToDirectionFragment();
-	
-	public void onSwitchedToMainFragment(Fragment f);
-	
-	public OTPBundle getOTPBundle();
-	
-	public void setOTPBundle(OTPBundle b);
-	
-	public void setCurrentRequestString(String url);
-	
-	public String getCurrentRequestString();
-	
-	public void zoomToLocation(LatLng latLng);
-		
-	public void setButtonStartLocation (boolean isButtonStartLocation);
-	
+
+    public void onItinerariesLoaded(List<Itinerary> itineraries);
+
+    public void onItinerarySelected(int i);
+
+    public List<Leg> getCurrentItinerary();
+
+    public List<Itinerary> getCurrentItineraryList();
+
+    public int getCurrentItineraryIndex();
+
+    public void onSwitchedToDirectionFragment();
+
+    public void onSwitchedToMainFragment(Fragment f);
+
+    public OTPBundle getOTPBundle();
+
+    public void setOTPBundle(OTPBundle b);
+
+    public void setCurrentRequestString(String url);
+
+    public String getCurrentRequestString();
+
+    public void zoomToLocation(LatLng latLng);
+
+    public void setButtonStartLocation(boolean isButtonStartLocation);
+
 }
