@@ -19,9 +19,15 @@ package edu.usf.cutr.opentripplanner.android.util;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
+
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.v092snapshot.api.model.Itinerary;
+import org.opentripplanner.v092snapshot.api.model.Leg;
 
 import android.content.Context;
 import edu.usf.cutr.opentripplanner.android.OTPApp;
@@ -118,6 +124,46 @@ public class ConversionUtils {
 		return text;
 	}
 	
+	public static List<Itinerary> fixTimezoneOffsets(List<Itinerary> itineraries, boolean useDeviceTimezone){
+		int agencyTimeZoneOffset = 0;
+		boolean containsTransitLegs = false;
+		
+		if ((itineraries != null) && !itineraries.isEmpty()){
+			ArrayList<Itinerary> itinerariesFixed = new ArrayList<Itinerary>(itineraries);
+			
+			for (Itinerary it : itinerariesFixed){
+				for (Leg leg : it.legs){
+					if ((TraverseMode.valueOf((String) leg.mode)).isTransit() && !containsTransitLegs){
+						containsTransitLegs = true;
+					}
+					if (leg.getAgencyTimeZoneOffset() != 0){
+						agencyTimeZoneOffset = leg.getAgencyTimeZoneOffset();
+						//If agencyTimeZoneOffset is different from 0, route contains transit legs
+						containsTransitLegs = true;
+						break;
+					}
+				}
+			}
+			
+			if (useDeviceTimezone || !containsTransitLegs){
+				agencyTimeZoneOffset = TimeZone.getDefault().getOffset(itinerariesFixed.get(0).startTime.getTimeInMillis());
+			}
+			
+			if (agencyTimeZoneOffset != 0){
+				for (Itinerary it : itinerariesFixed){
+					for (Leg leg : it.legs){
+						leg.agencyTimeZoneOffset = agencyTimeZoneOffset;
+					}
+				}
+			}
+			
+			return itinerariesFixed;
+		}
+		else{
+			return itineraries;
+		}
+	}
+	
 	public static String getTimeWithContext(Context applicationContext, int offsetGMT, long time, boolean inLine){
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 		DateFormat timeFormat = android.text.format.DateFormat.getTimeFormat(applicationContext);
@@ -126,25 +172,34 @@ public class ConversionUtils {
 		dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
 		
 		cal.setTimeInMillis(time);
+		
+		String noDeviceTimezoneNote = "";
+		if (offsetGMT != TimeZone.getDefault().getOffset(time)){
+			noDeviceTimezoneNote = "GMT";
+			if (offsetGMT != 0){
+				noDeviceTimezoneNote += offsetGMT/3600000;
+			}
+		}
+		
 		cal.add(Calendar.MILLISECOND, offsetGMT);
 		
 		if (inLine){
 			if (ConversionUtils.isToday(cal)){
-				return (" " + applicationContext.getResources().getString(R.string.connector_time) + " " + timeFormat.format(cal.getTime()));	
+				return (" " + applicationContext.getResources().getString(R.string.connector_time) + " " + timeFormat.format(cal.getTime()) + " "  + noDeviceTimezoneNote);	
 			}
 			else if (ConversionUtils.isTomorrow(cal)){
-				return (" " + applicationContext.getResources().getString(R.string.next_day) + " " + applicationContext.getResources().getString(R.string.connector_time) + " " + timeFormat.format(cal.getTime()));
+				return (" " + applicationContext.getResources().getString(R.string.next_day) + " " + applicationContext.getResources().getString(R.string.connector_time) + " " + timeFormat.format(cal.getTime()) + " " + noDeviceTimezoneNote);
 			}
 			else{
-				return (" " + applicationContext.getResources().getString(R.string.connector_full_date) + " " + dateFormat.format(cal.getTime()) +" " + applicationContext.getResources().getString(R.string.connector_time) + " " + timeFormat.format(cal.getTime()));
+				return (" " + applicationContext.getResources().getString(R.string.connector_full_date) + " " + dateFormat.format(cal.getTime()) +" " + applicationContext.getResources().getString(R.string.connector_time) + " " + timeFormat.format(cal.getTime()) + " "  + noDeviceTimezoneNote);
 			}
 		}
 		else{
 			if (ConversionUtils.isToday(cal)){
-				return (timeFormat.format(cal.getTime()));	
+				return (timeFormat.format(cal.getTime()) + " "  + noDeviceTimezoneNote);	
 			}
 			else{
-				return (timeFormat.format(cal.getTime()) + " " + dateFormat.format(cal.getTime()));
+				return (timeFormat.format(cal.getTime()) + " " + dateFormat.format(cal.getTime()) + " "  + noDeviceTimezoneNote);
 			}
 		}
 

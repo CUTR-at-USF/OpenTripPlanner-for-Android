@@ -8,6 +8,7 @@
         <Preference android:title="@string/refresh_server_list" android:key="refresh_server_list"/>
         <CheckBoxPreference android:title="@string/selected_custom_server_title" android:key="selected_custom_server" android:defaultValue="false"  android:summary="@string/selected_custom_server_description"></CheckBoxPreference>
         <EditTextPreference android:key="custom_server_url" android:title="@string/custom_server_url" android:inputType="text|textNoSuggestions" android:hint="@string/custom_server_url_hint"></EditTextPreference>
+        <CheckBoxPreference android:title="@string/use_device_timezone" android:key="use_device_timezone" android:defaultValue="false"  android:summary="@string/use_device_timezone_description"></CheckBoxPreference>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/map_options" android:key="map_options">
         <CheckBoxPreference android:title="@string/use_intelligent_markers_title" android:key="use_intelligent_markers" android:checked="true"  android:defaultValue="true" android:summary="@string/use_intelligent_markers_description"></CheckBoxPreference>
