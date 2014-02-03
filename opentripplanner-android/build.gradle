@@ -1,0 +1,117 @@
+/*
+ * Copyright (C) 2013 University of South Florida (sjbarbeau@gmail.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.7.1+'
+    }
+}
+apply plugin: 'android'
+
+repositories {
+    mavenCentral()
+    maven {
+        // CUTR SNAPSHOTs
+        url "https://github.com/CUTR-at-USF/cutr-mvn-repo/raw/master/snapshots"
+    }
+    maven {
+        // CUTR Releases
+        url "https://github.com/CUTR-at-USF/cutr-mvn-repo/raw/master/releases"
+    }
+}
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "19.0.1"
+
+    defaultConfig {
+        minSdkVersion 8
+        targetSdkVersion 13
+    }
+
+    // http://stackoverflow.com/questions/20673625/gradle-0-7-0-duplicate-files-during-packaging-of-apk
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+    }
+
+    if (project.hasProperty("secure.properties")
+            && new File(project.property("secure.properties")).exists()) {
+
+        Properties props = new Properties()
+        props.load(new FileInputStream(file(project.property("secure.properties"))))
+
+        signingConfigs {
+            debug {
+                storeFile file("otp-android.debug.keystore")
+            }
+
+            release {
+                storeFile file(props['key.store'])
+                keyAlias props['key.alias']
+                storePassword "askmelater"
+                keyPassword "askmelater"
+            }
+        }
+    } else {
+        signingConfigs {
+            debug {
+                storeFile file("otp-android.debug.keystore")
+            }
+
+            release {
+                // Nothing here
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+        }
+    }
+}
+
+task askForPasswords << {
+    // Must create String because System.readPassword() returns char[]
+    // (and assigning that below fails silently)
+    def storePw = new String(System.console().readPassword("\nKeystore password: "))
+    def keyPw = new String(System.console().readPassword("Key password: "))
+
+    android.signingConfigs.release.storePassword = storePw
+    android.signingConfigs.release.keyPassword = keyPw
+}
+
+tasks.whenTaskAdded { theTask ->
+    if (theTask.name.equals("packageRelease")) {
+        theTask.dependsOn "askForPasswords"
+    }
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:18.0.+'
+    compile 'com.google.android.gms:play-services:3.2.65'
+    compile 'com.fasterxml.jackson.core:jackson-core:2.3.0'
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.3.0'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.3.0'
+    // POJOs used for full data-binding via Jackson
+    compile 'edu.usf.cutr.opentripplanner.android:opentripplanner-pojos:1.0.0-SNAPSHOT'
+    // OpenCSV, for parsing the OTP Server Directory Google Doc
+    compile 'net.sf.opencsv:opencsv:2.3'
+}
