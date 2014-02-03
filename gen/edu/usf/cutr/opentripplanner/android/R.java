@@ -536,7 +536,7 @@ containing a value of this type.
         public static final int googleplaceskey=0x7f050000;
     }
     public static final class string {
-        public static final int alternative_routes=0x7f0800a9;
+        public static final int alternative_routes=0x7f0800ab;
         public static final int app_name=0x7f080019;
         /**   Title for notification shown when GooglePlayServices needs to be
         enabled for a application to work. [CHAR LIMIT=70] 
@@ -563,9 +563,9 @@ containing a value of this type.
         public static final int auth_client_using_bad_version_title=0x7f080013;
         public static final int auto_detect_server=0x7f080084;
         public static final int auto_detect_server_description=0x7f080085;
-        public static final int before_distance_bike=0x7f0800a1;
-        public static final int before_distance_walk=0x7f0800a2;
-        public static final int before_route=0x7f08009e;
+        public static final int before_distance_bike=0x7f0800a3;
+        public static final int before_distance_walk=0x7f0800a4;
+        public static final int before_route=0x7f0800a0;
         public static final int choose_geocoder=0x7f080078;
         public static final int choose_location_type_end=0x7f080055;
         public static final int choose_location_type_start=0x7f080054;
@@ -636,12 +636,12 @@ containing a value of this type.
         /**  Long form sign-in button text [CHAR LIMIT=30] 
          */
         public static final int common_signin_button_text_long=0x7f080012;
-        public static final int connector_destination=0x7f08009d;
-        public static final int connector_full_date=0x7f08009b;
-        public static final int connector_headsign=0x7f08009c;
-        public static final int connector_stop=0x7f080099;
-        public static final int connector_time=0x7f08009a;
-        public static final int connector_time_full=0x7f0800a5;
+        public static final int connector_destination=0x7f08009f;
+        public static final int connector_full_date=0x7f08009d;
+        public static final int connector_headsign=0x7f08009e;
+        public static final int connector_stop=0x7f08009b;
+        public static final int connector_time=0x7f08009c;
+        public static final int connector_time_full=0x7f0800a7;
         public static final int custom_server_error=0x7f080083;
         public static final int custom_server_name=0x7f08004d;
         public static final int custom_server_not_set=0x7f08004e;
@@ -655,34 +655,34 @@ containing a value of this type.
         public static final int custom_server_url_error=0x7f080082;
         public static final int custom_server_url_hint=0x7f080025;
         public static final int cyclemap=0x7f08001e;
-        public static final int date_time_spinner_arrive=0x7f08008d;
-        public static final int date_time_spinner_depart=0x7f08008e;
-        public static final int date_time_title=0x7f08008c;
-        public static final int dir_absolute_east=0x7f0800cd;
-        public static final int dir_absolute_north=0x7f0800ce;
-        public static final int dir_absolute_northeast=0x7f0800cf;
-        public static final int dir_absolute_northwest=0x7f0800d0;
-        public static final int dir_absolute_south=0x7f0800d1;
-        public static final int dir_absolute_southeast=0x7f0800d2;
-        public static final int dir_absolute_southwest=0x7f0800d3;
-        public static final int dir_absolute_west=0x7f0800d4;
-        public static final int dir_relative_circle_clockwise=0x7f0800c0;
-        public static final int dir_relative_circle_counterclockwise=0x7f0800c1;
-        public static final int dir_relative_continue=0x7f0800c2;
-        public static final int dir_relative_depart=0x7f0800c3;
-        public static final int dir_relative_elevator=0x7f0800c4;
-        public static final int dir_relative_hard_left=0x7f0800c5;
-        public static final int dir_relative_hard_right=0x7f0800c6;
-        public static final int dir_relative_left=0x7f0800c7;
-        public static final int dir_relative_right=0x7f0800c8;
-        public static final int dir_relative_slightly_left=0x7f0800c9;
-        public static final int dir_relative_slightly_right=0x7f0800ca;
-        public static final int dir_relative_uturn_left=0x7f0800cb;
-        public static final int dir_relative_uturn_right=0x7f0800cc;
+        public static final int date_time_spinner_arrive=0x7f08008f;
+        public static final int date_time_spinner_depart=0x7f080090;
+        public static final int date_time_title=0x7f08008e;
+        public static final int dir_absolute_east=0x7f0800cf;
+        public static final int dir_absolute_north=0x7f0800d0;
+        public static final int dir_absolute_northeast=0x7f0800d1;
+        public static final int dir_absolute_northwest=0x7f0800d2;
+        public static final int dir_absolute_south=0x7f0800d3;
+        public static final int dir_absolute_southeast=0x7f0800d4;
+        public static final int dir_absolute_southwest=0x7f0800d5;
+        public static final int dir_absolute_west=0x7f0800d6;
+        public static final int dir_relative_circle_clockwise=0x7f0800c2;
+        public static final int dir_relative_circle_counterclockwise=0x7f0800c3;
+        public static final int dir_relative_continue=0x7f0800c4;
+        public static final int dir_relative_depart=0x7f0800c5;
+        public static final int dir_relative_elevator=0x7f0800c6;
+        public static final int dir_relative_hard_left=0x7f0800c7;
+        public static final int dir_relative_hard_right=0x7f0800c8;
+        public static final int dir_relative_left=0x7f0800c9;
+        public static final int dir_relative_right=0x7f0800ca;
+        public static final int dir_relative_slightly_left=0x7f0800cb;
+        public static final int dir_relative_slightly_right=0x7f0800cc;
+        public static final int dir_relative_uturn_left=0x7f0800cd;
+        public static final int dir_relative_uturn_right=0x7f0800ce;
         public static final int disable_gps=0x7f080068;
-        public static final int distance_kilometers=0x7f0800a3;
-        public static final int distance_meters=0x7f0800a4;
-        public static final int distance_unit=0x7f0800e7;
+        public static final int distance_kilometers=0x7f0800a5;
+        public static final int distance_meters=0x7f0800a6;
+        public static final int distance_unit=0x7f0800e9;
         public static final int enable_gps=0x7f080067;
         public static final int end_location_hint=0x7f080039;
         public static final int end_marker_activated=0x7f080074;
@@ -692,32 +692,32 @@ containing a value of this type.
         public static final int feedback_email_android_developer=0x7f080022;
         public static final int feedback_send_email=0x7f08006d;
         public static final int feedback_subject=0x7f08006e;
-        public static final int full_hours=0x7f080096;
-        public static final int full_minutes=0x7f080097;
-        public static final int full_seconds=0x7f080098;
+        public static final int full_hours=0x7f080098;
+        public static final int full_minutes=0x7f080099;
+        public static final int full_seconds=0x7f08009a;
         public static final int geocoder_google_places=0x7f080024;
-        public static final int geocoder_no_results_message=0x7f080087;
+        public static final int geocoder_no_results_message=0x7f080089;
         public static final int geocoder_nominatim=0x7f080023;
-        public static final int geocoder_preference_provider_google_places=0x7f0800ac;
-        public static final int geocoder_preference_provider_nominatim=0x7f0800ab;
-        public static final int geocoder_preference_provider_title=0x7f0800aa;
-        public static final int geocoder_results_title=0x7f080086;
+        public static final int geocoder_preference_provider_google_places=0x7f0800ae;
+        public static final int geocoder_preference_provider_nominatim=0x7f0800ad;
+        public static final int geocoder_preference_provider_title=0x7f0800ac;
+        public static final int geocoder_results_title=0x7f080088;
         public static final int geocoding_request_progress=0x7f08003d;
-        public static final int header_bike_options=0x7f0800bc;
-        public static final int header_bike_options_bike_friendly=0x7f0800bf;
-        public static final int header_bike_options_flat=0x7f0800be;
-        public static final int header_bike_options_quick=0x7f0800bd;
-        public static final int header_optimization=0x7f0800ba;
-        public static final int header_travel_mode=0x7f0800bb;
-        public static final int info_server_error=0x7f0800b2;
-        public static final int info_server_no_server_selected=0x7f0800b1;
-        public static final int location_error=0x7f0800b9;
+        public static final int header_bike_options=0x7f0800be;
+        public static final int header_bike_options_bike_friendly=0x7f0800c1;
+        public static final int header_bike_options_flat=0x7f0800c0;
+        public static final int header_bike_options_quick=0x7f0800bf;
+        public static final int header_optimization=0x7f0800bc;
+        public static final int header_travel_mode=0x7f0800bd;
+        public static final int info_server_error=0x7f0800b4;
+        public static final int info_server_no_server_selected=0x7f0800b3;
+        public static final int location_error=0x7f0800bb;
         public static final int location_type_contact=0x7f080057;
         public static final int location_type_current_location=0x7f080056;
         public static final int location_type_map_point=0x7f080058;
-        public static final int long_hours=0x7f080093;
-        public static final int long_minutes=0x7f080094;
-        public static final int long_seconds=0x7f080095;
+        public static final int long_hours=0x7f080095;
+        public static final int long_minutes=0x7f080096;
+        public static final int long_seconds=0x7f080097;
         public static final int map_options=0x7f08007e;
         public static final int map_tile_provider=0x7f08007f;
         public static final int map_tiles_default_server=0x7f08001b;
@@ -742,20 +742,20 @@ containing a value of this type.
         public static final int my_location=0x7f08006a;
         public static final int need_to_place_marker=0x7f080036;
         public static final int need_to_place_markers_before_planning=0x7f080037;
-        public static final int next_day=0x7f08008f;
+        public static final int next_day=0x7f080091;
         public static final int no=0x7f080027;
         public static final int no_gps_signal=0x7f080069;
         public static final int optimization_bike_triangle=0x7f080066;
         public static final int optimization_fewest_transfers=0x7f080065;
         public static final int optimization_quick=0x7f080063;
         public static final int optimization_safe=0x7f080064;
-        public static final int origin_destination_are_mylocation=0x7f0800b6;
-        public static final int play_services_error=0x7f0800b8;
-        public static final int play_services_error_title=0x7f0800b7;
-        public static final int refresh_server_list=0x7f0800a6;
+        public static final int origin_destination_are_mylocation=0x7f0800b8;
+        public static final int play_services_error=0x7f0800ba;
+        public static final int play_services_error_title=0x7f0800b9;
+        public static final int refresh_server_list=0x7f0800a8;
         public static final int routing_options=0x7f08007d;
-        public static final int selected_custom_server_description=0x7f0800b4;
-        public static final int selected_custom_server_title=0x7f0800b3;
+        public static final int selected_custom_server_description=0x7f0800b6;
+        public static final int selected_custom_server_title=0x7f0800b5;
         public static final int server_checker_error_message=0x7f080040;
         public static final int server_checker_info_dialog_bounds=0x7f080046;
         public static final int server_checker_info_dialog_contact=0x7f080044;
@@ -766,10 +766,10 @@ containing a value of this type.
         public static final int server_checker_info_dialog_url=0x7f080045;
         public static final int server_checker_progress=0x7f08003e;
         public static final int server_checker_successful=0x7f08003f;
-        public static final int server_down=0x7f0800b5;
+        public static final int server_down=0x7f0800b7;
         public static final int server_info=0x7f08006f;
-        public static final int server_list_donwload_date_description=0x7f0800a7;
-        public static final int server_list_donwload_date_unknown=0x7f0800a8;
+        public static final int server_list_donwload_date_description=0x7f0800a9;
+        public static final int server_list_donwload_date_unknown=0x7f0800aa;
         public static final int server_selector_custom_server_alert_title=0x7f08004c;
         public static final int server_selector_detected=0x7f080049;
         public static final int server_selector_progress=0x7f080048;
@@ -777,9 +777,9 @@ containing a value of this type.
         public static final int server_selector_server_info_dialog_title=0x7f08004b;
         public static final int servers_spreadsheet_url=0x7f08001a;
         public static final int settings=0x7f08006b;
-        public static final int short_hours=0x7f080090;
-        public static final int short_minutes=0x7f080091;
-        public static final int short_seconds=0x7f080092;
+        public static final int short_hours=0x7f080092;
+        public static final int short_minutes=0x7f080093;
+        public static final int short_seconds=0x7f080094;
         public static final int start_location_hint=0x7f080038;
         public static final int start_marker_activated=0x7f080071;
         public static final int start_marker_description=0x7f080072;
@@ -798,53 +798,55 @@ containing a value of this type.
         public static final int step_by_step_transit_get_on=0x7f080032;
         public static final int step_by_step_transit_stops_in_between=0x7f080035;
         public static final int step_by_step_turn=0x7f08002d;
-        public static final int street_type_alley=0x7f0800e1;
-        public static final int street_type_bike_path=0x7f0800d5;
-        public static final int street_type_bridleway=0x7f0800d8;
-        public static final int street_type_byway=0x7f0800e3;
-        public static final int street_type_footbridge=0x7f0800db;
-        public static final int street_type_footpath=0x7f0800d9;
-        public static final int street_type_link=0x7f0800df;
-        public static final int street_type_open_area=0x7f0800d6;
-        public static final int street_type_parking_aisle=0x7f0800e2;
-        public static final int street_type_path=0x7f0800d7;
-        public static final int street_type_platform=0x7f0800da;
-        public static final int street_type_ramp=0x7f0800de;
-        public static final int street_type_road=0x7f0800dd;
-        public static final int street_type_service_road=0x7f0800e0;
-        public static final int street_type_sidewalk=0x7f0800e5;
-        public static final int street_type_steps=0x7f0800e6;
-        public static final int street_type_track=0x7f0800e4;
-        public static final int street_type_underpass=0x7f0800dc;
+        public static final int street_type_alley=0x7f0800e3;
+        public static final int street_type_bike_path=0x7f0800d7;
+        public static final int street_type_bridleway=0x7f0800da;
+        public static final int street_type_byway=0x7f0800e5;
+        public static final int street_type_footbridge=0x7f0800dd;
+        public static final int street_type_footpath=0x7f0800db;
+        public static final int street_type_link=0x7f0800e1;
+        public static final int street_type_open_area=0x7f0800d8;
+        public static final int street_type_parking_aisle=0x7f0800e4;
+        public static final int street_type_path=0x7f0800d9;
+        public static final int street_type_platform=0x7f0800dc;
+        public static final int street_type_ramp=0x7f0800e0;
+        public static final int street_type_road=0x7f0800df;
+        public static final int street_type_service_road=0x7f0800e2;
+        public static final int street_type_sidewalk=0x7f0800e7;
+        public static final int street_type_steps=0x7f0800e8;
+        public static final int street_type_track=0x7f0800e6;
+        public static final int street_type_underpass=0x7f0800de;
         public static final int textbox_close_to_marker=0x7f08003a;
         public static final int tiles_cyclemap=0x7f080021;
         public static final int tiles_mapnik=0x7f080020;
         public static final int tiles_maquest=0x7f08001f;
-        public static final int total_duration=0x7f0800a0;
-        public static final int tripplanner_error_bogus_parameter=0x7f0800ed;
-        public static final int tripplanner_error_dialog_title=0x7f08008b;
-        public static final int tripplanner_error_geocode_from_ambiguous=0x7f0800f3;
-        public static final int tripplanner_error_geocode_from_not_found=0x7f0800ee;
-        public static final int tripplanner_error_geocode_from_to_ambiguous=0x7f0800f5;
-        public static final int tripplanner_error_geocode_from_to_not_found=0x7f0800f0;
-        public static final int tripplanner_error_geocode_to_ambiguous=0x7f0800f4;
-        public static final int tripplanner_error_geocode_to_not_found=0x7f0800ef;
-        public static final int tripplanner_error_location_not_accessible=0x7f0800f2;
-        public static final int tripplanner_error_no_transit_times=0x7f0800ec;
-        public static final int tripplanner_error_outside_bounds=0x7f0800ea;
-        public static final int tripplanner_error_path_not_found=0x7f0800eb;
-        public static final int tripplanner_error_request_timeout=0x7f0800e8;
-        public static final int tripplanner_error_system=0x7f0800e9;
-        public static final int tripplanner_error_too_close=0x7f0800f1;
-        public static final int tripplanner_error_triangle=0x7f0800f6;
-        public static final int tripplanner_no_results_message=0x7f08008a;
-        public static final int tripplanner_progress=0x7f080088;
-        public static final int tripplanner_results_title=0x7f080089;
-        public static final int use_android_geocoder_description=0x7f0800ae;
-        public static final int use_android_geocoder_title=0x7f0800ad;
-        public static final int use_intelligent_markers_description=0x7f0800b0;
-        public static final int use_intelligent_markers_title=0x7f0800af;
-        public static final int walking_duration=0x7f08009f;
+        public static final int total_duration=0x7f0800a2;
+        public static final int tripplanner_error_bogus_parameter=0x7f0800ef;
+        public static final int tripplanner_error_dialog_title=0x7f08008d;
+        public static final int tripplanner_error_geocode_from_ambiguous=0x7f0800f5;
+        public static final int tripplanner_error_geocode_from_not_found=0x7f0800f0;
+        public static final int tripplanner_error_geocode_from_to_ambiguous=0x7f0800f7;
+        public static final int tripplanner_error_geocode_from_to_not_found=0x7f0800f2;
+        public static final int tripplanner_error_geocode_to_ambiguous=0x7f0800f6;
+        public static final int tripplanner_error_geocode_to_not_found=0x7f0800f1;
+        public static final int tripplanner_error_location_not_accessible=0x7f0800f4;
+        public static final int tripplanner_error_no_transit_times=0x7f0800ee;
+        public static final int tripplanner_error_outside_bounds=0x7f0800ec;
+        public static final int tripplanner_error_path_not_found=0x7f0800ed;
+        public static final int tripplanner_error_request_timeout=0x7f0800ea;
+        public static final int tripplanner_error_system=0x7f0800eb;
+        public static final int tripplanner_error_too_close=0x7f0800f3;
+        public static final int tripplanner_error_triangle=0x7f0800f8;
+        public static final int tripplanner_no_results_message=0x7f08008c;
+        public static final int tripplanner_progress=0x7f08008a;
+        public static final int tripplanner_results_title=0x7f08008b;
+        public static final int use_android_geocoder_description=0x7f0800b0;
+        public static final int use_android_geocoder_title=0x7f0800af;
+        public static final int use_device_timezone=0x7f080086;
+        public static final int use_device_timezone_description=0x7f080087;
+        public static final int use_intelligent_markers_description=0x7f0800b2;
+        public static final int use_intelligent_markers_title=0x7f0800b1;
+        public static final int walking_duration=0x7f0800a1;
         public static final int wheelchair_accessibility_description=0x7f08007a;
         public static final int wheelchair_accessible=0x7f080079;
         public static final int yes=0x7f080026;
@@ -909,7 +911,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name edu.usf.cutr.opentripplanner.android:cameraBearing
+          @attr name android:cameraBearing
         */
         public static final int MapAttrs_cameraBearing = 1;
         /**
@@ -923,7 +925,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name edu.usf.cutr.opentripplanner.android:cameraTargetLat
+          @attr name android:cameraTargetLat
         */
         public static final int MapAttrs_cameraTargetLat = 2;
         /**
@@ -937,7 +939,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name edu.usf.cutr.opentripplanner.android:cameraTargetLng
+          @attr name android:cameraTargetLng
         */
         public static final int MapAttrs_cameraTargetLng = 3;
         /**
@@ -951,7 +953,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name edu.usf.cutr.opentripplanner.android:cameraTilt
+          @attr name android:cameraTilt
         */
         public static final int MapAttrs_cameraTilt = 4;
         /**
@@ -965,7 +967,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name edu.usf.cutr.opentripplanner.android:cameraZoom
+          @attr name android:cameraZoom
         */
         public static final int MapAttrs_cameraZoom = 5;
         /**
@@ -985,7 +987,7 @@ containing a value of this type.
 <tr><td><code>terrain</code></td><td>3</td><td></td></tr>
 <tr><td><code>hybrid</code></td><td>4</td><td></td></tr>
 </table>
-          @attr name edu.usf.cutr.opentripplanner.android:mapType
+          @attr name android:mapType
         */
         public static final int MapAttrs_mapType = 0;
         /**
@@ -999,7 +1001,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name edu.usf.cutr.opentripplanner.android:uiCompass
+          @attr name android:uiCompass
         */
         public static final int MapAttrs_uiCompass = 6;
         /**
@@ -1013,7 +1015,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name edu.usf.cutr.opentripplanner.android:uiRotateGestures
+          @attr name android:uiRotateGestures
         */
         public static final int MapAttrs_uiRotateGestures = 7;
         /**
@@ -1027,7 +1029,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name edu.usf.cutr.opentripplanner.android:uiScrollGestures
+          @attr name android:uiScrollGestures
         */
         public static final int MapAttrs_uiScrollGestures = 8;
         /**
@@ -1041,7 +1043,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name edu.usf.cutr.opentripplanner.android:uiTiltGestures
+          @attr name android:uiTiltGestures
         */
         public static final int MapAttrs_uiTiltGestures = 9;
         /**
@@ -1055,7 +1057,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name edu.usf.cutr.opentripplanner.android:uiZoomControls
+          @attr name android:uiZoomControls
         */
         public static final int MapAttrs_uiZoomControls = 10;
         /**
@@ -1069,7 +1071,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name edu.usf.cutr.opentripplanner.android:uiZoomGestures
+          @attr name android:uiZoomGestures
         */
         public static final int MapAttrs_uiZoomGestures = 11;
         /**
@@ -1083,7 +1085,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name edu.usf.cutr.opentripplanner.android:useViewLifecycle
+          @attr name android:useViewLifecycle
         */
         public static final int MapAttrs_useViewLifecycle = 12;
         /**
@@ -1097,7 +1099,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name edu.usf.cutr.opentripplanner.android:zOrderOnTop
+          @attr name android:zOrderOnTop
         */
         public static final int MapAttrs_zOrderOnTop = 13;
         /** Attributes that can be used with a Panel.
@@ -1141,7 +1143,7 @@ theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
           <p>This is a private symbol.
-          @attr name edu.usf.cutr.opentripplanner.android:animationDuration
+          @attr name android:animationDuration
         */
         public static final int Panel_animationDuration = 0;
         /**
@@ -1155,7 +1157,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
 <p>May be a color value, in the form of "<code>#<i>rgb</i></code>", "<code>#<i>argb</i></code>",
 "<code>#<i>rrggbb</i></code>", or "<code>#<i>aarrggbb</i></code>".
           <p>This is a private symbol.
-          @attr name edu.usf.cutr.opentripplanner.android:closedHandle
+          @attr name android:closedHandle
         */
         public static final int Panel_closedHandle = 7;
         /**
@@ -1167,7 +1169,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
           <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
           <p>This is a private symbol.
-          @attr name edu.usf.cutr.opentripplanner.android:content
+          @attr name android:content
         */
         public static final int Panel_content = 3;
         /**
@@ -1179,7 +1181,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
           <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
           <p>This is a private symbol.
-          @attr name edu.usf.cutr.opentripplanner.android:handle
+          @attr name android:handle
         */
         public static final int Panel_handle = 2;
         /**
@@ -1195,7 +1197,7 @@ theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
           <p>This is a private symbol.
-          @attr name edu.usf.cutr.opentripplanner.android:linearFlying
+          @attr name android:linearFlying
         */
         public static final int Panel_linearFlying = 4;
         /**
@@ -1209,7 +1211,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
 <p>May be a color value, in the form of "<code>#<i>rgb</i></code>", "<code>#<i>argb</i></code>",
 "<code>#<i>rrggbb</i></code>", or "<code>#<i>aarrggbb</i></code>".
           <p>This is a private symbol.
-          @attr name edu.usf.cutr.opentripplanner.android:openedHandle
+          @attr name android:openedHandle
         */
         public static final int Panel_openedHandle = 6;
         /**
@@ -1230,7 +1232,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
 <tr><td><code>right</code></td><td>3</td><td> Panel placed at right of the screen. </td></tr>
 </table>
           <p>This is a private symbol.
-          @attr name edu.usf.cutr.opentripplanner.android:position
+          @attr name android:position
         */
         public static final int Panel_position = 1;
         /**
@@ -1248,7 +1250,7 @@ theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
           <p>This is a private symbol.
-          @attr name edu.usf.cutr.opentripplanner.android:weight
+          @attr name android:weight
         */
         public static final int Panel_weight = 5;
         /** Attributes that can be used with a SmoothButton.
@@ -1277,7 +1279,7 @@ containing a value of this type.
 
           <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
-          @attr name edu.usf.cutr.opentripplanner.android:transitionDrawable
+          @attr name android:transitionDrawable
         */
         public static final int SmoothButton_transitionDrawable = 0;
         /**
@@ -1291,7 +1293,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name edu.usf.cutr.opentripplanner.android:transitionDrawableLength
+          @attr name android:transitionDrawableLength
         */
         public static final int SmoothButton_transitionDrawableLength = 1;
         /**
@@ -1306,7 +1308,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name edu.usf.cutr.opentripplanner.android:transitionTextColorDown
+          @attr name android:transitionTextColorDown
         */
         public static final int SmoothButton_transitionTextColorDown = 3;
         /**
@@ -1321,7 +1323,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name edu.usf.cutr.opentripplanner.android:transitionTextColorUp
+          @attr name android:transitionTextColorUp
         */
         public static final int SmoothButton_transitionTextColorUp = 2;
         /** Attributes that can be used with a Switcher.
@@ -1356,7 +1358,7 @@ theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
           <p>This is a private symbol.
-          @attr name edu.usf.cutr.opentripplanner.android:animationDuration
+          @attr name android:animationDuration
         */
         public static final int Switcher_animationDuration = 0;
         /**
@@ -1368,7 +1370,7 @@ containing a value of this type.
           <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
           <p>This is a private symbol.
-          @attr name edu.usf.cutr.opentripplanner.android:decreaseButton
+          @attr name android:decreaseButton
         */
         public static final int Switcher_decreaseButton = 2;
         /**
@@ -1384,7 +1386,7 @@ theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
           <p>This is a private symbol.
-          @attr name edu.usf.cutr.opentripplanner.android:idleTimeout
+          @attr name android:idleTimeout
         */
         public static final int Switcher_idleTimeout = 1;
         /**
@@ -1396,7 +1398,7 @@ containing a value of this type.
           <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
           <p>This is a private symbol.
-          @attr name edu.usf.cutr.opentripplanner.android:increaseButton
+          @attr name android:increaseButton
         */
         public static final int Switcher_increaseButton = 3;
     };
