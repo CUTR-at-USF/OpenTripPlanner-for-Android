@@ -334,17 +334,20 @@ public class MainFragment extends Fragment implements
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        getActivity().getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
-            public void onBackStackChanged() {
-                Log.i(TAG, "back stack changed ");
-                int backCount = getActivity().getSupportFragmentManager().getBackStackEntryCount();
-                if (backCount == 0) {
-                    if (getFragmentListener() != null) {
-                        itinerarySelectionSpinner.setSelection(getFragmentListener().getCurrentItineraryIndex());
+        getActivity().getSupportFragmentManager()
+                .addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+                    public void onBackStackChanged() {
+                        Log.i(TAG, "back stack changed ");
+                        int backCount = getActivity().getSupportFragmentManager()
+                                .getBackStackEntryCount();
+                        if (backCount == 0) {
+                            if (getFragmentListener() != null) {
+                                itinerarySelectionSpinner.setSelection(
+                                        getFragmentListener().getCurrentItineraryIndex());
+                            }
+                        }
                     }
-                }
-            }
-        });
+                });
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -636,7 +639,7 @@ public class MainFragment extends Fragment implements
                         if (items[item].equals(getResources()
                                 .getString(R.string.location_type_current_location))) {	
                                         /*		myActivity = (MyActivity) activity;
-							myActivity.getmLocationClient();
+                                                        myActivity.getmLocationClient();
 							Location loc = this.MainFragment.getmLocationClient().getLastLocation();*/
                             LatLng mCurrentLatLng = getLastLocation();
                             if (mCurrentLatLng != null) {
