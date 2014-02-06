@@ -20,8 +20,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
@@ -165,8 +163,7 @@ import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_CUSTOM_
 public class MainFragment extends Fragment implements
         ServerSelectorCompleteListener,
         TripRequestCompleteListener, MetadataRequestCompleteListener,
-        OTPGeocodingListener, LocationListener,
-        DateCompleteListener, OnRangeSeekBarChangeListener<Double>,
+        OTPGeocodingListener, DateCompleteListener, OnRangeSeekBarChangeListener<Double>,
         GooglePlayServicesClient.OnConnectionFailedListener,
         GooglePlayServicesClient.ConnectionCallbacks,
         GoogleMap.OnCameraChangeListener {
@@ -177,7 +174,6 @@ public class MainFragment extends Fragment implements
     private Context mApplicationContext;
 
     private static LocationManager sLocationManager;
-    private LocationRequest mLocationRequest;
     private LocationClient mLocationClient;
     private OnFragmentListener mFragmentListener;
     private SharedPreferences mPrefs;
@@ -400,10 +396,6 @@ public class MainFragment extends Fragment implements
         sLocationManager = (LocationManager) getActivity()
                 .getSystemService(Context.LOCATION_SERVICE);
 
-        mLocationRequest = LocationRequest.create();
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setInterval(OTPApp.UPDATE_INTERVAL);
-        mLocationRequest.setFastestInterval(OTPApp.FASTEST_INTERVAL);
 
         if (savedInstanceState == null) {
             SharedPreferences.Editor prefsEditor = mPrefs.edit();
@@ -3070,30 +3062,6 @@ public class MainFragment extends Fragment implements
 
     @Override
     public void onDisconnected() {
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        LatLng mCurrentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-        Server selectedServer = mOTPApp.getSelectedServer();
-
-        if ((mCurrentLatLng != null) && (selectedServer != null) && (LocationUtil
-                .checkPointInBoundingBox(mCurrentLatLng, selectedServer,
-                        OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))) {
-            mMap.animateCamera(CameraUpdateFactory
-                    .newLatLngZoom(mCurrentLatLng, getServerInitialZoom(selectedServer)));
-        } else if ((selectedServer != null) && selectedServer.areBoundsSet()) {
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getServerCenter(selectedServer),
-                    getServerInitialZoom(selectedServer)));
-            setMarker(true, getServerCenter(selectedServer), false);
-        }
-
-        /*
-        String msg = "Updated Location: " +
-                Double.toString(location.getLatitude()) + "," +
-                Double.toString(location.getLongitude());
-        Toast.makeText(mApplicationContext, msg, Toast.LENGTH_SHORT).show();*/
-
     }
 
     /**
