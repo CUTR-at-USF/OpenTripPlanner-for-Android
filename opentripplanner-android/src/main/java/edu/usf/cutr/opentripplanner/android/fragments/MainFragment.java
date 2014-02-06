@@ -303,84 +303,97 @@ public class MainFragment extends Fragment implements
 
         final View mainView = inflater.inflate(R.layout.main, container, false);
 
-        ViewTreeObserver vto = mainView.getViewTreeObserver();
-        vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-            @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-            @Override
-            public void onGlobalLayout() {
-                MainFragment.removeOnGlobalLayoutListener(mainView, this);
-                int locationtbEndLocation[] = new int[2];
-                mTbEndLocation.getLocationInWindow(locationtbEndLocation);
-                int locationItinerarySelectionSpinner[] = new int[2];
-                mItinerarySelectionSpinner.getLocationInWindow(locationItinerarySelectionSpinner);
-                int locationbtnHandle[] = new int[2];
-                mBtnHandle.getLocationInWindow(locationbtnHandle);
-                DisplayMetrics metrics = MainFragment.this.getResources().getDisplayMetrics();
-                int windowHeight = metrics.heightPixels;
-                int paddingMargin = MainFragment.this.getResources()
-                        .getInteger(R.integer.map_padding_margin);
-                if (mMap != null) {
-                    mMap.setPadding(locationbtnHandle[0] + mBtnHandle.getWidth() / 2 + paddingMargin,
-                            locationtbEndLocation[1] + mTbEndLocation.getHeight() / 2
-                                    + paddingMargin,
-                            0,
-                            windowHeight - locationItinerarySelectionSpinner[1] + paddingMargin);
-                }
+        if (mainView != null){
+            ViewTreeObserver vto = mainView.getViewTreeObserver();
+
+            if (vto != null){
+                vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+                    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+                    @Override
+                    public void onGlobalLayout() {
+                        MainFragment.removeOnGlobalLayoutListener(mainView, this);
+                        int locationtbEndLocation[] = new int[2];
+                        mTbEndLocation.getLocationInWindow(locationtbEndLocation);
+                        int locationItinerarySelectionSpinner[] = new int[2];
+                        mItinerarySelectionSpinner.getLocationInWindow(locationItinerarySelectionSpinner);
+                        int locationbtnHandle[] = new int[2];
+                        mBtnHandle.getLocationInWindow(locationbtnHandle);
+                        DisplayMetrics metrics = MainFragment.this.getResources().getDisplayMetrics();
+                        int windowHeight = metrics.heightPixels;
+                        int paddingMargin = MainFragment.this.getResources()
+                                .getInteger(R.integer.map_padding_margin);
+                        if (mMap != null) {
+                            mMap.setPadding(locationbtnHandle[0] + mBtnHandle.getWidth() / 2 + paddingMargin,
+                                    locationtbEndLocation[1] + mTbEndLocation.getHeight() / 2
+                                            + paddingMargin,
+                                    0,
+                                    windowHeight - locationItinerarySelectionSpinner[1] + paddingMargin);
+                        }
+                    }
+                });
             }
-        });
+            else{
+                Log.w(TAG, "Not possible to obtain exact element's positions on screen, some other"
+                        + "elements can be misplaced");
+            }
 
-        mTbStartLocation = (EditText) mainView
-                .findViewById(R.id.tbStartLocation);
-        mTbEndLocation = (EditText) mainView.findViewById(R.id.tbEndLocation);
+            mTbStartLocation = (EditText) mainView
+                    .findViewById(R.id.tbStartLocation);
+            mTbEndLocation = (EditText) mainView.findViewById(R.id.tbEndLocation);
 
-        mBtnPlanTrip = (ImageButton) mainView.findViewById(R.id.btnPlanTrip);
-        mDdlOptimization = (ListView) mainView
-                .findViewById(R.id.spinOptimization);
-        mDdlTravelMode = (ListView) mainView.findViewById(R.id.spinTravelMode);
+            mBtnPlanTrip = (ImageButton) mainView.findViewById(R.id.btnPlanTrip);
+            mDdlOptimization = (ListView) mainView
+                    .findViewById(R.id.spinOptimization);
+            mDdlTravelMode = (ListView) mainView.findViewById(R.id.spinTravelMode);
 
-        mBikeTriangleParameters = new RangeSeekBar<Double>(OTPApp.BIKE_PARAMETERS_MIN_VALUE,
-                OTPApp.BIKE_PARAMETERS_MAX_VALUE, this.getActivity().getApplicationContext(),
-                R.color.sysRed, R.color.sysGreen, R.color.sysBlue, R.drawable.seek_thumb_normal,
-                R.drawable.seek_thumb_pressed);
+            mBikeTriangleParameters = new RangeSeekBar<Double>(OTPApp.BIKE_PARAMETERS_MIN_VALUE,
+                    OTPApp.BIKE_PARAMETERS_MAX_VALUE, this.getActivity().getApplicationContext(),
+                    R.color.sysRed, R.color.sysGreen, R.color.sysBlue, R.drawable.seek_thumb_normal,
+                    R.drawable.seek_thumb_pressed);
 
-        // add RangeSeekBar to pre-defined layout
-        mBikeTriangleParametersLayout = (ViewGroup) mainView.findViewById(R.id.bikeParametersLayout);
+            // add RangeSeekBar to pre-defined layout
+            mBikeTriangleParametersLayout = (ViewGroup) mainView.findViewById(R.id.bikeParametersLayout);
 
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-                LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        params.addRule(RelativeLayout.BELOW, R.id.bikeParametersTags);
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                    LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+            params.addRule(RelativeLayout.BELOW, R.id.bikeParametersTags);
 
-        mBikeTriangleParametersLayout.addView(mBikeTriangleParameters, params);
+            mBikeTriangleParametersLayout.addView(mBikeTriangleParameters, params);
 
-        mBtnMyLocation = (ImageButton) mainView.findViewById(R.id.btnMyLocation);
+            mBtnMyLocation = (ImageButton) mainView.findViewById(R.id.btnMyLocation);
 
-        mBtnDateDialog = (ImageButton) mainView.findViewById(R.id.btnDateDialog);
+            mBtnDateDialog = (ImageButton) mainView.findViewById(R.id.btnDateDialog);
 
-        mBtnDisplayDirection = (ImageButton) mainView
-                .findViewById(R.id.btnDisplayDirection);
+            mBtnDisplayDirection = (ImageButton) mainView
+                    .findViewById(R.id.btnDisplayDirection);
 
-        mNavigationDrawerLeftPane = (ViewGroup) mainView.findViewById(R.id.navigationDrawerLeftPane);
-        mPanelDisplayDirection = (ViewGroup) mainView.findViewById(R.id.panelDisplayDirection);
+            mNavigationDrawerLeftPane = (ViewGroup) mainView.findViewById(R.id.navigationDrawerLeftPane);
+            mPanelDisplayDirection = (ViewGroup) mainView.findViewById(R.id.panelDisplayDirection);
 
-        mBtnHandle = (ImageButton) mainView.findViewById(R.id.btnHandle);
-        mDrawerLayout = (DrawerLayout) mainView.findViewById(R.id.drawerLayout);
+            mBtnHandle = (ImageButton) mainView.findViewById(R.id.btnHandle);
+            mDrawerLayout = (DrawerLayout) mainView.findViewById(R.id.drawerLayout);
 
-        mTbStartLocation.setImeOptions(EditorInfo.IME_ACTION_NEXT);
-        mTbEndLocation.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        mTbEndLocation.requestFocus();
+            mTbStartLocation.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+            mTbEndLocation.setImeOptions(EditorInfo.IME_ACTION_DONE);
+            mTbEndLocation.requestFocus();
 
-        mItinerarySelectionSpinner = (Spinner) mainView.findViewById(R.id.itinerarySelection);
+            mItinerarySelectionSpinner = (Spinner) mainView.findViewById(R.id.itinerarySelection);
 
-        Log.v(TAG, "finish onStart()");
+            Log.v(TAG, "finish onStart()");
 
-        if (Build.VERSION.SDK_INT > 11) {
-            LayoutTransition l = new LayoutTransition();
-            ViewGroup mainButtons = (ViewGroup) mainView
-                    .findViewById(R.id.content_frame);
-            mainButtons.setLayoutTransition(l);
+            if (Build.VERSION.SDK_INT > 11) {
+                LayoutTransition l = new LayoutTransition();
+                ViewGroup mainButtons = (ViewGroup) mainView
+                        .findViewById(R.id.content_frame);
+                mainButtons.setLayoutTransition(l);
+            }
+
+            return mainView;
         }
-
-        return mainView;
+        else{
+            Log.e(TAG, "Not possible to obtain main view, UI won't be correctly created");
+            return null;
+        }
     }
 
 
@@ -388,10 +401,17 @@ public class MainFragment extends Fragment implements
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private static void removeOnGlobalLayoutListener(View v,
             ViewTreeObserver.OnGlobalLayoutListener listener) {
-        if (Build.VERSION.SDK_INT < 16) {
-            v.getViewTreeObserver().removeGlobalOnLayoutListener(listener);
-        } else {
-            v.getViewTreeObserver().removeOnGlobalLayoutListener(listener);
+        ViewTreeObserver viewTreeObserver = v.getViewTreeObserver();
+        if (viewTreeObserver != null){
+            if (Build.VERSION.SDK_INT < 16) {
+                viewTreeObserver.removeGlobalOnLayoutListener(listener);
+            } else {
+                viewTreeObserver.removeOnGlobalLayoutListener(listener);
+            }
+        }
+        else{
+            Log.w(TAG, "Problems obtaining exact element's positions on screen, some other elements"
+                    + "can be misplaced");
         }
     }
 
@@ -579,7 +599,7 @@ public class MainFragment extends Fragment implements
 
                     public void onClick(DialogInterface dialog, int item) {
                         if (items[item].equals(getResources()
-                                .getString(R.string.location_type_current_location))) {	
+                                .getString(R.string.location_type_current_location))) {
                                         /*		myActivity = (MyActivity) activity;
                                                         myActivity.getmLocationClient();
 							Location loc = this.MainFragment.getmLocationClient().getLastLocation();*/
@@ -657,7 +677,7 @@ public class MainFragment extends Fragment implements
 
                     public void onClick(DialogInterface dialog, int item) {
                         if (items[item].equals(getResources()
-                                .getString(R.string.location_type_current_location))) {	
+                                .getString(R.string.location_type_current_location))) {
 					/*		myActivity = (MyActivity) activity;
 							myActivity.getmLocationClient();
 							Location loc = this.MainFragment.getmLocationClient().getLastLocation();*/
@@ -735,27 +755,35 @@ public class MainFragment extends Fragment implements
                 }
                 TextView tv = (TextView) v;
                 if (!hasFocus) {
-                    String text = tv.getText().toString();
+                    CharSequence tvCharSequence = tv.getText();
 
-                    if (!TextUtils.isEmpty(text)) {
-                        if (v.getId() == R.id.tbStartLocation
-                                && !mIsStartLocationGeocodingProcessed
-                                && !mPrefs
-                                .getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true)) {
-                            processAddress(true, tv.getText().toString(), false);
-                        } else if (v.getId() == R.id.tbEndLocation
-                                && !mIsEndLocationGeocodingProcessed
-                                && !mPrefs
-                                .getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION,
-                                        true)) {
-                            processAddress(false, tv.getText().toString(), false);
+                    if (tvCharSequence != null){
+                        String text = tvCharSequence.toString();
+
+                        if (!TextUtils.isEmpty(text)) {
+                            if (v.getId() == R.id.tbStartLocation
+                                    && !mIsStartLocationGeocodingProcessed
+                                    && !mPrefs
+                                    .getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true)) {
+                                processAddress(true, text, false);
+                            } else if (v.getId() == R.id.tbEndLocation
+                                    && !mIsEndLocationGeocodingProcessed
+                                    && !mPrefs
+                                    .getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION,
+                                            true)) {
+                                processAddress(false, text, false);
+                            }
+                        } else {
+                            if (v.getId() == R.id.tbStartLocation) {
+                                tv.setHint(getResources().getString(R.string.start_location_hint));
+                            } else if (v.getId() == R.id.tbEndLocation) {
+                                tv.setHint(getResources().getString(R.string.end_location_hint));
+                            }
                         }
-                    } else {
-                        if (v.getId() == R.id.tbStartLocation) {
-                            tv.setHint(getResources().getString(R.string.start_location_hint));
-                        } else if (v.getId() == R.id.tbEndLocation) {
-                            tv.setHint(getResources().getString(R.string.end_location_hint));
-                        }
+                    }
+                    else{
+                        Log.w(TAG, "Focus has changed, but was not possible to obtain start/end"
+                                + " textbox text");
                     }
                 }
             }
@@ -828,7 +856,15 @@ public class MainFragment extends Fragment implements
                                 && !mPrefs
                                 .getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true)) {
                             mGeocodingBeenRequested = true;
-                            processAddress(true, v.getText().toString(), false);
+
+                            CharSequence tvCharSequence = v.getText();
+                            if (tvCharSequence != null){
+                                processAddress(true, tvCharSequence.toString(), false);
+                            }
+                            else {
+                                Log.w(TAG, "User switched to next input, but was not possible to"
+                                        + "obtain start/end textbox text");
+                            }
                         }
                     }
                 } else if (v.getId() == R.id.tbEndLocation) {
@@ -919,9 +955,9 @@ public class MainFragment extends Fragment implements
                 = new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//		    	Toast.makeText(parent.getContext(), 
+//		    	Toast.makeText(parent.getContext(),
 //		    				   Long.toString(id) + " chosen " +
-//		    				   parent.getItemAtPosition(position).toString(), 
+//		    				   parent.getItemAtPosition(position).toString(),
 //		    				   Toast.LENGTH_SHORT).show();
                 mFragmentListener.onItinerarySelected(position);
 
@@ -960,17 +996,21 @@ public class MainFragment extends Fragment implements
                     int position, long id) {
                 TraverseModeSpinnerItem traverseModeSpinnerItem
                         = (TraverseModeSpinnerItem) mDdlTravelMode.getItemAtPosition(position);
-                if (traverseModeSpinnerItem.getTraverseModeSet().contains(TraverseMode.BICYCLE)) {
-                    setBikeOptimizationAdapter(true);
-                    showBikeParameters(true);
-                } else {
-                    setBikeOptimizationAdapter(false);
-                    showBikeParameters(false);
-                }
+                if (traverseModeSpinnerItem != null){
+                    if (traverseModeSpinnerItem.getTraverseModeSet().contains(TraverseMode.BICYCLE)) {
+                        setBikeOptimizationAdapter(true);
+                        showBikeParameters(true);
+                    } else {
+                        setBikeOptimizationAdapter(false);
+                        showBikeParameters(false);
+                    }
 
-                mBtnPlanTrip.setImageBitmap(BitmapFactory.decodeResource(getResources(),
-                        ItineraryDecrypt
-                                .getModeIcon(traverseModeSpinnerItem.getTraverseModeSet())));
+                    mBtnPlanTrip.setImageBitmap(BitmapFactory.decodeResource(getResources(),
+                            ItineraryDecrypt
+                                    .getModeIcon(traverseModeSpinnerItem.getTraverseModeSet())));
+                }
+                Log.e(TAG, "Not possible to change travel mode because traverse mode is unknown"
+                        + "for selected transport medium");
             }
         });
 
@@ -980,9 +1020,14 @@ public class MainFragment extends Fragment implements
 
                 OptimizeSpinnerItem optimizeSpinnerItem = (OptimizeSpinnerItem) mDdlOptimization
                         .getItemAtPosition(position);
-                showBikeParameters(
-                        optimizeSpinnerItem.getOptimizeType().equals(OptimizeType.TRIANGLE));
-
+                if (optimizeSpinnerItem != null){
+                    showBikeParameters(
+                            optimizeSpinnerItem.getOptimizeType().equals(OptimizeType.TRIANGLE));
+                }
+                else{
+                    Log.e(TAG, "Not possible to change optimization mode because selected"
+                            + "optimization is unknown");
+                }
             }
         });
 
@@ -995,18 +1040,33 @@ public class MainFragment extends Fragment implements
      */
     private void processRequestTrip() {
         mIsRealLostFocus = false;
+        Editable tbEditable;
+
         if (!mIsEndLocationGeocodingProcessed
                 && !mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, true)
                 && !mGeocodingBeenRequested) {
             mRequestTripAfterEndGeocoding = true;
             mGeocodingBeenRequested = true;
-            processAddress(false, mTbEndLocation.getText().toString(), false);
+            if ((tbEditable = mTbEndLocation.getText()) != null){
+                processAddress(false, tbEditable.toString(), false);
+            }
+            else{
+                Log.e(TAG, "Trip won't be requested because there was an error fetching destination"
+                        + " from input field");
+            }
         } else if (!mIsStartLocationGeocodingProcessed
                 && !mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true)
                 && !mGeocodingBeenRequested) {
             mRequestTripAfterStartGeocoding = true;
             mGeocodingBeenRequested = true;
-            processAddress(true, mTbStartLocation.getText().toString(), false);
+            if ((tbEditable = mTbStartLocation.getText()) != null){
+                processAddress(true, tbEditable.toString(), false);
+
+            }
+            else{
+                Log.e(TAG, "Trip won't be requested because there was an error fetching origin from"
+                        + " input field");
+            }
         } else if (!mIsStartLocationGeocodingProcessed
                 && !mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true)
                 && !mIsEndLocationGeocodingProcessed
@@ -1016,8 +1076,20 @@ public class MainFragment extends Fragment implements
             mRequestTripAfterEndGeocoding = true;
             mRequestTripAfterStartEndGeocoding = true;
             mGeocodingBeenRequested = true;
-            processAddress(true, mTbStartLocation.getText().toString(), false);
-            processAddress(false, mTbEndLocation.getText().toString(), false);
+            if ((tbEditable = mTbStartLocation.getText()) != null){
+                processAddress(true, tbEditable.toString(), false);
+            }
+            else{
+                Log.e(TAG, "Trip won't be requested because there was an error fetching origin from"
+                        + " input field");
+            }
+            if ((tbEditable = mTbEndLocation.getText()) != null){
+                processAddress(false, tbEditable.toString(), false);
+            }
+            else{
+                Log.e(TAG, "Trip won't be requested because there was an error fetching destination"
+                        + " from input field");
+            }
         } else {
             requestTrip();
         }
@@ -1233,14 +1305,19 @@ public class MainFragment extends Fragment implements
                 TraverseModeSpinnerItem traverseModeSpinnerItem
                         = (TraverseModeSpinnerItem) mDdlTravelMode
                         .getItemAtPosition(mDdlTravelMode.getCheckedItemPosition());
-                if (traverseModeSpinnerItem.getTraverseModeSet().contains(TraverseMode.BICYCLE)) {
-                    setBikeOptimizationAdapter(true);
-                    mDdlOptimization.setItemChecked(
-                            savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION), true);
-                    OptimizeSpinnerItem optimizeSpinnerItem = (OptimizeSpinnerItem) mDdlOptimization
-                            .getItemAtPosition(mDdlOptimization.getCheckedItemPosition());
-                    if (optimizeSpinnerItem.getOptimizeType().equals(OptimizeType.TRIANGLE)) {
-                        showBikeParameters(true);
+                if (traverseModeSpinnerItem != null){
+                    // This should always be the case because if it's stored it was already checked
+                    if (traverseModeSpinnerItem.getTraverseModeSet().contains(TraverseMode.BICYCLE)) {
+                        setBikeOptimizationAdapter(true);
+                        mDdlOptimization.setItemChecked(
+                                savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION), true);
+                        OptimizeSpinnerItem optimizeSpinnerItem = (OptimizeSpinnerItem) mDdlOptimization
+                                .getItemAtPosition(mDdlOptimization.getCheckedItemPosition());
+                        if (optimizeSpinnerItem != null){
+                            if (optimizeSpinnerItem.getOptimizeType().equals(OptimizeType.TRIANGLE)) {
+                                showBikeParameters(true);
+                            }
+                        }
                     }
                 }
                 mDdlTravelMode.setItemChecked(
@@ -1320,30 +1397,30 @@ public class MainFragment extends Fragment implements
      * @param show if true drop down list will be shown
      */
     private void toggleItinerarySelectionSpinner(boolean show) {
-        if (show) {
-            mPanelDisplayDirection.setVisibility(View.VISIBLE);
-            RelativeLayout.LayoutParams paramsMyLocation
-                    = (android.widget.RelativeLayout.LayoutParams) mBtnMyLocation.getLayoutParams();
-            paramsMyLocation.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+        RelativeLayout.LayoutParams paramsMyLocation
+                = (android.widget.RelativeLayout.LayoutParams) mBtnMyLocation.getLayoutParams();
+        RelativeLayout.LayoutParams paramsHandle
+                = (android.widget.RelativeLayout.LayoutParams) mBtnHandle.getLayoutParams();
+        if ((paramsHandle != null) && (paramsMyLocation != null)){
+            if (show) {
+                mPanelDisplayDirection.setVisibility(View.VISIBLE);
+                //Workaround, this value proves to be false, but is dirty. This is because removeRule is not defined in early versions of the API
+                paramsMyLocation.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+                //Workaround, this value proves to be false, but is dirty. This is because removeRule is not defined in early versions of the API
+                paramsMyLocation.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+            }
+            else {
+                mPanelDisplayDirection.setVisibility(View.INVISIBLE);
+                paramsMyLocation.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+                paramsHandle.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+            }
             mBtnMyLocation.setLayoutParams(paramsMyLocation);
-            RelativeLayout.LayoutParams paramsHandle
-                    = (android.widget.RelativeLayout.LayoutParams) mBtnHandle.getLayoutParams();
-            paramsHandle.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
             mBtnHandle.setLayoutParams(paramsHandle);
             mBtnMyLocation.requestLayout();
             mBtnHandle.requestLayout();
-        } else {
-            mPanelDisplayDirection.setVisibility(View.INVISIBLE);
-            RelativeLayout.LayoutParams paramsMyLocation
-                    = (android.widget.RelativeLayout.LayoutParams) mBtnMyLocation.getLayoutParams();
-            paramsMyLocation.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-            mBtnMyLocation.setLayoutParams(paramsMyLocation);
-            RelativeLayout.LayoutParams paramsHandle
-                    = (android.widget.RelativeLayout.LayoutParams) mBtnHandle.getLayoutParams();
-            paramsHandle.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-            mBtnHandle.setLayoutParams(paramsHandle);
-            mBtnMyLocation.requestLayout();
-            mBtnHandle.requestLayout();
+        }
+        else{
+            Log.w(TAG, "Not possible to move down itineraries spinner");
         }
     }
 
@@ -1454,12 +1531,17 @@ public class MainFragment extends Fragment implements
             optimizeSpinnerItem = (OptimizeSpinnerItem) mDdlOptimization.getItemAtPosition(0);
         }
 
-        request.setOptimize(optimizeSpinnerItem.getOptimizeType());
-
-        if (optimizeSpinnerItem.getOptimizeType().equals(OptimizeType.TRIANGLE)) {
-            request.setTriangleTimeFactor(mBikeTriangleMinValue);
-            request.setTriangleSlopeFactor(mBikeTriangleMaxValue - mBikeTriangleMinValue);
-            request.setTriangleSafetyFactor(1 - mBikeTriangleMaxValue);
+        if (optimizeSpinnerItem != null){
+            request.setOptimize(optimizeSpinnerItem.getOptimizeType());
+            if (optimizeSpinnerItem.getOptimizeType().equals(OptimizeType.TRIANGLE)) {
+                request.setTriangleTimeFactor(mBikeTriangleMinValue);
+                request.setTriangleSlopeFactor(mBikeTriangleMaxValue - mBikeTriangleMinValue);
+                request.setTriangleSafetyFactor(1 - mBikeTriangleMaxValue);
+            }
+        }
+        else{
+            Log.e(TAG, "Optimization not found, not possible to add it to the request so, most"
+                    + "likely results will be incorrect");
         }
 
         TraverseModeSpinnerItem traverseModeSpinnerItem = (TraverseModeSpinnerItem) mDdlTravelMode
@@ -1467,7 +1549,14 @@ public class MainFragment extends Fragment implements
         if (traverseModeSpinnerItem == null) {
             traverseModeSpinnerItem = (TraverseModeSpinnerItem) mDdlTravelMode.getItemAtPosition(0);
         }
-        request.setModes(traverseModeSpinnerItem.getTraverseModeSet());
+
+        if (traverseModeSpinnerItem != null){
+            request.setModes(traverseModeSpinnerItem.getTraverseModeSet());
+        }
+        else{
+            Log.e(TAG, "Traverse mode not found, not possible to add it to the request so, most"
+                    + "likely results will be incorrect");
+        }
 
         Integer defaultMaxWalkInt = mApplicationContext.getResources()
                 .getInteger(R.integer.max_walking_distance);
@@ -1634,12 +1723,18 @@ public class MainFragment extends Fragment implements
      * @param enable when true views will be disable
      * @param vg     a ViewGroup that will be modified
      */
-    private void disableEnableControls(boolean enable, ViewGroup vg) {
-        for (int i = 0; i < vg.getChildCount(); i++) {
+    private void disableEnableControls(boolean enable, ViewGroup vg){
+        for (int i = 0; i < vg.getChildCount(); i++){
             View child = vg.getChildAt(i);
-            child.setEnabled(enable);
-            if (child instanceof ViewGroup) {
-                disableEnableControls(enable, (ViewGroup) child);
+            if (child instanceof ViewGroup){
+                disableEnableControls(enable, (ViewGroup)child);
+            } else {
+                if (child != null){
+                    child.setEnabled(enable);
+                }
+                else{
+                    Log.w(TAG, "Not possible to fully perform process to disable all controls");
+                }
             }
         }
     }
@@ -1918,10 +2013,23 @@ public class MainFragment extends Fragment implements
 
     private String getLocationTbText(boolean isTbStartLocation) {
         if (isTbStartLocation) {
-            return mTbStartLocation.getText().toString();
+            Editable tbStarLocationEditable = mTbStartLocation.getText();
+            if (tbStarLocationEditable != null){
+                return tbStarLocationEditable.toString();
+            }
+            else{
+                Log.e(TAG, "Not possible to obtain origin from input box");
+            }
         } else {
-            return mTbEndLocation.getText().toString();
+            Editable tbEndLocationEditable = mTbEndLocation.getText();
+            if (tbEndLocationEditable != null){
+                return tbEndLocationEditable.toString();
+            }
+            else{
+                Log.e(TAG, "Not possible to obtain destination from input box");
+            }
         }
+        return null;
     }
 
     /**
@@ -1961,7 +2069,7 @@ public class MainFragment extends Fragment implements
                 runAutoDetectServerNoLocation(true);
             }
         }
-		
+
 		/*if (mMapFailed){
 			Intent i = this.getActivity().getBaseContext().getPackageManager()
 		             .getLaunchIntentForPackage( this.getActivity().getBaseContext().getPackageName() );
@@ -2013,8 +2121,22 @@ public class MainFragment extends Fragment implements
                     mIsStartLocationChangedByUser);
             bundle.putBoolean(OTPApp.BUNDLE_KEY_IS_END_LOCATION_CHANGED_BY_USER,
                     mIsEndLocationChangedByUser);
-            bundle.putString(OTPApp.BUNDLE_KEY_TB_START_LOCATION,
-                    mTbStartLocation.getText().toString());
+            Editable tbStarLocationEditable = mTbStartLocation.getText();
+            if (tbStarLocationEditable != null){
+                bundle.putString(OTPApp.BUNDLE_KEY_TB_START_LOCATION,
+                        tbStarLocationEditable.toString());
+            }
+            else{
+                Log.e(TAG, "Not possible to obtain origin while saving app bundle");
+            }
+            Editable tbEndLocationEditable = mTbEndLocation.getText();
+            if (tbEndLocationEditable != null){
+                bundle.putString(OTPApp.BUNDLE_KEY_TB_END_LOCATION,
+                        tbEndLocationEditable.toString());
+            }
+            else{
+                Log.e(TAG, "Not possible to obtain destination while saving app bundle");
+            }
             bundle.putString(OTPApp.BUNDLE_KEY_TB_END_LOCATION, mTbEndLocation.getText().toString());
             bundle.putInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION,
                     mDdlOptimization.getCheckedItemPosition());
@@ -2514,16 +2636,23 @@ public class MainFragment extends Fragment implements
                 List<LatLng> points = LocationUtil.decodePoly(leg.legGeometry
                         .getPoints());
 
+                MarkerOptions modeMarkerOption = new MarkerOptions().position(points.get(0));
+
                 float scaleFactor = getResources().getFraction(R.fraction.scaleFactor, 1, 1);
 
-                Drawable d = getResources().getDrawable(getPathIcon(leg.mode));
-                BitmapDrawable bd = (BitmapDrawable) d.getCurrent();
-                Bitmap b = bd.getBitmap();
-                Bitmap bhalfsize = Bitmap.createScaledBitmap(b, (int) (b.getWidth() / scaleFactor),
-                        (int) (b.getHeight() / scaleFactor), false);
-
-                MarkerOptions modeMarkerOption = new MarkerOptions().position(points.get(0))
-                        .icon(BitmapDescriptorFactory.fromBitmap(bhalfsize));
+                Drawable drawable = getResources().getDrawable(getPathIcon(leg.mode));
+                if (drawable != null){
+                    BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable.getCurrent();
+                    Bitmap bitmap = bitmapDrawable.getBitmap();
+                    Bitmap bitmapHalfSize = Bitmap.createScaledBitmap(bitmap,
+                            (int) (bitmap.getWidth() / scaleFactor),
+                            (int) (bitmap.getHeight() / scaleFactor), false);
+                    modeMarkerOption.icon(
+                            BitmapDescriptorFactory.fromBitmap(bitmapHalfSize));
+                }
+                else{
+                    Log.e(TAG, "Error obtaining drawable to add mode icons to the map");
+                }
 
                 TraverseMode traverseMode = TraverseMode.valueOf((String) leg.mode);
 
@@ -2670,13 +2799,27 @@ public class MainFragment extends Fragment implements
                     .getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true))) {
                 mResultTripStartLocation = addressToString(mStartAddress);
             } else {
-                mResultTripStartLocation = mTbStartLocation.getText().toString();
+                Editable tbStarLocationEditable = mTbStartLocation.getText();
+                if (tbStarLocationEditable != null){
+                    mResultTripStartLocation = tbStarLocationEditable.toString();
+                }
+                else{
+                    Log.e(TAG, "Not possible to obtain origin from input box while saving it to"
+                            + " step-by-step screen");
+                }
             }
             if ((mEndAddress != null) && (mPrefs
                     .getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true))) {
                 mResultTripEndLocation = addressToString(mEndAddress);
             } else {
-                mResultTripEndLocation = mTbEndLocation.getText().toString();
+                Editable tbEndLocationEditable = mTbEndLocation.getText();
+                if (tbEndLocationEditable != null){
+                    mResultTripEndLocation = tbEndLocationEditable.toString();
+                }
+                else{
+                    Log.e(TAG, "Not possible to obtain destination from input box while saving it to"
+                            + " step-by-step screen");
+                }
             }
         }
     }
@@ -2707,7 +2850,7 @@ public class MainFragment extends Fragment implements
             }
             if (!isTransitIsTagSet) {
                 itinerarySummaryList[i] = Integer.toString(i + 1)
-                        + ".   ";//Shown index is i + 1, to use 1-based indexes for the UI instead of 0-based					
+                        + ".   ";//Shown index is i + 1, to use 1-based indexes for the UI instead of 0-based
                 itinerarySummaryList[i] +=
                         ConversionUtils.getFormattedDistance(it.walkDistance, mApplicationContext)
                                 + " " + "-" + " " + ConversionUtils
