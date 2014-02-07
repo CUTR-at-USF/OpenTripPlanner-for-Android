@@ -1427,7 +1427,7 @@ public class MainFragment extends Fragment implements
                 //Workaround, this value proves to be false, but is dirty. This is because removeRule is not defined in early versions of the API
                 paramsMyLocation.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
                 //Workaround, this value proves to be false, but is dirty. This is because removeRule is not defined in early versions of the API
-                paramsMyLocation.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+                paramsHandle.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
             } else {
                 mPanelDisplayDirection.setVisibility(View.INVISIBLE);
                 paramsMyLocation.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
