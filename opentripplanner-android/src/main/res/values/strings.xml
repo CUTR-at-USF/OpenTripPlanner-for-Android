@@ -119,6 +119,8 @@
     <string name="tripplanner_results_title">Routing Results</string>
     <string name="tripplanner_no_results_message">Error planning trip</string>
     <string name="tripplanner_error_dialog_title">Sorry, routing is not possible</string>
+    <string name="tripplanner_error_not_defined">Sorry, there was an error with servers reply
+    </string>
     <string name="date_time_title">Set date and time</string>
     <string name="date_time_spinner_arrive">Arrive at:</string>
     <string name="date_time_spinner_depart">Depart at:</string>
@@ -146,6 +148,7 @@
     <string name="distance_meters">m</string>
     <string name="connector_time_full">takes</string>
     <string name="refresh_server_list">Refresh server list</string>
+    <string name="refresh_server_list_error">Not possible to obtain servers</string>
     <string name="server_list_donwload_date_description">Server List Downloaded on</string>
     <string name="server_list_donwload_date_unknown">Last Server List Download Unknown</string>
     <string name="alternative_routes">Select a route</string>
@@ -156,7 +159,7 @@
     <string name="use_android_geocoder_description">Query first with Android Geocoder</string>
     <string name="use_intelligent_markers_title">Intelligent markers</string>
     <string name="use_intelligent_markers_description">Move markers to a close geographical location</string>
-    <string name="info_server_no_server_selected">No server selected</string>
+    <string name="error_no_server_selected">No server selected</string>
     <string name="info_server_error">Attention: Cannot obtain server info!</string>
     <string name="selected_custom_server_title">Custom OTP Server</string>
     <string name="selected_custom_server_description">Select server provided by custom URL</string>
