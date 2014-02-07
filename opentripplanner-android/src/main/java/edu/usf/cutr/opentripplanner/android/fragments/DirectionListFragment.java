@@ -150,7 +150,7 @@ public class DirectionListFragment extends ExpandableListFragment {
             isTransitIsTagSet = false;
             Itinerary it = itineraryList.get(i);
             for (Leg leg : it.legs) {
-                TraverseMode traverseMode = TraverseMode.valueOf((String) leg.mode);
+                TraverseMode traverseMode = TraverseMode.valueOf(leg.mode);
                 if (traverseMode.isTransit()) {
                     itinerarySummaryList[i] = getResources().getString(R.string.before_route) + " "
                             + leg.getRouteShortName() + ". ";
@@ -186,10 +186,6 @@ public class DirectionListFragment extends ExpandableListFragment {
                 = new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//		    	Toast.makeText(parent.getContext(), 
-//		    				   Long.toString(id) + " chosen " +
-//		    				   parent.getItemAtPosition(position).toString(), 
-//		    				   Toast.LENGTH_SHORT).show();
                 fragmentListener.onItinerarySelected(position);
 
                 setDepartureArrivalHeaders();
@@ -228,12 +224,6 @@ public class DirectionListFragment extends ExpandableListFragment {
         itinerarySelectionSpinner.setSelection(currentItineraryIndex);
         itinerarySelectionSpinner.setOnItemSelectedListener(itinerarySpinnerListener);
 
-//		TextView totalDistanceHeader = (TextView)header.findViewById(R.id.totalDistanceHeader);
-//		totalDistanceHeader.setText(Double.toString(itDecrypt.getTotalDistance()));
-//		TextView timeTraveledHeader = (TextView)header.findViewById(R.id.timeTraveledHeader);
-//		Double d = itDecrypt.getTotalTimeTraveled();
-//		timeTraveledHeader.setText(getFormattedDuration(d.intValue()));
-
         // Populate list with our static array of titles.
         elv = getExpandableListView();
 
@@ -265,7 +255,7 @@ public class DirectionListFragment extends ExpandableListFragment {
 
         if (legsList.size() == 1) {
             Leg firstLeg = legsList.get(0);
-            TraverseMode traverseMode = TraverseMode.valueOf((String) firstLeg.mode);
+            TraverseMode traverseMode = TraverseMode.valueOf(firstLeg.mode);
             if (!traverseMode.isTransit()) {
                 elv.expandGroup(0);
             }
