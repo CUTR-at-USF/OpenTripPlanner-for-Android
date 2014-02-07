@@ -48,8 +48,6 @@ public class Nominatim implements Places {
 
     private String request = "http://open.mapquestapi.com/nominatim/v1/search?format=json";
 
-    private static String TAG = "OTP";
-
     public static final String PARAM_NAME = "q";
 
     public static final String PARAM_LEFT = "left";
@@ -123,7 +121,7 @@ public class Nominatim implements Places {
             request += "&bounded=1";
         }
 
-        Log.v(TAG, request);
+        Log.v(OTPApp.TAG, request);
 
         HttpGet httpGet = new HttpGet(request);
         try {
@@ -139,20 +137,20 @@ public class Nominatim implements Places {
                     builder.append(line);
                 }
             } else {
-                Log.v(TAG, "Failed to download file");
+                Log.v(OTPApp.TAG, "Failed to download file");
             }
         } catch (ClientProtocolException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Log.v(TAG, builder.toString());
+        Log.v(OTPApp.TAG, builder.toString());
 
         JSONArray json = null;
         try {
             json = new JSONArray(builder.toString());
         } catch (JSONException e) {
-            Log.e(TAG, "Error parsing data " + e.toString());
+            Log.e(OTPApp.TAG, "Error parsing data " + e.toString());
         }
 
         return json;

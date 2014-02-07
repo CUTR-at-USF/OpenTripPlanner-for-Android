@@ -45,8 +45,6 @@ public class MetadataRequest extends AsyncTask<String, Integer, GraphMetadata> {
 
     private GraphMetadata metadata;
 
-    private static final String TAG = "OTP";
-
     private ProgressDialog progressDialog;
 
     private WeakReference<Activity> activity;
@@ -93,7 +91,7 @@ public class MetadataRequest extends AsyncTask<String, Integer, GraphMetadata> {
                     progressDialog.dismiss();
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error in Metadata Request PostExecute dismissing dialog: " + e);
+                Log.e(OTPApp.TAG, "Error in Metadata Request PostExecute dismissing dialog: " + e);
             }
         }
 
@@ -106,7 +104,7 @@ public class MetadataRequest extends AsyncTask<String, Integer, GraphMetadata> {
             Toast.makeText(context, context.getResources().getString(R.string.info_server_error),
                     Toast.LENGTH_SHORT).show();
 
-            Log.e(TAG, "No metadata!");
+            Log.e(OTPApp.TAG, "No metadata!");
         }
     }
 
@@ -115,7 +113,7 @@ public class MetadataRequest extends AsyncTask<String, Integer, GraphMetadata> {
 
         String u = serverURL + res;
 
-        Log.d(TAG, "URL: " + u);
+        Log.d(OTPApp.TAG, "URL: " + u);
 
         HttpURLConnection urlConnection = null;
         URL url = null;
@@ -145,7 +143,7 @@ public class MetadataRequest extends AsyncTask<String, Integer, GraphMetadata> {
                     GraphMetadata.class);
 
         } catch (IOException e) {
-            Log.e(TAG, "Error fetching JSON or XML: " + e);
+            Log.e(OTPApp.TAG, "Error fetching JSON or XML: " + e);
             e.printStackTrace();
             // Reset timestamps to show there was an error
             // requestStartTime = 0;

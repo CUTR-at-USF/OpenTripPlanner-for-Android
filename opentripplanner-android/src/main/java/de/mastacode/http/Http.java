@@ -44,6 +44,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import edu.usf.cutr.opentripplanner.android.OTPApp;
+
 /**
  * Fluent builder for the {@linkplain HttpClient} to simplify its usage.
  *
@@ -122,7 +124,6 @@ public final class Http {
      *
      * @see {@link HttpRequestBuilder#customize(RequestCustomizer)}
      */
-    private static final String TAG = "OTP";
 
     public static interface RequestCustomizer {
 
@@ -361,7 +362,7 @@ public final class Http {
 
             final HttpResponse response = client.execute(request);
 
-            Log.v(TAG, "res= " + response);
+            Log.v(OTPApp.TAG, "res= " + response);
             return response;
         }
 

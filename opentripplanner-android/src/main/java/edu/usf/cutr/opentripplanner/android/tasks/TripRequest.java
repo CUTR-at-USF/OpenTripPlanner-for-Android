@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.R;
 import edu.usf.cutr.opentripplanner.android.listeners.TripRequestCompleteListener;
 import edu.usf.cutr.opentripplanner.android.model.Server;
@@ -54,8 +55,6 @@ import edu.usf.cutr.opentripplanner.android.util.JacksonConfig;
 public class TripRequest extends AsyncTask<Request, Integer, Long> {
 
     private Response response;
-
-    private static final String TAG = "OTP";
 
     private ProgressDialog progressDialog;
 
@@ -105,7 +104,7 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
                 progressDialog.dismiss();
             }
         } catch (Exception e) {
-            Log.e(TAG, "Error in TripRequest Cancelled dismissing dialog: " + e);
+            Log.e(OTPApp.TAG, "Error in TripRequest Cancelled dismissing dialog: " + e);
         }
 
         if (activity.get() != null) {
@@ -122,7 +121,7 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
             alert.show();
         }
 
-        Log.e(TAG, "No route to display!");
+        Log.e(OTPApp.TAG, "No route to display!");
     }
 
     protected void onPostExecute(Long result) {
@@ -132,7 +131,7 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
                     progressDialog.dismiss();
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error in TripRequest PostExecute dismissing dialog: " + e);
+                Log.e(OTPApp.TAG, "Error in TripRequest PostExecute dismissing dialog: " + e);
             }
         }
 
@@ -163,7 +162,7 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
                     feedback.create().show();
                 }
             }
-            Log.e(TAG, "No route to display!");
+            Log.e(OTPApp.TAG, "No route to display!");
         }
     }
 
@@ -260,7 +259,7 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
             u += "&intermediatePlaces=";
         }
 
-        Log.d(TAG, "URL: " + u);
+        Log.d(OTPApp.TAG, "URL: " + u);
 
         currentRequestString = u;
 
@@ -285,11 +284,11 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
             urlConnection.disconnect();
 
         } catch (java.net.SocketTimeoutException e) {
-            Log.e(TAG, "Timeout fetching JSON or XML: " + e);
+            Log.e(OTPApp.TAG, "Timeout fetching JSON or XML: " + e);
             e.printStackTrace();
             cancel(true);
         } catch (IOException e) {
-            Log.e(TAG, "Error fetching JSON or XML: " + e);
+            Log.e(OTPApp.TAG, "Error fetching JSON or XML: " + e);
             e.printStackTrace();
             cancel(true);
             // Reset timestamps to show there was an error

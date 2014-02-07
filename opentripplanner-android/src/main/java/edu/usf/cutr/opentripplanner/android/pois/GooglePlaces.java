@@ -50,8 +50,6 @@ public class GooglePlaces implements Places {
 
     private String apiKey;
 
-    private static String TAG = "OTP";
-
     public static final String PARAM_LOCATION = "location";
 
     public static final String PARAM_RADIUS = "radius";
@@ -133,7 +131,7 @@ public class GooglePlaces implements Places {
         request += "&sensor=false";
         request += "&key=" + getApiKey();
 
-        Log.v(TAG, request);
+        Log.v(OTPApp.TAG, request);
 
         HttpGet httpGet = new HttpGet(request);
         try {
@@ -149,20 +147,20 @@ public class GooglePlaces implements Places {
                     builder.append(line);
                 }
             } else {
-                Log.v(TAG, "Failed to download file");
+                Log.v(OTPApp.TAG, "Failed to download file");
             }
         } catch (ClientProtocolException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Log.v(TAG, builder.toString());
+        Log.v(OTPApp.TAG, builder.toString());
 
         JSONObject json = null;
         try {
             json = new JSONObject(builder.toString());
         } catch (JSONException e) {
-            Log.e(TAG, "Error parsing data " + e.toString());
+            Log.e(OTPApp.TAG, "Error parsing data " + e.toString());
         }
 
         return json;

@@ -67,8 +67,6 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 
     private EditTextPreference maxWalkingDistance;
 
-    private final String TAG = "OTP";
-
     private Intent returnIntent;
 
     @Override
@@ -280,7 +278,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
                     autoDetectServer.setEnabled(true);
                 }
 
-                Log.v(TAG, "Custom server Button clicked");
+                Log.v(OTPApp.TAG, "Custom server Button clicked");
 
                 returnIntent.putExtra(OTPApp.CHANGED_SELECTED_CUSTOM_SERVER_RETURN_KEY, true);
                 setResult(RESULT_OK, returnIntent);
@@ -315,7 +313,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
                 .setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                     @Override
                     public boolean onPreferenceClick(Preference arg0) {
-                        Log.v(TAG, "Provider Feedback Button clicked");
+                        Log.v(OTPApp.TAG, "Provider Feedback Button clicked");
                         String recipient = getString(R.string.feedback_email_android_developer);
 
                         String uriText = "mailto:" + recipient;
@@ -361,7 +359,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
                 .setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                     @Override
                     public boolean onPreferenceClick(Preference arg0) {
-                        Log.v(TAG, "Server Refresh Button clicked");
+                        Log.v(OTPApp.TAG, "Server Refresh Button clicked");
 
                         returnIntent.putExtra(OTPApp.REFRESH_SERVER_RETURN_KEY, true);
                         setResult(RESULT_OK, returnIntent);
