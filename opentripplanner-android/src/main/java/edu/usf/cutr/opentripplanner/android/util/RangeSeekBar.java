@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 University of South Florida
+ * Copyright 2013 Stephan Tittel, Peter Sinnott, and Thomas Barrasso
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,6 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and 
  * limitations under the License.
+ *
+ * See https://code.google.com/p/range-seek-bar/ for details.
  */
 
 package edu.usf.cutr.opentripplanner.android.util;
@@ -241,7 +243,6 @@ public class RangeSeekBar<T extends Number> extends ImageView {
      *
      * @param absoluteMinValue   The minimum value of the selectable range.
      * @param absoluteMaxValue   The maximum value of the selectable range.
-     * @param context
      * @param leftColor          The <tt>int</tt> of the color to go between the left most
      *                           point and the left (min) thumb point. will Default to
      *                           #FFFF0000 (RED) if 0 is sent.
