@@ -299,19 +299,6 @@ public class DirectionListFragment extends ExpandableListFragment {
         bundle.putSerializable(OTPApp.BUNDLE_KEY_OTP_BUNDLE, otpBundle);
     }
 
-    @Override
-    public void onListItemClick(ExpandableListView l, View v, int pos, long id) {
-        showDetails(pos);
-    }
-
-    /**
-     * Helper function to show the details of a selected item, either by
-     * displaying a fragment in-place in the current UI, or starting a
-     * whole new activity in which it is displayed.
-     */
-    void showDetails(int index) {
-    }
-
     /**
      * @return the fragmentListener
      */
