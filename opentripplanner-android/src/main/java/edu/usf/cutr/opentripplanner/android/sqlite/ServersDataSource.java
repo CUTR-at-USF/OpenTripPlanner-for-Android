@@ -54,8 +54,6 @@ public class ServersDataSource {
             MySQLiteHelper.COLUMN_CENTER,
             MySQLiteHelper.COLUMN_ZOOM};
 
-    private static final String TAG = "OTP";
-
     private SimpleDateFormat dateFormat = (SimpleDateFormat) SimpleDateFormat.getDateTimeInstance();
 
     private ServersDataSource(Context context) {
@@ -107,13 +105,13 @@ public class ServersDataSource {
 
     public void deleteServer(Server server) {
         long id = server.getId();
-        Log.v(TAG, "Server deleted with id: " + id);
+        Log.v(OTPApp.TAG, "Server deleted with id: " + id);
         database.delete(MySQLiteHelper.TABLE_SERVERS, MySQLiteHelper.COLUMN_ID
                 + " = " + id, null);
     }
 
     public Server getServer(Long id) {
-        Log.v(TAG, "Server deleted with id: " + id);
+        Log.v(OTPApp.TAG, "Server deleted with id: " + id);
         Server newServer = null;
 
         Cursor cursor = database.query(MySQLiteHelper.TABLE_SERVERS, allColumns,

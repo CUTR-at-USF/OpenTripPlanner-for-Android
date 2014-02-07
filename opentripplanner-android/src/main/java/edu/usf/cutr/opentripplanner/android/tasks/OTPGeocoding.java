@@ -56,8 +56,6 @@ import edu.usf.cutr.opentripplanner.android.util.LocationUtil;
 
 public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 
-    private static final String TAG = "OTP";
-
     private WeakReference<Activity> activity;
 
     private Context context;
@@ -205,9 +203,9 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
             strKey = total.toString();
             strKey.trim(); //Remove any whitespace
         } catch (NotFoundException e) {
-            Log.w(TAG, "Warning - didn't find the google places key file:" + e);
+            Log.w(OTPApp.TAG, "Warning - didn't find the google places key file:" + e);
         } catch (IOException e) {
-            Log.w(TAG, "Error reading the developer key file:" + e);
+            Log.w(OTPApp.TAG, "Error reading the developer key file:" + e);
         }
 
         return strKey;
@@ -228,7 +226,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
             }
             p = new GooglePlaces(getKeyFromResource());
 
-            Log.v(TAG, "Using Google Places!");
+            Log.v(OTPApp.TAG, "Using Google Places!");
         } else {
             params.put(Nominatim.PARAM_NAME, name);
             if (selectedServer != null) {
@@ -244,7 +242,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 
             p = new Nominatim();
 
-            Log.v(TAG, "Using Nominatim!");
+            Log.v(OTPApp.TAG, "Using Nominatim!");
         }
 
         ArrayList<POI> pois = new ArrayList<POI>();
@@ -254,7 +252,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 
         for (int i = 0; i < pois.size(); i++) {
             POI poi = pois.get(i);
-            Log.v(TAG, poi.getName() + " " + poi.getLatitude() + "," + poi.getLongitude());
+            Log.v(OTPApp.TAG, poi.getName() + " " + poi.getLatitude() + "," + poi.getLongitude());
             Address addr = new Address(context.getResources().getConfiguration().locale);
             addr.setLatitude(poi.getLatitude());
             addr.setLongitude(poi.getLongitude());
@@ -291,7 +289,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
             AlertDialog alert = geocoderAlert.create();
             alert.show();
         }
-        Log.e(TAG, "No geocoding processed!");
+        Log.e(OTPApp.TAG, "No geocoding processed!");
     }
 
     protected void onPostExecute(Long result) {

@@ -73,8 +73,6 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long>
 
     private Server selectedServer;
 
-    private static final String TAG = "OTP";
-
     private ProgressDialog progressDialog;
 
     private WeakReference<Activity> activity;
@@ -139,14 +137,14 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long>
         // If not forced to refresh list
         if (!mustRefreshList) {
             // Check if servers are stored in SQLite?
-            Log.v(TAG, "Attempt retrieving servers from sqlite");
+            Log.v(OTPApp.TAG, "Attempt retrieving servers from sqlite");
             serverList = getServersFromSQLite();
         }
 
         // If forced to refresh list OR
         // If severs are not stored, download list from the Google Spreadsheet and Insert to database
         if (serverList == null || serverList.isEmpty() || mustRefreshList) {
-            Log.v(TAG, "No data from sqlite. Attempt retrieving servers from google spreadsheet");
+            Log.v(OTPApp.TAG, "No data from sqlite. Attempt retrieving servers from google spreadsheet");
             serverList = downloadServerList(
                     context.getResources().getString(R.string.servers_spreadsheet_url));
 
@@ -185,7 +183,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long>
             shown += s.getRegion() + s.getDate().toString() + "\n";
             servers.add(new Server(s));
         }
-        Log.v(TAG, shown);
+        Log.v(OTPApp.TAG, shown);
         dataSource.close();
 
         dataSource.open();
@@ -216,9 +214,9 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long>
         try {
             result = Http.get(url).use(client).charset(OTPApp.URL_ENCODING).followRedirects(true)
                     .asString();
-            Log.d(TAG, "Spreadsheet: " + result);
+            Log.d(OTPApp.TAG, "Spreadsheet: " + result);
         } catch (IOException e) {
-            Log.e(TAG, "Unable to download spreadsheet with server list: " + e.getMessage());
+            Log.e(OTPApp.TAG, "Unable to download spreadsheet with server list: " + e.getMessage());
             return null;
         }
 
@@ -236,13 +234,13 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long>
                 serverList.add(s);
             }
         } catch (IOException e) {
-            Log.e(TAG, "Problem reading CSV server file: " + e.getMessage());
+            Log.e(OTPApp.TAG, "Problem reading CSV server file: " + e.getMessage());
 
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e2) {
-                    Log.e(TAG, "Error closing CSVReader file: " + e2);
+                    Log.e(OTPApp.TAG, "Error closing CSVReader file: " + e2);
                 }
             }
 
@@ -252,12 +250,12 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long>
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    Log.e(TAG, "Error closing CSVReader file: " + e);
+                    Log.e(OTPApp.TAG, "Error closing CSVReader file: " + e);
                 }
             }
         }
 
-        Log.d(TAG, "Servers: " + serverList.size());
+        Log.d(OTPApp.TAG, "Servers: " + serverList.size());
 
         return serverList;
     }
@@ -309,7 +307,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long>
                     progressDialog.dismiss();
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error in Server Selector PostExecute dismissing dialog: " + e);
+                Log.e(OTPApp.TAG, "Error in Server Selector PostExecute dismissing dialog: " + e);
             }
         }
 
@@ -341,7 +339,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long>
             e.commit();
             callback.onServerSelectorComplete(selectedServer);
         } else if (knownServers != null && !knownServers.isEmpty()) {
-            Log.d(TAG,
+            Log.d(OTPApp.TAG,
                     "No server automatically selected.  User will need to choose the OTP server.");
 
             // Create dialog for user to choose
@@ -429,14 +427,14 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Long>
                                 }
                             }
                         }
-                        Log.v(TAG, "Chosen: " + items[item]);
+                        Log.v(OTPApp.TAG, "Chosen: " + items[item]);
                     }
                 });
                 builder.show();
             }
         } else {
             //TODO - handle error here that server list cannot be loaded
-            Log.e(TAG, "Server list could not be downloaded!!");
+            Log.e(OTPApp.TAG, "Server list could not be downloaded!!");
         }
     }
 

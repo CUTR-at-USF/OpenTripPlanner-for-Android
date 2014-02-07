@@ -34,13 +34,12 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 import de.mastacode.http.Http;
+import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.R;
 import edu.usf.cutr.opentripplanner.android.listeners.ServerCheckerCompleteListener;
 import edu.usf.cutr.opentripplanner.android.model.Server;
 
 public class ServerChecker extends AsyncTask<Server, Long, String> {
-
-    private static final String TAG = "OTP";
 
     private ProgressDialog progressDialog;
 
@@ -96,7 +95,7 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
         Server server = params[0];
 
         if (server == null) {
-            Log.w(TAG,
+            Log.w(OTPApp.TAG,
                     "Tried to get server info when no server was selected");
             cancel(true);
         }
@@ -131,7 +130,7 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
                     .use(new DefaultHttpClient(httpParameters)).asResponse()
                     .getStatusLine().getStatusCode();
         } catch (IOException e) {
-            Log.e(TAG, "Unable to reach server: " + e.getMessage());
+            Log.e(OTPApp.TAG, "Unable to reach server: " + e.getMessage());
             message = context.getResources().getString(R.string.server_checker_error_message) + " "
                     + e.getMessage();
             return message;
@@ -163,7 +162,7 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
                     progressDialog.dismiss();
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error in Server Checker PostExecute dismissing dialog: " + e);
+                Log.e(OTPApp.TAG, "Error in Server Checker PostExecute dismissing dialog: " + e);
             }
         }
 

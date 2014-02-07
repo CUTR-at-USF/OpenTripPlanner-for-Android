@@ -63,8 +63,6 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener {
 
     private MainFragment mainFragment;
 
-    private String TAG = "OTP";
-
     private String currentRequestString = "";
 
     private boolean isButtonStartLocation = false;
@@ -145,7 +143,7 @@ public class MyActivity extends FragmentActivity implements OnFragmentListener {
 
         mainFragment = null;
 
-        Log.d(TAG, "Released mainFragment with map in MyActivity.onDestroy()");
+        Log.d(OTPApp.TAG, "Released mainFragment with map in MyActivity.onDestroy()");
 
         super.onDestroy();
     }
