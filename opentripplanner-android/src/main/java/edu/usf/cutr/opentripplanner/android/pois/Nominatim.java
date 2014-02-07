@@ -16,13 +16,6 @@
 
 package edu.usf.cutr.opentripplanner.android.pois;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,9 +24,10 @@ import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,28 +54,11 @@ public class Nominatim implements Places {
 
 
     // JSON Node names
-    private static final String TAG_PLACE_ID = "html_attributions";
-
-    private static final String TAG_LICENSE = "licence";
-
-    private static final String TAG_OSM_TYPE = "osm_type";
-
-    private static final String TAG_OSM_ID = "osm_id";
-
-    private static final String TAG_BOUNDING_BOX = "boundingbox";
-
     private static final String TAG_LATITUDE = "lat";
 
     private static final String TAG_LONGITUDE = "lon";
 
     private static final String TAG_NAME = "display_name";
-
-    private static final String TAG_CLASS = "class";
-
-    private static final String TAG_TYPE = "type";
-
-    // contacts JSONArray
-    JSONArray json = null;
 
     public Nominatim() {
     }
@@ -91,9 +68,8 @@ public class Nominatim implements Places {
     public JSONArray requestPlaces(String paramName, String left, String top, String right,
             String bottom) {
         StringBuilder builder = new StringBuilder();
-        HttpClient client = new DefaultHttpClient();
 
-        String encodedParamName = "";
+        String encodedParamName;
         String encodedParamLeft = "";
         String encodedParamTop = "";
         String encodedParamRight = "";
@@ -107,7 +83,7 @@ public class Nominatim implements Places {
                 encodedParamBottom = URLEncoder.encode(bottom, OTPApp.URL_ENCODING);
             }
         } catch (UnsupportedEncodingException e1) {
-            // TODO Auto-generated catch block
+            Log.e(OTPApp.TAG, "Error encoding Nominatim request");
             e1.printStackTrace();
             return null;
         }
@@ -123,26 +99,34 @@ public class Nominatim implements Places {
 
         Log.v(OTPApp.TAG, request);
 
-        HttpGet httpGet = new HttpGet(request);
+        HttpURLConnection urlConnection = null;
+
         try {
-            HttpResponse response = client.execute(httpGet);
-            StatusLine statusLine = response.getStatusLine();
-            int statusCode = statusLine.getStatusCode();
-            if (statusCode == 200) {
-                HttpEntity entity = response.getEntity();
-                InputStream content = entity.getContent();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(content));
+            URL url = new URL(request);
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setConnectTimeout(OTPApp.HTTP_CONNECTION_TIMEOUT);
+            urlConnection.setReadTimeout(OTPApp.HTTP_SOCKET_TIMEOUT);
+            urlConnection.connect();
+            int status = urlConnection.getResponseCode();
+
+            if (status == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(urlConnection.getInputStream()));
                 String line;
                 while ((line = reader.readLine()) != null) {
                     builder.append(line);
                 }
             } else {
-                Log.v(OTPApp.TAG, "Failed to download file");
+                Log.e(OTPApp.TAG, "Error obtaining Nominatim response, status code: " + status);
             }
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+            Log.e(OTPApp.TAG, "Error obtaining Nominatim response" + e.toString());
+            return null;
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
         }
         Log.v(OTPApp.TAG, builder.toString());
 
@@ -150,7 +134,7 @@ public class Nominatim implements Places {
         try {
             json = new JSONArray(builder.toString());
         } catch (JSONException e) {
-            Log.e(OTPApp.TAG, "Error parsing data " + e.toString());
+            Log.e(OTPApp.TAG, "Error parsing Nominatim data " + e.toString());
         }
 
         return json;
@@ -183,6 +167,7 @@ public class Nominatim implements Places {
                     pois.add(point);
                 }
             } catch (JSONException e) {
+                Log.e(OTPApp.TAG, "Error parsing Google Places data " + e.toString());
                 e.printStackTrace();
             }
         }

@@ -16,13 +16,6 @@
 
 package edu.usf.cutr.opentripplanner.android.pois;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,9 +24,10 @@ import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,45 +51,20 @@ public class GooglePlaces implements Places {
     public static final String PARAM_NAME = "query";
 
     // JSON Node names
-    private static final String TAG_HTML_ATTRIBUTIONS = "html_attributions";
-
-    private static final String TAG_STATUS = "status";
-
     private static final String TAG_RESULTS = "results";
 
     private static final String TAG_GEOMETRY = "geometry";
 
     private static final String TAG_LOCATION = "location";
 
-    private static final String TAG_VIEWPORT = "viewport";
-
     private static final String TAG_LATITUDE = "lat";
 
     private static final String TAG_LONGITUDE = "lng";
 
-    private static final String TAG_ICON = "icon";
-
     private static final String TAG_NAME = "name";
-
-    private static final String TAG_RATING = "rating";
-
-    private static final String TAG_REFERENCE = "reference";
-
-    private static final String TAG_TYPES = "types";
-
-    private static final String TAG_VICINITY = "vicinity";
 
     private static final String TAG_FORMATTED_ADDRESS = "formatted_address";
 
-    private static final String TAG_EVENTS = "events";
-
-    private static final String TAG_EVENT_ID = "event_id";
-
-    private static final String TAG_SUMMARY = "summary";
-
-    private static final String TAG_URL = "url";
-
-    // contacts JSONArray
     JSONArray results = null;
 
     public GooglePlaces(String apiKey) {
@@ -104,11 +73,10 @@ public class GooglePlaces implements Places {
 
     public JSONObject requestPlaces(String paramLocation, String paramRadius, String paramName) {
         StringBuilder builder = new StringBuilder();
-        HttpClient client = new DefaultHttpClient();
 
         String encodedParamLocation = "";
         String encodedParamRadius = "";
-        String encodedParamName = "";
+        String encodedParamName;
         try {
             if ((paramLocation != null) && (paramRadius != null)) {
                 encodedParamLocation = URLEncoder.encode(paramLocation, OTPApp.URL_ENCODING);
@@ -116,7 +84,7 @@ public class GooglePlaces implements Places {
             }
             encodedParamName = URLEncoder.encode(paramName, OTPApp.URL_ENCODING);
         } catch (UnsupportedEncodingException e1) {
-            // TODO Auto-generated catch block
+            Log.e(OTPApp.TAG, "Error encoding Google Places request");
             e1.printStackTrace();
             return null;
         }
@@ -133,26 +101,35 @@ public class GooglePlaces implements Places {
 
         Log.v(OTPApp.TAG, request);
 
-        HttpGet httpGet = new HttpGet(request);
+        HttpURLConnection urlConnection = null;
+
         try {
-            HttpResponse response = client.execute(httpGet);
-            StatusLine statusLine = response.getStatusLine();
-            int statusCode = statusLine.getStatusCode();
-            if (statusCode == 200) {
-                HttpEntity entity = response.getEntity();
-                InputStream content = entity.getContent();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(content));
+            URL url = new URL(request);
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setConnectTimeout(OTPApp.HTTP_CONNECTION_TIMEOUT);
+            urlConnection.setReadTimeout(OTPApp.HTTP_SOCKET_TIMEOUT);
+            urlConnection.connect();
+            int status = urlConnection.getResponseCode();
+
+            if (status == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(urlConnection.getInputStream()));
                 String line;
                 while ((line = reader.readLine()) != null) {
                     builder.append(line);
                 }
             } else {
-                Log.v(OTPApp.TAG, "Failed to download file");
+                Log.e(OTPApp.TAG,
+                        "Error obtaining Google Places response, status code: \" + status");
             }
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
         } catch (IOException e) {
+            Log.e(OTPApp.TAG, "Error obtaining Google Places response" + e.toString());
             e.printStackTrace();
+            return null;
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
         }
         Log.v(OTPApp.TAG, builder.toString());
 
@@ -160,7 +137,7 @@ public class GooglePlaces implements Places {
         try {
             json = new JSONObject(builder.toString());
         } catch (JSONException e) {
-            Log.e(OTPApp.TAG, "Error parsing data " + e.toString());
+            Log.e(OTPApp.TAG, "Error parsing Google Places data " + e.toString());
         }
 
         return json;
@@ -196,6 +173,7 @@ public class GooglePlaces implements Places {
                     pois.add(point);
                 }
             } catch (JSONException e) {
+                Log.e(OTPApp.TAG, "Error parsing Google Places data " + e.toString());
                 e.printStackTrace();
             }
         }
