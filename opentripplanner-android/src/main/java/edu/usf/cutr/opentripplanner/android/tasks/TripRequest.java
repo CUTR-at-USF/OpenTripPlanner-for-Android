@@ -16,6 +16,7 @@
 
 package edu.usf.cutr.opentripplanner.android.tasks;
 
+import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.api.ws.Message;
 import org.opentripplanner.api.ws.Request;
 import org.opentripplanner.v092snapshot.api.model.Itinerary;
@@ -29,6 +30,7 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -39,6 +41,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.R;
 import edu.usf.cutr.opentripplanner.android.listeners.TripRequestCompleteListener;
 import edu.usf.cutr.opentripplanner.android.model.Server;
@@ -54,8 +57,6 @@ import edu.usf.cutr.opentripplanner.android.util.JacksonConfig;
 public class TripRequest extends AsyncTask<Request, Integer, Long> {
 
     private Response response;
-
-    private static final String TAG = "OTP";
 
     private ProgressDialog progressDialog;
 
@@ -75,8 +76,9 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
         this.context = context;
         this.selectedServer = selectedServer;
         this.callback = callback;
-        if (activity.get() != null) {
-            progressDialog = new ProgressDialog(activity.get());
+        Activity activityRetrieved = activity.get();
+        if (activityRetrieved != null) {
+            progressDialog = new ProgressDialog(activityRetrieved);
         }
     }
 
@@ -84,16 +86,18 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
         if (activity.get() != null) {
             progressDialog.setIndeterminate(true);
             progressDialog.setCancelable(true);
-            progressDialog = ProgressDialog.show(activity.get(), "",
-                    context.getText(R.string.tripplanner_progress), true);
+            Activity activityRetrieved = activity.get();
+            if (activityRetrieved != null) {
+                progressDialog = ProgressDialog.show(activityRetrieved, "",
+                        context.getText(R.string.tripplanner_progress), true);
+            }
         }
     }
 
     protected Long doInBackground(Request... reqs) {
-        int count = reqs.length;
         long totalSize = 0;
-        for (int i = 0; i < count; i++) {
-            response = requestPlan(reqs[i]);
+        for (Request req : reqs) {
+            response = requestPlan(req);
         }
         return totalSize;
     }
@@ -105,11 +109,12 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
                 progressDialog.dismiss();
             }
         } catch (Exception e) {
-            Log.e(TAG, "Error in TripRequest Cancelled dismissing dialog: " + e);
+            Log.e(OTPApp.TAG, "Error in TripRequest Cancelled dismissing dialog: " + e);
         }
 
-        if (activity.get() != null) {
-            AlertDialog.Builder geocoderAlert = new AlertDialog.Builder(activity.get());
+        Activity activityRetrieved = activity.get();
+        if (activityRetrieved != null) {
+            AlertDialog.Builder geocoderAlert = new AlertDialog.Builder(activityRetrieved);
             geocoderAlert.setTitle(R.string.tripplanner_results_title)
                     .setMessage(R.string.tripplanner_error_request_timeout)
                     .setCancelable(false)
@@ -122,7 +127,7 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
             alert.show();
         }
 
-        Log.e(TAG, "No route to display!");
+        Log.e(OTPApp.TAG, "No route to display!");
     }
 
     protected void onPostExecute(Long result) {
@@ -132,7 +137,7 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
                     progressDialog.dismiss();
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error in TripRequest PostExecute dismissing dialog: " + e);
+                Log.e(OTPApp.TAG, "Error in TripRequest PostExecute dismissing dialog: " + e);
             }
         }
 
@@ -143,27 +148,35 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 
             callback.onTripRequestComplete(itineraries, currentRequestString);
         } else {
-            // TODO - handle errors here?
-            int errorCode = response.getError().getId();
+            Activity activityRetrieved = activity.get();
+            if (activityRetrieved != null) {
+                AlertDialog.Builder feedback = new AlertDialog.Builder(activityRetrieved);
+                feedback.setTitle(context.getResources()
+                        .getString(R.string.tripplanner_error_dialog_title));
+                feedback.setNeutralButton(context.getResources().getString(android.R.string.ok),
+                        null);
+                feedback.create().show();
+                String msg = context.getResources()
+                        .getString(R.string.tripplanner_error_not_defined);
 
-            if (response != null && response.getError() != null && errorCode != Message.PLAN_OK
-                    .getId()) {
+                PlannerError error = response.getError();
+                if (error != null) {
+                    int errorCode = error.getId();
 
-                String msg = getErrorMessage(response.getError().getId());
-                if (msg == null) {
-                    msg = response.getError().getMsg();
+                    if (response != null && response.getError() != null
+                            && errorCode != Message.PLAN_OK
+                            .getId()) {
+
+                        msg = getErrorMessage(response.getError().getId());
+                        if (msg == null) {
+                            msg = response.getError().getMsg();
+                        }
+                    }
                 }
-                if (activity.get() != null) {
-                    AlertDialog.Builder feedback = new AlertDialog.Builder(activity.get());
-                    feedback.setTitle(context.getResources()
-                            .getString(R.string.tripplanner_error_dialog_title));
-                    feedback.setMessage(msg);
-                    feedback.setNeutralButton(context.getResources().getString(android.R.string.ok),
-                            null);
-                    feedback.create().show();
-                }
+                feedback.setMessage(msg);
             }
-            Log.e(TAG, "No route to display!");
+
+            Log.e(OTPApp.TAG, "No route to display!");
         }
     }
 
@@ -230,42 +243,22 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
             }
         }
 
-        //fromPlace=28.066192823902,-82.416927819827
-        //&toPlace=28.064072155861,-82.41109133301
-        //&arr=Depart
-        //&min=QUICK
-        //&maxWalkDistance=7600
-        //&mode=WALK
-        //&itinID=1
-        //&submit
-        //&date=06/07/2011
-        //&time=11:34%20am
-
-        //&showIntermediateStops=TRUE
-
-        //String u = "http://go.cutr.usf.edu:8083/opentripplanner-api-webapp/ws/plan?fromPlace=28.066192823902,-82.416927819827&toPlace=28.064072155861,-82.41109133301&arr=Depart&min=QUICK&maxWalkDistance=7600&mode=WALK&itinID=1&submit&date=06/07/2011&time=11:34%20am";
-        //String u = "http://go.cutr.usf.edu:8083/opentripplanner-api-webapp/ws/plan" + params;
-
         String res = "/plan";
 
         if (selectedServer == null) {
-            //TODO - handle error for no server selected
+            Toast.makeText(context,
+                    context.getResources().getString(R.string.error_no_server_selected),
+                    Toast.LENGTH_SHORT).show();
             return null;
         }
         String u = selectedServer.getBaseURL() + res + params;
 
-        //Below fixes a bug where the New York OTP server will whine
-        //if doesn't get the parameter for intermediate places
-        if (selectedServer.getRegion().equalsIgnoreCase("New York")) {
-            u += "&intermediatePlaces=";
-        }
-
-        Log.d(TAG, "URL: " + u);
+        Log.d(OTPApp.TAG, "URL: " + u);
 
         currentRequestString = u;
 
         HttpURLConnection urlConnection = null;
-        URL url = null;
+        URL url;
         Response plan = null;
 
         try {
@@ -275,21 +268,16 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestProperty("Accept", "application/json");
-            urlConnection.setConnectTimeout(
-                    context.getResources().getInteger(R.integer.connection_timeout));
-            urlConnection
-                    .setReadTimeout(context.getResources().getInteger(R.integer.socket_timeout));
-            // plan = serializer.read(Response.class, result);
+            urlConnection.setConnectTimeout(OTPApp.HTTP_CONNECTION_TIMEOUT);
+            urlConnection.setReadTimeout(OTPApp.HTTP_SOCKET_TIMEOUT);
             plan = JacksonConfig.getObjectReaderInstance()
                     .readValue(urlConnection.getInputStream());
-            urlConnection.disconnect();
-
         } catch (java.net.SocketTimeoutException e) {
-            Log.e(TAG, "Timeout fetching JSON or XML: " + e);
+            Log.e(OTPApp.TAG, "Timeout fetching JSON or XML: " + e);
             e.printStackTrace();
             cancel(true);
         } catch (IOException e) {
-            Log.e(TAG, "Error fetching JSON or XML: " + e);
+            Log.e(OTPApp.TAG, "Error fetching JSON or XML: " + e);
             e.printStackTrace();
             cancel(true);
             // Reset timestamps to show there was an error

@@ -77,21 +77,12 @@ public class OTPApp extends Application {
 
     public static final float COORDINATES_IMPORTANT_DIFFERENCE = 2000f;
 
-    public static final int CUSTOM_TILES_MAX_ZOOM_LEVEL = 20;
-
     //in meters
     public static final int MARKER_GEOCODING_MAX_ERROR = 100;
 
-    private static final int MILLISECONDS_PER_SECOND = 1000;
+    public static final int HTTP_CONNECTION_TIMEOUT = 15000;
 
-    private static final int UPDATE_INTERVAL_IN_SECONDS = 5;
-
-    public static final long UPDATE_INTERVAL = MILLISECONDS_PER_SECOND * UPDATE_INTERVAL_IN_SECONDS;
-
-    private static final int FASTEST_INTERVAL_IN_SECONDS = 1;
-
-    public static final long FASTEST_INTERVAL = MILLISECONDS_PER_SECOND
-            * FASTEST_INTERVAL_IN_SECONDS;
+    public static final int HTTP_SOCKET_TIMEOUT = 15000;
 
     public static final String BUNDLE_KEY_MAP_FAILED = "Map failed";
 
@@ -100,11 +91,6 @@ public class OTPApp extends Application {
     public static final String BUNDLE_KEY_MAP_START_MARKER_POSITION = "Map StartMarkerPosition";
 
     public static final String BUNDLE_KEY_MAP_END_MARKER_POSITION = "Map EndMarkerPosition";
-
-    public static final String BUNDLE_KEY_MAP_ROUTE_POLYLINE_OPTIONS = "Map RoutePolylineOptions";
-
-    public static final String BUNDLE_KEY_MAP_BOUNDARIES_POLYLINE_OPTIONS
-            = "Map BoundariesPolylineOptions";
 
     public static final String BUNDLE_KEY_TB_START_LOCATION = "tbStartLocation";
 
@@ -115,8 +101,6 @@ public class OTPApp extends Application {
     public static final String BUNDLE_KEY_DDL_TRAVEL_MODE = "ddlTravelMode";
 
     public static final String BUNDLE_KEY_OTP_BUNDLE = "OTP bundle";
-
-    public static final String BUNDLE_KEY_PANEL_STATE = "panel state";
 
     public static final String BUNDLE_KEY_APP_STARTS = "app starts";
 
@@ -170,8 +154,6 @@ public class OTPApp extends Application {
 
     public static final String PREFERENCE_KEY_GEOCODER_PROVIDER = "geocoder_provider";
 
-    public static final String PREFERENCE_KEY_ROUTING_OPTIONS = "routing_options";
-
     public static final String PREFERENCE_KEY_AUTO_DETECT_SERVER = "auto_detect_server";
 
     public static final String PREFERENCE_KEY_CUSTOM_SERVER_URL = "custom_server_url";
@@ -205,8 +187,6 @@ public class OTPApp extends Application {
     public static final String TAG = "OTP";
 
     public static final int EXPIRATION_DAYS_FOR_SERVER_LIST = 3;
-
-    public static final float defaultZoomStep = 1;
 
     public static final float defaultInitialZoomLevel = 12;
 

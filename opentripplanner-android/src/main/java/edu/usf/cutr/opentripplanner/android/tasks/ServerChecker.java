@@ -16,12 +16,6 @@
 
 package edu.usf.cutr.opentripplanner.android.tasks;
 
-import org.apache.http.HttpStatus;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -32,15 +26,15 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
-import de.mastacode.http.Http;
+import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.R;
 import edu.usf.cutr.opentripplanner.android.listeners.ServerCheckerCompleteListener;
 import edu.usf.cutr.opentripplanner.android.model.Server;
 
 public class ServerChecker extends AsyncTask<Server, Long, String> {
-
-    private static final String TAG = "OTP";
 
     private ProgressDialog progressDialog;
 
@@ -61,8 +55,9 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
         this.activity = activity;
         this.context = context;
         this.showMessage = showMessage;
-        if (activity.get() != null) {
-            progressDialog = new ProgressDialog(activity.get());
+        Activity activityRetrieved = activity.get();
+        if (activityRetrieved != null) {
+            progressDialog = new ProgressDialog(activityRetrieved);
         }
     }
 
@@ -75,8 +70,9 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
         this.context = context;
         this.showMessage = showMessage;
         this.callback = callback;
-        if (activity.get() != null) {
-            progressDialog = new ProgressDialog(activity.get());
+        Activity activityRetrieved = activity.get();
+        if (activityRetrieved != null) {
+            progressDialog = new ProgressDialog(activityRetrieved);
         }
     }
 
@@ -85,9 +81,13 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
         if (activity.get() != null) {
             progressDialog.setIndeterminate(true);
             progressDialog.setCancelable(true);
-            progressDialog = ProgressDialog
-                    .show(activity.get(), "", context.getString(R.string.server_checker_progress),
-                            true);
+            Activity activityRetrieved = activity.get();
+            if (activityRetrieved != null) {
+                progressDialog = ProgressDialog
+                        .show(activityRetrieved, "",
+                                context.getString(R.string.server_checker_progress),
+                                true);
+            }
         }
     }
 
@@ -96,55 +96,57 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
         Server server = params[0];
 
         if (server == null) {
-            Log.w(TAG,
+            Log.w(OTPApp.TAG,
                     "Tried to get server info when no server was selected");
             cancel(true);
-        }
+            return null;
+        } else {
+            String message =
+                    context.getResources().getString(R.string.server_checker_info_dialog_region)
+                            + " " + server.getRegion() + "\n" + context.getResources()
+                            .getString(R.string.server_checker_info_dialog_language) + " " + server
+                            .getLanguage() + context.getResources()
+                            .getString(R.string.server_checker_info_dialog_contact) + " " + server
+                            .getContactName() + " ("
+                            + server.getContactEmail() + ")" + "\n" + context.getResources()
+                            .getString(R.string.server_checker_info_dialog_url) + " " + server
+                            .getBaseURL()
+                            + "\n" + context.getResources()
+                            .getString(R.string.server_checker_info_dialog_bounds) + " " + server
+                            .getBounds() + "\n" + context.getResources()
+                            .getString(R.string.server_checker_info_dialog_reachable) + " ";
 
-        String message =
-                context.getResources().getString(R.string.server_checker_info_dialog_region) + " "
-                        + server.getRegion();
-        message += "\n" + context.getResources()
-                .getString(R.string.server_checker_info_dialog_language) + " " + server
-                .getLanguage();
-        message += "\n" + context.getResources()
-                .getString(R.string.server_checker_info_dialog_contact) + " " + server
-                .getContactName() + " ("
-                + server.getContactEmail() + ")";
-        message += "\n" + context.getResources().getString(R.string.server_checker_info_dialog_url)
-                + " " + server.getBaseURL();
+            int status = 0;
+            HttpURLConnection urlConnection = null;
 
-        // TODO - fix server info bounds
-        message += "\n" + context.getResources()
-                .getString(R.string.server_checker_info_dialog_bounds) + " " + server.getBounds();
-        message += "\n" + context.getResources()
-                .getString(R.string.server_checker_info_dialog_reachable) + " ";
+            try {
+                URL url = new URL(server.getBaseURL() + "/plan");
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setConnectTimeout(OTPApp.HTTP_CONNECTION_TIMEOUT);
+                urlConnection.setReadTimeout(OTPApp.HTTP_SOCKET_TIMEOUT);
+                urlConnection.connect();
+                status = urlConnection.getResponseCode();
+            } catch (IOException e) {
+                Log.e(OTPApp.TAG, "Unable to reach server: " + e.getMessage());
+                message = context.getResources().getString(R.string.server_checker_error_message)
+                        + " "
+                        + e.getMessage();
+                return message;
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+            }
 
-        int status = 0;
-        try {
-            HttpParams httpParameters = new BasicHttpParams();
-            int timeoutConnection = context.getResources().getInteger(R.integer.connection_timeout);
-            HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
-            int timeoutSocket = context.getResources().getInteger(R.integer.socket_timeout);
-            HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
-            status = Http.get(server.getBaseURL() + "/plan")
-                    .use(new DefaultHttpClient(httpParameters)).asResponse()
-                    .getStatusLine().getStatusCode();
-        } catch (IOException e) {
-            Log.e(TAG, "Unable to reach server: " + e.getMessage());
-            message = context.getResources().getString(R.string.server_checker_error_message) + " "
-                    + e.getMessage();
+            if (status == HttpURLConnection.HTTP_OK) {
+                message += context.getResources().getString(R.string.yes);
+                isWorking = true;
+            } else {
+                message += context.getResources().getString(R.string.no);
+            }
+
             return message;
         }
-
-        if (status == HttpStatus.SC_OK) {
-            message += context.getResources().getString(R.string.yes);
-            isWorking = true;
-        } else {
-            message += context.getResources().getString(R.string.no);
-        }
-
-        return message;
     }
 
     @Override
@@ -163,13 +165,14 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
                     progressDialog.dismiss();
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error in Server Checker PostExecute dismissing dialog: " + e);
+                Log.e(OTPApp.TAG, "Error in Server Checker PostExecute dismissing dialog: " + e);
             }
         }
 
         if (showMessage) {
-            if (activity.get() != null) {
-                AlertDialog.Builder dialog = new AlertDialog.Builder(activity.get());
+            Activity activityRetrieved = activity.get();
+            if (activityRetrieved != null) {
+                AlertDialog.Builder dialog = new AlertDialog.Builder(activityRetrieved);
                 dialog.setTitle(context.getResources()
                         .getString(R.string.server_checker_info_dialog_title));
                 dialog.setMessage(result);

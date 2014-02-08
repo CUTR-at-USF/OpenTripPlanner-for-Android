@@ -56,8 +56,6 @@ import edu.usf.cutr.opentripplanner.android.util.LocationUtil;
 
 public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 
-    private static final String TAG = "OTP";
-
     private WeakReference<Activity> activity;
 
     private Context context;
@@ -143,12 +141,11 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
         if ((addresses == null) || addresses.isEmpty()) {
             addresses = searchPlaces(address);
 
-            for (int i = 0; i < addresses.size(); i++) {
-                Address addr = addresses.get(i);
-                String str = addr.getAddressLine(0);
-                List<String> addrLines = Arrays.asList(str.split(", "));
-                for (int j = 0; j < addrLines.size(); j++) {
-                    addr.setAddressLine(j, addrLines.get(j));
+            for (Address addressRetrieved : addresses) {
+                String str = addressRetrieved.getAddressLine(0);
+                List<String> addressLines = Arrays.asList(str.split(", "));
+                for (int j = 0; j < addressLines.size(); j++) {
+                    addressRetrieved.setAddressLine(j, addressLines.get(j));
                 }
             }
         }
@@ -191,7 +188,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
      * exist
      */
     private String getKeyFromResource() {
-        String strKey = new String("");
+        String strKey = "";
 
         try {
             InputStream in = context.getResources().openRawResource(R.raw.googleplaceskey);
@@ -203,11 +200,11 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
             }
 
             strKey = total.toString();
-            strKey.trim(); //Remove any whitespace
+            strKey = strKey.trim(); //Remove any whitespace
         } catch (NotFoundException e) {
-            Log.w(TAG, "Warning - didn't find the google places key file:" + e);
+            Log.w(OTPApp.TAG, "Warning - didn't find the google places key file:" + e);
         } catch (IOException e) {
-            Log.w(TAG, "Error reading the developer key file:" + e);
+            Log.w(OTPApp.TAG, "Error reading the developer key file:" + e);
         }
 
         return strKey;
@@ -228,7 +225,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
             }
             p = new GooglePlaces(getKeyFromResource());
 
-            Log.v(TAG, "Using Google Places!");
+            Log.v(OTPApp.TAG, "Using Google Places!");
         } else {
             params.put(Nominatim.PARAM_NAME, name);
             if (selectedServer != null) {
@@ -244,7 +241,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 
             p = new Nominatim();
 
-            Log.v(TAG, "Using Nominatim!");
+            Log.v(OTPApp.TAG, "Using Nominatim!");
         }
 
         ArrayList<POI> pois = new ArrayList<POI>();
@@ -252,12 +249,11 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 
         ArrayList<Address> addresses = new ArrayList<Address>();
 
-        for (int i = 0; i < pois.size(); i++) {
-            POI poi = pois.get(i);
-            Log.v(TAG, poi.getName() + " " + poi.getLatitude() + "," + poi.getLongitude());
-            Address addr = new Address(context.getResources().getConfiguration().locale);
-            addr.setLatitude(poi.getLatitude());
-            addr.setLongitude(poi.getLongitude());
+        for (POI poi : pois) {
+            Log.v(OTPApp.TAG, poi.getName() + " " + poi.getLatitude() + "," + poi.getLongitude());
+            Address address = new Address(context.getResources().getConfiguration().locale);
+            address.setLatitude(poi.getLatitude());
+            address.setLongitude(poi.getLongitude());
             String addressLine;
 
             if (poi.getAddress() != null) {
@@ -269,16 +265,17 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
             } else {
                 addressLine = poi.getName();
             }
-            addr.setAddressLine(addr.getMaxAddressLineIndex() + 1, addressLine);
-            addresses.add(addr);
+            address.setAddressLine(address.getMaxAddressLineIndex() + 1, addressLine);
+            addresses.add(address);
         }
 
         return addresses;
     }
 
     protected void onCancelled(Long result) {
-        if (activity.get() != null) {
-            AlertDialog.Builder geocoderAlert = new AlertDialog.Builder(activity.get());
+        Activity activityRetrieved = activity.get();
+        if (activityRetrieved != null) {
+            AlertDialog.Builder geocoderAlert = new AlertDialog.Builder(activityRetrieved);
             geocoderAlert.setTitle(R.string.geocoder_results_title)
                     .setMessage(R.string.geocoder_no_results_message)
                     .setCancelable(false)
@@ -291,7 +288,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
             AlertDialog alert = geocoderAlert.create();
             alert.show();
         }
-        Log.e(TAG, "No geocoding processed!");
+        Log.e(OTPApp.TAG, "No geocoding processed!");
     }
 
     protected void onPostExecute(Long result) {
