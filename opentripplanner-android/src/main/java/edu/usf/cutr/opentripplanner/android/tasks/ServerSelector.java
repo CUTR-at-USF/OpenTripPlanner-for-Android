@@ -69,7 +69,7 @@ import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_SELECTE
  */
 
 public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
-implements ServerCheckerCompleteListener {
+        implements ServerCheckerCompleteListener {
 
     private Server selectedServer;
 
@@ -96,9 +96,9 @@ implements ServerCheckerCompleteListener {
     /**
      * Constructs a new ServerSelector
      *
-     * @param mustRefreshList     true if we should download a new list of servers from the Google
-     *                            Doc, false if we should use cached list of servers
-     * @param showDialog          true if a progress dialog is requested
+     * @param mustRefreshList true if we should download a new list of servers from the Google
+     *                        Doc, false if we should use cached list of servers
+     * @param showDialog      true if a progress dialog is requested
      */
     public ServerSelector(WeakReference<Activity> activity, Context context,
             ServersDataSource dataSource, ServerSelectorCompleteListener callback,
@@ -146,7 +146,8 @@ implements ServerCheckerCompleteListener {
         // If forced to refresh list OR
         // If severs are not stored, download list from the Google Spreadsheet and Insert to database
         if (serverList == null || serverList.isEmpty() || mustRefreshList) {
-            Log.v(OTPApp.TAG, "No data from sqlite. Attempt retrieving servers from google spreadsheet");
+            Log.v(OTPApp.TAG,
+                    "No data from sqlite. Attempt retrieving servers from google spreadsheet");
             serverList = downloadServerList(
                     context.getResources().getString(R.string.servers_spreadsheet_url));
 

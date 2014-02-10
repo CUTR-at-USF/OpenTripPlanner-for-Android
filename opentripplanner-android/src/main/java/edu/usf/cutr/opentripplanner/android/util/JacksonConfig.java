@@ -279,7 +279,6 @@ public class JacksonConfig {
      * first request to use the ObjectMapper or ObjectReader.
      *
      * This method is non-blocking.
-     *
      */
     public static void forceCacheRead() {
         if (isUsingCache()) {

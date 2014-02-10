@@ -297,8 +297,9 @@ public class MainFragment extends Fragment implements
                 viewTreeObserver.removeOnGlobalLayoutListener(listener);
             }
         } else {
-            Log.w(OTPApp.TAG, "Problems obtaining exact element's positions on screen, some other elements"
-                    + "can be misplaced");
+            Log.w(OTPApp.TAG,
+                    "Problems obtaining exact element's positions on screen, some other elements"
+                            + "can be misplaced");
         }
     }
 
@@ -330,12 +331,12 @@ public class MainFragment extends Fragment implements
         getActivity().getSupportFragmentManager()
                 .addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
                     public void onBackStackChanged() {
-                        Log.i(TAG, "back stack changed ");
+                        Log.i(OTPApp.TAG, "back stack changed ");
                         int backCount = getActivity().getSupportFragmentManager()
                                 .getBackStackEntryCount();
                         if (backCount == 0) {
                             if (getFragmentListener() != null) {
-                                itinerarySelectionSpinner.setSelection(
+                                mItinerarySelectionSpinner.setSelection(
                                         getFragmentListener().getCurrentItineraryIndex());
                             }
                         }
@@ -383,8 +384,9 @@ public class MainFragment extends Fragment implements
                     }
                 });
             } else {
-                Log.w(OTPApp.TAG, "Not possible to obtain exact element's positions on screen, some other"
-                        + "elements can be misplaced");
+                Log.w(OTPApp.TAG,
+                        "Not possible to obtain exact element's positions on screen, some other"
+                                + "elements can be misplaced");
             }
 
             mTbStartLocation = (EditText) mainView
@@ -801,8 +803,9 @@ public class MainFragment extends Fragment implements
                             }
                         }
                     } else {
-                        Log.w(OTPApp.TAG, "Focus has changed, but was not possible to obtain start/end"
-                                + " textbox text");
+                        Log.w(OTPApp.TAG,
+                                "Focus has changed, but was not possible to obtain start/end"
+                                        + " textbox text");
                     }
                 }
             }
@@ -880,8 +883,9 @@ public class MainFragment extends Fragment implements
                             if (tvCharSequence != null) {
                                 processAddress(true, tvCharSequence.toString(), false);
                             } else {
-                                Log.w(OTPApp.TAG, "User switched to next input, but was not possible to"
-                                        + "obtain start/end textbox text");
+                                Log.w(OTPApp.TAG,
+                                        "User switched to next input, but was not possible to"
+                                                + "obtain start/end textbox text");
                             }
                         }
                     }
@@ -999,8 +1003,9 @@ public class MainFragment extends Fragment implements
                     public void onRangeSeekBarValuesChanged(RangeSeekBar<?> rangeSeekBar,
                             Double minValue, Double maxValue) {
                         // handle changed range values
-                        Log.i(OTPApp.TAG, "User selected new range values: MIN=" + minValue + ", MAX="
-                                + maxValue);
+                        Log.i(OTPApp.TAG,
+                                "User selected new range values: MIN=" + minValue + ", MAX="
+                                        + maxValue);
                     }
 
                 });
@@ -1024,8 +1029,9 @@ public class MainFragment extends Fragment implements
                             ItineraryDecrypt
                                     .getModeIcon(traverseModeSpinnerItem.getTraverseModeSet())));
                 }
-                Log.e(OTPApp.TAG, "Not possible to change travel mode because traverse mode is unknown"
-                        + "for selected transport medium");
+                Log.e(OTPApp.TAG,
+                        "Not possible to change travel mode because traverse mode is unknown"
+                                + "for selected transport medium");
             }
         });
 
@@ -1064,8 +1070,9 @@ public class MainFragment extends Fragment implements
             if ((tbEditable = mTbEndLocation.getText()) != null) {
                 processAddress(false, tbEditable.toString(), false);
             } else {
-                Log.e(OTPApp.TAG, "Trip won't be requested because there was an error fetching destination"
-                        + " from input field");
+                Log.e(OTPApp.TAG,
+                        "Trip won't be requested because there was an error fetching destination"
+                                + " from input field");
             }
         } else if (!mIsStartLocationGeocodingProcessed
                 && !mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true)
@@ -1076,8 +1083,9 @@ public class MainFragment extends Fragment implements
                 processAddress(true, tbEditable.toString(), false);
 
             } else {
-                Log.e(OTPApp.TAG, "Trip won't be requested because there was an error fetching origin from"
-                        + " input field");
+                Log.e(OTPApp.TAG,
+                        "Trip won't be requested because there was an error fetching origin from"
+                                + " input field");
             }
         } else if (!mIsStartLocationGeocodingProcessed
                 && !mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true)
@@ -1091,14 +1099,16 @@ public class MainFragment extends Fragment implements
             if ((tbEditable = mTbStartLocation.getText()) != null) {
                 processAddress(true, tbEditable.toString(), false);
             } else {
-                Log.e(OTPApp.TAG, "Trip won't be requested because there was an error fetching origin from"
-                        + " input field");
+                Log.e(OTPApp.TAG,
+                        "Trip won't be requested because there was an error fetching origin from"
+                                + " input field");
             }
             if ((tbEditable = mTbEndLocation.getText()) != null) {
                 processAddress(false, tbEditable.toString(), false);
             } else {
-                Log.e(OTPApp.TAG, "Trip won't be requested because there was an error fetching destination"
-                        + " from input field");
+                Log.e(OTPApp.TAG,
+                        "Trip won't be requested because there was an error fetching destination"
+                                + " from input field");
             }
         } else {
             requestTrip();
@@ -1556,8 +1566,9 @@ public class MainFragment extends Fragment implements
                 request.setTriangleSafetyFactor(1 - mBikeTriangleMaxValue);
             }
         } else {
-            Log.e(OTPApp.TAG, "Optimization not found, not possible to add it to the request so, most"
-                    + "likely results will be incorrect");
+            Log.e(OTPApp.TAG,
+                    "Optimization not found, not possible to add it to the request so, most"
+                            + "likely results will be incorrect");
         }
 
         TraverseModeSpinnerItem traverseModeSpinnerItem = (TraverseModeSpinnerItem) mDdlTravelMode
@@ -1569,8 +1580,9 @@ public class MainFragment extends Fragment implements
         if (traverseModeSpinnerItem != null) {
             request.setModes(traverseModeSpinnerItem.getTraverseModeSet());
         } else {
-            Log.e(OTPApp.TAG, "Traverse mode not found, not possible to add it to the request so, most"
-                    + "likely results will be incorrect");
+            Log.e(OTPApp.TAG,
+                    "Traverse mode not found, not possible to add it to the request so, most"
+                            + "likely results will be incorrect");
         }
 
         Integer defaultMaxWalkInt = mApplicationContext.getResources()
@@ -1747,7 +1759,8 @@ public class MainFragment extends Fragment implements
                 if (child != null) {
                     child.setEnabled(enable);
                 } else {
-                    Log.w(OTPApp.TAG, "Not possible to fully perform process to disable all controls");
+                    Log.w(OTPApp.TAG,
+                            "Not possible to fully perform process to disable all controls");
                 }
             }
         }
@@ -2804,8 +2817,9 @@ public class MainFragment extends Fragment implements
                 if (tbStarLocationEditable != null) {
                     mResultTripStartLocation = tbStarLocationEditable.toString();
                 } else {
-                    Log.e(OTPApp.TAG, "Not possible to obtain origin from input box while saving it to"
-                            + " step-by-step screen");
+                    Log.e(OTPApp.TAG,
+                            "Not possible to obtain origin from input box while saving it to"
+                                    + " step-by-step screen");
                 }
             }
             if ((mEndAddress != null) && (mPrefs
