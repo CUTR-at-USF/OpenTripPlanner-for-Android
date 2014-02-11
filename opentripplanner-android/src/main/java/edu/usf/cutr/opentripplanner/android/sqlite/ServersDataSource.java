@@ -23,7 +23,6 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,8 +53,6 @@ public class ServersDataSource {
             MySQLiteHelper.COLUMN_CENTER,
             MySQLiteHelper.COLUMN_ZOOM};
 
-    private SimpleDateFormat dateFormat = (SimpleDateFormat) SimpleDateFormat.getDateTimeInstance();
-
     private ServersDataSource(Context context) {
         dbHelper = MySQLiteHelper.getInstance(context);
     }
@@ -78,29 +75,35 @@ public class ServersDataSource {
     public Server createServer(Server s) {
         ContentValues values = new ContentValues();
 
-        if (s.getDate() != null) {
-            values.put(MySQLiteHelper.COLUMN_DATE, s.getDate());
-            Log.d(OTPApp.TAG,
-                    "Wrote '" + s.getRegion() + "' server date to SQLLite - " + s.getDate());
-        }
-        values.put(MySQLiteHelper.COLUMN_REGION, s.getRegion());
-        values.put(MySQLiteHelper.COLUMN_BASEURL, s.getBaseURL());
-        values.put(MySQLiteHelper.COLUMN_BOUNDS, s.getBounds());
-        values.put(MySQLiteHelper.COLUMN_CENTER, s.getCenter());
-        values.put(MySQLiteHelper.COLUMN_ZOOM, s.getZoom());
-        values.put(MySQLiteHelper.COLUMN_LANGUAGE, s.getLanguage());
-        values.put(MySQLiteHelper.COLUMN_CONTACT_NAME, s.getContactName());
-        values.put(MySQLiteHelper.COLUMN_CONTACT_EMAIL, s.getContactEmail());
+        if ((s.getRegion() != null) && (s.getBaseURL() != null) && (s.getBounds() != null)
+                && (s.getCenter() != null) && (s.getZoom() != null) && (s.getLanguage() != null)
+                && (s.getContactName() != null) && (s.getContactEmail() != null)) {
+            if (s.getDate() != null) {
+                values.put(MySQLiteHelper.COLUMN_DATE, s.getDate());
+                Log.d(OTPApp.TAG,
+                        "Wrote '" + s.getRegion() + "' server date to SQLLite - " + s.getDate());
+            }
+            values.put(MySQLiteHelper.COLUMN_REGION, s.getRegion());
+            values.put(MySQLiteHelper.COLUMN_BASEURL, s.getBaseURL());
+            values.put(MySQLiteHelper.COLUMN_BOUNDS, s.getBounds());
+            values.put(MySQLiteHelper.COLUMN_CENTER, s.getCenter());
+            values.put(MySQLiteHelper.COLUMN_ZOOM, s.getZoom());
+            values.put(MySQLiteHelper.COLUMN_LANGUAGE, s.getLanguage());
+            values.put(MySQLiteHelper.COLUMN_CONTACT_NAME, s.getContactName());
+            values.put(MySQLiteHelper.COLUMN_CONTACT_EMAIL, s.getContactEmail());
 
-        long insertId = database.insert(MySQLiteHelper.TABLE_SERVERS, null,
-                values);
-        Cursor cursor = database.query(MySQLiteHelper.TABLE_SERVERS,
-                allColumns, MySQLiteHelper.COLUMN_ID + " = " + insertId, null,
-                null, null, null);
-        cursor.moveToFirst();
-        Server newServer = cursorToServer(cursor);
-        cursor.close();
-        return newServer;
+            long insertId = database.insert(MySQLiteHelper.TABLE_SERVERS, null,
+                    values);
+            Cursor cursor = database.query(MySQLiteHelper.TABLE_SERVERS,
+                    allColumns, MySQLiteHelper.COLUMN_ID + " = " + insertId, null,
+                    null, null, null);
+            cursor.moveToFirst();
+            Server newServer = cursorToServer(cursor);
+            cursor.close();
+            return newServer;
+        } else {
+            return null;
+        }
     }
 
     public void deleteServer(Server server) {
