@@ -111,10 +111,14 @@
     <string name="custom_server_error">Por favor introduce unha nova URL para o servidor alternativo</string>
     <string name="auto_detect_server">Detectar servidor automáticamente</string>
     <string name="auto_detect_server_description">Encontrar servidor automáticamente para a ubicación actual</string>
+    <string name="use_device_timezone">Usar zona horaria do telefone</string>
+    <string name="use_device_timezone_description">Sempre usar a zona horaria do usuario ignorando a zona horaria do servidor</string>
     <string name="geocoder_results_title">Resultados de direccións</string>
     <string name="geocoder_no_results_message">Disculpa, non se puido obter nengún resultado para esa dirección</string>
     <string name="tripplanner_progress">"Buscando a mellor ruta. Por favor espera&#8230;"</string>
     <string name="tripplanner_results_title">Resultados de rutas</string>
+    <string name="tripplanner_no_results_message">Erro obtendo a ruta</string>
+    <string name="tripplanner_error_not_defined">Desculpa, houbo un erro coa resposta do servidor</string>
     <string name="tripplanner_error_dialog_title">Ruta non atopada</string>
     <string name="tripplanner_error_request_timeout">O servidor non responde, intentao de novo máis tarde</string>
     <string name="tripplanner_error_system">O servidor non funciona, intentao de novo máis tarde</string>
@@ -154,9 +158,11 @@
     <string name="total_duration">tardas</string>
     <string name="before_distance_bike">Vai en bici</string>
     <string name="before_distance_walk">Vai andando</string>
-    <string name="distance_unit">m</string>
+    <string name="distance_kilometers">km</string>
+    <string name="distance_meters">m</string>
     <string name="connector_time_full">tardas</string>
     <string name="refresh_server_list">Actualizar servidores</string>
+    <string name="refresh_server_list_error">Non foi posíbel descargar a lista de servidores</string>
     <string name="server_list_donwload_date_description">Lista de servidores descargada</string>
     <string name="server_list_donwload_date_unknown">Data de descarga de lista descoñecida</string>
     <string name="alternative_routes">Seleccionar unha ruta</string>
@@ -167,7 +173,7 @@
     <string name="use_android_geocoder_description">Buscar direccións primeiro con geocodificador de Android</string>
     <string name="use_intelligent_markers_title">Marcadores intelixentes</string>
     <string name="use_intelligent_markers_description">Mover os marcadores á dirección que se atope máis perto</string>
-    <string name="info_server_no_server_selected">Non hai nengún servidor seleccionado</string>
+    <string name="error_no_server_selected">Non hai nengún servidor seleccionado</string>
     <string name="info_server_error">Atención: Non se puido obter información do servidor!</string>
     <string name="selected_custom_server_title">Servidor alternativo</string>
     <string name="selected_custom_server_description">Usar o servidor aternativo</string>

@@ -111,10 +111,14 @@
     <string name="custom_server_error">Por favor introduce una nueva URL para el servidor alternativo</string>
     <string name="auto_detect_server">Detectar servidor automáticamente</string>
     <string name="auto_detect_server_description">Encontrar servidor automáticamente para la ubicación actual</string>
+    <string name="use_device_timezone">Usar zona horaria del teléfono</string>
+    <string name="use_device_timezone_description">Siempre usar la zona horaria del usuario ignorando la zona horaria del servidor</string>
     <string name="geocoder_results_title">Resultados de direcciones</string>
     <string name="geocoder_no_results_message">Disculpa, no se ha obtenido ningún resultado para esa dirección</string>
     <string name="tripplanner_progress">"Buscando la mejor ruta. Por favor espera&#8230;"</string>
     <string name="tripplanner_results_title">Resultados de rutas</string>
+    <string name="tripplanner_no_results_message">Error obteniendo la ruta</string>
+    <string name="tripplanner_error_not_defined">Disculpa, hubo un error con la respuesta del servidor</string>
     <string name="tripplanner_error_dialog_title">Ruta no encontrada</string>
     <string name="tripplanner_error_request_timeout">El servidor no responde, por favor intentelo de nuevo más tarde</string>
     <string name="tripplanner_error_system">El servidor no funciona correctamente, por favor intentalo de nuevo más tarde</string>
@@ -154,9 +158,11 @@
     <string name="total_duration">tardas</string>
     <string name="before_distance_bike">Ve en bici</string>
     <string name="before_distance_walk">Ve andando</string>
-    <string name="distance_unit">m</string>
+    <string name="distance_kilometers">km</string>
+    <string name="distance_meters">m</string>
     <string name="connector_time_full">tardas</string>
     <string name="refresh_server_list">Actualizar servidores</string>
+    <string name="refresh_server_list_error">No ha sido posible descargar la lista de servidores</string>
     <string name="server_list_donwload_date_description">Lista de servidores descargada</string>
     <string name="server_list_donwload_date_unknown">Fecha de descarga de lista desconocida</string>
     <string name="alternative_routes">Seleccionar una ruta</string>
