@@ -118,9 +118,23 @@
     <string name="tripplanner_progress">"Generating trip. Please wait..."</string>
     <string name="tripplanner_results_title">Routing Results</string>
     <string name="tripplanner_no_results_message">Error planning trip</string>
-    <string name="tripplanner_error_dialog_title">Sorry, routing is not possible</string>
-    <string name="tripplanner_error_not_defined">Sorry, there was an error with servers reply
-    </string>
+    <string name="tripplanner_error_not_defined">Sorry, there was an error with servers reply</string>
+    <string name="tripplanner_error_dialog_title">Planning not possible</string>
+    <string name="tripplanner_error_request_timeout">Server is not responding, please try again later</string>
+    <string name="tripplanner_error_system">Server is not working, please try again later</string>
+    <string name="tripplanner_error_outside_bounds">Origin or destination are outside server limits</string>
+    <string name="tripplanner_error_path_not_found">"There aren't any routes matching criteria between origin and destination"</string>
+    <string name="tripplanner_error_no_transit_times">Transit times for selected date are not defined in the server</string>
+    <string name="tripplanner_error_bogus_parameter">Incorrect request, please try again with different parameters</string>
+    <string name="tripplanner_error_geocode_from_not_found">Origin not found</string>
+    <string name="tripplanner_error_geocode_to_not_found">Destination not found</string>
+    <string name="tripplanner_error_geocode_from_to_not_found">Origin and destination not found</string>
+    <string name="tripplanner_error_too_close">Trip is too short</string>
+    <string name="tripplanner_error_location_not_accessible">Chosen location is not accessible</string>
+    <string name="tripplanner_error_geocode_from_ambiguous">Origin is ambiguous</string>
+    <string name="tripplanner_error_geocode_to_ambiguous">Destination  is ambiguous</string>
+    <string name="tripplanner_error_geocode_from_to_ambiguous">Origin and destination are ambiguous</string>
+    <string name="tripplanner_error_triangle">Incorrect bike parameters, please try again with different values</string>
     <string name="date_time_title">Set date and time</string>
     <string name="date_time_spinner_arrive">Arrive at:</string>
     <string name="date_time_spinner_depart">Depart at:</string>
