@@ -20,6 +20,7 @@ import android.content.Context;
 import android.location.Location;
 
 import edu.usf.cutr.opentripplanner.android.R;
+import edu.usf.cutr.opentripplanner.android.exceptions.ServerListParsingException;
 
 /**
  * Modified by Khoa Tran
@@ -77,7 +78,7 @@ public class Server {
         super();
     }
 
-    public Server(Server s) {
+    public Server(Server s) throws ServerListParsingException {
         super();
         setId(s.getId());
         setDate(s.getDate());
@@ -92,7 +93,8 @@ public class Server {
     }
 
     public Server(Long d, String region, String baseURL, String bounds,
-            String language, String contactName, String contactEmail, String center, String zoom) {
+            String language, String contactName, String contactEmail, String center, String zoom)
+            throws ServerListParsingException {
         super();
         setDate(d);
         setRegion(region);
@@ -106,7 +108,8 @@ public class Server {
     }
 
     public Server(String region, String baseURL, String bounds,
-            String language, String contactName, String contactEmail, String center, String zoom) {
+            String language, String contactName, String contactEmail, String center, String zoom)
+            throws ServerListParsingException {
         super();
         setRegion(region);
         setBaseURL(baseURL);
@@ -156,39 +159,60 @@ public class Server {
         return zoom;
     }
 
-    public void setZoom(String zoom) {
-        zoomSet = true;
-        this.zoom = zoom;
-
-        setInitialZoom(Float.parseFloat(zoom));
+    public void setZoom(String zoom) throws ServerListParsingException {
+        try {
+            Float zoomFloat = Float.parseFloat(zoom);
+            setInitialZoom(zoomFloat);
+            zoomSet = true;
+            this.zoom = zoom;
+        } catch (NumberFormatException e) {
+            throw new ServerListParsingException("Incorrect zoom value: " + e.toString());
+        }
     }
 
     public String getCenter() {
         return center;
     }
 
-    public void setCenter(String center) {
-        centerSet = true;
-        this.center = center;
+    public void setCenter(String center) throws ServerListParsingException {
         String[] tokens = center.split(",");
-
-        setCenterLatitude(Double.parseDouble(tokens[0]));
-        setCenterLongitude(Double.parseDouble(tokens[1]));
+        if (tokens.length == 2) {
+            centerSet = true;
+            this.center = center;
+            try {
+                setCenterLatitude(Double.parseDouble(tokens[0]));
+                setCenterLongitude(Double.parseDouble(tokens[1]));
+            } catch (NumberFormatException e) {
+                throw new ServerListParsingException(
+                        "Incorrect center coordinates: " + e.toString());
+            }
+        } else {
+            throw new ServerListParsingException("Incorrect center coordinates");
+        }
     }
 
     public String getBounds() {
         return bounds;
     }
 
-    public void setBounds(String bounds) {
-        boundsSet = true;
-        this.bounds = bounds;
+    public void setBounds(String bounds) throws ServerListParsingException {
         String[] tokens = bounds.split(",");
 
-        setLowerLeftLatitude(Double.parseDouble(tokens[0]));
-        setLowerLeftLongitude(Double.parseDouble(tokens[1]));
-        setUpperRightLatitude(Double.parseDouble(tokens[2]));
-        setUpperRightLongitude(Double.parseDouble(tokens[3]));
+        if (tokens.length == 4) {
+            boundsSet = true;
+            this.bounds = bounds;
+            try {
+                setLowerLeftLatitude(Double.parseDouble(tokens[0].trim()));
+                setLowerLeftLongitude(Double.parseDouble(tokens[1].trim()));
+                setUpperRightLatitude(Double.parseDouble(tokens[2].trim()));
+                setUpperRightLongitude(Double.parseDouble(tokens[3].trim()));
+            } catch (NumberFormatException e) {
+                throw new ServerListParsingException(
+                        "Incorrect bound coordinates: " + e.toString());
+            }
+        } else {
+            throw new ServerListParsingException("Incorrect bound coordinates");
+        }
     }
 
     public String getLanguage() {

@@ -47,6 +47,7 @@ import java.util.List;
 import au.com.bytecode.opencsv.CSVReader;
 import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.R;
+import edu.usf.cutr.opentripplanner.android.exceptions.ServerListParsingException;
 import edu.usf.cutr.opentripplanner.android.listeners.ServerCheckerCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.ServerSelectorCompleteListener;
 import edu.usf.cutr.opentripplanner.android.model.Server;
@@ -224,15 +225,37 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
             try {
                 Long currentTime = Calendar.getInstance().getTime().getTime();
 
-                List<String[]> entries = reader.readAll();
-                for (String[] e : entries) {
-                    if (e[0].equalsIgnoreCase("Region")) {
+                List<String[]> serversStrings = reader.readAll();
+                for (String[] serverString : serversStrings) {
+                    if (serverString[0].equalsIgnoreCase("Region")) {
                         continue; //Ignore the first line of the file
                     }
-
-                    Server s = new Server(currentTime, e[0], e[1], e[2], e[3], e[4], e[5], e[6],
-                            e[7]);
-                    serverList.add(s);
+                    for (String stringEntry : serverString) {
+                        stringEntry = stringEntry.trim();
+                    }
+                    boolean allFieldsNotNull = true;
+                    for (String serverField : serverString) {
+                        serverField = serverField.trim();
+                        if (serverField.equals("")) {
+                            Log.e(OTPApp.TAG, "Some necessary fields are null, server not added");
+                            allFieldsNotNull = false;
+                            break;
+                        }
+                    }
+                    if (allFieldsNotNull && (serverString.length >= 8)) {
+                        try {
+                            Server s = new Server(currentTime, serverString[0], serverString[1],
+                                    serverString[2], serverString[3], serverString[4],
+                                    serverString[5], serverString[6], serverString[7]);
+                            serverList.add(s);
+                        } catch (ServerListParsingException e) {
+                            Log.e(OTPApp.TAG,
+                                    "Error parsing necessary fields, server not added: " + e);
+                        }
+                    } else {
+                        Log.e(OTPApp.TAG,
+                                "Server does not provide necessary fields, server not added");
+                    }
                 }
             } catch (IOException e) {
                 Log.e(OTPApp.TAG, "Problem reading CSV server file: " + e.getMessage());
@@ -268,7 +291,9 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
     private void insertServerListToDatabase(List<Server> servers) {
         dataSource.open();
         for (Server server : servers) {
-            dataSource.createServer(server);
+            if (dataSource.createServer(server) == null) {
+                Log.e(OTPApp.TAG, "Some server fields are incorrect, server not added");
+            }
         }
         dataSource.close();
     }
