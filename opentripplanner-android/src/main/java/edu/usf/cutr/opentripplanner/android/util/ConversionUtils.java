@@ -119,9 +119,9 @@ public class ConversionUtils {
         }
         long m = (sec % 3600) / 60;
         if (h > 0) {
-            text += Long.toString(h) + " " + applicationContext.getResources()
+            text += Long.toString(h) + applicationContext.getResources()
                     .getString(R.string.short_hours);
-            text += Long.toString(m) + " " + applicationContext.getResources()
+            text += " " + Long.toString(m) + applicationContext.getResources()
                     .getString(R.string.short_minutes);
         } else {
             if (m == 0) {
