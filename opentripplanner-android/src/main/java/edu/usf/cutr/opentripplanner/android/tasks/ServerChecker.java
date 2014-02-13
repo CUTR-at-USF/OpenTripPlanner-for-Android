@@ -105,7 +105,7 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
                     context.getResources().getString(R.string.server_checker_info_dialog_region)
                             + " " + server.getRegion() + "\n" + context.getResources()
                             .getString(R.string.server_checker_info_dialog_language) + " " + server
-                            .getLanguage() + context.getResources()
+                            .getLanguage() + "\n" + context.getResources()
                             .getString(R.string.server_checker_info_dialog_contact) + " " + server
                             .getContactName() + " ("
                             + server.getContactEmail() + ")" + "\n" + context.getResources()
