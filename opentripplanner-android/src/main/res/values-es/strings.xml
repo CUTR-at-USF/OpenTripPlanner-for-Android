@@ -115,7 +115,7 @@
     <string name="use_device_timezone_description">Siempre usar la zona horaria del usuario ignorando la zona horaria del servidor</string>
     <string name="geocoder_results_title">Resultados de direcciones</string>
     <string name="geocoder_no_results_message">Disculpa, no se ha obtenido ningún resultado para esa dirección</string>
-    <!-- <string name="advanced">Advanced</string> -->
+    <string name="advanced">Avanzado</string>
     <string name="tripplanner_progress">"Buscando la mejor ruta. Por favor espera&#8230;"</string>
     <string name="tripplanner_results_title">Resultados de rutas</string>
     <string name="tripplanner_no_results_message">Error obteniendo la ruta</string>
@@ -162,14 +162,14 @@
     <string name="distance_kilometers">km</string>
     <string name="distance_meters">m</string>
     <string name="connector_time_full">tardas</string>
-    <!-- <string name="location_preference_category_title">Location</string> -->
-    <!-- <string name="location_advanced_preference_category_summary">Set your own region using a URL</string> -->
+    <string name="location_preference_category_title">Localización</string> 
+    <string name="location_advanced_preference_category_summary">Añade tu región introduciendo una URL</string>
     <string name="refresh_server_list">Actualizar servidores</string>
     <string name="refresh_server_list_error">No ha sido posible descargar la lista de servidores</string>
     <string name="server_list_download_date_description">Lista de servidores descargada</string>
     <string name="server_list_download_date_unknown">Fecha de descarga de lista desconocida</string>
     <string name="alternative_routes">Seleccionar una ruta</string>
-    <!-- <string name="geocoder_preference_category_title">Address &amp; Point-of-Interest Search</string> -->
+    <string name="geocoder_preference_category_title">Dirección &amp; Búsqueda de Puntos-de-Interés</string>
     <string name="geocoder_preference_provider_title">Proveedor de direcciones</string>
     <string name="geocoder_preference_provider_nominatim">Mapquest Nominatim</string>
     <string name="geocoder_preference_provider_google_places">Google Places</string>
