@@ -131,10 +131,10 @@ import edu.usf.cutr.opentripplanner.android.SettingsActivity;
 import edu.usf.cutr.opentripplanner.android.listeners.DateCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.MetadataRequestCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.OTPGeocodingListener;
-import edu.usf.cutr.opentripplanner.android.listeners.OnFragmentListener;
+import edu.usf.cutr.opentripplanner.android.listeners.OtpFragment;
 import edu.usf.cutr.opentripplanner.android.listeners.ServerSelectorCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.TripRequestCompleteListener;
-import edu.usf.cutr.opentripplanner.android.maps.MyUrlTileProvider;
+import edu.usf.cutr.opentripplanner.android.maps.CustomUrlTileProvider;
 import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
 import edu.usf.cutr.opentripplanner.android.model.OptimizeSpinnerItem;
 import edu.usf.cutr.opentripplanner.android.model.Server;
@@ -147,7 +147,7 @@ import edu.usf.cutr.opentripplanner.android.tasks.ServerSelector;
 import edu.usf.cutr.opentripplanner.android.tasks.TripRequest;
 import edu.usf.cutr.opentripplanner.android.util.ConversionUtils;
 import edu.usf.cutr.opentripplanner.android.util.DateTimeDialog;
-import edu.usf.cutr.opentripplanner.android.util.ItineraryDecrypt;
+import edu.usf.cutr.opentripplanner.android.util.DirectionsGenerator;
 import edu.usf.cutr.opentripplanner.android.util.LocationUtil;
 import edu.usf.cutr.opentripplanner.android.util.RangeSeekBar;
 import edu.usf.cutr.opentripplanner.android.util.RangeSeekBar.OnRangeSeekBarChangeListener;
@@ -177,7 +177,7 @@ public class MainFragment extends Fragment implements
 
     private LocationClient mLocationClient;
 
-    private OnFragmentListener mFragmentListener;
+    private OtpFragment mFragmentListener;
 
     private SharedPreferences mPrefs;
 
@@ -316,10 +316,10 @@ public class MainFragment extends Fragment implements
         super.onAttach(activity);
         try {
             ((MyActivity) activity).setDateCompleteCallback(this);
-            setFragmentListener((OnFragmentListener) activity);
+            setFragmentListener((OtpFragment) activity);
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentListener");
+                    + " must implement OtpFragment");
         }
     }
 
@@ -1026,7 +1026,7 @@ public class MainFragment extends Fragment implements
                     }
 
                     mBtnPlanTrip.setImageBitmap(BitmapFactory.decodeResource(getResources(),
-                            ItineraryDecrypt
+                            DirectionsGenerator
                                     .getModeIcon(traverseModeSpinnerItem.getTraverseModeSet())));
                 }
                 Log.e(OTPApp.TAG,
@@ -2676,7 +2676,7 @@ public class MainFragment extends Fragment implements
                     modeMarkerOption.title(stepIndex + ". " + getResources()
                             .getString(R.string.before_route) + " " + leg.getRouteShortName()
                             + " " + getResources().getString(R.string.connector_stop) + " "
-                            + ItineraryDecrypt.getLocalizedStreetName(leg.getFrom().name,
+                            + DirectionsGenerator.getLocalizedStreetName(leg.getFrom().name,
                             mApplicationContext.getResources()));
                     String modeMarkerSnippet = ConversionUtils
                             .getTimeWithContext(mApplicationContext, leg.getAgencyTimeZoneOffset(),
@@ -2691,13 +2691,13 @@ public class MainFragment extends Fragment implements
                         modeMarkerOption.title(stepIndex + ". " + getResources()
                                 .getString(R.string.before_distance_walk)
                                 + " " + getResources().getString(R.string.connector_destination)
-                                + " " + ItineraryDecrypt.getLocalizedStreetName(leg.getTo().name,
+                                + " " + DirectionsGenerator.getLocalizedStreetName(leg.getTo().name,
                                 mApplicationContext.getResources()));
                     } else if (traverseMode.equals(TraverseMode.BICYCLE)) {
                         modeMarkerOption.title(stepIndex + ". " + getResources()
                                 .getString(R.string.before_distance_bike)
                                 + " " + getResources().getString(R.string.connector_destination)
-                                + " " + ItineraryDecrypt.getLocalizedStreetName(leg.getTo().name,
+                                + " " + DirectionsGenerator.getLocalizedStreetName(leg.getTo().name,
                                 mApplicationContext.getResources()));
                     }
                     modeMarkerOption.snippet(ConversionUtils
@@ -2774,11 +2774,11 @@ public class MainFragment extends Fragment implements
         return icon;
     }
 
-    public OnFragmentListener getFragmentListener() {
+    public OtpFragment getFragmentListener() {
         return mFragmentListener;
     }
 
-    public void setFragmentListener(OnFragmentListener fragmentListener) {
+    public void setFragmentListener(OtpFragment fragmentListener) {
         this.mFragmentListener = fragmentListener;
     }
 
@@ -2801,7 +2801,7 @@ public class MainFragment extends Fragment implements
             toggleItinerarySelectionSpinner(!itineraries.isEmpty());
 
             showRouteOnMap(itineraries.get(0).legs, true);
-            OnFragmentListener ofl = getFragmentListener();
+            OtpFragment ofl = getFragmentListener();
 
             // onItinerariesLoaded must be invoked before onItinerarySelected(0)
             ofl.onItinerariesLoaded(itineraries);
@@ -3064,7 +3064,8 @@ public class MainFragment extends Fragment implements
                 mMaxZoomLevel = getResources().getInteger(R.integer.tiles_maquest_max_zoom);
             }
             mMap.setMapType(GoogleMap.MAP_TYPE_NONE);
-            MyUrlTileProvider mTileProvider = new MyUrlTileProvider(OTPApp.CUSTOM_MAP_TILE_WIDTH,
+            CustomUrlTileProvider mTileProvider = new CustomUrlTileProvider(
+                    OTPApp.CUSTOM_MAP_TILE_WIDTH,
                     OTPApp.CUSTOM_MAP_TILE_HEIGHT, overlayString);
             mSelectedTileOverlay = mMap.addTileOverlay(
                     new TileOverlayOptions().tileProvider(mTileProvider)

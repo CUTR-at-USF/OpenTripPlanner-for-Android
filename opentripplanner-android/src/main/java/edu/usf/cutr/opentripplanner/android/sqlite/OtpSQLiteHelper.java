@@ -22,10 +22,12 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 /**
+ * Helper class for MySQLite
+ *
  * @author Khoa Tran
  */
 
-public class MySQLiteHelper extends SQLiteOpenHelper {
+public class OtpSQLiteHelper extends SQLiteOpenHelper {
 
     public static final String TABLE_SERVERS = "Servers";
 
@@ -53,7 +55,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 2;
 
-    private static MySQLiteHelper mInstance = null;
+    private static OtpSQLiteHelper mInstance = null;
 
     // Database creation sql statement
     private static final String DATABASE_CREATE = "CREATE TABLE "
@@ -70,18 +72,18 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             + COLUMN_ZOOM + " TEXT NOT NULL"
             + ");";
 
-    private MySQLiteHelper(Context context) {
+    private OtpSQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
 
-    public static MySQLiteHelper getInstance(Context ctx) {
+    public static OtpSQLiteHelper getInstance(Context ctx) {
 
         // Use the application context, which will ensure that you
         // don't accidentally leak an Activity's context.
         // See this article for more information: http://bit.ly/6LRzfx
         if (mInstance == null) {
-            mInstance = new MySQLiteHelper(ctx.getApplicationContext());
+            mInstance = new OtpSQLiteHelper(ctx.getApplicationContext());
         }
         return mInstance;
     }
@@ -94,7 +96,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.w(MySQLiteHelper.class.getName(),
+        Log.w(OtpSQLiteHelper.class.getName(),
                 "Upgrading database from version " + oldVersion + " to "
                         + newVersion + ", which will destroy all old data");
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_SERVERS);

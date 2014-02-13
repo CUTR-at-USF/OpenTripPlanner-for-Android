@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
+ * Interface used to abstract Point-of-Interest implementation details for various Point-of-Interest
+ * providers
+ *
  * @author Khoa Tran
  */
 

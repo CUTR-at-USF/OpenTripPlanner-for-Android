@@ -35,6 +35,9 @@ import java.util.HashMap;
 import edu.usf.cutr.opentripplanner.android.OTPApp;
 
 /**
+ * A list of places obtained from Google's Places API
+ * https://developers.google.com/places/documentation/
+ *
  * @author Khoa Tran
  */
 

@@ -38,13 +38,13 @@ import java.util.List;
 
 import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.R;
-import edu.usf.cutr.opentripplanner.android.listeners.OnFragmentListener;
+import edu.usf.cutr.opentripplanner.android.listeners.OtpFragment;
 import edu.usf.cutr.opentripplanner.android.model.Direction;
 import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
 import edu.usf.cutr.opentripplanner.android.util.ConversionUtils;
 import edu.usf.cutr.opentripplanner.android.util.DirectionExpandableListAdapter;
+import edu.usf.cutr.opentripplanner.android.util.DirectionsGenerator;
 import edu.usf.cutr.opentripplanner.android.util.ExpandableListFragment;
-import edu.usf.cutr.opentripplanner.android.util.ItineraryDecrypt;
 
 /**
  * This fragment shows the list of step-by-step directions for a planned trip
@@ -56,7 +56,7 @@ public class DirectionListFragment extends ExpandableListFragment {
 
     View header = null;
 
-    private OnFragmentListener fragmentListener;
+    private OtpFragment fragmentListener;
 
     private ExpandableListView elv;
 
@@ -76,10 +76,10 @@ public class DirectionListFragment extends ExpandableListFragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            setFragmentListener((OnFragmentListener) activity);
+            setFragmentListener((OtpFragment) activity);
         } catch (ClassCastException e) {
             throw new ClassCastException(
-                    activity.toString() + " must implement OnFragmentListener");
+                    activity.toString() + " must implement OtpFragment");
         }
     }
 
@@ -99,7 +99,7 @@ public class DirectionListFragment extends ExpandableListFragment {
         super.onActivityCreated(savedInstanceState);
 
         ImageButton btnDisplayMap = (ImageButton) header.findViewById(R.id.btnDisplayMap);
-        final OnFragmentListener ofl = this.getFragmentListener();
+        final OtpFragment ofl = this.getFragmentListener();
         final DirectionListFragment dlf = this;
         OnClickListener oclDisplayDirection = new OnClickListener() {
             @Override
@@ -133,9 +133,9 @@ public class DirectionListFragment extends ExpandableListFragment {
         int currentItineraryIndex = fragmentListener.getCurrentItineraryIndex();
 
         ArrayList<Direction> directions = new ArrayList<Direction>();
-        ItineraryDecrypt itDecrypt = new ItineraryDecrypt(currentItinerary,
+        DirectionsGenerator dirGen = new DirectionsGenerator(currentItinerary,
                 getActivity().getApplicationContext());
-        ArrayList<Direction> tempDirections = itDecrypt.getDirections();
+        ArrayList<Direction> tempDirections = dirGen.getDirections();
         if (tempDirections != null && !tempDirections.isEmpty()) {
             directions.addAll(tempDirections);
         }
@@ -192,10 +192,10 @@ public class DirectionListFragment extends ExpandableListFragment {
 
                 if (!isFragmentFirstLoad) {
                     ArrayList<Direction> directions = new ArrayList<Direction>();
-                    ItineraryDecrypt itDecrypt = new ItineraryDecrypt(
+                    DirectionsGenerator dirGen = new DirectionsGenerator(
                             fragmentListener.getCurrentItinerary(),
                             getActivity().getApplicationContext());
-                    ArrayList<Direction> tempDirections = itDecrypt.getDirections();
+                    ArrayList<Direction> tempDirections = dirGen.getDirections();
                     if (tempDirections != null && !tempDirections.isEmpty()) {
                         directions.addAll(tempDirections);
                     }
@@ -292,14 +292,14 @@ public class DirectionListFragment extends ExpandableListFragment {
     /**
      * @return the fragmentListener
      */
-    public OnFragmentListener getFragmentListener() {
+    public OtpFragment getFragmentListener() {
         return fragmentListener;
     }
 
     /**
      * @param fragmentListener the fragmentListener to set
      */
-    public void setFragmentListener(OnFragmentListener fragmentListener) {
+    public void setFragmentListener(OtpFragment fragmentListener) {
         this.fragmentListener = fragmentListener;
     }
 }
