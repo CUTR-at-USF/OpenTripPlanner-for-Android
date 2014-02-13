@@ -13,6 +13,18 @@ We strongly suggest that you use the `AndroidStyle.xml` template file, included 
 3. Go to "File->Settings->Code Style", and under "Scheme" select "AndroidStyle" and click "Ok".
 4. Right-click on the files that contain your contributions and select "Reformat Code", check "Optimize imports", and select "Run".
 
+## Maintaining Translations
+
+OTP Android includes translations for several languages, including Spanish, Galacian, German, and Italian.  We rely primarily on contributors
+to keep these strings up to date.  As a result,  we should follow the below process when adding new text to the app:
+
+1. **Developer adds new strings** - Add the English representation of the strings to the default `values/strings.xml` file (e.g., `<string name="this_is_a_new_string">This is the new text shown to the user</string>`)
+2. **Developer adds template for new strings to alternate language `strings.xml` files** - Add a commented-out placeholder to the `values-xx/strings.xml` files for all translations, so that the translator can easily see what strings haves been added.  For example, to show that the Spanish translation needs to be updated, the `values-es/strings.xml` file should be updated to include `<!-- <string name="this_is_a_new_string">This is the new text shown to the user</string> -->`)
+3. **Developer opens an issue on the [issue tracker](https://github.com/CUTR-at-USF/OpenTripPlanner-for-Android/issues) for each translation that needs to be updated** - When approaching a new release, for each language that needs to be updated the developer should open a new issue on the issue tracker, and tag past translation contributors via Github usernames for that language.  For example, if @vreixo contributed Spanish translations in the past, an issue would be opened saying "Need to update Spanish translations", and @vreixo would be tagged in the issue description with a request to update the translations, including a link to the file that needs to be updated.  Find past translation contributors by reviewing the Github history for the given `values-xx/strings.xml` file.  Since contributors are often volunteers, please be respectful of their time and only open issues for completed features after English versions of the text has been finalized.
+4. **Translation contributor updates the alternate language `strings.xml` file(s)** - After the translation contributor is tagged on the issue, they can easily see the currently commented out strings that need to be updated in the given `values-xx/strings.xml` file.  They will uncomment this string, and add the appropriate translation.  For example, the commented out XML from step 2 above would be changed to `<string name="this_is_a_new_string">Éste es el nuevo texto que se muestra al usuario</string>`.  The translation contributor would then open a Github pull request (or post them in a comment on the issue, if they aren't familiar with Git) with the new translations for all new strings in the given `values-xx/strings.xml` file.
+
+Since there is considerable overhead for the above process, whenever possible please consider using images to convey meaning, instead of text.
+
 ## Closing policy for issues and pull requests
 
 OpenTripPlanner for Android is a popular project and the capacity to deal with issues and pull requests is limited. Out of respect for our volunteers, issues and pull requests not in line with the guidelines listed in this document may be closed without notice.
@@ -48,11 +60,12 @@ If you can, please submit a pull request with the fix or improvements including 
 1. Fork the project on GitHub
 2. Create a feature branch
 3. Write tests and code
-4. Apply the `AndroidStyle.xml` style template to your code in Android Studio.
-5. If you have multiple commits please combine them into one commit by [squashing them](http://git-scm.com/book/en/Git-Tools-Rewriting-History#Squashing-Commits)
-6. Push the commit to your fork
-7. Submit a pull request with a motive for your change and the method you used to achieve it
-8. [Search for issues](https://github.com/CUTR-at-USF/OpenTripPlanner-for-Android/search?q=&ref=cmdform&type=Issues) related to your pull request and mention them in the pull request description or comments
+4. If your code includes any new text shown to the user, update the alternate language `values-xx/strings.xml` files with commented out templates as outlined in the "Maintaining Translations" section above.
+5. Apply the `AndroidStyle.xml` style template to your code in Android Studio.
+6. If you have multiple commits please combine them into one commit by [squashing them](http://git-scm.com/book/en/Git-Tools-Rewriting-History#Squashing-Commits)
+7. Push the commit to your fork
+8. Submit a pull request with a motive for your change and the method you used to achieve it
+9. [Search for issues](https://github.com/CUTR-at-USF/OpenTripPlanner-for-Android/search?q=&ref=cmdform&type=Issues) related to your pull request and mention them in the pull request description or comments
 
 We will accept pull requests if:
 
