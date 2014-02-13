@@ -39,7 +39,7 @@ import java.util.List;
 import edu.usf.cutr.opentripplanner.android.fragments.DirectionListFragment;
 import edu.usf.cutr.opentripplanner.android.fragments.MainFragment;
 import edu.usf.cutr.opentripplanner.android.listeners.DateCompleteListener;
-import edu.usf.cutr.opentripplanner.android.listeners.OnFragmentListener;
+import edu.usf.cutr.opentripplanner.android.listeners.OtpFragment;
 import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
 
 /**
@@ -51,7 +51,7 @@ import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
  * @author Vreixo Gonz�lez (update to Google Maps API v2, UI and general app improvements)
  */
 
-public class MyActivity extends FragmentActivity implements OnFragmentListener {
+public class MyActivity extends FragmentActivity implements OtpFragment {
 
     private List<Leg> currentItinerary = new ArrayList<Leg>();
 

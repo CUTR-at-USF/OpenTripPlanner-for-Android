@@ -28,10 +28,13 @@ import java.util.List;
 import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
 
 /**
+ * An interface used to define callbacks and getter methods that are used by fragments in OTP
+ * Android
+ *
  * @author Khoa Tran
  */
 
-public interface OnFragmentListener {
+public interface OtpFragment {
 
     public void onItinerariesLoaded(List<Itinerary> itineraries);
 

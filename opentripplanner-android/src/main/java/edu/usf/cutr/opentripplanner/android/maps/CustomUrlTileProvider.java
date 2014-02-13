@@ -21,11 +21,11 @@ import com.google.android.gms.maps.model.UrlTileProvider;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class MyUrlTileProvider extends UrlTileProvider {
+public class CustomUrlTileProvider extends UrlTileProvider {
 
     private String baseUrl;
 
-    public MyUrlTileProvider(int width, int height, String url) {
+    public CustomUrlTileProvider(int width, int height, String url) {
         super(width, height);
         this.baseUrl = url;
     }

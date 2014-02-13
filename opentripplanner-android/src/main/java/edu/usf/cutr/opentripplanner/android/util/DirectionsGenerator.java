@@ -36,10 +36,13 @@ import edu.usf.cutr.opentripplanner.android.R;
 import edu.usf.cutr.opentripplanner.android.model.Direction;
 
 /**
+ * Generates a set of step-by-step directions that can be shown to the user from a list of trip
+ * legs
+ *
  * @author Khoa Tran
  */
 
-public class ItineraryDecrypt {
+public class DirectionsGenerator {
 
     private List<Leg> legs = new ArrayList<Leg>();
 
@@ -51,7 +54,7 @@ public class ItineraryDecrypt {
 
     private Context applicationContext;
 
-    public ItineraryDecrypt(List<Leg> legs, Context applicationContext) {
+    public DirectionsGenerator(List<Leg> legs, Context applicationContext) {
         this.legs.addAll(legs);
         this.applicationContext = applicationContext;
 
@@ -88,14 +91,14 @@ public class ItineraryDecrypt {
 
             TraverseMode traverseMode = TraverseMode.valueOf((String) leg.mode);
             if (traverseMode.isOnStreetNonTransit()) {
-                Direction dir = decryptNonTransit(leg);
+                Direction dir = generateNonTransitDirections(leg);
                 if (dir == null) {
                     continue;
                 }
                 dir.setDirectionIndex(index);
                 addDirection(dir);
             } else {
-                ArrayList<Direction> directions = decryptTransit(leg);
+                ArrayList<Direction> directions = generateTransitDirections(leg);
                 if (directions == null) {
                     continue;
                 }
@@ -118,7 +121,7 @@ public class ItineraryDecrypt {
         }
     }
 
-    private Direction decryptNonTransit(Leg leg) {
+    private Direction generateNonTransitDirections(Leg leg) {
         Direction direction = new Direction();
 
         //		http://opentripplanner.usf.edu/opentripplanner-api-webapp/ws/plan?optimize=QUICK&time=09:24pm&arriveBy=false&wheelchair=false&maxWalkDistance=7600.0&fromPlace=28.033389%2C+-82.521034&toPlace=28.064709%2C+-82.471618&date=03/07/12&mode=WALK,TRAM,SUBWAY,RAIL,BUS,FERRY,CABLE_CAR,GONDOLA,FUNICULAR,TRANSIT,TRAINISH,BUSISH
@@ -342,7 +345,7 @@ public class ItineraryDecrypt {
         return null;
     }
 
-    private ArrayList<Direction> decryptTransit(Leg leg) {
+    private ArrayList<Direction> generateTransitDirections(Leg leg) {
         ArrayList<Direction> directions = new ArrayList<Direction>(2);
         Direction onDirection = new Direction();
         Direction offDirection = new Direction();

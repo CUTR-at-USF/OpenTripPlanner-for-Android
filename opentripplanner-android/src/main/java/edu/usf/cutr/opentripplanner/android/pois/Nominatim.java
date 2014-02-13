@@ -35,6 +35,9 @@ import java.util.HashMap;
 import edu.usf.cutr.opentripplanner.android.OTPApp;
 
 /**
+ * A list of places obtained from MapQuest's Nominatim API
+ * http://developer.mapquest.com/web/products/open/nominatim
+ *
  * @author Khoa Tran
  */
 

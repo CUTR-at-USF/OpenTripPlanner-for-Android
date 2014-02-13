@@ -17,6 +17,8 @@
 package edu.usf.cutr.opentripplanner.android.pois;
 
 /**
+ * A container class for simple Point-of-interest information
+ *
  * @author Khoa Tran
  */
 
