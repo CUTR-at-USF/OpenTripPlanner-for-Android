@@ -115,6 +115,7 @@
     <string name="use_device_timezone_description">Sempre usar a zona horaria do usuario ignorando a zona horaria do servidor</string>
     <string name="geocoder_results_title">Resultados de direccións</string>
     <string name="geocoder_no_results_message">Disculpa, non se puido obter nengún resultado para esa dirección</string>
+    <!-- <string name="advanced">Advanced</string> -->
     <string name="tripplanner_progress">"Buscando a mellor ruta. Por favor espera&#8230;"</string>
     <string name="tripplanner_results_title">Resultados de rutas</string>
     <string name="tripplanner_no_results_message">Erro obtendo a ruta</string>
@@ -161,11 +162,14 @@
     <string name="distance_kilometers">km</string>
     <string name="distance_meters">m</string>
     <string name="connector_time_full">tardas</string>
+    <!-- <string name="location_preference_category_title">Location</string> -->
+    <!-- <string name="location_advanced_preference_category_summary">Set your own region using a URL</string> -->
     <string name="refresh_server_list">Actualizar servidores</string>
     <string name="refresh_server_list_error">Non foi posíbel descargar a lista de servidores</string>
-    <string name="server_list_donwload_date_description">Lista de servidores descargada</string>
-    <string name="server_list_donwload_date_unknown">Data de descarga de lista descoñecida</string>
+    <string name="server_list_download_date_description">Lista de servidores descargada</string>
+    <string name="server_list_download_date_unknown">Data de descarga de lista descoñecida</string>
     <string name="alternative_routes">Seleccionar unha ruta</string>
+    <!-- <string name="geocoder_preference_category_title">Address &amp; Point-of-Interest Search</string> -->
     <string name="geocoder_preference_provider_title">Provedor de direccións</string>
     <string name="geocoder_preference_provider_nominatim">Mapquest Nominatim</string>
     <string name="geocoder_preference_provider_google_places">Google Places</string>

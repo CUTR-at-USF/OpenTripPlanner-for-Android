@@ -113,6 +113,7 @@
     <string name="auto_detect_server_description">Encontrar automaticamente servidor para a localização actual</string>
     <string name="geocoder_results_title">Resultados de endereços</string>
     <string name="geocoder_no_results_message">Lamentamos, mas não é possível obter nenhum resultado para este endereço</string>
+    <!-- <string name="advanced">Advanced</string> -->
     <string name="tripplanner_progress">"A calcular a melhor rota, por favor aguarde&#8230;"</string>
     <string name="tripplanner_results_title">Resultados de rotas</string>
     <string name="tripplanner_no_results_message">Erro a calcular a rota</string>
@@ -142,10 +143,13 @@
     <string name="before_distance_walk">Vá a pé</string>
     <string name="distance_unit">m</string>
     <string name="connector_time_full">demora</string>
+    <!-- <string name="location_preference_category_title">Location</string> -->
+    <!-- <string name="location_advanced_preference_category_summary">Set your own region using a URL</string> -->
     <string name="refresh_server_list">Actualizar servidores</string>
-    <string name="server_list_donwload_date_description">Lista de servidores descarregada</string>
-    <string name="server_list_donwload_date_unknown">Data de descarga da lista de servidores desconhecida</string>
+    <string name="server_list_download_date_description">Lista de servidores descarregada</string>
+    <string name="server_list_download_date_unknown">Data de descarga da lista de servidores desconhecida</string>
     <string name="alternative_routes">Seleccionar uma rota</string>
+    <!-- <string name="geocoder_preference_category_title">Address &amp; Point-of-Interest Search</string> -->
     <string name="geocoder_preference_provider_title">Fornecedor do serviço de Geocoding</string>
     <string name="geocoder_preference_provider_nominatim">Mapquest Nominatim</string>
     <string name="geocoder_preference_provider_google_places">Google Places</string>

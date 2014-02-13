@@ -113,6 +113,7 @@
     <string name="auto_detect_server_description">Găsire server automat pentru locația actuală</string>
     <string name="geocoder_results_title">Rezultate de adrese</string>
     <string name="geocoder_no_results_message">Ne pare rău, nu s-a obținut niciun rezultat pentru această adresă</string>
+    <!-- <string name="advanced">Advanced</string> -->
     <string name="tripplanner_progress">"Căutând cea mai bună rută. Va rog așteptați&#8230;"</string>
     <string name="tripplanner_results_title">Rezultate de rute</string>
     <string name="tripplanner_no_results_message">Eroare planificând ruta</string>
@@ -142,10 +143,13 @@
     <string name="before_distance_walk">Mergi</string>
     <string name="distance_unit">m</string>
     <string name="connector_time_full">durație</string>
+    <!-- <string name="location_preference_category_title">Location</string> -->
+    <!-- <string name="location_advanced_preference_category_summary">Set your own region using a URL</string> -->
     <string name="refresh_server_list">Actualizare servere</string>
-    <string name="server_list_donwload_date_description">Liste de servere descărcate</string>
-    <string name="server_list_donwload_date_unknown">Dată de descărcări de liste necunoscute</string>
+    <string name="server_list_download_date_description">Liste de servere descărcate</string>
+    <string name="server_list_download_date_unknown">Dată de descărcări de liste necunoscute</string>
     <string name="alternative_routes">Selecționați o rută</string>
+    <!-- <string name="geocoder_preference_category_title">Address &amp; Point-of-Interest Search</string> -->
     <string name="geocoder_preference_provider_title">Furnizor de adrese</string>
     <string name="geocoder_preference_provider_nominatim">Mapquest Nominatim</string>
     <string name="geocoder_preference_provider_google_places">Google Places</string>

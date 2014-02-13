@@ -346,13 +346,13 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
             Calendar cal = Calendar.getInstance();
             cal.setTimeInMillis(mostRecentDate);
             serverRefreshButton.setSummary(
-                    getResources().getString(R.string.server_list_donwload_date_description)
+                    getResources().getString(R.string.server_list_download_date_description)
                             + ConversionUtils.getTimeWithContext(this.getApplicationContext(),
                             cal.getTimeZone().getOffset(cal.getTimeInMillis()),
                             cal.getTimeInMillis(), true));
         } else {
             serverRefreshButton.setSummary(
-                    getResources().getString(R.string.server_list_donwload_date_unknown));
+                    getResources().getString(R.string.server_list_download_date_unknown));
         }
 
         serverRefreshButton

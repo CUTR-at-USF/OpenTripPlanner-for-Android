@@ -113,6 +113,7 @@
     <string name="auto_detect_server_description">Trova automaticamente il server OTP basandoti sulla mia posizione</string>
     <string name="geocoder_results_title">Risultato geocodifca</string>
     <string name="geocoder_no_results_message">Spiacenti, non è stata trovata alcuna posizione per l\'indirizzo specificato.</string>
+    <!-- <string name="advanced">Advanced</string> -->
     <string name="tripplanner_progress">"Generazione percorso. Attendere&#8230;"</string>
     <string name="tripplanner_results_title">Percorsi trovati</string>
     <string name="tripplanner_error_dialog_title">Percorso non tovato</string>
@@ -156,10 +157,13 @@
     <string name="before_distance_walk">Cammina</string>
     <string name="distance_unit">m</string>
     <string name="connector_time_full">tempo impiegato</string>
+    <!-- <string name="location_preference_category_title">Location</string> -->
+    <!-- <string name="location_advanced_preference_category_summary">Set your own region using a URL</string> -->
     <string name="refresh_server_list">Aggiorna elenco server</string>
-    <string name="server_list_donwload_date_description">Elenco dei server aggiornato il</string>
-    <string name="server_list_donwload_date_unknown">Data di aggiornamento non disponibile</string>
+    <string name="server_list_download_date_description">Elenco dei server aggiornato il</string>
+    <string name="server_list_download_date_unknown">Data di aggiornamento non disponibile</string>
     <string name="alternative_routes">Seleziona un percorso</string>
+    <!-- <string name="geocoder_preference_category_title">Address &amp; Point-of-Interest Search</string> -->
     <string name="geocoder_preference_provider_title">Provider della geocodifica</string>
     <string name="geocoder_preference_provider_nominatim">Mapquest Nominatim</string>
     <string name="geocoder_preference_provider_google_places">Google Places</string>

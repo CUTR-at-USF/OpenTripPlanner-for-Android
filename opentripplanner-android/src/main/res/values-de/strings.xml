@@ -113,6 +113,7 @@
     <string name="auto_detect_server_description">Wählt einen Server basierend auf dem jetzigen Aufenthaltsort</string>
     <string name="geocoder_results_title">Ergebnisse der Ortssuche</string>
     <string name="geocoder_no_results_message">Es wurde keine Ort für diese Adresse gefunden.</string>
+    <!-- <string name="advanced">Advanced</string> -->
     <string name="tripplanner_progress">"Planung der Route. Bitte Warten&#8230;"</string>
     <string name="tripplanner_results_title">Ergebnisse der Routensuche</string>
     <string name="tripplanner_no_results_message">Fehler bei der Routenplanung</string>
@@ -158,10 +159,13 @@
     <string name="distance_kilometers">km</string>
     <string name="distance_meters">m</string>
     <string name="connector_time_full">Dauer</string>
+    <!-- <string name="location_preference_category_title">Location</string> -->
+    <!-- <string name="location_advanced_preference_category_summary">Set your own region using a URL</string> -->
     <string name="refresh_server_list">Server-Liste aktualisieren</string>
-    <string name="server_list_donwload_date_description">Server-Liste geladen am </string>
-    <string name="server_list_donwload_date_unknown">Datum der letzten Server-Liste ist unbekannt.</string>
+    <string name="server_list_download_date_description">Server-Liste geladen am </string>
+    <string name="server_list_download_date_unknown">Datum der letzten Server-Liste ist unbekannt.</string>
     <string name="alternative_routes">Wählen Sie eine Route</string>
+    <!-- <string name="geocoder_preference_category_title">Address &amp; Point-of-Interest Search</string> -->
     <string name="geocoder_preference_provider_title">Adress-Anbieter</string>
     <string name="geocoder_preference_provider_nominatim">MapQuest Nominatim</string>
     <string name="geocoder_preference_provider_google_places">Google Places</string>
