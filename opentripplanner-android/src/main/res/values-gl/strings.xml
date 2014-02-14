@@ -177,13 +177,14 @@
 
     <!-- Points of Interest and Address Search -->
     <string name="geocoder_preference_category_title">Direccións e puntos de interés</string>
+    <string name="geocoder_advanced_preference_category_summary">Modifica o comportamento por defecto do geocodificador</string>
     <string name="geocoder_preference_provider_title">Provedor de direccións</string>
     <string name="geocoder_preference_provider_nominatim">Mapquest Nominatim</string>
     <string name="geocoder_preference_provider_google_places">Google Places</string>
     <string name="use_android_geocoder_title">Preferir geocodificador de Android</string>
     <string name="use_android_geocoder_description">Intentar primeiro con geocodificador de Android para todas as búsquedas</string>
     <string name="use_intelligent_markers_title">Marcadores intelixentes</string>
-    <string name="use_intelligent_markers_description">Mover os marcadores á dirección que se atope máis perto</string>
+    <string name="use_intelligent_markers_description">Mover os marcadores á dirección ou punto de interés que se atope máis perto</string>
 
     <!-- Custom regions -->
     <string name="error_no_server_selected">Non se seleccionou nengunha rexión</string>
