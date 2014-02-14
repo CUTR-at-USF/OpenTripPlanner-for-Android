@@ -177,13 +177,14 @@
 
     <!-- Points of Interest and Address Search -->
     <string name="geocoder_preference_category_title">Address &amp; Point-of-Interest Search</string>
+    <string name="geocoder_advanced_preference_category_summary">Modify geocoder default behavior</string>
     <string name="geocoder_preference_provider_title">Search provider</string>
     <string name="geocoder_preference_provider_nominatim">Mapquest Nominatim</string>
     <string name="geocoder_preference_provider_google_places">Google Places</string>
     <string name="use_android_geocoder_title">Prefer Android geocoder</string>
     <string name="use_android_geocoder_description">Try Android geocoder first for all searches</string>
     <string name="use_intelligent_markers_title">Intelligent markers</string>
-    <string name="use_intelligent_markers_description">Move markers to routable locations</string>
+    <string name="use_intelligent_markers_description">Move markers to the closer address or Point-Of-Interest</string>
 
     <!-- Custom regions -->
     <string name="error_no_server_selected">No region selected</string>
@@ -195,7 +196,7 @@
     <string name="origin_destination_are_mylocation">Can\'t plan: origin and destination are the same"</string>
     <string name="play_services_error_title">Google Play Services error</string>
     <string name="play_services_error">Can\'t contact Google: the app may not work</string>
-    <string name="location_error">Can\'t find location</string>
+    <string name="current_location_error">Can\'t find current location</string>
 
     <!-- Trip options -->
     <string name="header_optimization">Trip type</string>
