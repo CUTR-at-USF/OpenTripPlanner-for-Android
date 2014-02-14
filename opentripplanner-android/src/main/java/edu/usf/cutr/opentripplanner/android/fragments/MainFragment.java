@@ -649,7 +649,7 @@ public class MainFragment extends Fragment implements
                             } else {
                                 Toast.makeText(MainFragment.this.mApplicationContext,
                                         mApplicationContext.getResources()
-                                                .getString(R.string.location_error),
+                                                .getString(R.string.current_location_error),
                                         Toast.LENGTH_LONG).show();
                             }
 
@@ -721,7 +721,7 @@ public class MainFragment extends Fragment implements
                             } else {
                                 Toast.makeText(MainFragment.this.mApplicationContext,
                                         mApplicationContext.getResources()
-                                                .getString(R.string.location_error),
+                                                .getString(R.string.current_location_error),
                                         Toast.LENGTH_LONG).show();
                             }
 
@@ -925,7 +925,8 @@ public class MainFragment extends Fragment implements
 
                 if (mCurrentLatLng == null) {
                     Toast.makeText(mApplicationContext,
-                            mApplicationContext.getResources().getString(R.string.location_error),
+                            mApplicationContext.getResources()
+                                    .getString(R.string.current_location_error),
                             Toast.LENGTH_LONG).show();
                 } else {
                     if (mMap.getCameraPosition().zoom < OTPApp.defaultMyLocationZoomLevel) {
@@ -1483,7 +1484,8 @@ public class MainFragment extends Fragment implements
         } else if (isOriginMyLocation || isDestinationMyLocation) {
             if (mCurrentLatLng == null) {
                 Toast.makeText(MainFragment.this.mApplicationContext,
-                        mApplicationContext.getResources().getString(R.string.location_error),
+                        mApplicationContext.getResources()
+                                .getString(R.string.current_location_error),
                         Toast.LENGTH_LONG).show();
                 return;
             } else {
@@ -1784,7 +1786,7 @@ public class MainFragment extends Fragment implements
     public void runAutoDetectServer(LatLng mCurrentLatLng, boolean showDialog) {
         if ((mCurrentLatLng == null) || (mMap == null)) {
             Toast.makeText(mApplicationContext,
-                    mApplicationContext.getResources().getString(R.string.location_error),
+                    mApplicationContext.getResources().getString(R.string.current_location_error),
                     Toast.LENGTH_LONG).show();
         } else {
             ServersDataSource dataSource = ServersDataSource.getInstance(mApplicationContext);
@@ -2219,7 +2221,8 @@ public class MainFragment extends Fragment implements
                         String.valueOf(mCurrentLatLng.longitude));
             } else {
                 Toast.makeText(mApplicationContext,
-                        mApplicationContext.getResources().getString(R.string.location_error),
+                        mApplicationContext.getResources()
+                                .getString(R.string.current_location_error),
                         Toast.LENGTH_LONG).show();
             }
         } else {
@@ -2511,7 +2514,8 @@ public class MainFragment extends Fragment implements
                         .getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false)) {
                     if (mCurrentLatLng == null) {
                         Toast.makeText(mApplicationContext, mApplicationContext.getResources()
-                                .getString(R.string.location_error), Toast.LENGTH_LONG).show();
+                                .getString(R.string.current_location_error), Toast.LENGTH_LONG)
+                                .show();
                     } else {
                         zoomToTwoPoints(latlng, mCurrentLatLng);
                     }
@@ -2526,7 +2530,8 @@ public class MainFragment extends Fragment implements
                 } else if (mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, false)) {
                     if (mCurrentLatLng == null) {
                         Toast.makeText(mApplicationContext, mApplicationContext.getResources()
-                                .getString(R.string.location_error), Toast.LENGTH_LONG).show();
+                                .getString(R.string.current_location_error), Toast.LENGTH_LONG)
+                                .show();
                     } else {
                         zoomToTwoPoints(mCurrentLatLng, latlng);
                     }
