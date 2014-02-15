@@ -63,8 +63,9 @@
                 android:key="geocoder_provider"></ListPreference>
         <PreferenceScreen
                 android:title="@string/advanced"
-                android:key="geocoder_advanced_preference_category">
-            <CheckBoxPreference
+            android:summary="@string/geocoder_advanced_preference_category_summary"
+            android:key="geocoder_advanced_preference_category">
+        <CheckBoxPreference
                     android:title="@string/use_android_geocoder_title"
                     android:key="use_android_geocoder"
                     android:checked="true"
