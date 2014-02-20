@@ -36,26 +36,26 @@
     <string name="start_location_hint">Ausgangsort</string>
     <string name="end_location_hint">Zielort</string>
     <string name="textbox_close_to_marker">Ortsmarke, in der Nähe von</string>
-    <string name="metadata_request_successful">Metadaten erfolgreich heruntergeladen</string>
-    <string name="metadata_request_progress">Abfrage der Graph Metadaten. Bitte warten&#8230;</string>
-    <string name="geocoding_request_progress">Adressabfrage läuft. Bitte warten&#8230;</string>
-    <string name="server_checker_progress">Server-Informationen werden abgefragt. Bitte warten&#8230;</string>
-    <string name="server_checker_successful">OK: Server funktioniert.</string>
-    <string name="server_checker_error_message">Server scheint nicht verfügbar zu sein:</string>
-    <string name="server_checker_info_dialog_title">OpenTripPlanner Server Informationen</string>
+    <!--<string name="metadata_request_successful">Transit service downloaded</string>-->
+    <!--<string name="metadata_request_progress">Finding transit service. Please wait&#8230;</string>-->
+    <!--<string name="geocoding_request_progress">Finding points-of-interest. Please wait&#8230;</string>-->
+    <!--<string name="server_checker_progress">Getting region info. Please wait&#8230;</string>-->
+    <!--<string name="server_checker_successful">OK: Region is working</string>-->
+    <!--<string name="server_checker_error_message">Unable to contact region:</string>-->
+    <!--<string name="server_checker_info_dialog_title">OpenTripPlanner Region</string>-->
     <string name="server_checker_info_dialog_region">Region:</string>
     <string name="server_checker_info_dialog_language">Sprache:</string>
     <string name="server_checker_info_dialog_contact">Kontakt:</string>
     <string name="server_checker_info_dialog_url">URL:</string>
     <string name="server_checker_info_dialog_bounds">Bereich:</string>
-    <string name="server_checker_info_dialog_reachable">Server funktioniert:</string>
-    <string name="server_selector_progress">Suche besten Server. Bitte warten&#8230;</string>
-    <string name="server_selector_detected">Server gefunden</string>
-    <string name="server_selector_server_change_info">Diese Informationen können unter \'Einstellung\' verändert werden.</string>
-    <string name="server_selector_server_info_dialog_title">Wählen sie den OpenTripPlanner Server</string>
-    <string name="server_selector_custom_server_alert_title">Geben sie die Internet-Adresse eines OTP Servers ein</string>
-    <string name="custom_server_name">Eigener Server</string>
-    <string name="custom_server_not_set">"Der Server wurde nicht gefunden: URL scheint falsch zu sein"</string>
+    <!--<string name="server_checker_info_dialog_reachable">Online:</string>-->
+    <!--<string name="server_selector_progress">Finding transit service. Please wait&#8230;</string>-->
+    <!--<string name="server_selector_detected">Found</string>-->
+    <!--<string name="server_selector_server_change_info">Change in Settings</string>-->
+    <!--<string name="server_selector_server_info_dialog_title">Choose Region</string>-->
+    <!--<string name="server_selector_custom_server_alert_title">Enter a custom OTP region URL</string>-->
+    <!--<string name="custom_server_name">Custom region</string>-->
+    <!--<string name="custom_server_not_set">Bad URL for custom region</string>-->
     <string name="custom_server_unknown_region">Unbekannt</string>
     <string name="custom_server_unknown_bounds">Unbekannt</string>
     <string name="custom_server_unknown_language">Unbekannt</string>
@@ -88,7 +88,7 @@
     <string name="feedback">Kontakt</string>
     <string name="feedback_send_email">Email senden</string>
     <string name="feedback_subject">Nachricht an OTP Android Entwickler</string>
-    <string name="server_info">Server Informationen</string>
+    <!--<string name="server_info">Region info</string>-->
     <string name="start_marker_title">Start</string>
     <string name="start_marker_activated">Startort</string>
     <string name="start_marker_description">Gedrückt halten zum verschieben&#8230;</string>
@@ -96,34 +96,39 @@
     <string name="end_marker_activated">Zielort</string>
     <string name="end_marker_description">Gedrückt halten zum verschieben&#8230;</string>
     <string name="marker_out_of_boundaries">Gewählter Ort ist ausserhalb der Graph-Grenzen. Wählen sie erneut.</string>
-    <string name="markers_dialog_title">Wählen sie die Ortsart</string>
+    <!--<string name="markers_dialog_title">Choose location</string>-->
     <string name="choose_geocoder">Wählen sie die Adressen-Erkennung</string>
     <string name="wheelchair_accessible">Rollstuhl-freundlich</string>
-    <string name="wheelchair_accessibility_description">Berechnet eine Strecke die für Rollstuhlfahrer geeignet sein sollte</string>
+    <!--<string name="wheelchair_accessibility_description">Find wheelchair-friendly routes</string> IS BETTER TO USE A SIMILAR BUT DIFFERENT WORD FOR ACCESSIBLE, LIKE FRIENDLY, TO DON'T REPEAT IN THE SUMMARY-->
     <string name="maximum_walk">Maximale Strecke zu Fuss</string>
     <string name="maximum_walk_description">Meter</string>
-    <string name="routing_options">Strecken-Einstellungen</string>
-    <string name="map_options">Karten-Einstellungen</string>
+    <!--<string name="routing_options">Routing options</string> OPTION WORD WAS REDUNDANT-->
+    <!--<string name="map_options">Map options</string> OPTION WORD WAS REDUNDANT-->
     <string name="map_tile_provider">Kartenanbieter</string>
-    <string name="custom_server_url">Eigene Server URL</string>
-    <string name="custom_server_url_description">Angegebener Server wurde erfolgreich eingestellt</string>
+    <!--<string name="custom_server_url">Custom region URL</string>-->
+    <!--<string name="custom_server_url_description">Current OTP region is online</string>-->
     <string name="custom_server_url_error">Server-Adresse scheint ungültig zu sein</string>
     <string name="custom_server_error">Bitte versuchen sie es mit einer anderen Server-Adresse (URL)</string>
-    <string name="auto_detect_server">Automatische Server-Auswahl</string>
-    <string name="auto_detect_server_description">Wählt einen Server basierend auf dem jetzigen Aufenthaltsort</string>
-    <string name="geocoder_results_title">Ergebnisse der Ortssuche</string>
+    <!--<string name="auto_detect_server">Automatic region</string>-->
+    <!--<string name="auto_detect_server_description">Sets your current transit region based on your current location</string>-->
+    <!--<string name="use_device_timezone">Use device timezone</string>-->
+    <!--<string name="use_device_timezone_description">Ignores the timezone of the selected region</string>-->
+    <!--<string name="geocoder_results_title">Search Results</string>-->
     <string name="geocoder_no_results_message">Es wurde keine Ort für diese Adresse gefunden.</string>
+    <!--<string name="tripplanner_progress">Planning trip. Please wait&#8230;</string>-->
+    <!--<string name="tripplanner_results_title">Planning Results</string>-->
     <!-- <string name="advanced">Advanced</string> -->
-    <string name="tripplanner_progress">"Planung der Route. Bitte Warten&#8230;"</string>
-    <string name="tripplanner_results_title">Ergebnisse der Routensuche</string>
+
+    <!-- Trip Plan Error Messages -->
     <string name="tripplanner_no_results_message">Fehler bei der Routenplanung</string>
+    <!--<string name="tripplanner_error_not_defined">Sorry, something went wrong.  Please try again.</string>-->
     <string name="tripplanner_error_dialog_title">Es wurde keine Route gefunden.</string>
-    <string name="tripplanner_error_request_timeout">Keine Antwort vom Server - Bitte versuchen sie es später erneut.</string>
-    <string name="tripplanner_error_system">Der Server is nicht ansprechbar. Bitte versuchen sie es später erneut.</string>
-    <string name="tripplanner_error_outside_bounds">Für den Startort oder den Zielort liegen keine Strassendaten vor.</string>
-    <string name="tripplanner_error_path_not_found">Es wurde keine Route gefunden, die den gewählten Einstellungen entspricht.</string>
-    <string name="tripplanner_error_no_transit_times">Für den gewählten Zeitpunkt liegen keine Fahrplandaten vor.</string>
-    <string name="tripplanner_error_bogus_parameter">Falsche Eingabewerte. Bitte ändern sie die Routen-Einstellungen.</string>
+    <!--<string name="tripplanner_error_request_timeout">Region is not responding, please try again later</string>-->
+    <!--<string name="tripplanner_error_system">Region is offline, please try again later</string>-->
+    <!--<string name="tripplanner_error_outside_bounds">Origin or destination are outside region limits</string>-->
+    <!--<string name="tripplanner_error_path_not_found">Couldn\'t find a matching route between origin and destination</string>-->
+    <!--<string name="tripplanner_error_no_transit_times">Transit times for selected date are not available</string>-->
+    <!--<string name="tripplanner_error_bogus_parameter">Something went wrong.  Change your trip options and try again.</string>-->
     <string name="tripplanner_error_geocode_from_not_found">Startort wurde nicht gefunden.</string>
     <string name="tripplanner_error_geocode_to_not_found">Zielort wurde nicht gefunden</string>
     <string name="tripplanner_error_geocode_from_to_not_found">Start- und Zielort wurden nicht gefunden</string>
@@ -132,7 +137,9 @@
     <string name="tripplanner_error_geocode_from_ambiguous">Es wurden mehrere Startpunkte gefunden.</string>
     <string name="tripplanner_error_geocode_to_ambiguous">Es wurden mehrere Zielpunkte gefunden.</string>
     <string name="tripplanner_error_geocode_from_to_ambiguous">Start- und Zielpunkte können nicht eindeutig ermittelt werden.</string>
-    <string name="tripplanner_error_triangle">Die Einstellung für die Fahrradroute werden vom System nicht akzeptiert. Bitte ändern sie die Einstellung und versuchen sie es erneut.</string>
+    <!--<string name="tripplanner_error_triangle">Something went wrong.  Change your bike options and try again</string>-->
+
+    <!-- Time and mode -->
     <string name="date_time_title">Datum und Uhrzeit einstellen</string>
     <string name="date_time_spinner_arrive">Ankunft:</string>
     <string name="date_time_spinner_depart">Abfahrt:</string>
@@ -159,35 +166,47 @@
     <string name="distance_kilometers">km</string>
     <string name="distance_meters">m</string>
     <string name="connector_time_full">Dauer</string>
+
     <!-- <string name="location_preference_category_title">Location</string> -->
     <!-- <string name="location_advanced_preference_category_summary">Set your own region using a URL</string> -->
-    <string name="refresh_server_list">Server-Liste aktualisieren</string>
-    <string name="server_list_download_date_description">Server-Liste geladen am </string>
-    <string name="server_list_download_date_unknown">Datum der letzten Server-Liste ist unbekannt.</string>
+    <!--<string name="refresh_server_list">Refresh region list</string>-->
+    <!--<string name="refresh_server_list_error">Couldn\'t get region list</string>-->
+    <!--<string name="server_list_download_date_description">Last Updated</string>-->
+    <!--<string name="server_list_download_date_unknown">Last Update Unknown</string>-->
     <string name="alternative_routes">Wählen Sie eine Route</string>
+
+    <!-- Points of Interest and Address Search -->
     <!-- <string name="geocoder_preference_category_title">Address &amp; Point-of-Interest Search</string> -->
-    <string name="geocoder_preference_provider_title">Adress-Anbieter</string>
+    <!--<string name="geocoder_advanced_preference_category_summary">Modify geocoder default behavior</string>-->
+    <!--<string name="geocoder_preference_provider_title">Search provider</string>-->
     <string name="geocoder_preference_provider_nominatim">MapQuest Nominatim</string>
     <string name="geocoder_preference_provider_google_places">Google Places</string>
-    <string name="use_android_geocoder_title">Android Adressen</string>
-    <string name="use_android_geocoder_description">Ortssuche zuerst mittels Android Adresssuche</string>
+    <!--<string name="use_android_geocoder_title">Prefer Android geocoder</string>-->
+    <!--<string name="use_android_geocoder_description">Try Android geocoder first for all searches</string>-->
     <string name="use_intelligent_markers_title">Intelligente Ortsmarke</string>
-    <string name="use_intelligent_markers_description">Bewegen sie die Ortsmarke zum nächsten bekannten Ort</string>
-    <string name="error_no_server_selected">Es wurde kein Server gewählt</string>
-    <string name="info_server_error">Achtung: Server Informationen wurden nicht erhalten!</string>
-    <string name="selected_custom_server_title">Eigener Server</string>
-    <string name="selected_custom_server_description">Geben sie die Adresse eines OTP Servers ein</string>
-    <string name="server_down">Achtung: Server reagiert nicht!</string>
-    <string name="origin_destination_are_mylocation">"Routenplanung kann nicht erfolgen da Start- und Zielort gleich sind"</string>
-    <string name="play_services_error_title">Interner Fehler von "Play Services"</string>
-    <string name="play_services_error">Google Play Server nicht erreichbar: möglicherweise funktioniert die Anwendung nicht</string>
-    <string name="location_error">Momentaner Aufenthaltsort ist nicht bestimmbar</string>
+    <!--<string name="use_intelligent_markers_description">Move markers to the closer address or Point-Of-Interest</string>-->
+
+    <!-- Custom regions -->
+    <!--<string name="error_no_server_selected">No region selected</string>-->
+    <!--<string name="info_server_error">Attention: Cannot obtain region info!</string>-->
+    <!--<string name="selected_custom_server_title">Custom region</string>-->
+    <!--<string name="selected_custom_server_description">Set the region using a custom URL</string>-->
+    <!--<string name="server_down">Can\'t contact regional server!</string>-->
+
+    <!--<string name="origin_destination_are_mylocation">Can\'t plan: origin and destination are the same"</string>-->
+    <!--<string name="play_services_error_title">Google Play Services error</string>-->
+    <!--<string name="play_services_error">Can\'t contact Google: the app may not work</string>-->
+    <string name="current_location_error">Momentaner Aufenthaltsort ist nicht bestimmbar</string>
+
+    <!-- Trip options -->
     <string name="header_optimization">Art der Route</string>
     <string name="header_travel_mode">Fortbewegungsart</string>
     <string name="header_bike_options">Fahrrad-Einstellungen</string>
     <string name="header_bike_options_quick">Schnell</string>
     <string name="header_bike_options_flat">Flach</string>
     <string name="header_bike_options_bike_friendly">Fahrrad-Freundlich</string>
+
+    <!-- Directions -->
     <string name="dir_relative_circle_clockwise">Kreis in Uhrzeigerrichtung</string>
     <string name="dir_relative_circle_counterclockwise">Kreis entgegen der Uhrzeigerrichtung</string>
     <string name="dir_relative_continue">Weiter</string>
