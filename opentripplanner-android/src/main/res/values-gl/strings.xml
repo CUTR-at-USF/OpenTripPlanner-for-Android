@@ -178,7 +178,7 @@
     <!-- Points of Interest and Address Search -->
     <string name="geocoder_preference_category_title">Direccións e puntos de interés</string>
     <string name="geocoder_advanced_preference_category_summary">Modificar comportamento por defecto do xeocodificador</string>
-    <string name="geocoder_preference_provider_title">Provedor de direccións</string>
+    <string name="geocoder_preference_provider_title">Provedor de búsqueda</string>
     <string name="geocoder_preference_provider_nominatim">Mapquest Nominatim</string>
     <string name="geocoder_preference_provider_google_places">Google Places</string>
     <string name="use_android_geocoder_title">Preferir xeocodificador de Android</string>
