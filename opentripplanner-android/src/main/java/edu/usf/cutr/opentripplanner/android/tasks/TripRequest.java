@@ -155,7 +155,6 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
                         .getString(R.string.tripplanner_error_dialog_title));
                 feedback.setNeutralButton(context.getResources().getString(android.R.string.ok),
                         null);
-                feedback.create().show();
                 String msg = context.getResources()
                         .getString(R.string.tripplanner_error_not_defined);
 
@@ -174,6 +173,7 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
                     }
                 }
                 feedback.setMessage(msg);
+                feedback.create().show();
             }
 
             Log.e(OTPApp.TAG, "No route to display!");
