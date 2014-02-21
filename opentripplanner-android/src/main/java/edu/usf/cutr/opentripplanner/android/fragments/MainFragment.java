@@ -2375,7 +2375,7 @@ public class MainFragment extends Fragment implements
                     Log.w(OTPApp.TAG,
                             "Tried to get server info when no server was selected");
                     Toast.makeText(mApplicationContext, mApplicationContext.getResources()
-                            .getString(R.string.info_server_no_server_selected), Toast.LENGTH_SHORT)
+                            .getString(R.string.error_no_server_selected), Toast.LENGTH_SHORT)
                             .show();
                     break;
                 }
