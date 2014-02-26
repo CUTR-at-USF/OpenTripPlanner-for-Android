@@ -31,8 +31,8 @@
     <string name="step_by_step_transit_get_off">Saia do</string>
     <string name="step_by_step_transit_connector_stop_name">Paragem</string>
     <string name="step_by_step_transit_stops_in_between">Paragens até ao destino</string>
-    <string name="need_to_place_marker">"Adicione um marcador de posição&#8230;"</string>o
-    <string name="need_to_place_markers_before_planning">"É necessário definir os pontos de origem e de destino primeiro"</string>
+    <string name="need_to_place_marker">Adicione um marcador de posição&#8230;</string>
+    <string name="need_to_place_markers_before_planning">É necessário definir os pontos de origem e de destino primeiro</string>
     <string name="start_location_hint">Local de origem</string>
     <string name="end_location_hint">Local de destino</string>
     <string name="textbox_close_to_marker">Marcador perto de</string>
@@ -184,7 +184,7 @@
     <string name="use_android_geocoder_title">Preferir o geocoder Android</string>
     <string name="use_android_geocoder_description">Experimentar o geocoder Android primeiro para todas as pesquisas</string>
     <string name="use_intelligent_markers_title">Marcadores inteligentes</string>
-    <string name="use_intelligent_markers_description">Mover os marcadores para uma morada mais próxima ou para um Ponto de Interesse</string>-->
+    <string name="use_intelligent_markers_description">Mover os marcadores para uma morada mais próxima ou para um Ponto de Interesse</string>
 
     <!-- Custom regions -->
     <string name="error_no_server_selected">Nenhuma região seleccionada</string>
