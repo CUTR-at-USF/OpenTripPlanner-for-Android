@@ -396,7 +396,9 @@ public class DirectionsGenerator {
 
         offDirectionText +=
                 applicationContext.getResources().getString(R.string.step_by_step_transit_get_off)
-                        + " " + serviceName + " " + mode + " " + route + "\n";
+                        + " " + serviceName + " " + mode + " " + route + ConversionUtils
+                        .getTimeWithContext(applicationContext, leg.getAgencyTimeZoneOffset(),
+                                Long.parseLong(leg.getEndTime()), true) + "\n";
         offDirectionText += applicationContext.getResources()
                 .getString(R.string.step_by_step_transit_connector_stop_name) + " " + to.name + " ("
                 + agencyAndIdTo.getAgencyId() + " " + agencyAndIdTo.getId() + ")";
