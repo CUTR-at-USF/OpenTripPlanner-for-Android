@@ -268,9 +268,10 @@ public class DirectionListFragment extends ExpandableListFragment {
 
         if (!actualItinerary.legs.isEmpty()) {
             Leg firstLeg = actualItinerary.legs.get(0);
+            Leg lastLeg = actualItinerary.legs.get((actualItinerary.legs.size() - 1));
             int agencyTimeZoneOffset = firstLeg.getAgencyTimeZoneOffset();
             long startTimeInSeconds = Long.parseLong(firstLeg.getStartTime());
-            long endTimeInSeconds = Long.parseLong(firstLeg.getEndTime());
+            long endTimeInSeconds = Long.parseLong(lastLeg.getEndTime());
 
             departureTimeHeader.setText(ConversionUtils
                     .getTimeWithContext(getActivity().getApplicationContext(), agencyTimeZoneOffset,
