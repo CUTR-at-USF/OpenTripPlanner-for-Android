@@ -125,7 +125,7 @@
     <string name="tripplanner_error_dialog_title">No se ha podido planear el viaje.</string>
     <string name="tripplanner_error_request_timeout">Esta región no responde, por favor intentelo de nuevo más tarde</string>
     <string name="tripplanner_error_system">Esta región no está funcionando, por favor intentalo de nuevo más tarde</string>
-    <string name="tripplanner_error_outside_bounds">Origen o destino se encuentran fuera de los límites do servidor</string>
+    <string name="tripplanner_error_outside_bounds">Origen o destino están fuera del área cubierta por la red de transportes</string>
     <string name="tripplanner_error_path_not_found">No se pudo encontrar ninguna ruta adecuada entre origen y destino</string>
     <string name="tripplanner_error_no_transit_times">Los horarios para la fecha escogida no están disponibles</string>
     <string name="tripplanner_error_bogus_parameter">Algo ha ido mal. Cambia las opciones de viaje e intentalo de nuevo.</string>
