@@ -200,7 +200,7 @@
 
     <!-- Trip options -->
     <string name="header_optimization">Einstellungen zur Verbidungssuche</string>
-    <string name="header_travel_mode"Verkehrsmittel</string>
+    <string name="header_travel_mode">Verkehrsmittel</string>
     <string name="header_bike_options">Fahrrad-Einstellungen</string>
     <string name="header_bike_options_quick">Schnell</string>
     <string name="header_bike_options_flat">Flach</string>
