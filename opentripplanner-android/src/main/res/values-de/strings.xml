@@ -125,7 +125,7 @@
     <string name="tripplanner_error_dialog_title">Verbindungssuche ohne Ergebnis.</string>
     <string name="tripplanner_error_request_timeout">Regionalserver antwortet nicht. Bitte versuchen Sie es später erneut.</string>
     <string name="tripplanner_error_system">Regionalserver nicht erreichbar. Bitte versuchen Sie es später erneut.</string>
-    <string name="tripplanner_error_outside_bounds">Start- oder Zielort sind ausserhalb der Region.</string>
+    <!--<string name="tripplanner_error_outside_bounds">Origin or destination is outside transportation network coverage</string>-->
     <string name="tripplanner_error_path_not_found">Es wurde keine Verkerhsverbindung gefunden.</string>
     <string name="tripplanner_error_no_transit_times">Für das gewählte Datum liegen keine Fahrplandaten vor.</string>
     <string name="tripplanner_error_bogus_parameter">Es ist ein Fehler aufgetreten. Ändern sie die Sucheinstellungen und versuchen sie es erneut.</string>
