@@ -27,6 +27,7 @@
     <string name="step_by_step_from">da</string>
     <string name="step_by_step_to">a</string>
     <string name="step_by_step_connector_street_name">su</string>
+    <!--<string name="step_by_step_connector_street_name_roundabout">to</string>-->
     <string name="step_by_step_transit_get_on">Sali su</string>
     <string name="step_by_step_transit_get_off">Scendi da</string>
     <string name="step_by_step_transit_connector_stop_name">A</string>
@@ -207,19 +208,19 @@
     <string name="header_bike_options_bike_friendly">Fattibile in bicicletta</string>
 
     <!-- Directions -->
-    <string name="dir_relative_circle_clockwise">in senso orario</string>
-    <string name="dir_relative_circle_counterclockwise">in senso antiorario</string>
-    <string name="dir_relative_continue">continua</string>
-    <string name="dir_relative_depart">parti</string>
-    <string name="dir_relative_elevator">ascensore</string>
-    <string name="dir_relative_hard_left">svolta a sinistra repentina</string>
-    <string name="dir_relative_hard_right">svolta a destra repentina</string>
-    <string name="dir_relative_left">svolta a sinistra</string>
-    <string name="dir_relative_right">svolta a destra</string>
+    <!--<string name="dir_relative_circle_clockwise">At the roundabout take the</string>-->
+    <!--<string name="dir_relative_circle_counterclockwise">At the roundabout take the</string>-->
+    <string name="dir_relative_continue">Continua</string>
+    <string name="dir_relative_depart">Parti</string>
+    <!--<string name="dir_relative_elevator">Take elevator</string>-->
+    <string name="dir_relative_hard_left">Gira a sinistra repentina</string>
+    <string name="dir_relative_hard_right">Gira a destra repentina</string>
+    <string name="dir_relative_left">a sinistra</string>
+    <string name="dir_relative_right">a destra</string>
     <string name="dir_relative_slightly_left">leggermente a sinistra</string>
     <string name="dir_relative_slightly_right">leggermente a destra</string>
-    <string name="dir_relative_uturn_left">torna indietro a sinistra</string>
-    <string name="dir_relative_uturn_right">torna indietro a destra</string>
+    <!--<string name="dir_relative_uturn_left">Make uturn to the left</string>-->
+    <!--<string name="dir_relative_uturn_right">Make uturn to the right</string>-->
     <string name="dir_absolute_east">est</string>
     <string name="dir_absolute_north">nord</string>
     <string name="dir_absolute_northeast">nord-est</string>
@@ -246,4 +247,22 @@
     <string name="street_type_track">carreggiata</string>
     <string name="street_type_sidewalk">marciapiede</string>
     <string name="street_type_steps">scalino</string>
+
+    <!--&lt;!&ndash; Ordinals &ndash;&gt;-->
+    <!--<string name="roundabout_ordinal_first">first</string>-->
+    <!--<string name="roundabout_ordinal_second">second</string>-->
+    <!--<string name="roundabout_ordinal_third">third</string>-->
+    <!--<string name="roundabout_ordinal_fourth">fourth</string>-->
+    <!--<string name="roundabout_ordinal_fifth">fifth</string>-->
+    <!--<string name="roundabout_ordinal_sixth">sixth</string>-->
+    <!--<string name="roundabout_ordinal_seventh">seventh</string>-->
+    <!--<string name="roundabout_ordinal_eighth">eighth</string>-->
+    <!--<string name="roundabout_ordinal_ninth">ninth</string>-->
+    <!--<string name="roundabout_ordinal_tenth">tenth</string>-->
+
+    <!-- To complement the roundabout_number for a bigger ordinal -->
+    <!--<string name="roundabout_number">roundabout_number</string>-->
+
+    <!-- After the ordinal -->
+    <!--<string name="roundabout_exit">exit</string>-->
 </resources>

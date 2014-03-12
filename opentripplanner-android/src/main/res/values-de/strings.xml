@@ -27,6 +27,7 @@
     <string name="step_by_step_from">von</string>
     <string name="step_by_step_to">nach</string>
     <string name="step_by_step_connector_street_name">auf</string>
+    <!--<string name="step_by_step_connector_street_name_roundabout">to</string>-->
     <string name="step_by_step_transit_get_on">Einstieg</string>
     <string name="step_by_step_transit_get_off">Ausstieg</string>
     <string name="step_by_step_transit_connector_stop_name">an Haltestelle</string>
@@ -207,19 +208,19 @@
     <string name="header_bike_options_bike_friendly">Fahrrad-Freundlich</string>
 
     <!-- Directions -->
-    <string name="dir_relative_circle_clockwise">Kreis in Uhrzeigerrichtung</string>
-    <string name="dir_relative_circle_counterclockwise">Kreis entgegen der Uhrzeigerrichtung</string>
+    <!--<string name="dir_relative_circle_clockwise">At the roundabout take the</string>-->
+    <!--<string name="dir_relative_circle_counterclockwise">At the roundabout take the</string>-->
     <string name="dir_relative_continue">Weiter</string>
     <string name="dir_relative_depart">Abfahrt</string>
-    <string name="dir_relative_elevator">Aufzug</string>
+    <!--<string name="dir_relative_elevator">Take elevator</string>-->
     <string name="dir_relative_hard_left">Stark nach Links</string>
     <string name="dir_relative_hard_right">Stark nach Rechts</string>
-    <string name="dir_relative_left">Links</string>
-    <string name="dir_relative_right">Rechts</string>
-    <string name="dir_relative_slightly_left">Leicht Links</string>
-    <string name="dir_relative_slightly_right">Leicht Rechts</string>
-    <string name="dir_relative_uturn_left">Links Wenden</string>
-    <string name="dir_relative_uturn_right">Rechts Wenden</string>
+    <string name="dir_relative_left">links</string>
+    <string name="dir_relative_right">rechts</string>
+    <string name="dir_relative_slightly_left">leicht Links</string>
+    <string name="dir_relative_slightly_right">leicht Rechts</string>
+    <!--<string name="dir_relative_uturn_left">Make uturn to the left</string>-->
+    <!--<string name="dir_relative_uturn_right">Make uturn to the right</string>-->
     <string name="dir_absolute_east">Osten</string>
     <string name="dir_absolute_north">Norden</string>
     <string name="dir_absolute_northeast">Nordosten</string>
@@ -246,4 +247,22 @@
     <string name="street_type_track">Weg</string>
     <string name="street_type_sidewalk">Gehsteig</string>
     <string name="street_type_steps">Treppe</string>
+
+    <!--&lt;!&ndash; Ordinals &ndash;&gt;-->
+    <!--<string name="roundabout_ordinal_first">first</string>-->
+    <!--<string name="roundabout_ordinal_second">second</string>-->
+    <!--<string name="roundabout_ordinal_third">third</string>-->
+    <!--<string name="roundabout_ordinal_fourth">fourth</string>-->
+    <!--<string name="roundabout_ordinal_fifth">fifth</string>-->
+    <!--<string name="roundabout_ordinal_sixth">sixth</string>-->
+    <!--<string name="roundabout_ordinal_seventh">seventh</string>-->
+    <!--<string name="roundabout_ordinal_eighth">eighth</string>-->
+    <!--<string name="roundabout_ordinal_ninth">ninth</string>-->
+    <!--<string name="roundabout_ordinal_tenth">tenth</string>-->
+
+    <!-- To complement the roundabout_number for a bigger ordinal -->
+    <!--<string name="roundabout_number">roundabout_number</string>-->
+
+    <!-- After the ordinal -->
+    <!--<string name="roundabout_exit">exit</string>-->
 </resources>

@@ -124,9 +124,8 @@ public class DirectionsGenerator {
     private Direction generateNonTransitDirections(Leg leg) {
         Direction direction = new Direction();
 
-        //		http://opentripplanner.usf.edu/opentripplanner-api-webapp/ws/plan?optimize=QUICK&time=09:24pm&arriveBy=false&wheelchair=false&maxWalkDistance=7600.0&fromPlace=28.033389%2C+-82.521034&toPlace=28.064709%2C+-82.471618&date=03/07/12&mode=WALK,TRAM,SUBWAY,RAIL,BUS,FERRY,CABLE_CAR,GONDOLA,FUNICULAR,TRANSIT,TRAINISH,BUSISH
+        //http://opentripplanner.usf.edu/opentripplanner-api-webapp/ws/plan?optimize=QUICK&time=09:24pm&arriveBy=false&wheelchair=false&maxWalkDistance=7600.0&fromPlace=28.033389%2C+-82.521034&toPlace=28.064709%2C+-82.471618&date=03/07/12&mode=WALK,TRAM,SUBWAY,RAIL,BUS,FERRY,CABLE_CAR,GONDOLA,FUNICULAR,TRANSIT,TRAINISH,BUSISH
 
-        // Get appropriate action and icon
         // Get appropriate action and icon
         String action = applicationContext.getResources().getString(R.string.mode_walk_action);
         TraverseMode mode = TraverseMode.valueOf((String) leg.mode);
@@ -152,15 +151,13 @@ public class DirectionsGenerator {
                         + getLocalizedStreetName(toPlace.name, applicationContext.getResources());
         mainDirectionText += toPlace.stopId == null ? ""
                 : " (" + toPlace.stopId.getAgencyId() + " " + toPlace.stopId.getId() + ")";
-//		double duration = DateTimeConversion.getDuration(leg.startTime, leg.endTime);
         double totalDistance = leg.distance;
         mainDirectionText += "\n[" + ConversionUtils
                 .getFormattedDistance(totalDistance, applicationContext)
-                + " ]";// Double.toString(duration);
-
+                + " ]";
         direction.setDirectionText(mainDirectionText);
 
-        //		Sub-direction
+        //Sub-direction
         List<WalkStep> walkSteps = leg.getWalkSteps();
 
         if (walkSteps == null) {
@@ -174,8 +171,6 @@ public class DirectionsGenerator {
             String subDirectionText = "";
 
             double distance = step.distance;
-            // Distance traveled [distance]
-            //		distance = Double.valueOf(twoDForm.format(distance)); -->VREIXO
             dir.setDistanceTraveled(distance);
 
             RelativeDirection relativeDir = step.relativeDirection;
@@ -190,6 +185,8 @@ public class DirectionsGenerator {
             boolean isBogusName = (step.bogusName == null ? false : step.bogusName);
             double lon = step.lon;
             double lat = step.lat;
+            String streetConnector = applicationContext.getResources()
+                    .getString(R.string.step_by_step_connector_street_name);
             //Elevation[] elevation = step.getElevation();  //Removed elevation for now, since we're not doing anything with it and it causes version issues between OTP server APIs v0.9.1-SNAPSHOT and v0.9.2-SNAPSHOT
             List<Alerts> alert = step.alerts;
 
@@ -201,30 +198,44 @@ public class DirectionsGenerator {
             }
             // (Turn left)/(Continue)
             else {
-                if (!isStayOn) {
-                    RelativeDirection rDir = RelativeDirection.valueOf(relativeDir.name());
+                RelativeDirection rDir = RelativeDirection.valueOf(relativeDir.name());
 
-                    // Do not need TURN Continue
-                    if (rDir.compareTo(RelativeDirection.CONTINUE) != 0 &&
-                            rDir.compareTo(RelativeDirection.CIRCLE_CLOCKWISE) != 0 &&
-                            rDir.compareTo(RelativeDirection.CIRCLE_COUNTERCLOCKWISE) != 0) {
+                // Do not need TURN Continue
+                if (rDir.compareTo(RelativeDirection.RIGHT) == 0 ||
+                        rDir.compareTo(RelativeDirection.LEFT) == 0 ||
+                        rDir.compareTo(RelativeDirection.SLIGHTLY_LEFT) == 0 ||
+                        rDir.compareTo(RelativeDirection.SLIGHTLY_RIGHT) == 0) {
+                    subDirectionText += applicationContext.getResources()
+                            .getString(R.string.step_by_step_turn) + " ";
+                }
+
+                subDirectionText += relativeDirString + " ";
+
+                if (rDir.compareTo(RelativeDirection.CIRCLE_CLOCKWISE) == 0
+                        || rDir.compareTo(RelativeDirection.CIRCLE_COUNTERCLOCKWISE) == 0) {
+                    if (step.exit != null) {
+                        try {
+                            String ordinal = getOrdinal(Integer.parseInt(step.exit));
+                            if (ordinal != null) {
+                                subDirectionText += ordinal + " ";
+                            } else {
+                                subDirectionText += applicationContext.getResources()
+                                        .getString(R.string.roundabout_number) + " " + ordinal
+                                        + " ";
+                            }
+                        } catch (NumberFormatException e) {
+                            //If is not a roundabout_number and is not null is better to try to display it
+                            subDirectionText += step.exit + " ";
+                        }
                         subDirectionText += applicationContext.getResources()
-                                .getString(R.string.step_by_step_turn) + " ";
+                                .getString(R.string.roundabout_exit) + " ";
+                        streetConnector = applicationContext.getResources()
+                                .getString(R.string.step_by_step_connector_street_name_roundabout);
                     }
-
-                    subDirectionText += relativeDirString + " ";
-                } else {
-                    subDirectionText += relativeDirString + " ";
                 }
             }
 
-            // (on ABC)
-            //			if(!isBogusName) {
-            //				subDirectionText += "on "+ streetName + " ";
-            //			}
-
-            subDirectionText += applicationContext.getResources()
-                    .getString(R.string.step_by_step_connector_street_name) + " "
+            subDirectionText += streetConnector + " "
                     + getLocalizedStreetName(streetName, applicationContext.getResources()) + " ";
 
             subDirectionText += "\n[" + ConversionUtils
@@ -241,6 +252,44 @@ public class DirectionsGenerator {
         direction.setSubDirections(subDirections);
 
         return direction;
+    }
+
+    private String getOrdinal(int number) {
+        switch (number) {
+            case 1:
+                return applicationContext.getResources()
+                        .getString(R.string.roundabout_ordinal_first);
+            case 2:
+                return applicationContext.getResources()
+                        .getString(R.string.roundabout_ordinal_second);
+            case 3:
+                return applicationContext.getResources()
+                        .getString(R.string.roundabout_ordinal_third);
+            case 4:
+                return applicationContext.getResources()
+                        .getString(R.string.roundabout_ordinal_fourth);
+            case 5:
+                return applicationContext.getResources()
+                        .getString(R.string.roundabout_ordinal_fifth);
+            case 6:
+                return applicationContext.getResources()
+                        .getString(R.string.roundabout_ordinal_sixth);
+            case 7:
+                return applicationContext.getResources()
+                        .getString(R.string.roundabout_ordinal_seventh);
+            case 8:
+                return applicationContext.getResources()
+                        .getString(R.string.roundabout_ordinal_eighth);
+            case 9:
+                return applicationContext.getResources()
+                        .getString(R.string.roundabout_ordinal_ninth);
+            case 10:
+                return applicationContext.getResources()
+                        .getString(R.string.roundabout_ordinal_tenth);
+            default:
+                return null;
+        }
+
     }
 
     // Dirty fix to avoid the presence of names for unnamed streets (as road, track, etc.) for other languages than English
