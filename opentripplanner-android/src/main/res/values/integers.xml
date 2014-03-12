@@ -9,4 +9,5 @@
     <integer name="tiles_maquest_max_zoom">18</integer>
     <integer name="tiles_mapnik_max_zoom">19</integer>
     <integer name="tiles_cyclemap_max_zoom">18</integer>
+    <integer name="tiles_lyrk_max_zoom">18</integer>
 </resources>

@@ -109,6 +109,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
         entriesValues.add(OTPApp.MAP_TILE_GOOGLE_SATELLITE);
         entriesValues.add(OTPApp.MAP_TILE_GOOGLE_HYBRID);
         entriesValues.add(OTPApp.MAP_TILE_GOOGLE_TERRAIN);
+        entriesValues.add(OTPApp.MAP_TILE_GOOGLE_TERRAIN);
         mapTileProvider
                 .setEntryValues(entriesValues.toArray(new CharSequence[entriesValues.size()]));
         if (mapTileProvider.getValue() == null) {
@@ -165,6 +166,9 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
         } else if (actualMapTileProvider
                 .equals(getResources().getString(R.string.tiles_cyclemap))) {
             mapTileProvider.setSummary(getResources().getString(R.string.cyclemap));
+        } else if (actualMapTileProvider
+                .equals(getResources().getString(R.string.tiles_lyrk))) {
+            mapTileProvider.setSummary(getResources().getString(R.string.lyrk));
         } else if (actualMapTileProvider.equals(OTPApp.MAP_TILE_GOOGLE_NORMAL)) {
             mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_NORMAL);
         } else if (actualMapTileProvider.equals(OTPApp.MAP_TILE_GOOGLE_HYBRID)) {
@@ -190,6 +194,8 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
                     mapTileProvider.setSummary(getResources().getString(R.string.maquest));
                 } else if (value.equals(getResources().getString(R.string.tiles_cyclemap))) {
                     mapTileProvider.setSummary(getResources().getString(R.string.cyclemap));
+                } else if (value.equals(getResources().getString(R.string.tiles_lyrk))) {
+                    mapTileProvider.setSummary(getResources().getString(R.string.lyrk));
                 } else if (value.equals(OTPApp.MAP_TILE_GOOGLE_NORMAL)) {
                     mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_NORMAL);
                 } else if (value.equals(OTPApp.MAP_TILE_GOOGLE_HYBRID)) {
