@@ -215,7 +215,8 @@ public class DirectionsGenerator {
                         || rDir.compareTo(RelativeDirection.CIRCLE_COUNTERCLOCKWISE) == 0) {
                     if (step.exit != null) {
                         try {
-                            String ordinal = getOrdinal(Integer.parseInt(step.exit));
+                            String ordinal = getOrdinal(Integer.parseInt(step.exit),
+                                    applicationContext.getResources());
                             if (ordinal != null) {
                                 subDirectionText += ordinal + " ";
                             } else {
@@ -254,38 +255,28 @@ public class DirectionsGenerator {
         return direction;
     }
 
-    private String getOrdinal(int number) {
+    private static String getOrdinal(int number, Resources resources) {
         switch (number) {
             case 1:
-                return applicationContext.getResources()
-                        .getString(R.string.roundabout_ordinal_first);
+                return resources.getString(R.string.roundabout_ordinal_first);
             case 2:
-                return applicationContext.getResources()
-                        .getString(R.string.roundabout_ordinal_second);
+                return resources.getString(R.string.roundabout_ordinal_second);
             case 3:
-                return applicationContext.getResources()
-                        .getString(R.string.roundabout_ordinal_third);
+                return resources.getString(R.string.roundabout_ordinal_third);
             case 4:
-                return applicationContext.getResources()
-                        .getString(R.string.roundabout_ordinal_fourth);
+                return resources.getString(R.string.roundabout_ordinal_fourth);
             case 5:
-                return applicationContext.getResources()
-                        .getString(R.string.roundabout_ordinal_fifth);
+                return resources.getString(R.string.roundabout_ordinal_fifth);
             case 6:
-                return applicationContext.getResources()
-                        .getString(R.string.roundabout_ordinal_sixth);
+                return resources.getString(R.string.roundabout_ordinal_sixth);
             case 7:
-                return applicationContext.getResources()
-                        .getString(R.string.roundabout_ordinal_seventh);
+                return resources.getString(R.string.roundabout_ordinal_seventh);
             case 8:
-                return applicationContext.getResources()
-                        .getString(R.string.roundabout_ordinal_eighth);
+                return resources.getString(R.string.roundabout_ordinal_eighth);
             case 9:
-                return applicationContext.getResources()
-                        .getString(R.string.roundabout_ordinal_ninth);
+                return resources.getString(R.string.roundabout_ordinal_ninth);
             case 10:
-                return applicationContext.getResources()
-                        .getString(R.string.roundabout_ordinal_tenth);
+                return resources.getString(R.string.roundabout_ordinal_tenth);
             default:
                 return null;
         }
