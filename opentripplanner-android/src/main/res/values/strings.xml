@@ -13,8 +13,11 @@
  License for the specific language governing permissions and limitations under
  the License.
 -->
-<resources>
-    <string name="yes">Yes</string>
+<resources
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:locale="en"
+        tools:ignore="MissingTranslation">
+<string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="step_by_step_title">Directions</string>
     <string name="step_by_step_header_from">From</string>
