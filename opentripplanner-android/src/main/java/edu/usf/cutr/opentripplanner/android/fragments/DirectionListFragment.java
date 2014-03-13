@@ -205,7 +205,8 @@ public class DirectionListFragment extends ExpandableListFragment {
 
                     DirectionExpandableListAdapter adapter = new DirectionExpandableListAdapter(
                             DirectionListFragment.this.getActivity(),
-                            R.layout.list_direction_item, direction_data);
+                            R.layout.list_direction_item, R.layout.list_subdirection_item,
+                            direction_data);
 
                     elv.setAdapter(adapter);
 
@@ -231,7 +232,7 @@ public class DirectionListFragment extends ExpandableListFragment {
 
         DirectionExpandableListAdapter adapter = new DirectionExpandableListAdapter(
                 this.getActivity(),
-                R.layout.list_direction_item, direction_data);
+                R.layout.list_direction_item, R.layout.list_subdirection_item, direction_data);
 
         elv.addHeaderView(header);
 
