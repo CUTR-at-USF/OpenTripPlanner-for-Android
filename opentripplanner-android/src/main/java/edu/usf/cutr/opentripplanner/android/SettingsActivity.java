@@ -109,7 +109,6 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
         entriesValues.add(OTPApp.MAP_TILE_GOOGLE_SATELLITE);
         entriesValues.add(OTPApp.MAP_TILE_GOOGLE_HYBRID);
         entriesValues.add(OTPApp.MAP_TILE_GOOGLE_TERRAIN);
-        entriesValues.add(OTPApp.MAP_TILE_GOOGLE_TERRAIN);
         mapTileProvider
                 .setEntryValues(entriesValues.toArray(new CharSequence[entriesValues.size()]));
         if (mapTileProvider.getValue() == null) {
@@ -261,7 +260,8 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 
                 Toast.makeText(SettingsActivity.this.getApplicationContext(),
                         SettingsActivity.this.getApplicationContext().getResources()
-                                .getString(R.string.custom_server_url_error), Toast.LENGTH_SHORT)
+                                .getString(R.string.custom_server_url_error), Toast.LENGTH_SHORT
+                )
                         .show();
 
                 customServerURL
@@ -355,7 +355,8 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
                     getResources().getString(R.string.server_list_download_date_description)
                             + ConversionUtils.getTimeWithContext(this.getApplicationContext(),
                             cal.getTimeZone().getOffset(cal.getTimeInMillis()),
-                            cal.getTimeInMillis(), true));
+                            cal.getTimeInMillis(), true)
+            );
         } else {
             serverRefreshButton.setSummary(
                     getResources().getString(R.string.server_list_download_date_unknown));
