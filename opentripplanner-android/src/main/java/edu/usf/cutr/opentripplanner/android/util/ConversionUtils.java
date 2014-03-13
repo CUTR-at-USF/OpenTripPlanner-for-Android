@@ -215,8 +215,12 @@ public class ConversionUtils {
         } else {
             if (ConversionUtils.isToday(cal)) {
                 return (timeFormat.format(cal.getTime()) + " " + noDeviceTimezoneNote);
+            } else if (ConversionUtils.isTomorrow(cal)) {
+                return (" " + timeFormat.format(cal.getTime()) + ", "
+                        + applicationContext.getResources().getString(R.string.next_day) + " "
+                        + noDeviceTimezoneNote);
             } else {
-                return (timeFormat.format(cal.getTime()) + " " + dateFormat.format(cal.getTime())
+                return (timeFormat.format(cal.getTime()) + ", " + dateFormat.format(cal.getTime())
                         + " " + noDeviceTimezoneNote);
             }
         }
