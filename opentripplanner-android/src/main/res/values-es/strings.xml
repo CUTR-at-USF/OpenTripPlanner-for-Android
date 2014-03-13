@@ -22,11 +22,12 @@
     <string name="step_by_step_header_to">A</string>
     <string name="step_by_step_header_departure">Sal.</string>
     <string name="step_by_step_header_arrival">LLeg.</string>
-    <string name="step_by_step_turn">Gire a la</string>
+    <string name="step_by_step_turn">Gira</string>
     <string name="step_by_step_heading">en dirección</string>
     <string name="step_by_step_from">de</string>
     <string name="step_by_step_to">a</string>
     <string name="step_by_step_connector_street_name">en</string>
+    <string name="step_by_step_connector_street_name_roundabout">hacia</string>
     <string name="step_by_step_transit_get_on">Sube al</string>
     <string name="step_by_step_transit_get_off">Baja del</string>
     <string name="step_by_step_transit_connector_stop_name">En</string>
@@ -207,19 +208,19 @@
     <string name="header_bike_options_bike_friendly">Bueno para bicis</string>
 
     <!-- Directions -->
-    <string name="dir_relative_circle_clockwise">gira en sentido horario</string>
-    <string name="dir_relative_circle_counterclockwise">gira en sentido antihorario</string>
-    <string name="dir_relative_continue">continúa</string>
-    <string name="dir_relative_depart">sal</string>
-    <string name="dir_relative_elevator">elevador</string>
-    <string name="dir_relative_hard_left">izquierda cerrada</string>
-    <string name="dir_relative_hard_right">derecha cerrada</string>
-    <string name="dir_relative_left">izquierda</string>
-    <string name="dir_relative_right">derecha</string>
-    <string name="dir_relative_slightly_left">lixeiramente a la izquierda</string>
-    <string name="dir_relative_slightly_right">lixeiramente a la derecha</string>
-    <string name="dir_relative_uturn_left">cambio de sentido a la izquierda</string>
-    <string name="dir_relative_uturn_right">cambio de sentido a la derecha</string>
+    <string name="dir_relative_circle_clockwise">En la rotonda toma la</string>
+    <string name="dir_relative_circle_counterclockwise">En la rotonda toma la</string>
+    <string name="dir_relative_continue">Continúa</string>
+    <string name="dir_relative_depart">Sal</string>
+    <string name="dir_relative_elevator">Coge el elevador</string>
+    <string name="dir_relative_hard_left">Giro cerrado a la izquierda</string>
+    <string name="dir_relative_hard_right">Giro cerrado a la derecha</string>
+    <string name="dir_relative_left">a la izquierda</string>
+    <string name="dir_relative_right">a la derecha</string>
+    <string name="dir_relative_slightly_left">ligeramente a la izquierda</string>
+    <string name="dir_relative_slightly_right">ligeramente a la derecha</string>
+    <string name="dir_relative_uturn_left">Haz un cambio de sentido hacia la izquierda</string>
+    <string name="dir_relative_uturn_right">Haz un cambio de sentido hacia la derecha</string>
     <string name="dir_absolute_east">este</string>
     <string name="dir_absolute_north">norte</string>
     <string name="dir_absolute_northeast">noreste</string>
@@ -246,4 +247,22 @@
     <string name="street_type_track">vía secundaria</string>
     <string name="street_type_sidewalk">acera</string>
     <string name="street_type_steps">escaleras</string>
+
+    <!-- Ordinals -->
+    <string name="roundabout_ordinal_first">primera</string>
+    <string name="roundabout_ordinal_second">segunda</string>
+    <string name="roundabout_ordinal_third">tercera</string>
+    <string name="roundabout_ordinal_fourth">cuarta</string>
+    <string name="roundabout_ordinal_fifth">quinta</string>
+    <string name="roundabout_ordinal_sixth">sexta</string>
+    <string name="roundabout_ordinal_seventh">séptima</string>
+    <string name="roundabout_ordinal_eighth">octava</string>
+    <string name="roundabout_ordinal_ninth">novena</string>
+    <string name="roundabout_ordinal_tenth">décima</string>
+
+    <!-- To complement the roundabout_number for a bigger ordinal -->
+    <string name="roundabout_number">número</string>
+
+    <!-- After the ordinal -->
+    <string name="roundabout_exit">salida</string>
 </resources>
