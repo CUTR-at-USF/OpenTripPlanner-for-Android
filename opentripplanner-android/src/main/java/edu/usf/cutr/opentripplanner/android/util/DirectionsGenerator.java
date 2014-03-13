@@ -167,6 +167,7 @@ public class DirectionsGenerator {
         ArrayList<Direction> subDirections = new ArrayList<Direction>(walkSteps.size());
 
         for (WalkStep step : walkSteps) {
+            int subdirection_icon = R.drawable.clear;
             Direction dir = new Direction();
             String subDirectionText = "";
 
@@ -199,6 +200,9 @@ public class DirectionsGenerator {
             // (Turn left)/(Continue)
             else {
                 RelativeDirection rDir = RelativeDirection.valueOf(relativeDir.name());
+
+                subdirection_icon = getRelativeDirectionIcon(rDir,
+                        applicationContext.getResources());
 
                 // Do not need TURN Continue
                 if (rDir.compareTo(RelativeDirection.RIGHT) == 0 ||
@@ -244,7 +248,7 @@ public class DirectionsGenerator {
 
             dir.setDirectionText(subDirectionText);
 
-            dir.setIcon(icon);
+            dir.setIcon(subdirection_icon);
 
             // Add new sub-direction
             subDirections.add(dir);
@@ -511,6 +515,38 @@ public class DirectionsGenerator {
             return R.drawable.mode_bike;
         } else {
             return R.drawable.icon;
+        }
+    }
+
+    public static int getRelativeDirectionIcon(RelativeDirection relDir, Resources resources) {
+        if (relDir.equals(RelativeDirection.CIRCLE_CLOCKWISE)) {
+            return R.drawable.circle_clockwise;
+        } else if (relDir.equals(RelativeDirection.CIRCLE_COUNTERCLOCKWISE)) {
+            return R.drawable.circle_counterclockwise;
+        } else if (relDir.equals(RelativeDirection.CONTINUE)) {
+            return R.drawable.reldir_continue;
+        } else if (relDir.equals(RelativeDirection.DEPART)) {
+            return R.drawable.clear;
+        } else if (relDir.equals(RelativeDirection.ELEVATOR)) {
+            return R.drawable.elevator;
+        } else if (relDir.equals(RelativeDirection.HARD_LEFT)) {
+            return R.drawable.hard_left;
+        } else if (relDir.equals(RelativeDirection.HARD_RIGHT)) {
+            return R.drawable.hard_right;
+        } else if (relDir.equals(RelativeDirection.LEFT)) {
+            return R.drawable.left;
+        } else if (relDir.equals(RelativeDirection.RIGHT)) {
+            return R.drawable.right;
+        } else if (relDir.equals(RelativeDirection.SLIGHTLY_LEFT)) {
+            return R.drawable.slightly_left;
+        } else if (relDir.equals(RelativeDirection.SLIGHTLY_RIGHT)) {
+            return R.drawable.slightly_right;
+        } else if (relDir.equals(RelativeDirection.UTURN_LEFT)) {
+            return R.drawable.uturn_left;
+        } else if (relDir.equals(RelativeDirection.UTURN_RIGHT)) {
+            return R.drawable.uturn_right;
+        } else {
+            return R.drawable.clear;
         }
     }
 
