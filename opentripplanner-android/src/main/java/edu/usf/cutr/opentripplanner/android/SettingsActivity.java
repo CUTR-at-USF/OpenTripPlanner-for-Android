@@ -165,6 +165,9 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
         } else if (actualMapTileProvider
                 .equals(getResources().getString(R.string.tiles_cyclemap))) {
             mapTileProvider.setSummary(getResources().getString(R.string.cyclemap));
+        } else if (actualMapTileProvider
+                .equals(getResources().getString(R.string.tiles_lyrk))) {
+            mapTileProvider.setSummary(getResources().getString(R.string.lyrk));
         } else if (actualMapTileProvider.equals(OTPApp.MAP_TILE_GOOGLE_NORMAL)) {
             mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_NORMAL);
         } else if (actualMapTileProvider.equals(OTPApp.MAP_TILE_GOOGLE_HYBRID)) {
@@ -190,6 +193,8 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
                     mapTileProvider.setSummary(getResources().getString(R.string.maquest));
                 } else if (value.equals(getResources().getString(R.string.tiles_cyclemap))) {
                     mapTileProvider.setSummary(getResources().getString(R.string.cyclemap));
+                } else if (value.equals(getResources().getString(R.string.tiles_lyrk))) {
+                    mapTileProvider.setSummary(getResources().getString(R.string.lyrk));
                 } else if (value.equals(OTPApp.MAP_TILE_GOOGLE_NORMAL)) {
                     mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_NORMAL);
                 } else if (value.equals(OTPApp.MAP_TILE_GOOGLE_HYBRID)) {
@@ -255,7 +260,8 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 
                 Toast.makeText(SettingsActivity.this.getApplicationContext(),
                         SettingsActivity.this.getApplicationContext().getResources()
-                                .getString(R.string.custom_server_url_error), Toast.LENGTH_SHORT)
+                                .getString(R.string.custom_server_url_error), Toast.LENGTH_SHORT
+                )
                         .show();
 
                 customServerURL
@@ -349,7 +355,8 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
                     getResources().getString(R.string.server_list_download_date_description)
                             + ConversionUtils.getTimeWithContext(this.getApplicationContext(),
                             cal.getTimeZone().getOffset(cal.getTimeInMillis()),
-                            cal.getTimeInMillis(), true));
+                            cal.getTimeInMillis(), true)
+            );
         } else {
             serverRefreshButton.setSummary(
                     getResources().getString(R.string.server_list_download_date_unknown));

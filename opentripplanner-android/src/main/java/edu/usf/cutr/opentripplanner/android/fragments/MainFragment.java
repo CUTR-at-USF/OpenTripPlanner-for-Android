@@ -3040,6 +3040,9 @@ public class MainFragment extends Fragment implements
      *                      Google ones
      */
     public void updateOverlay(String overlayString) {
+        int tile_width = OTPApp.CUSTOM_MAP_TILE_SMALL_WIDTH;
+        int tile_height = OTPApp.CUSTOM_MAP_TILE_SMALL_HEIGHT;
+
         if (overlayString == null) {
             overlayString = mPrefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE,
                     mApplicationContext.getResources()
@@ -3065,13 +3068,18 @@ public class MainFragment extends Fragment implements
         } else {
             if (overlayString.equals(getResources().getString(R.string.tiles_mapnik))) {
                 mMaxZoomLevel = getResources().getInteger(R.integer.tiles_mapnik_max_zoom);
+            } else if (overlayString.equals(getResources().getString(R.string.tiles_lyrk))) {
+                mMaxZoomLevel = getResources().getInteger(R.integer.tiles_lyrk_max_zoom);
+                tile_width = OTPApp.CUSTOM_MAP_TILE_BIG_WIDTH;
+                tile_height = OTPApp.CUSTOM_MAP_TILE_BIG_HEIGHT;
             } else {
                 mMaxZoomLevel = getResources().getInteger(R.integer.tiles_maquest_max_zoom);
             }
+
             mMap.setMapType(GoogleMap.MAP_TYPE_NONE);
             CustomUrlTileProvider mTileProvider = new CustomUrlTileProvider(
-                    OTPApp.CUSTOM_MAP_TILE_WIDTH,
-                    OTPApp.CUSTOM_MAP_TILE_HEIGHT, overlayString);
+                    tile_width,
+                    tile_height, overlayString);
             mSelectedTileOverlay = mMap.addTileOverlay(
                     new TileOverlayOptions().tileProvider(mTileProvider)
                             .zIndex(OTPApp.CUSTOM_MAP_TILE_Z_INDEX));

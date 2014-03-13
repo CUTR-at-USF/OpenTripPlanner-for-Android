@@ -59,9 +59,13 @@ public class OTPApp extends Application {
 
     public static final String MAP_TILE_GOOGLE_TERRAIN = "Google terrain";
 
-    public static final int CUSTOM_MAP_TILE_HEIGHT = 256;
+    public static final int CUSTOM_MAP_TILE_SMALL_HEIGHT = 256;
 
-    public static final int CUSTOM_MAP_TILE_WIDTH = 256;
+    public static final int CUSTOM_MAP_TILE_SMALL_WIDTH = 256;
+
+    public static final int CUSTOM_MAP_TILE_BIG_HEIGHT = 512;
+
+    public static final int CUSTOM_MAP_TILE_BIG_WIDTH = 512;
 
     public static final int CUSTOM_MAP_TILE_Z_INDEX = -1;
 
