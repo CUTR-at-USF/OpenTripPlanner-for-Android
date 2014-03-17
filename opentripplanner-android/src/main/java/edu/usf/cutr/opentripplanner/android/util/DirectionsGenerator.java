@@ -127,13 +127,13 @@ public class DirectionsGenerator {
         //http://opentripplanner.usf.edu/opentripplanner-api-webapp/ws/plan?optimize=QUICK&time=09:24pm&arriveBy=false&wheelchair=false&maxWalkDistance=7600.0&fromPlace=28.033389%2C+-82.521034&toPlace=28.064709%2C+-82.471618&date=03/07/12&mode=WALK,TRAM,SUBWAY,RAIL,BUS,FERRY,CABLE_CAR,GONDOLA,FUNICULAR,TRANSIT,TRAINISH,BUSISH
 
         // Get appropriate action and icon
-        String action = applicationContext.getResources().getString(R.string.mode_walk_action);
+        String action = applicationContext.getResources().getString(R.string.step_by_step_non_transit_mode_walk_action);
         TraverseMode mode = TraverseMode.valueOf((String) leg.mode);
         int icon = getModeIcon(new TraverseModeSet(mode));
         if (mode.compareTo(TraverseMode.BICYCLE) == 0) {
-            action = applicationContext.getResources().getString(R.string.mode_bicycle_action);
+            action = applicationContext.getResources().getString(R.string.step_by_step_non_transit_mode_bicycle_action);
         } else if (mode.compareTo(TraverseMode.CAR) == 0) {
-            action = applicationContext.getResources().getString(R.string.mode_car_action);
+            action = applicationContext.getResources().getString(R.string.step_by_step_non_transit_mode_car_action);
         }
 
         direction.setIcon(icon);
@@ -143,11 +143,11 @@ public class DirectionsGenerator {
         Place toPlace = leg.to;
         String mainDirectionText = action;
         mainDirectionText += fromPlace.name == null ? ""
-                : " " + applicationContext.getResources().getString(R.string.step_by_step_from)
+                : " " + applicationContext.getResources().getString(R.string.step_by_step_non_transit_from)
                         + " " + getLocalizedStreetName(fromPlace.name,
                         applicationContext.getResources());
         mainDirectionText += toPlace.name == null ? ""
-                : " " + applicationContext.getResources().getString(R.string.step_by_step_to) + " "
+                : " " + applicationContext.getResources().getString(R.string.step_by_step_non_transit_to) + " "
                         + getLocalizedStreetName(toPlace.name, applicationContext.getResources());
         mainDirectionText += toPlace.stopId == null ? ""
                 : " (" + toPlace.stopId.getAgencyId() + " " + toPlace.stopId.getId() + ")";
@@ -187,14 +187,14 @@ public class DirectionsGenerator {
             double lon = step.lon;
             double lat = step.lat;
             String streetConnector = applicationContext.getResources()
-                    .getString(R.string.step_by_step_connector_street_name);
+                    .getString(R.string.step_by_step_non_transit_connector_street_name);
             //Elevation[] elevation = step.getElevation();  //Removed elevation for now, since we're not doing anything with it and it causes version issues between OTP server APIs v0.9.1-SNAPSHOT and v0.9.2-SNAPSHOT
             List<Alerts> alert = step.alerts;
 
             // Walk East
             if (relativeDir == null) {
                 subDirectionText += action + " " + applicationContext.getResources()
-                        .getString(R.string.step_by_step_heading) + " ";
+                        .getString(R.string.step_by_step_non_transit_heading) + " ";
                 subDirectionText += absoluteDirString + " ";
             }
             // (Turn left)/(Continue)
@@ -210,7 +210,7 @@ public class DirectionsGenerator {
                         rDir.compareTo(RelativeDirection.SLIGHTLY_LEFT) == 0 ||
                         rDir.compareTo(RelativeDirection.SLIGHTLY_RIGHT) == 0) {
                     subDirectionText += applicationContext.getResources()
-                            .getString(R.string.step_by_step_turn) + " ";
+                            .getString(R.string.step_by_step_non_transit_turn) + " ";
                 }
 
                 subDirectionText += relativeDirString + " ";
@@ -225,17 +225,17 @@ public class DirectionsGenerator {
                                 subDirectionText += ordinal + " ";
                             } else {
                                 subDirectionText += applicationContext.getResources()
-                                        .getString(R.string.roundabout_number) + " " + ordinal
+                                        .getString(R.string.step_by_step_non_transit_roundabout_number) + " " + ordinal
                                         + " ";
                             }
                         } catch (NumberFormatException e) {
-                            //If is not a roundabout_number and is not null is better to try to display it
+                            //If is not a step_by_step_non_transit_roundabout_number and is not null is better to try to display it
                             subDirectionText += step.exit + " ";
                         }
                         subDirectionText += applicationContext.getResources()
-                                .getString(R.string.roundabout_exit) + " ";
+                                .getString(R.string.step_by_step_non_transit_roundabout_exit) + " ";
                         streetConnector = applicationContext.getResources()
-                                .getString(R.string.step_by_step_connector_street_name_roundabout);
+                                .getString(R.string.step_by_step_non_transit_connector_street_name_roundabout);
                     }
                 }
             }
@@ -262,25 +262,25 @@ public class DirectionsGenerator {
     private static String getOrdinal(int number, Resources resources) {
         switch (number) {
             case 1:
-                return resources.getString(R.string.roundabout_ordinal_first);
+                return resources.getString(R.string.step_by_step_non_transit_roundabout_ordinal_first);
             case 2:
-                return resources.getString(R.string.roundabout_ordinal_second);
+                return resources.getString(R.string.step_by_step_non_transit_roundabout_ordinal_second);
             case 3:
-                return resources.getString(R.string.roundabout_ordinal_third);
+                return resources.getString(R.string.step_by_step_non_transit_roundabout_ordinal_third);
             case 4:
-                return resources.getString(R.string.roundabout_ordinal_fourth);
+                return resources.getString(R.string.step_by_step_non_transit_roundabout_ordinal_fourth);
             case 5:
-                return resources.getString(R.string.roundabout_ordinal_fifth);
+                return resources.getString(R.string.step_by_step_non_transit_roundabout_ordinal_fifth);
             case 6:
-                return resources.getString(R.string.roundabout_ordinal_sixth);
+                return resources.getString(R.string.step_by_step_non_transit_roundabout_ordinal_sixth);
             case 7:
-                return resources.getString(R.string.roundabout_ordinal_seventh);
+                return resources.getString(R.string.step_by_step_non_transit_roundabout_ordinal_seventh);
             case 8:
-                return resources.getString(R.string.roundabout_ordinal_eighth);
+                return resources.getString(R.string.step_by_step_non_transit_roundabout_ordinal_eighth);
             case 9:
-                return resources.getString(R.string.roundabout_ordinal_ninth);
+                return resources.getString(R.string.step_by_step_non_transit_roundabout_ordinal_ninth);
             case 10:
-                return resources.getString(R.string.roundabout_ordinal_tenth);
+                return resources.getString(R.string.step_by_step_non_transit_roundabout_ordinal_tenth);
             default:
                 return null;
         }
@@ -336,31 +336,31 @@ public class DirectionsGenerator {
     public static String getLocalizedRelativeDir(RelativeDirection relDir, Resources resources) {
         if (relDir != null) {
             if (relDir.equals(RelativeDirection.CIRCLE_CLOCKWISE)) {
-                return resources.getString(R.string.dir_relative_circle_clockwise);
+                return resources.getString(R.string.step_by_step_non_transit_dir_relative_circle_clockwise);
             } else if (relDir.equals(RelativeDirection.CIRCLE_COUNTERCLOCKWISE)) {
-                return resources.getString(R.string.dir_relative_circle_counterclockwise);
+                return resources.getString(R.string.step_by_step_non_transit_dir_relative_circle_counterclockwise);
             } else if (relDir.equals(RelativeDirection.CONTINUE)) {
-                return resources.getString(R.string.dir_relative_continue);
+                return resources.getString(R.string.step_by_step_non_transit_dir_relative_continue);
             } else if (relDir.equals(RelativeDirection.DEPART)) {
-                return resources.getString(R.string.dir_relative_depart);
+                return resources.getString(R.string.step_by_step_non_transit_dir_relative_depart);
             } else if (relDir.equals(RelativeDirection.ELEVATOR)) {
-                return resources.getString(R.string.dir_relative_elevator);
+                return resources.getString(R.string.step_by_step_non_transit_dir_relative_elevator);
             } else if (relDir.equals(RelativeDirection.HARD_LEFT)) {
-                return resources.getString(R.string.dir_relative_hard_left);
+                return resources.getString(R.string.step_by_step_non_transit_dir_relative_hard_left);
             } else if (relDir.equals(RelativeDirection.HARD_RIGHT)) {
-                return resources.getString(R.string.dir_relative_hard_right);
+                return resources.getString(R.string.step_by_step_non_transit_dir_relative_hard_right);
             } else if (relDir.equals(RelativeDirection.LEFT)) {
-                return resources.getString(R.string.dir_relative_left);
+                return resources.getString(R.string.step_by_step_non_transit_dir_relative_left);
             } else if (relDir.equals(RelativeDirection.RIGHT)) {
-                return resources.getString(R.string.dir_relative_right);
+                return resources.getString(R.string.step_by_step_non_transit_dir_relative_right);
             } else if (relDir.equals(RelativeDirection.SLIGHTLY_LEFT)) {
-                return resources.getString(R.string.dir_relative_slightly_left);
+                return resources.getString(R.string.step_by_step_non_transit_dir_relative_slightly_left);
             } else if (relDir.equals(RelativeDirection.SLIGHTLY_RIGHT)) {
-                return resources.getString(R.string.dir_relative_slightly_right);
+                return resources.getString(R.string.step_by_step_non_transit_dir_relative_slightly_right);
             } else if (relDir.equals(RelativeDirection.UTURN_LEFT)) {
-                return resources.getString(R.string.dir_relative_uturn_left);
+                return resources.getString(R.string.step_by_step_non_transit_dir_relative_uturn_left);
             } else if (relDir.equals(RelativeDirection.UTURN_RIGHT)) {
-                return resources.getString(R.string.dir_relative_uturn_right);
+                return resources.getString(R.string.step_by_step_non_transit_dir_relative_uturn_right);
             }
         }
         return null;
@@ -369,21 +369,21 @@ public class DirectionsGenerator {
     public static String getLocalizedAbsoluteDir(AbsoluteDirection absDir, Resources resources) {
         if (absDir != null) {
             if (absDir.equals(AbsoluteDirection.EAST)) {
-                return resources.getString(R.string.dir_absolute_east);
+                return resources.getString(R.string.step_by_step_non_transit_dir_absolute_east);
             } else if (absDir.equals(AbsoluteDirection.NORTH)) {
-                return resources.getString(R.string.dir_absolute_north);
+                return resources.getString(R.string.step_by_step_non_transit_dir_absolute_north);
             } else if (absDir.equals(AbsoluteDirection.NORTHEAST)) {
-                return resources.getString(R.string.dir_absolute_northeast);
+                return resources.getString(R.string.step_by_step_non_transit_dir_absolute_northeast);
             } else if (absDir.equals(AbsoluteDirection.NORTHWEST)) {
-                return resources.getString(R.string.dir_absolute_northwest);
+                return resources.getString(R.string.step_by_step_non_transit_dir_absolute_northwest);
             } else if (absDir.equals(AbsoluteDirection.SOUTH)) {
-                return resources.getString(R.string.dir_absolute_south);
+                return resources.getString(R.string.step_by_step_non_transit_dir_absolute_south);
             } else if (absDir.equals(AbsoluteDirection.SOUTHEAST)) {
-                return resources.getString(R.string.dir_absolute_southeast);
+                return resources.getString(R.string.step_by_step_non_transit_dir_absolute_southeast);
             } else if (absDir.equals(AbsoluteDirection.SOUTHWEST)) {
-                return resources.getString(R.string.dir_absolute_southwest);
+                return resources.getString(R.string.step_by_step_non_transit_dir_absolute_southwest);
             } else if (absDir.equals(AbsoluteDirection.WEST)) {
-                return resources.getString(R.string.dir_absolute_west);
+                return resources.getString(R.string.step_by_step_non_transit_dir_absolute_west);
             }
         }
         return null;

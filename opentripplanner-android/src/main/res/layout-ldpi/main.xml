@@ -77,7 +77,7 @@
                 android:layout_below="@+id/tbStartLocation"
                 android:layout_height="wrap_content"
                 android:layout_margin="4dp"
-                android:hint="@string/end_location_hint"
+                android:hint="@string/text_box_end_location_hint"
                 android:selectAllOnFocus="true"
                 android:singleLine="true"
                 android:drawableRight="@android:drawable/ic_input_get"
@@ -143,8 +143,7 @@
                     android:layout_toLeftOf="@id/separator"
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
-                    android:layout_margin="4dp"
-                    android:prompt="@string/alternative_routes">
+                    android:layout_margin="4dp">
             </Spinner>
 
         </RelativeLayout>
@@ -172,7 +171,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="15sp"
-                    android:text="@string/header_optimization">
+                    android:text="@string/left_panel_header_optimization">
             </TextView>
 
             <ListView
@@ -203,7 +202,7 @@
                     android:textSize="15sp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/header_travel_mode">
+                    android:text="@string/left_panel_header_travel_mode">
             </TextView>
 
             <ListView
@@ -238,7 +237,7 @@
                         android:textSize="15sp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/header_bike_options">
+                        android:text="@string/left_panel_header_bike_options">
                 </TextView>
 
                 <LinearLayout
@@ -258,7 +257,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:text="@string/header_bike_options_quick">
+                            android:text="@string/left_panel_bike_options_quick">
                     </TextView>
 
                     <TextView
@@ -269,7 +268,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:text="@string/header_bike_options_flat">
+                            android:text="@string/left_panel_bike_options_flat">
                     </TextView>
 
                     <TextView
@@ -280,7 +279,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:text="@string/header_bike_options_bike_friendly">
+                            android:text="@string/left_panel_bike_options_bike_friendly">
                     </TextView>
                 </LinearLayout>
 

@@ -152,7 +152,7 @@ public class DirectionListFragment extends ExpandableListFragment {
             for (Leg leg : it.legs) {
                 TraverseMode traverseMode = TraverseMode.valueOf(leg.mode);
                 if (traverseMode.isTransit()) {
-                    itinerarySummaryList[i] = getResources().getString(R.string.before_route) + " "
+                    itinerarySummaryList[i] = getResources().getString(R.string.connector_before_route) + " "
                             + leg.getRouteShortName() + ". ";
                     isTransitIsTagSet = true;
                     break;
@@ -166,11 +166,11 @@ public class DirectionListFragment extends ExpandableListFragment {
 
         for (int i = 0; i < itinerarySummaryList.length; i++) {
             Itinerary it = itineraryList.get(i);
-            itinerarySummaryList[i] += getString(R.string.total_duration) + " " + ConversionUtils
+            itinerarySummaryList[i] += getString(R.string.step_by_step_total_duration) + " " + ConversionUtils
                     .getFormattedDurationTextNoSeconds(it.duration / 1000,
                             getActivity().getApplicationContext());
             if (isTransitIsTagSet) {
-                itinerarySummaryList[i] += "   " + getString(R.string.walking_duration) + " "
+                itinerarySummaryList[i] += "   " + getString(R.string.step_by_step_walking_duration) + " "
                         + ConversionUtils.getFormattedDurationTextNoSeconds(it.walkTime,
                         getActivity().getApplicationContext());
             }

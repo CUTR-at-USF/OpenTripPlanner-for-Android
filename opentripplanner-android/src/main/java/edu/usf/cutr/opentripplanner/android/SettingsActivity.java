@@ -130,10 +130,10 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
                 getResources().getString(R.string.geocoder_nominatim))
                 .equals(getResources().getString(R.string.geocoder_nominatim))) {
             geocoderProvider.setSummary(
-                    getResources().getString(R.string.geocoder_preference_provider_nominatim));
+                    getResources().getString(R.string.settings_menu_geocoder_preference_provider_nominatim));
         } else {
             geocoderProvider.setSummary(
-                    getResources().getString(R.string.geocoder_preference_provider_google_places));
+                    getResources().getString(R.string.settings_menu_geocoder_preference_provider_google_places));
         }
 
         geocoderProvider.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
@@ -144,10 +144,10 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 
                 if (value.equals(getResources().getString(R.string.geocoder_nominatim))) {
                     geocoderProvider.setSummary(getResources()
-                            .getString(R.string.geocoder_preference_provider_nominatim));
+                            .getString(R.string.settings_menu_geocoder_preference_provider_nominatim));
                 } else {
                     geocoderProvider.setSummary(getResources()
-                            .getString(R.string.geocoder_preference_provider_google_places));
+                            .getString(R.string.settings_menu_geocoder_preference_provider_google_places));
                 }
 
                 return true;
@@ -211,7 +211,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
         });
 
         maxWalkingDistance.setSummary(maxWalkingDistance.getText() + " " + getResources()
-                .getString(R.string.maximum_walk_description));
+                .getString(R.string.settings_menu_maximum_walk_description));
 
         maxWalkingDistance.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 
@@ -220,7 +220,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
                 String value = (String) newValue;
 
                 maxWalkingDistance.setSummary(
-                        value + " " + getResources().getString(R.string.maximum_walk_description));
+                        value + " " + getResources().getString(R.string.settings_menu_maximum_walk_description));
 
                 return true;
             }
@@ -229,10 +229,10 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 
         if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, false)) {
             customServerURL
-                    .setSummary(getResources().getString(R.string.custom_server_url_description));
+                    .setSummary(getResources().getString(R.string.settings_menu_custom_server_url_description));
         } else {
             selectedCustomServer.setEnabled(false);
-            customServerURL.setSummary(getResources().getString(R.string.custom_server_url_error));
+            customServerURL.setSummary(getResources().getString(R.string.settings_menu_custom_server_url_description_error_url));
         }
 
         if (selectedCustomServer.isEnabled() && selectedCustomServer.isChecked()) {
@@ -260,12 +260,12 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 
                 Toast.makeText(SettingsActivity.this.getApplicationContext(),
                         SettingsActivity.this.getApplicationContext().getResources()
-                                .getString(R.string.custom_server_url_error), Toast.LENGTH_SHORT
+                                .getString(R.string.settings_menu_custom_server_url_description_error_url), Toast.LENGTH_SHORT
                 )
                         .show();
 
                 customServerURL
-                        .setSummary(getResources().getString(R.string.custom_server_url_error));
+                        .setSummary(getResources().getString(R.string.settings_menu_custom_server_url_description_error_url));
 
                 setResult(RESULT_OK, returnIntent);
                 return false;
@@ -325,7 +325,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
                         String uriText = "mailto:" + recipient;
 
                         String subject = "";
-                        subject += getResources().getString(R.string.feedback_subject);
+                        subject += getResources().getString(R.string.menu_button_feedback_subject);
                         Date d = Calendar.getInstance().getTime();
                         subject += "[" + d.toString() + "]";
                         uriText += "?subject=" + subject;
@@ -335,7 +335,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
                         Intent sendIntent = new Intent(Intent.ACTION_SENDTO);
                         sendIntent.setData(uri);
                         startActivity(Intent.createChooser(sendIntent,
-                                getResources().getString(R.string.feedback_send_email)));
+                                getResources().getString(R.string.menu_button_feedback_send_email)));
 
                         return true;
                     }
@@ -352,14 +352,14 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
             Calendar cal = Calendar.getInstance();
             cal.setTimeInMillis(mostRecentDate);
             serverRefreshButton.setSummary(
-                    getResources().getString(R.string.server_list_download_date_description)
+                    getResources().getString(R.string.settings_menu_server_list_download_date_description)
                             + ConversionUtils.getTimeWithContext(this.getApplicationContext(),
                             cal.getTimeZone().getOffset(cal.getTimeInMillis()),
                             cal.getTimeInMillis(), true)
             );
         } else {
             serverRefreshButton.setSummary(
-                    getResources().getString(R.string.server_list_download_date_unknown));
+                    getResources().getString(R.string.settings_menu_server_list_download_date_unknown));
         }
 
         serverRefreshButton
@@ -391,13 +391,13 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
             returnIntent.putExtra(OTPApp.CHANGED_SELECTED_CUSTOM_SERVER_RETURN_KEY, true);
             setResult(RESULT_OK, returnIntent);
             customServerURL
-                    .setSummary(getResources().getString(R.string.custom_server_url_description));
+                    .setSummary(getResources().getString(R.string.settings_menu_custom_server_url_description));
             prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, true);
         } else {
             autoDetectServer.setEnabled(true);
             selectedCustomServer.setChecked(false);
             selectedCustomServer.setEnabled(false);
-            customServerURL.setSummary(getResources().getString(R.string.custom_server_error));
+            customServerURL.setSummary(getResources().getString(R.string.settings_menu_custom_server_url_description_error_unreachable));
             prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, false);
             prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false);
         }

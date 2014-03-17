@@ -70,7 +70,7 @@ public class MetadataRequest extends AsyncTask<String, Integer, GraphMetadata> {
             Activity activityRetrieved = activity.get();
             if (activityRetrieved != null) {
                 progressDialog = ProgressDialog.show(activityRetrieved, "",
-                        context.getResources().getString(R.string.metadata_request_progress), true);
+                        context.getResources().getString(R.string.task_progress_metadata_progress), true);
             }
         }
     }
@@ -116,11 +116,11 @@ public class MetadataRequest extends AsyncTask<String, Integer, GraphMetadata> {
 
         if (metadata != null) {
             Toast.makeText(context,
-                    context.getResources().getString(R.string.metadata_request_successful),
+                    context.getResources().getString(R.string.toast_metadata_request_successful),
                     Toast.LENGTH_SHORT).show();
             callback.onMetadataRequestComplete(metadata);
         } else {
-            Toast.makeText(context, context.getResources().getString(R.string.info_server_error),
+            Toast.makeText(context, context.getResources().getString(R.string.toast_server_checker_info_error),
                     Toast.LENGTH_SHORT).show();
 
             Log.e(OTPApp.TAG, "No metadata!");
