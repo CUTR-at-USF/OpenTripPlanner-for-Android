@@ -359,8 +359,8 @@
                     <string name="step_by_step_non_transit_dir_relative_hard_right">Tourner complètement à droite</string>
                     <string name="step_by_step_non_transit_dir_relative_left">à gauche</string>
                     <string name="step_by_step_non_transit_dir_relative_right">à droite</string>
-                    <string name="step_by_step_non_transit_dir_relative_slightly_left">légèrement à gauche</string>
-                    <string name="step_by_step_non_transit_dir_relative_slightly_right">légèrement à droite</string>
+                    <string name="step_by_step_non_transit_dir_relative_slightly_left">Tourner légèrement à gauche</string>
+                    <string name="step_by_step_non_transit_dir_relative_slightly_right">Tourner légèrement à droite</string>
                     <string name="step_by_step_non_transit_dir_relative_uturn_left">Demi-tour vers la gauche</string>
                     <string name="step_by_step_non_transit_dir_relative_uturn_right">Demi-tour vers la droite</string>
 

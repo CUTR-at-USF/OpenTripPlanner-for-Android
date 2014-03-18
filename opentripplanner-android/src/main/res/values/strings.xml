@@ -349,13 +349,13 @@
                     <string name="step_by_step_non_transit_connector_street_name_roundabout">to</string>
 
                     <!-- Relative directions -->
-                    <!--<string name="step_by_step_non_transit_dir_relative_circle_clockwise">At the roundabout take the</string>-->
-                    <!--<string name="step_by_step_non_transit_dir_relative_circle_counterclockwise">At the roundabout take the</string>-->
+                    <string name="step_by_step_non_transit_dir_relative_circle_clockwise">At the roundabout take the</string>
+                    <string name="step_by_step_non_transit_dir_relative_circle_counterclockwise">At the roundabout take the</string>
                     <string name="step_by_step_non_transit_dir_relative_continue">Continue</string>
                     <string name="step_by_step_non_transit_dir_relative_depart">Depart</string>
                     <string name="step_by_step_non_transit_dir_relative_elevator">Take elevator</string>
-                    <string name="step_by_step_non_transit_dir_relative_hard_left">Sharp left</string>
-                    <string name="step_by_step_non_transit_dir_relative_hard_right">Sharp right</string>
+                    <string name="step_by_step_non_transit_dir_relative_hard_left">Turn sharp left</string>
+                    <string name="step_by_step_non_transit_dir_relative_hard_right">Turn sharp right</string>
                     <string name="step_by_step_non_transit_dir_relative_left">left</string>
                     <string name="step_by_step_non_transit_dir_relative_right">right</string>
                     <string name="step_by_step_non_transit_dir_relative_slightly_left">Turn slight left</string>

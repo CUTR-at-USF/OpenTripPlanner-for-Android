@@ -206,9 +206,7 @@ public class DirectionsGenerator {
 
                 // Do not need TURN Continue
                 if (rDir.compareTo(RelativeDirection.RIGHT) == 0 ||
-                        rDir.compareTo(RelativeDirection.LEFT) == 0 ||
-                        rDir.compareTo(RelativeDirection.SLIGHTLY_LEFT) == 0 ||
-                        rDir.compareTo(RelativeDirection.SLIGHTLY_RIGHT) == 0) {
+                        rDir.compareTo(RelativeDirection.LEFT) == 0) {
                     subDirectionText += applicationContext.getResources()
                             .getString(R.string.step_by_step_non_transit_turn) + " ";
                 }
