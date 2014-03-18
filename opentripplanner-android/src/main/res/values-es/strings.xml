@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
  Copyright 2011-2013 Marcy Gordon, University of South Florida
  
  Licensed under the Apache License, Version 2.0 (the "License") name="dir you may not
@@ -17,433 +18,434 @@
 
     <!-- Map view / main UI -->
 
-    <!-- Start/End text boxes -->
+        <!-- Start/End text boxes -->
 
-    <!-- Text box contents -->
+            <!-- Text box contents -->
 
-    <!-- When routing from my location -->
-    <string name="text_box_my_location">Mi ubicación</string>
+                <!-- When routing from my location -->
+                <string name="text_box_my_location">Mi ubicación</string>
 
-    <!-- Hint when they are empty -->
-    <string name="text_box_start_location_hint">Lugar de origen</string>
-    <string name="text_box_end_location_hint">Lugar de destino</string>
+                <!-- Hint when they are empty -->
+                <string name="text_box_start_location_hint">Lugar de origen</string>
+                <string name="text_box_end_location_hint">Lugar de destino</string>
 
-    <!-- A marker is not set and is needed -->
-    <string name="text_box_need_to_place_marker">"Añade un marcador de posición …"</string>
+                <!-- A marker is not set and is needed -->
+                <string name="text_box_need_to_place_marker">"Añade un marcador de posición …"</string>
 
-    <!-- To attach preceding an address that was retrieved for location but is too far away -->
-    <string name="text_box_close_to_marker">Marcador, cerca de</string>
+                <!-- To attach preceding an address that was retrieved for location but is too far away -->
+                <string name="text_box_close_to_marker">Marcador, cerca de</string>
 
-    <!-- Pop-up dialog from button inside text box -->
+            <!-- Pop-up dialog from button inside text box -->
 
-    <!-- Title -->
-    <string name="text_box_dialog_choose_location_type_start">Escoge el lugar de origen</string>
-    <string name="text_box_dialog_choose_location_type_end">Escoge el lugar de destino</string>
+                <!-- Title -->
+                <string name="text_box_dialog_choose_location_type_start">Escoge el lugar de origen</string>
+                <string name="text_box_dialog_choose_location_type_end">Escoge el lugar de destino</string>
 
-    <!-- Options -->
-    <string name="text_box_dialog_location_type_current_location">Ubicación actual</string>
-    <string name="text_box_dialog_location_type_contact">Dirección de un contacto</string>
-    <string name="text_box_dialog_location_type_map_point">Punto en el mapa</string>
+                <!-- Options -->
+                <string name="text_box_dialog_location_type_current_location">Ubicación actual</string>
+                <string name="text_box_dialog_location_type_contact">Dirección de un contacto</string>
+                <string name="text_box_dialog_location_type_map_point">Punto en el mapa</string>
 
-    <!-- Start/End markers -->
-    <string name="map_markers_start_marker_title">Salida</string>
-    <string name="map_markers_start_marker_description">Pulsa para arrastrar…</string>
-    <string name="map_markers_end_marker_title">Llegada</string>
-    <string name="map_markers_end_marker_description">Pulsa para arrastrar…</string>
+        <!-- Start/End markers -->
+        <string name="map_markers_start_marker_title">Salida</string>
+        <string name="map_markers_start_marker_description">Pulsa para arrastrar…</string>
+        <string name="map_markers_end_marker_title">Llegada</string>
+        <string name="map_markers_end_marker_description">Pulsa para arrastrar…</string>
 
-    <!-- Mode change map markers -->
+        <!-- Mode change map markers -->
 
-    <!-- Info pop-ups -->
+            <!-- Info pop-ups -->
 
-    <!-- Headings - actions -->
-    <string name="map_markers_mode_bicycle_action">Ve en bici</string>
-    <string name="map_markers_mode_walk_action">Ve a pie</string>
+                <!-- Headings - actions -->
+                <string name="map_markers_mode_bicycle_action">Ve en bici</string>
+                <string name="map_markers_mode_walk_action">Ve a pie</string>
 
-    <!-- Connectors -->
-    <string name="map_markers_connector_before_stop">de</string>
-    <string name="map_markers_connector_before_destination">a</string>
-
-    <!-- Toast messages -->
-
-    <!-- User input reactions messages -->
-    <string name="toast_map_markers_start_marker_activated">Lugar de origen</string>
-    <string name="toast_map_markers_end_marker_activated">Lugar de destino</string>
-    <string name="toast_map_markers_marker_out_of_boundaries">Lugar situado fuera del área cubierta por el servidor. Marcador no fijado</string>
-
-    <!-- Task completed info messages -->
-
-    <!-- Used alone -->
-    <string name="toast_metadata_request_successful">Red de transportes descargada correctamente</string>
-    <string name="toast_server_checker_successful">OK: Region is working</string>
-
-    <!-- Used together: toast_server_selector_detected + "server name" + toast_server_selector_server_change_info -->
-    <string name="toast_server_selector_detected">Encontrada</string>
-    <string name="toast_server_selector_server_change_info">Cambiar en las opciones</string>
-
-    <!-- Errors -->
-
-    <!-- Triggering planning trip task -->
-    <string name="toast_tripplanner_need_to_place_markers_before_planning">"Primero tienes que introducir un origen y un destino"</string>
-    <string name="toast_tripplanner_origin_destination_are_mylocation">"No se puede planear el viaje, el origen y el destino son iguales"</string>
-
-    <!-- Obtaining server list -->
-    <string name="toast_server_selector_refresh_server_list_error">No ha sido posible obtener la lista de regiones</string>
-
-    <!-- Contacting server -->
-    <string name="toast_no_server_selected_error">No se ha escogido ninguna región</string>
-    <string name="toast_server_checker_error_unreachable">No se ha podido contactar con la región:</string>
-    <string name="toast_server_checker_info_error">Atención: No se ha podido obtener información de la región!</string>
-
-    <!-- Editing custom server URL -->
-    <string name="toast_server_checker_error_bad_url">"URL incorrecta para región personalizada"</string>
-
-    <!-- Obtaining user location: to select server, to display user location address in text box, ... -->
-    <string name="toast_tripplanner_current_location_error">No se ha podido obtener la ubicación actual</string>
+                <!-- Connectors -->
+                <string name="map_markers_connector_before_stop">de</string>
+                <string name="map_markers_connector_before_destination">a</string>
 
 
-    <!-- Dialogs -->
+        <!-- Toast messages -->
 
-    <!-- Info -->
+                <!-- User input reactions messages -->
+                <string name="toast_map_markers_start_marker_activated">Lugar de origen</string>
+                <string name="toast_map_markers_end_marker_activated">Lugar de destino</string>
+                <string name="toast_map_markers_marker_out_of_boundaries">Lugar situado fuera del área cubierta por el servidor. Marcador no fijado</string>
 
-    <!-- Task in progress "titleless" dialog messages -->
-    <string name="task_progress_tripplanner_progress">"Planeando viaje. Por favor espera…"</string>
-    <string name="task_progress_server_selector_progress">Buscando la red de transportes. Por favor espera…</string>
-    <string name="task_progress_server_checker_progress">Obteniendo información de la región. Por favor espera…</string>
-    <string name="task_progress_geocoding_progress">Buscando dirección/puntos de interés. Por favor espera…</string>
-    <string name="task_progress_metadata_progress">Obteniendo red de transportes. Por favor espera…</string>
+            <!-- Task completed info messages -->
 
-    <!-- Routes drop-down pop-up dialog (menu will be rendered this way prior to API level 15) -->
-    <string name="tripplanner_results_title">Resultados de rutas</string>
+                <!-- Used alone -->
+                <string name="toast_metadata_request_successful">Red de transportes descargada correctamente</string>
+                <string name="toast_server_checker_successful">OK: Region is working</string>
 
-    <!-- Long press point type selector dialog -->
+                <!-- Used together: toast_server_selector_detected + "server name" + toast_server_selector_server_change_info -->
+                <string name="toast_server_selector_detected">Encontrada</string>
+                <string name="toast_server_selector_server_change_info">Cambiar en las opciones</string>
 
-    <!-- Title -->
-    <string name="point_type_selector_title">Escoge la localización</string>
+            <!-- Errors -->
 
-    <!-- Options -->
-    <string name="point_type_selector_start_marker_option">Start location</string>
-    <string name="point_type_selector_end_marker_option">End location</string>
+                    <!-- Triggering planning trip task -->
+                    <string name="toast_tripplanner_need_to_place_markers_before_planning">"Primero tienes que introducir un origen y un destino"</string>
+                    <string name="toast_tripplanner_origin_destination_are_mylocation">"No se puede planear el viaje, el origen y el destino son iguales"</string>
 
-    <!-- Geocoding results dialog -->
+                    <!-- Obtaining server list -->
+                    <string name="toast_server_selector_refresh_server_list_error">No ha sido posible obtener la lista de regiones</string>
 
-    <!-- Title -->
-    <string name="geocoder_results_title">Resultados de la búsqueda</string>
+                    <!-- Contacting server -->
+                    <string name="toast_no_server_selected_error">No se ha escogido ninguna región</string>
+                    <string name="toast_server_checker_error_unreachable">No se ha podido contactar con la región:</string>
+                    <string name="toast_server_checker_info_error">Atención: No se ha podido obtener información de la región!</string>
 
-    <!-- Contents -->
-    <string name="geocoder_results_no_results_message">Disculpa, no se ha podido obtener una localización para esa dirección</string>
+                    <!-- Editing custom server URL -->
+                    <string name="toast_server_checker_error_bad_url">"URL incorrecta para región personalizada"</string>
 
-    <!-- Server info dialog -->
+                    <!-- Obtaining user location: to select server, to display user location address in text box, ... -->
+                    <string name="toast_tripplanner_current_location_error">No se ha podido obtener la ubicación actual</string>
 
-    <!-- Title -->
-    <string name="server_checker_info_title">Región OpenTripPlanner</string>
 
-    <!-- Headings -->
-    <string name="server_checker_info_region">Región:</string>
-    <string name="server_checker_info_language">Idioma:</string>
-    <string name="server_checker_info_contact">Contacto:</string>
-    <string name="server_checker_info_url">URL:</string>
-    <string name="server_checker_info_bounds">Área:</string>
-    <string name="server_checker_info_reachable">Activa:</string>
+        <!-- Dialogs -->
 
-    <!-- Fallback contents -->
-    <string name="server_checker_info_custom_server_name">Región personalizada</string>
-    <string name="server_checker_info_custom_server_unknown_region">Desconocida</string>
-    <string name="server_checker_info_custom_server_unknown_bounds">Desconocida</string>
-    <string name="server_checker_info_custom_server_unknown_language">Desoconocido</string>
-    <string name="server_checker_info_custom_server_unknown_name">Desconocida</string>
-    <string name="server_checker_info_custom_server_unknown_email">email desconocido</string>
+            <!-- Info -->
 
-    <!-- Server selector dialog -->
+                <!-- Task in progress "titleless" dialog messages -->
+                <string name="task_progress_tripplanner_progress">"Planeando viaje. Por favor espera…"</string>
+                <string name="task_progress_server_selector_progress">Buscando la red de transportes. Por favor espera…</string>
+                <string name="task_progress_server_checker_progress">Obteniendo información de la región. Por favor espera…</string>
+                <string name="task_progress_geocoding_progress">Buscando dirección/puntos de interés. Por favor espera…</string>
+                <string name="task_progress_metadata_progress">Obteniendo red de transportes. Por favor espera…</string>
 
-    <!-- Title -->
-    <string name="server_selector_custom_server_alert_title">Introduce una URL para región personalizada de OTP</string>
+                <!-- Routes drop-down pop-up dialog (menu will be rendered this way prior to API level 15) -->
+                <string name="tripplanner_results_title">Resultados de rutas</string>
 
-    <!-- Time and date dialog -->
+                <!-- Long press point type selector dialog -->
 
-    <!-- Title -->
-    <string name="date_time_selector_title">Establecer fecha y hora</string>
+                    <!-- Title -->
+                    <string name="point_type_selector_title">Escoge la localización</string>
 
-    <!-- Options dropdown -->
-    <string name="date_time_selector_spinner_arrive">Llegar:</string>
-    <string name="date_time_selector_spinner_depart">Salir:</string>
+                    <!-- Options -->
+                    <string name="point_type_selector_start_marker_option">Start location</string>
+                    <string name="point_type_selector_end_marker_option">End location</string>
 
-    <!-- Errors -->
+                <!-- Geocoding results dialog -->
 
-    <!-- Trip plan error dialog -->
+                    <!-- Title -->
+                    <string name="geocoder_results_title">Resultados de la búsqueda</string>
 
-    <!-- Title -->
-    <string name="tripplanner_error_dialog_title">No se ha podido planear el viaje.</string>
+                    <!-- Contents -->
+                    <string name="geocoder_results_no_results_message">Disculpa, no se ha podido obtener una localización para esa dirección</string>
 
-    <!-- Errors -->
-    <string name="tripplanner_error_not_defined">Disculpa, algo ha ido mal. Por favor intentalo de nuevo.</string>
-    <string name="tripplanner_error_request_timeout">Esta región no responde, por favor intentelo de nuevo más tarde</string>
-    <string name="tripplanner_error_system">Esta región no está funcionando, por favor intentalo de nuevo más tarde</string>
-    <string name="tripplanner_error_outside_bounds">Origen o destino están fuera del área cubierta por la red de transportes</string>
-    <string name="tripplanner_error_path_not_found">No se pudo encontrar ninguna ruta adecuada entre origen y destino</string>
-    <string name="tripplanner_error_no_transit_times">Los horarios para la fecha escogida no están disponibles</string>
-    <string name="tripplanner_error_bogus_parameter">Algo ha ido mal. Cambia las opciones de viaje e intentalo de nuevo.</string>
-    <string name="tripplanner_error_geocode_from_not_found">Origen no encontrado</string>
-    <string name="tripplanner_error_geocode_to_not_found">Destino no encontrado</string>
-    <string name="tripplanner_error_geocode_from_to_not_found">Origen y destino no encontrados</string>
-    <string name="tripplanner_error_too_close">Viage demasiado corto</string>
-    <string name="tripplanner_error_location_not_accessible">La localización escogida no es accesible</string>
-    <string name="tripplanner_error_geocode_from_ambiguous">El origen no está claro</string>
-    <string name="tripplanner_error_geocode_to_ambiguous">El destino no está claro</string>
-    <string name="tripplanner_error_geocode_from_to_ambiguous">Ni el origen ni el destino están claros</string>
-    <string name="tripplanner_error_triangle">Algo ha ido mal. Cambia las pciones de bicicleta los valores e intentalo de nuevo</string>
+                <!-- Server info dialog -->
 
-    <!-- Play services error dialog -->
+                    <!-- Title -->
+                    <string name="server_checker_info_title">Región OpenTripPlanner</string>
 
-    <!-- Title -->
-    <string name="play_services_error_title">Error de Google Play Services</string>
+                    <!-- Headings -->
+                    <string name="server_checker_info_region">Región:</string>
+                    <string name="server_checker_info_language">Idioma:</string>
+                    <string name="server_checker_info_contact">Contacto:</string>
+                    <string name="server_checker_info_url">URL:</string>
+                    <string name="server_checker_info_bounds">Área:</string>
+                    <string name="server_checker_info_reachable">Activa:</string>
 
-    <!-- Description -->
-    <string name="play_services_error">No se puede contactar con Google: la aplicación podría no funcionar</string>
+                    <!-- Fallback contents -->
+                    <string name="server_checker_info_custom_server_name">Región personalizada</string>
+                    <string name="server_checker_info_custom_server_unknown_region">Desconocida</string>
+                    <string name="server_checker_info_custom_server_unknown_bounds">Desconocida</string>
+                    <string name="server_checker_info_custom_server_unknown_language">Desoconocido</string>
+                    <string name="server_checker_info_custom_server_unknown_name">Desconocida</string>
+                    <string name="server_checker_info_custom_server_unknown_email">email desconocido</string>
+
+                <!-- Server selector dialog -->
+
+                    <!-- Title -->
+                    <string name="server_selector_custom_server_alert_title">Introduce una URL para región personalizada de OTP</string>
+
+                <!-- Time and date dialog -->
+
+                    <!-- Title -->
+                    <string name="date_time_selector_title">Establecer fecha y hora</string>
+
+                    <!-- Options dropdown -->
+                    <string name="date_time_selector_spinner_arrive">Llegar:</string>
+                    <string name="date_time_selector_spinner_depart">Salir:</string>
+
+            <!-- Errors -->
+
+            <!-- Trip plan error dialog -->
+
+                <!-- Title -->
+                <string name="tripplanner_error_dialog_title">No se ha podido planear el viaje.</string>
+
+                <!-- Errors -->
+                <string name="tripplanner_error_not_defined">Disculpa, algo ha ido mal. Por favor intentalo de nuevo.</string>
+                <string name="tripplanner_error_request_timeout">Esta región no responde, por favor intentelo de nuevo más tarde</string>
+                <string name="tripplanner_error_system">Esta región no está funcionando, por favor intentalo de nuevo más tarde</string>
+                <string name="tripplanner_error_outside_bounds">Origen o destino están fuera del área cubierta por la red de transportes</string>
+                <string name="tripplanner_error_path_not_found">No se pudo encontrar ninguna ruta adecuada entre origen y destino</string>
+                <string name="tripplanner_error_no_transit_times">Los horarios para la fecha escogida no están disponibles</string>
+                <string name="tripplanner_error_bogus_parameter">Algo ha ido mal. Cambia las opciones de viaje e intentalo de nuevo.</string>
+                <string name="tripplanner_error_geocode_from_not_found">Origen no encontrado</string>
+                <string name="tripplanner_error_geocode_to_not_found">Destino no encontrado</string>
+                <string name="tripplanner_error_geocode_from_to_not_found">Origen y destino no encontrados</string>
+                <string name="tripplanner_error_too_close">Viage demasiado corto</string>
+                <string name="tripplanner_error_location_not_accessible">La localización escogida no es accesible</string>
+                <string name="tripplanner_error_geocode_from_ambiguous">El origen no está claro</string>
+                <string name="tripplanner_error_geocode_to_ambiguous">El destino no está claro</string>
+                <string name="tripplanner_error_geocode_from_to_ambiguous">Ni el origen ni el destino están claros</string>
+                <string name="tripplanner_error_triangle">Algo ha ido mal. Cambia las pciones de bicicleta los valores e intentalo de nuevo</string>
+
+                <!-- Play services error dialog -->
+
+                    <!-- Title -->
+                    <string name="play_services_error_title">Error de Google Play Services</string>
+
+                    <!-- Description -->
+                    <string name="play_services_error">No se puede contactar con Google: la aplicación podría no funcionar</string>
 
 
     <!-- Left panel -->
 
-    <!-- Section headers -->
-    <string name="left_panel_header_optimization">Tipo de viaje</string>
-    <string name="left_panel_header_travel_mode">Modo de transporte</string>
-    <string name="left_panel_header_bike_options">Opciones bici</string>
+        <!-- Section headers -->
+        <string name="left_panel_header_optimization">Tipo de viaje</string>
+        <string name="left_panel_header_travel_mode">Modo de transporte</string>
+        <string name="left_panel_header_bike_options">Opciones bici</string>
 
-    <!-- Modes -->
-    <string name="left_panel_mode_transit">Transporte público</string>
-    <string name="left_panel_mode_car">Coche</string>
+        <!-- Modes -->
+        <string name="left_panel_mode_transit">Transporte público</string>
+        <string name="left_panel_mode_car">Coche</string>
+        <string name="left_panel_mode_bus">Solo autobús</string>
+        <string name="left_panel_mode_train">Solo tren</string>
+        <string name="left_panel_mode_walk">Sólo andando</string>
+        <string name="left_panel_mode_bicycle">Bici</string>
+        <string name="left_panel_mode_transit_bicycle">Transporte público y bici</string>
 
-    <string name="left_panel_mode_bus">Solo autobús</string>
-    <string name="left_panel_mode_train">Solo tren</string>
-    <string name="left_panel_mode_walk">Sólo andando</string>
-    <string name="left_panel_mode_bicycle">Bici</string>
-    <string name="left_panel_mode_transit_bicycle">Transporte público y bici</string>
+        <!-- Optimizations -->
+        <string name="left_panel_optimization_quick">Más rápido</string>
+        <string name="left_panel_optimization_safe">Más seguro</string>
+        <string name="left_panel_optimization_fewest_transfers">Menos trasbordos</string>
+        <string name="left_panel_optimization_bike_triangle">Viaje personalizado…</string>
 
-    <!-- Optimizations -->
-    <string name="left_panel_optimization_quick">Más rápido</string>
-    <string name="left_panel_optimization_safe">Más seguro</string>
-    <string name="left_panel_optimization_fewest_transfers">Menos trasbordos</string>
-    <string name="left_panel_optimization_bike_triangle">Viaje personalizado…</string>
-
-    <!-- Bike options -->
-    <string name="left_panel_bike_options_quick">Rápido</string>
-    <string name="left_panel_bike_options_flat">Llano</string>
-    <string name="left_panel_bike_options_bike_friendly">Bueno para bicis</string>
+        <!-- Bike options -->
+        <string name="left_panel_bike_options_quick">Rápido</string>
+        <string name="left_panel_bike_options_flat">Llano</string>
+        <string name="left_panel_bike_options_bike_friendly">Bueno para bicis</string>
 
 
     <!-- Menus -->
 
-    <!-- "Menu button" menu -->
+        <!-- "Menu button" menu -->
 
-    <!-- Options -->
-    <string name="menu_button_enable_gps">Activar GPS</string>
-    <string name="menu_button_disable_gps">Desactivar GPS</string>
-    <string name="menu_button_server_info">Información de la región</string>
-    <string name="menu_button_feedback">Enviar comentario</string>
-    <string name="menu_button_settings">Opciones</string>
+            <!-- Options -->
+            <string name="menu_button_enable_gps">Activar GPS</string>
+            <string name="menu_button_disable_gps">Desactivar GPS</string>
+            <string name="menu_button_server_info">Información de la región</string>
+            <string name="menu_button_feedback">Enviar comentario</string>
+            <string name="menu_button_settings">Opciones</string>
 
-    <!-- Feedback -->
+            <!-- Feedback -->
 
-    <!-- App chooser to resolve menu_button_feedback dialog title -->
-    <string name="menu_button_feedback_send_email">Enviar mensaje</string>
+                <!-- App chooser to resolve menu_button_feedback dialog title -->
+                <string name="menu_button_feedback_send_email">Enviar mensaje</string>
 
-    <!-- Feedback subject, included in sent intent -->
-    <string name="menu_button_feedback_subject">Informe para programador de OTP</string>
+                <!-- Feedback subject, included in sent intent -->
+                <string name="menu_button_feedback_subject">Informe para programador de OTP</string>
 
-    <!-- Settings menu -->
+        <!-- Settings menu -->
 
-    <!-- Common settings_menu_advanced menu_button_settings button title -->
-    <string name="settings_menu_advanced">Avanzado</string>
+            <!-- Common settings_menu_advanced menu_button_settings button title -->
+            <string name="settings_menu_advanced">Avanzado</string>
 
-    <!-- Routing -->
-    <string name="settings_menu_routing_options">Cálculo de rutas</string>
-    <string name="settings_menu_wheelchair_accessible">Accesible con silla de ruedas</string>
-    <string name="settings_menu_wheelchair_accessibility_description">Obtener rutas adecuadas para sillas de ruedas</string>
-    <string name="settings_menu_maximum_walk">Distancia máxima caminando</string>
-    <string name="settings_menu_maximum_walk_description">metros</string>
+            <!-- Routing -->
+            <string name="settings_menu_routing_options">Cálculo de rutas</string>
+            <string name="settings_menu_wheelchair_accessible">Accesible con silla de ruedas</string>
+            <string name="settings_menu_wheelchair_accessibility_description">Obtener rutas adecuadas para sillas de ruedas</string>
+            <string name="settings_menu_maximum_walk">Distancia máxima caminando</string>
+            <string name="settings_menu_maximum_walk_description">metros</string>
 
-    <!-- Location -->
-    <string name="settings_menu_location_preference_category_title">Localización</string>
-    <string name="settings_menu_auto_detect_server">Región automática</string>
-    <string name="settings_menu_auto_detect_server_description">Establecer región actual para la red de transportes basandose en la ubicación actual</string>
-    <string name="settings_menu_refresh_server_list">Actualizar lista de regiones</string>
-    <string name="settings_menu_use_device_timezone">Usar la zona horaria del teléfono</string>
-    <string name="settings_menu_use_device_timezone_description">Ignora la zona horaria de la región escogida</string>
-    <string name="settings_menu_server_list_download_date_description">Última actualización</string>
-    <string name="settings_menu_server_list_download_date_unknown">Fecha de descarga de lista desconocida</string>
+            <!-- Location -->
+            <string name="settings_menu_location_preference_category_title">Localización</string>
+            <string name="settings_menu_auto_detect_server">Región automática</string>
+            <string name="settings_menu_auto_detect_server_description">Establecer región actual para la red de transportes basandose en la ubicación actual</string>
+            <string name="settings_menu_refresh_server_list">Actualizar lista de regiones</string>
+            <string name="settings_menu_use_device_timezone">Usar la zona horaria del teléfono</string>
+            <string name="settings_menu_use_device_timezone_description">Ignora la zona horaria de la región escogida</string>
+            <string name="settings_menu_server_list_download_date_description">Última actualización</string>
+            <string name="settings_menu_server_list_download_date_unknown">Fecha de descarga de lista desconocida</string>
 
-    <!-- Advanced -->
+            <!-- Advanced -->
 
-    <!-- Custom regions -->
-    <string name="settings_menu_location_advanced_preference_category_summary">Añade tu región introduciendo una URL</string>
-    <string name="settings_menu_custom_server_url">URL para la región personalizada</string>
-    <string name="settings_menu_custom_server_url_description">La región OTP escogida está online</string>
-    <string name="settings_menu_custom_server_url_description_error_url">URL no válida</string>
-    <string name="settings_menu_custom_server_url_description_error_unreachable">Por favor introduce una nueva URL para el servidor alternativo</string>
-    <string name="settings_menu_custom_server_select_title">Región personalizada</string>
-    <string name="settings_menu_custom_server_select_description">Establecer la región usando una URL personalizada</string>
+                <!-- Custom regions -->
+                <string name="settings_menu_location_advanced_preference_category_summary">Añade tu región introduciendo una URL</string>
+                <string name="settings_menu_custom_server_url">URL para la región personalizada</string>
+                <string name="settings_menu_custom_server_url_description">La región OTP escogida está online</string>
+                <string name="settings_menu_custom_server_url_description_error_url">URL no válida</string>
+                <string name="settings_menu_custom_server_url_description_error_unreachable">Por favor introduce una nueva URL para el servidor alternativo</string>
+                <string name="settings_menu_custom_server_select_title">Región personalizada</string>
+                <string name="settings_menu_custom_server_select_description">Establecer la región usando una URL personalizada</string>
 
-    <!-- Map -->
-    <string name="settings_menu_map_options">Mapa</string>
-    <string name="settings_menu_map_tile_provider">Proveedor del mapa</string>
+            <!-- Map -->
+            <string name="settings_menu_map_options">Mapa</string>
+            <string name="settings_menu_map_tile_provider">Proveedor del mapa</string>
 
-    <!-- Points of Interest and Address Search -->
-    <string name="settings_menu_geocoder_preference_category_title">Direcciones y puntos de interés</string>
-    <string name="settings_menu_geocoder_preference_provider_title">Proveedor de búsqueda</string>
-    <string name="settings_menu_geocoder_preference_provider_nominatim">Mapquest Nominatim</string>
-    <string name="settings_menu_geocoder_preference_provider_google_places">Google Places</string>
+            <!-- Points of Interest and Address Search -->
+            <string name="settings_menu_geocoder_preference_category_title">Direcciones y puntos de interés</string>
+            <string name="settings_menu_geocoder_preference_provider_title">Proveedor de búsqueda</string>
+            <string name="settings_menu_geocoder_preference_provider_nominatim">Mapquest Nominatim</string>
+            <string name="settings_menu_geocoder_preference_provider_google_places">Google Places</string>
 
-    <!-- Advanced -->
-    <string name="settings_menu_geocoder_advanced_preference_category_summary">Modificar comportamiento por defecto del geocodificador</string>
+            <!-- Advanced -->
+            <string name="settings_menu_geocoder_advanced_preference_category_summary">Modificar comportamiento por defecto del geocodificador</string>
 
-    <!-- Android geocoder -->
-    <string name="settings_menu_use_android_geocoder_title">Preferir geocodificador de Android</string>
-    <string name="settings_menu_use_android_geocoder_description">Intentar primero con geocodificador de Android para todas las búsquedas</string>
+                <!-- Android geocoder -->
+                <string name="settings_menu_use_android_geocoder_title">Preferir geocodificador de Android</string>
+                <string name="settings_menu_use_android_geocoder_description">Intentar primero con geocodificador de Android para todas las búsquedas</string>
 
-    <!-- Intelligent markers -->
-    <string name="settings_menu_use_intelligent_markers_title">Marcadores inteligentes</string>
-    <string name="settings_menu_use_intelligent_markers_description">Mover los marcadores a la dirección o punto de interés más cercanos</string>
+                <!-- Intelligent markers -->
+                <string name="settings_menu_use_intelligent_markers_title">Marcadores inteligentes</string>
+                <string name="settings_menu_use_intelligent_markers_description">Mover los marcadores a la dirección o punto de interés más cercanos</string>
 
 
     <!-- Step-by-step screen -->
 
-    <!-- Title -->
-    <string name="step_by_step_title">Indicaciones</string>
+        <!-- Title -->
+        <string name="step_by_step_title">Indicaciones</string>
 
-    <!-- Top headers -->
-    <string name="step_by_step_header_from">De</string>
-    <string name="step_by_step_header_to">A</string>
-    <string name="step_by_step_header_departure">Sal.</string>
-    <string name="step_by_step_header_arrival">LLeg.</string>
+        <!-- Top headers -->
+        <string name="step_by_step_header_from">De</string>
+        <string name="step_by_step_header_to">A</string>
+        <string name="step_by_step_header_departure">Sal.</string>
+        <string name="step_by_step_header_arrival">LLeg.</string>
 
-    <!-- Drop down menu components -->
-    <string name="step_by_step_walking_duration">a pie</string>
-    <string name="step_by_step_total_duration">se tardan</string>
+        <!-- Drop down menu components -->
+        <string name="step_by_step_walking_duration">a pie</string>
+        <string name="step_by_step_total_duration">se tardan</string>
 
-    <!-- Instructions generation -->
+        <!-- Instructions generation -->
 
-    <!-- Transit -->
+            <!-- Transit -->
 
-    <!-- Transit instruction start -->
-    <string name="step_by_step_transit_get_on">Sube al</string>
-    <string name="step_by_step_transit_get_off">Baja del</string>
-    <string name="step_by_step_transit_stops_in_between">Paradas hasta el destino</string>
+                <!-- Transit instruction start -->
+                <string name="step_by_step_transit_get_on">Sube al</string>
+                <string name="step_by_step_transit_get_off">Baja del</string>
+                <string name="step_by_step_transit_stops_in_between">Paradas hasta el destino</string>
 
-    <!-- Transit description start -->
-    <string name="step_by_step_transit_connector_stop_name">En</string>
+                <!-- Transit description start -->
+                <string name="step_by_step_transit_connector_stop_name">En</string>
 
-    <!-- Non-transit -->
+            <!-- Non-transit -->
 
-    <!--  Main direction components -->
-    <string name="step_by_step_non_transit_mode_car_action">Conduce</string>
-    <string name="step_by_step_non_transit_mode_walk_action">Ve a pie</string>
-    <string name="step_by_step_non_transit_mode_bicycle_action">Ve en bici</string>
-    <string name="step_by_step_non_transit_from">de</string>
-    <string name="step_by_step_non_transit_to">a</string>
+                <!--  Main direction components -->
+                <string name="step_by_step_non_transit_mode_car_action">Conduce</string>
+                <string name="step_by_step_non_transit_mode_walk_action">Ve a pie</string>
+                <string name="step_by_step_non_transit_mode_bicycle_action">Ve en bici</string>
+                <string name="step_by_step_non_transit_from">de</string>
+                <string name="step_by_step_non_transit_to">a</string>
 
-    <!-- Subdirection components -->
+               <!-- Subdirection components -->
 
-    <!-- Connectors -->
-    <string name="step_by_step_non_transit_turn">Gira</string>
-    <string name="step_by_step_non_transit_heading">en dirección</string>
-    <string name="step_by_step_non_transit_connector_street_name">en</string>
-    <string name="step_by_step_non_transit_connector_street_name_roundabout">hacia</string>
+                    <!-- Connectors -->
+                    <string name="step_by_step_non_transit_turn">Gira</string>
+                    <string name="step_by_step_non_transit_heading">en dirección</string>
+                    <string name="step_by_step_non_transit_connector_street_name">en</string>
+                    <string name="step_by_step_non_transit_connector_street_name_roundabout">hacia</string>
 
-    <!-- Relative directions -->
-    <string name="step_by_step_non_transit_dir_relative_circle_clockwise">En la rotonda toma la</string>
-    <string name="step_by_step_non_transit_dir_relative_circle_counterclockwise">En la rotonda toma la</string>
-    <string name="step_by_step_non_transit_dir_relative_continue">Continúa</string>
-    <string name="step_by_step_non_transit_dir_relative_depart">Sal</string>
-    <string name="step_by_step_non_transit_dir_relative_elevator">Coge el elevador</string>
-    <string name="step_by_step_non_transit_dir_relative_hard_left">Giro cerrado a la izquierda</string>
-    <string name="step_by_step_non_transit_dir_relative_hard_right">Giro cerrado a la derecha</string>
-    <string name="step_by_step_non_transit_dir_relative_left">a la izquierda</string>
-    <string name="step_by_step_non_transit_dir_relative_right">a la derecha</string>
-    <string name="step_by_step_non_transit_dir_relative_slightly_left">ligeramente a la izquierda</string>
-    <string name="step_by_step_non_transit_dir_relative_slightly_right">ligeramente a la derecha</string>
-    <string name="step_by_step_non_transit_dir_relative_uturn_left">Haz un cambio de sentido hacia la izquierda</string>
-    <string name="step_by_step_non_transit_dir_relative_uturn_right">Haz un cambio de sentido hacia la derecha</string>
+                    <!-- Relative directions -->
+                    <!--<string name="step_by_step_non_transit_dir_relative_circle_clockwise">At the roundabout take the</string>-->
+                    <!--<string name="step_by_step_non_transit_dir_relative_circle_counterclockwise">At the roundabout take the</string>-->
+                    <string name="step_by_step_non_transit_dir_relative_continue">Continúa</string>
+                    <string name="step_by_step_non_transit_dir_relative_depart">Sal</string>
+                    <string name="step_by_step_non_transit_dir_relative_elevator">Coge el elevador</string>
+                    <string name="step_by_step_non_transit_dir_relative_hard_left">Giro cerrado a la izquierda</string>
+                    <string name="step_by_step_non_transit_dir_relative_hard_right">Giro cerrado a la derecha</string>
+                    <string name="step_by_step_non_transit_dir_relative_left">a la izquierda</string>
+                    <string name="step_by_step_non_transit_dir_relative_right">a la derecha</string>
+                    <string name="step_by_step_non_transit_dir_relative_slightly_left">ligeramente a la izquierda</string>
+                    <string name="step_by_step_non_transit_dir_relative_slightly_right">ligeramente a la derecha</string>
+                    <string name="step_by_step_non_transit_dir_relative_uturn_left">Haz un cambio de sentido hacia la izquierda</string>
+                    <string name="step_by_step_non_transit_dir_relative_uturn_right">Haz un cambio de sentido hacia la derecha</string>
 
-    <!-- Absolute directions -->
-    <string name="step_by_step_non_transit_dir_absolute_east">este</string>
-    <string name="step_by_step_non_transit_dir_absolute_north">norte</string>
-    <string name="step_by_step_non_transit_dir_absolute_northeast">noreste</string>
-    <string name="step_by_step_non_transit_dir_absolute_northwest">noroeste</string>
-    <string name="step_by_step_non_transit_dir_absolute_south">sur</string>
-    <string name="step_by_step_non_transit_dir_absolute_southeast">sureste</string>
-    <string name="step_by_step_non_transit_dir_absolute_southwest">suroeste</string>
-    <string name="step_by_step_non_transit_dir_absolute_west">oeste</string>
+                    <!-- Absolute directions -->
+                    <string name="step_by_step_non_transit_dir_absolute_east">este</string>
+                    <string name="step_by_step_non_transit_dir_absolute_north">norte</string>
+                    <string name="step_by_step_non_transit_dir_absolute_northeast">noreste</string>
+                    <string name="step_by_step_non_transit_dir_absolute_northwest">noroeste</string>
+                    <string name="step_by_step_non_transit_dir_absolute_south">sur</string>
+                    <string name="step_by_step_non_transit_dir_absolute_southeast">sureste</string>
+                    <string name="step_by_step_non_transit_dir_absolute_southwest">suroeste</string>
+                    <string name="step_by_step_non_transit_dir_absolute_west">oeste</string>
 
-    <!-- Roundabouts -->
+                    <!-- Roundabouts -->
 
-    <!-- Exit ordinals -->
-    <string name="step_by_step_non_transit_roundabout_ordinal_first">primera</string>
-    <string name="step_by_step_non_transit_roundabout_ordinal_second">segunda</string>
-    <string name="step_by_step_non_transit_roundabout_ordinal_third">tercera</string>
-    <string name="step_by_step_non_transit_roundabout_ordinal_fourth">cuarta</string>
-    <string name="step_by_step_non_transit_roundabout_ordinal_fifth">quinta</string>
-    <string name="step_by_step_non_transit_roundabout_ordinal_sixth">sexta</string>
-    <string name="step_by_step_non_transit_roundabout_ordinal_seventh">séptima</string>
-    <string name="step_by_step_non_transit_roundabout_ordinal_eighth">octava</string>
-    <string name="step_by_step_non_transit_roundabout_ordinal_ninth">novena</string>
-    <string name="step_by_step_non_transit_roundabout_ordinal_tenth">décima</string>
+                        <!-- Exit ordinals -->
+                        <string name="step_by_step_non_transit_roundabout_ordinal_first">primera</string>
+                        <string name="step_by_step_non_transit_roundabout_ordinal_second">segunda</string>
+                        <string name="step_by_step_non_transit_roundabout_ordinal_third">tercera</string>
+                        <string name="step_by_step_non_transit_roundabout_ordinal_fourth">cuarta</string>
+                        <string name="step_by_step_non_transit_roundabout_ordinal_fifth">quinta</string>
+                        <string name="step_by_step_non_transit_roundabout_ordinal_sixth">sexta</string>
+                        <string name="step_by_step_non_transit_roundabout_ordinal_seventh">séptima</string>
+                        <string name="step_by_step_non_transit_roundabout_ordinal_eighth">octava</string>
+                        <string name="step_by_step_non_transit_roundabout_ordinal_ninth">novena</string>
+                        <string name="step_by_step_non_transit_roundabout_ordinal_tenth">décima</string>
 
-    <!-- To complement the step_by_step_non_transit_roundabout_number for a bigger ordinal -->
-    <string name="step_by_step_non_transit_roundabout_number">número</string>
+                        <!-- To complement the step_by_step_non_transit_roundabout_number for a bigger ordinal -->
+                        <string name="step_by_step_non_transit_roundabout_number">número</string>
 
-    <!-- After the ordinal -->
-    <string name="step_by_step_non_transit_roundabout_exit">salida</string>
+                        <!-- After the ordinal -->
+                        <string name="step_by_step_non_transit_roundabout_exit">salida</string>
+
 
     <!-- App wide  -->
 
-    <!-- Used in util functions to display consistently time and distance all around the app  -->
+        <!-- Used in util functions to display consistently time and distance all around the app  -->
 
-    <!-- Time -->
+            <!-- Time -->
 
-    <!-- Units -->
-    <string name="time_short_hours">h</string>
-    <string name="time_short_minutes">m</string>
-    <string name="time_short_seconds">s</string>
-    <string name="time_long_hours">h</string>
-    <string name="time_long_minutes">min</string>
-    <string name="time_long_seconds">seg</string>
-    <string name="time_full_hours">horas</string>
-    <string name="time_full_minutes">minutos</string>
-    <string name="time_full_seconds">segundos</string>
+                <!-- Units -->
+                <string name="time_short_hours">h</string>
+                <string name="time_short_minutes">m</string>
+                <string name="time_short_seconds">s</string>
+                <string name="time_long_hours">h</string>
+                <string name="time_long_minutes">min</string>
+                <string name="time_long_seconds">seg</string>
+                <string name="time_full_hours">horas</string>
+                <string name="time_full_minutes">minutos</string>
+                <string name="time_full_seconds">segundos</string>
 
-    <!-- Connectors -->
-    <string name="time_connector_next_day">mañana</string>
-    <string name="time_connector_before_time">a las</string>
-    <string name="time_connector_before_date">el</string>
+                <!-- Connectors -->
+                <string name="time_connector_next_day">mañana</string>
+                <string name="time_connector_before_time">a las</string>
+                <string name="time_connector_before_date">el</string>
 
-    <!-- Distance -->
+            <!-- Distance -->
 
-    <!-- Units -->
-    <string name="distance_kilometers">km</string>
-    <string name="distance_meters">m</string>
+                <!-- Units -->
+                <string name="distance_kilometers">km</string>
+                <string name="distance_meters">m</string>
 
-    <!-- Used in util function to localize street generated names, used in map markers pop-ups and step-by-step  -->
+        <!-- Used in util function to localize street generated names, used in map markers pop-ups and step-by-step  -->
 
-    <!-- Street type -->
-    <string name="street_type_bike_path">senda de bicis</string>
-    <string name="street_type_open_area">espacio abierto</string>
-    <string name="street_type_path">camino</string>
-    <string name="street_type_bridleway">herradura</string>
-    <string name="street_type_footpath">camino pedestre</string>
-    <string name="street_type_platform">plataforma</string>
-    <string name="street_type_footbridge">puente pedestre</string>
-    <string name="street_type_underpass">paso inferior</string>
-    <string name="street_type_road">vía principal</string>
-    <string name="street_type_ramp">rampa</string>
-    <string name="street_type_link">conexión</string>
-    <string name="street_type_service_road">vía de acceso</string>
-    <string name="street_type_alley">callejón</string>
-    <string name="street_type_parking_aisle">zona de aparcamiento</string>
-    <string name="street_type_byway">sendero</string>
-    <string name="street_type_track">vía secundaria</string>
-    <string name="street_type_sidewalk">acera</string>
-    <string name="street_type_steps">escaleras</string>
+            <!-- Street type -->
+            <string name="street_type_bike_path">senda de bicis</string>
+            <string name="street_type_open_area">espacio abierto</string>
+            <string name="street_type_path">camino</string>
+            <string name="street_type_bridleway">herradura</string>
+            <string name="street_type_footpath">camino pedestre</string>
+            <string name="street_type_platform">plataforma</string>
+            <string name="street_type_footbridge">puente pedestre</string>
+            <string name="street_type_underpass">paso inferior</string>
+            <string name="street_type_road">vía principal</string>
+            <string name="street_type_ramp">rampa</string>
+            <string name="street_type_link">conexión</string>
+            <string name="street_type_service_road">vía de acceso</string>
+            <string name="street_type_alley">callejón</string>
+            <string name="street_type_parking_aisle">zona de aparcamiento</string>
+            <string name="street_type_byway">sendero</string>
+            <string name="street_type_track">vía secundaria</string>
+            <string name="street_type_sidewalk">acera</string>
+            <string name="street_type_steps">escaleras</string>
 
-    <!-- Used to introduce route names in itineraries drop down (map view and step-by-step) and map mode markers popups -->
-    <string name="connector_before_route">Línea</string>
+        <!-- Used to introduce route names in itineraries drop down (map view and step-by-step) and map mode markers popups -->
+        <string name="connector_before_route">Línea</string>
 
 </resources>
