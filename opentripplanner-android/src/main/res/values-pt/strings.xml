@@ -24,21 +24,21 @@
     <string name="step_by_step_header_arrival">Chegada</string>
     <string name="step_by_step_turn">Vire</string>
     <string name="step_by_step_heading">em direcção a</string>
-    <string name="step_by_step_from">de</string>
-    <string name="step_by_step_to">para</string>
-    <string name="step_by_step_connector_street_name">no/na</string>
-    <!--<string name="step_by_step_connector_street_name_roundabout">to</string>-->
-    <string name="step_by_step_transit_get_on">Entre no</string>
-    <string name="step_by_step_transit_get_off">Saia do</string>
+    <string name="step_by_step_from">desde</string>
+    <string name="step_by_step_to">até</string>
+    <string name="step_by_step_connector_street_name">em</string>
+    <string name="step_by_step_connector_street_name_roundabout">em</string>
+    <string name="step_by_step_transit_get_on">Entre em</string>
+    <string name="step_by_step_transit_get_off">Saia de</string>
     <string name="step_by_step_transit_connector_stop_name">Paragem</string>
-    <string name="step_by_step_transit_stops_in_between">Paragens até ao destino</string>
+    <string name="step_by_step_transit_stops_in_between">paragens até ao destino</string>
     <string name="need_to_place_marker">Adicione um marcador de posição&#8230;</string>
     <string name="need_to_place_markers_before_planning">É necessário definir os pontos de origem e de destino primeiro</string>
     <string name="start_location_hint">Local de origem</string>
     <string name="end_location_hint">Local de destino</string>
     <string name="textbox_close_to_marker">Marcador perto de</string>
-    <string name="metadata_request_successful">Informação de transportes descarregada.</string>
-    <string name="metadata_request_progress">À procura de informação de transportes. Por favor aguarde&#8230;</string>
+    <string name="metadata_request_successful">Dados da região descarregados.</string>
+    <string name="metadata_request_progress">À procura de dados da região. Por favor aguarde&#8230;</string>
     <string name="geocoding_request_progress">À procura de pontos de interesse. Por favor aguarde&#8230;</string>
     <string name="server_checker_progress">A obter informação da região. Por favor aguarde&#8230;</string>
     <string name="server_checker_successful">OK: Região a funcionar</string>
@@ -50,13 +50,13 @@
     <string name="server_checker_info_dialog_url">URL:</string>
     <string name="server_checker_info_dialog_bounds">Área:</string>
     <string name="server_checker_info_dialog_reachable">Online:</string>
-    <string name="server_selector_progress">À procura de informação de transportes. Por favor aguarde&#8230;</string>
+    <string name="server_selector_progress">À procura de informação da região, por favor aguarde&#8230;</string>
     <string name="server_selector_detected">Encontrado</string>
     <string name="server_selector_server_change_info">Altere nas Preferências</string>
     <string name="server_selector_server_info_dialog_title">Escolha a Região</string>
-    <string name="server_selector_custom_server_alert_title">Insira um URL personalizado duma região OTP</string>
-    <string name="custom_server_name">Região personalizada</string>
-    <string name="custom_server_not_set">Endereço para região personalizada é inválido</string>
+    <string name="server_selector_custom_server_alert_title">Insira um URL particular duma região OTP</string>
+    <string name="custom_server_name">Região particular</string>
+    <string name="custom_server_not_set">Endereço para região particular é inválido</string>
     <string name="custom_server_unknown_region">Desconhecida</string>
     <string name="custom_server_unknown_bounds">Desconhecida</string>
     <string name="custom_server_unknown_language">Desconhecido</string>
@@ -106,7 +106,7 @@
     <string name="routing_options">Itinerários</string>
     <string name="map_options">Mapa</string>
     <string name="map_tile_provider">Fornecedor do mapa</string>
-    <string name="custom_server_url">Endereço URL de região personalizada</string>
+    <string name="custom_server_url">Endereço URL de região particular</string>
     <string name="custom_server_url_description">Região OTP actual está online</string>
     <string name="custom_server_url_error">URL inválido</string>
     <string name="custom_server_error">Por favor introduza um novo URL para o servidor alternativo</string>
@@ -126,7 +126,7 @@
     <string name="tripplanner_error_dialog_title">O Planeamento não foi possível</string>
     <string name="tripplanner_error_request_timeout">A Região não está a responder, por favor tente mais tarde</string>
     <string name="tripplanner_error_system">A Região está offline, por favor tente mais tarde</string>
-    <!--<string name="tripplanner_error_outside_bounds">Origin or destination is outside transportation network coverage</string>-->
+    <string name="tripplanner_error_outside_bounds">Ponto de Origem ou de Destino encontra-se fora da cobertura da rede de transportes</string>
     <string name="tripplanner_error_path_not_found">Não foi possível encontrar uma rota entre o ponto de Origem e de Destino</string>
     <string name="tripplanner_error_no_transit_times">Horários de transportes para a data escolhida não estão disponíveis</string>
     <string name="tripplanner_error_bogus_parameter">Algo correu mal. Por favor altere as opções da viagem e tente outra vez.</string>
@@ -190,7 +190,7 @@
     <!-- Custom regions -->
     <string name="error_no_server_selected">Nenhuma região seleccionada</string>
     <string name="info_server_error">Aviso: Não é possível obter info da região!</string>
-    <string name="selected_custom_server_title">Região personalizada</string>
+    <string name="selected_custom_server_title">Região particular</string>
     <string name="selected_custom_server_description">Defina a região usando um URL próprio</string>
     <string name="server_down">Impossível contactar o servidor da região!</string>
 
@@ -208,19 +208,19 @@
     <string name="header_bike_options_bike_friendly">Apropriado para bicicletas</string>
 
     <!-- Directions -->
-    <!--<string name="dir_relative_circle_clockwise">At the roundabout take the</string>-->
-    <!--<string name="dir_relative_circle_counterclockwise">At the roundabout take the</string>-->
+    <string name="dir_relative_circle_clockwise">Na rotunda saia na</string>
+    <string name="dir_relative_circle_counterclockwise">Na rotunda saia na</string>
     <string name="dir_relative_continue">Continuar</string>
     <string name="dir_relative_depart">Partir</string>
-    <!--<string name="dir_relative_elevator">Take elevator</string>-->
+    <string name="dir_relative_elevator">Apanhe o elevador</string>
     <string name="dir_relative_hard_left">Curva apertada à esquerda</string>
     <string name="dir_relative_hard_right">Curva apertada à direita</string>
     <string name="dir_relative_left">à esquerda</string>
     <string name="dir_relative_right">à direita</string>
-    <!--<string name="dir_relative_slight_left">slight left</string>-->
-    <!--<string name="dir_relative_slight_right">slight right</string>-->
-    <!--<string name="dir_relative_uturn_left">Make uturn to the left</string>-->
-    <!--<string name="dir_relative_uturn_right">Make uturn to the right</string>-->
+    <string name="dir_relative_slight_left">Curva ligeira à esquerda</string>
+    <string name="dir_relative_slight_right">Curva ligeira à direita</string>
+    <string name="dir_relative_uturn_left">Faça inversão de marcha à esquerda</string>
+    <string name="dir_relative_uturn_right">Faça inversão de marcha à direita</string>
     <string name="dir_absolute_east">Este</string>
     <string name="dir_absolute_north">Norte</string>
     <string name="dir_absolute_northeast">Nordeste</string>
@@ -249,20 +249,20 @@
     <string name="street_type_steps">passos</string>
 
     <!--&lt;!&ndash; Ordinals &ndash;&gt;-->
-    <!--<string name="roundabout_ordinal_first">first</string>-->
-    <!--<string name="roundabout_ordinal_second">second</string>-->
-    <!--<string name="roundabout_ordinal_third">third</string>-->
-    <!--<string name="roundabout_ordinal_fourth">fourth</string>-->
-    <!--<string name="roundabout_ordinal_fifth">fifth</string>-->
-    <!--<string name="roundabout_ordinal_sixth">sixth</string>-->
-    <!--<string name="roundabout_ordinal_seventh">seventh</string>-->
-    <!--<string name="roundabout_ordinal_eighth">eighth</string>-->
-    <!--<string name="roundabout_ordinal_ninth">ninth</string>-->
-    <!--<string name="roundabout_ordinal_tenth">tenth</string>-->
+    <string name="roundabout_ordinal_first">primeira</string>
+    <string name="roundabout_ordinal_second">segunda</string>
+    <string name="roundabout_ordinal_third">terceira</string>
+    <string name="roundabout_ordinal_fourth">quarta</string>
+    <string name="roundabout_ordinal_fifth">quinta</string>
+    <string name="roundabout_ordinal_sixth">sexta</string>
+    <string name="roundabout_ordinal_seventh">sétima</string>
+    <string name="roundabout_ordinal_eighth">oitava</string>
+    <string name="roundabout_ordinal_ninth">nona</string>
+    <string name="roundabout_ordinal_tenth">décima</string>
 
     <!-- To complement the roundabout_number for a bigger ordinal -->
-    <!--<string name="roundabout_number">roundabout_number</string>-->
+    <string name="roundabout_number">número</string>
 
     <!-- After the ordinal -->
-    <!--<string name="roundabout_exit">exit</string>-->
+    <string name="roundabout_exit">saída</string>
 </resources>
