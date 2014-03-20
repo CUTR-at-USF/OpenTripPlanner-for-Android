@@ -190,9 +190,6 @@ public class MainFragment extends Fragment implements
 
     private Boolean mNeedToRunAutoDetect = false;
 
-    private boolean mIsRealLostFocus = true;
-
-
     private ImageButton mBtnPlanTrip;
 
     private ImageButton mBtnDateDialog;
@@ -582,12 +579,149 @@ public class MainFragment extends Fragment implements
                 mApplicationContext.getResources().getString(R.string.map_tiles_default_server));
         updateOverlay(overlayString);
 
-        addMapListeners();
         addInterfaceListeners();
     }
 
 
     private void addInterfaceListeners() {
+
+        final OnMapClickListener onMapClickListener = new OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latlng) {
+                InputMethodManager imm = (InputMethodManager) MainFragment.this.getActivity()
+                        .getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(mTbEndLocation.getWindowToken(), 0);
+                imm.hideSoftInputFromWindow(mTbStartLocation.getWindowToken(), 0);
+
+                if (mTbStartLocation.hasFocus()) {
+                    setMarker(true, latlng, true);
+                } else {
+                    setMarker(false, latlng, true);
+                }
+            }
+        };
+        mMap.setOnMapClickListener(onMapClickListener);
+
+        OnMarkerDragListener onMarkerDragListener = new OnMarkerDragListener() {
+
+            @Override
+            public void onMarkerDrag(Marker marker) {
+            }
+
+            @Override
+            public void onMarkerDragEnd(Marker marker) {
+                LatLng markerLatlng = marker.getPosition();
+
+                if (((mOTPApp.getSelectedServer() != null) && LocationUtil
+                        .checkPointInBoundingBox(markerLatlng, mOTPApp.getSelectedServer(),
+                                OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))
+                        || (mOTPApp.getSelectedServer() == null)) {
+                    if ((mStartMarker != null) && (marker.hashCode() == mStartMarker.hashCode())) {
+                        if (mPrefs
+                                .getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true)) {
+                            updateMarkerPosition(markerLatlng, true);
+                        } else {
+                            mIsStartLocationGeocodingProcessed = true;
+                            removeFocus(true);
+                        }
+                        mStartMarkerPosition = markerLatlng;
+                    } else if ((mEndMarker != null) && (marker.hashCode() == mEndMarker
+                            .hashCode())) {
+                        if (mPrefs
+                                .getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true)) {
+                            updateMarkerPosition(markerLatlng, false);
+                        } else {
+                            mIsEndLocationGeocodingProcessed = true;
+                            removeFocus(false);
+                        }
+                        mEndMarkerPosition = markerLatlng;
+                    }
+                } else {
+
+                    if ((mStartMarker != null) && (marker.hashCode() == mStartMarker.hashCode())) {
+                        marker.setPosition(mStartMarkerPosition);
+                    } else {
+                        marker.setPosition(mEndMarkerPosition);
+                    }
+                    Toast.makeText(mApplicationContext, mApplicationContext.getResources()
+                            .getString(R.string.marker_out_of_boundaries), Toast.LENGTH_SHORT)
+                            .show();
+                }
+            }
+
+            @Override
+            public void onMarkerDragStart(Marker marker) {
+                InputMethodManager imm = (InputMethodManager) MainFragment.this.getActivity()
+                        .getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(mTbEndLocation.getWindowToken(), 0);
+                imm.hideSoftInputFromWindow(mTbStartLocation.getWindowToken(), 0);
+            }
+        };
+        mMap.setOnMarkerDragListener(onMarkerDragListener);
+
+        OnMapLongClickListener onMapLongClickListener = new OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng latlng) {
+                InputMethodManager imm = (InputMethodManager) MainFragment.this.getActivity()
+                        .getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(mTbEndLocation.getWindowToken(), 0);
+                imm.hideSoftInputFromWindow(mTbStartLocation.getWindowToken(), 0);
+
+                final LatLng latLngFinal = latlng;
+                final CharSequence[] items = {mApplicationContext.getResources()
+                        .getString(R.string.start_marker_activated),
+                        mApplicationContext.getResources()
+                                .getString(R.string.end_marker_activated)};
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(
+                        MainFragment.this.getActivity());
+                builder.setTitle(getResources().getString(R.string.markers_dialog_title));
+                builder.setItems(items, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int item) {
+                        if (item == 0) {
+                            setMarker(true, latLngFinal, true);
+                        } else {
+                            setMarker(false, latLngFinal, true);
+                        }
+                    }
+                });
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
+        };
+        mMap.setOnMapLongClickListener(onMapLongClickListener);
+
+        OnClickListener onClickListener = new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                mDrawerLayout.openDrawer(Gravity.LEFT);
+            }
+        };
+        mBtnHandle.setOnClickListener(onClickListener);
+
+        OnInfoWindowClickListener onInfoWindowClickListener = new OnInfoWindowClickListener() {
+
+            @Override
+            public void onInfoWindowClick(Marker modeMarker) {
+                saveOTPBundle();
+                OTPBundle otpBundle = getFragmentListener().getOTPBundle();
+                Matcher matcher = Pattern.compile("\\d+").matcher(modeMarker.getTitle());
+                if (matcher.find()) {
+                    String numberString = modeMarker.getTitle().substring(0, matcher.end());
+                    //Step indexes shown to the user are in a scale starting by 1 but instructions steps internally start by 0
+                    int currentStepIndex = Integer.parseInt(numberString) - 1;
+                    otpBundle.setCurrentStepIndex(currentStepIndex);
+                    otpBundle.setFromInfoWindow(true);
+                    getFragmentListener().setOTPBundle(otpBundle);
+                    getFragmentListener().onSwitchedToDirectionFragment();
+                }
+
+            }
+        };
+        mMap.setOnInfoWindowClickListener(onInfoWindowClickListener);
+
+
 
         DrawerListener dl = new DrawerListener() {
             @Override
@@ -605,8 +739,6 @@ public class MainFragment extends Fragment implements
 
             @Override
             public void onDrawerOpened(View arg0) {
-                mTbStartLocation.clearFocus();
-                mTbEndLocation.clearFocus();
             }
 
             @Override
@@ -770,10 +902,11 @@ public class MainFragment extends Fragment implements
         OnFocusChangeListener tbLocationOnFocusChangeListener = new OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if (!mIsRealLostFocus) {
-                    mIsRealLostFocus = true;
-                    return;
+
+                if (hasFocus) {
+                    mMap.setOnMapClickListener(onMapClickListener);
                 }
+
                 TextView tv = (TextView) v;
                 if (!hasFocus) {
                     CharSequence tvCharSequence = tv.getText();
@@ -873,7 +1006,6 @@ public class MainFragment extends Fragment implements
                             || (event != null
                             && event.getAction() == KeyEvent.ACTION_DOWN && event
                             .getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
-                        mIsRealLostFocus = false;
                         if (!mIsStartLocationGeocodingProcessed
                                 && !mPrefs
                                 .getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true)) {
@@ -1060,7 +1192,6 @@ public class MainFragment extends Fragment implements
      * necessary.
      */
     private void processRequestTrip() {
-        mIsRealLostFocus = false;
         Editable tbEditable;
 
         if (!mIsEndLocationGeocodingProcessed
@@ -1130,142 +1261,6 @@ public class MainFragment extends Fragment implements
         this.getFragmentListener().setOTPBundle(bundle);
     }
 
-
-    private void addMapListeners() {
-        OnMapClickListener onMapClickListener = new OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latlng) {
-                InputMethodManager imm = (InputMethodManager) MainFragment.this.getActivity()
-                        .getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(mTbEndLocation.getWindowToken(), 0);
-                imm.hideSoftInputFromWindow(mTbStartLocation.getWindowToken(), 0);
-
-                if (mTbStartLocation.hasFocus()) {
-                    setMarker(true, latlng, true);
-                } else {
-                    setMarker(false, latlng, true);
-                }
-            }
-        };
-        mMap.setOnMapClickListener(onMapClickListener);
-
-        OnMarkerDragListener onMarkerDragListener = new OnMarkerDragListener() {
-
-            @Override
-            public void onMarkerDrag(Marker marker) {
-            }
-
-            @Override
-            public void onMarkerDragEnd(Marker marker) {
-                LatLng markerLatlng = marker.getPosition();
-
-                if (((mOTPApp.getSelectedServer() != null) && LocationUtil
-                        .checkPointInBoundingBox(markerLatlng, mOTPApp.getSelectedServer(),
-                                OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))
-                        || (mOTPApp.getSelectedServer() == null)) {
-                    if ((mStartMarker != null) && (marker.hashCode() == mStartMarker.hashCode())) {
-                        if (mPrefs
-                                .getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true)) {
-                            updateMarkerPosition(markerLatlng, true);
-                        } else {
-                            mIsStartLocationGeocodingProcessed = true;
-                        }
-                        mStartMarkerPosition = markerLatlng;
-                    } else if ((mEndMarker != null) && (marker.hashCode() == mEndMarker
-                            .hashCode())) {
-                        if (mPrefs
-                                .getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true)) {
-                            updateMarkerPosition(markerLatlng, false);
-                        } else {
-                            mIsEndLocationGeocodingProcessed = true;
-                        }
-                        mEndMarkerPosition = markerLatlng;
-                    }
-                } else {
-
-                    if ((mStartMarker != null) && (marker.hashCode() == mStartMarker.hashCode())) {
-                        marker.setPosition(mStartMarkerPosition);
-                    } else {
-                        marker.setPosition(mEndMarkerPosition);
-                    }
-                    Toast.makeText(mApplicationContext, mApplicationContext.getResources()
-                            .getString(R.string.marker_out_of_boundaries), Toast.LENGTH_SHORT)
-                            .show();
-                }
-            }
-
-            @Override
-            public void onMarkerDragStart(Marker marker) {
-                InputMethodManager imm = (InputMethodManager) MainFragment.this.getActivity()
-                        .getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(mTbEndLocation.getWindowToken(), 0);
-                imm.hideSoftInputFromWindow(mTbStartLocation.getWindowToken(), 0);
-            }
-        };
-        mMap.setOnMarkerDragListener(onMarkerDragListener);
-
-        OnMapLongClickListener onMapLongClickListener = new OnMapLongClickListener() {
-            @Override
-            public void onMapLongClick(LatLng latlng) {
-                InputMethodManager imm = (InputMethodManager) MainFragment.this.getActivity()
-                        .getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(mTbEndLocation.getWindowToken(), 0);
-                imm.hideSoftInputFromWindow(mTbStartLocation.getWindowToken(), 0);
-
-                final LatLng latLngFinal = latlng;
-                final CharSequence[] items = {mApplicationContext.getResources()
-                        .getString(R.string.start_marker_activated),
-                        mApplicationContext.getResources()
-                                .getString(R.string.end_marker_activated)};
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(
-                        MainFragment.this.getActivity());
-                builder.setTitle(getResources().getString(R.string.markers_dialog_title));
-                builder.setItems(items, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int item) {
-                        if (item == 0) {
-                            setMarker(true, latLngFinal, true);
-                        } else {
-                            setMarker(false, latLngFinal, true);
-                        }
-                    }
-                });
-                AlertDialog alert = builder.create();
-                alert.show();
-            }
-        };
-        mMap.setOnMapLongClickListener(onMapLongClickListener);
-
-        OnClickListener onClickListener = new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                mDrawerLayout.openDrawer(Gravity.LEFT);
-            }
-        };
-        mBtnHandle.setOnClickListener(onClickListener);
-
-        OnInfoWindowClickListener onInfoWindowClickListener = new OnInfoWindowClickListener() {
-
-            @Override
-            public void onInfoWindowClick(Marker modeMarker) {
-                saveOTPBundle();
-                OTPBundle otpBundle = getFragmentListener().getOTPBundle();
-                Matcher matcher = Pattern.compile("\\d+").matcher(modeMarker.getTitle());
-                if (matcher.find()) {
-                    String numberString = modeMarker.getTitle().substring(0, matcher.end());
-                    //Step indexes shown to the user are in a scale starting by 1 but instructions steps internally start by 0
-                    int currentStepIndex = Integer.parseInt(numberString) - 1;
-                    otpBundle.setCurrentStepIndex(currentStepIndex);
-                    otpBundle.setFromInfoWindow(true);
-                    getFragmentListener().setOTPBundle(otpBundle);
-                    getFragmentListener().onSwitchedToDirectionFragment();
-                }
-
-            }
-        };
-        mMap.setOnInfoWindowClickListener(onInfoWindowClickListener);
-    }
 
 
     private void restoreState(Bundle savedInstanceState) {
@@ -1770,6 +1765,27 @@ public class MainFragment extends Fragment implements
 
 
     /**
+     * Removes focus from the text box chosen by the parameter and deletes map click listener if
+     * none of the text boxes remain focused.
+     *
+     * @param isStartTextbox to select text box to removes focus from
+     */
+    private void removeFocus(boolean isStartTextbox) {
+        if (isStartTextbox) {
+            mTbStartLocation.clearFocus();
+            if (!mTbEndLocation.hasFocus()){
+                mMap.setOnMapClickListener(null);
+            }
+        } else {
+            mTbEndLocation.clearFocus();
+            if (!mTbStartLocation.hasFocus()){
+                mMap.setOnMapClickListener(null);
+            }
+        }
+    }
+
+
+    /**
      * Triggers ServerSelector task to retrieve servers list.
      * <p>
      * Server list will be downloaded or retrieved from the database.
@@ -1943,6 +1959,8 @@ public class MainFragment extends Fragment implements
                 }
                 Toast.makeText(mApplicationContext, toastText, Toast.LENGTH_SHORT).show();
             }
+
+            removeFocus(isStartMarker);
 
             if (isStartMarker) {
                 if (mStartMarker == null) {
@@ -2890,6 +2908,8 @@ public class MainFragment extends Fragment implements
     public void onOTPGeocodingComplete(final boolean isStartTextbox,
             ArrayList<Address> addressesReturn, boolean geocodingForMarker) {
         if (getActivity() != null) {
+            removeFocus(isStartTextbox);
+
             if (isStartTextbox) {
                 mIsStartLocationGeocodingProcessed = true;
             } else {
