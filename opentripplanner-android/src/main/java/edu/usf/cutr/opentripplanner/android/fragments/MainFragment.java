@@ -1169,6 +1169,7 @@ public class MainFragment extends Fragment implements
                             updateMarkerPosition(markerLatlng, true);
                         } else {
                             mIsStartLocationGeocodingProcessed = true;
+                            setMarker(true, markerLatlng, false);
                         }
                         mStartMarkerPosition = markerLatlng;
                     } else if ((mEndMarker != null) && (marker.hashCode() == mEndMarker
@@ -1178,6 +1179,7 @@ public class MainFragment extends Fragment implements
                             updateMarkerPosition(markerLatlng, false);
                         } else {
                             mIsEndLocationGeocodingProcessed = true;
+                            setMarker(false, markerLatlng, false);
                         }
                         mEndMarkerPosition = markerLatlng;
                     }
