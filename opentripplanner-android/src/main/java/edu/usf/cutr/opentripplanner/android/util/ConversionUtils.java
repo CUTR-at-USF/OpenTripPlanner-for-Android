@@ -97,12 +97,12 @@ public class ConversionUtils {
         long s = (sec % 3600) % 60;
         if (h > 0) {
             text += Long.toString(h) + applicationContext.getResources()
-                    .getString(R.string.short_hours);
+                    .getString(R.string.time_short_hours);
         }
         text += Long.toString(m) + applicationContext.getResources()
-                .getString(R.string.short_minutes);
+                .getString(R.string.time_short_minutes);
         text += Long.toString(s) + applicationContext.getResources()
-                .getString(R.string.short_seconds);
+                .getString(R.string.time_short_seconds);
         return text;
     }
 
@@ -120,16 +120,16 @@ public class ConversionUtils {
         long m = (sec % 3600) / 60;
         if (h > 0) {
             text += Long.toString(h) + applicationContext.getResources()
-                    .getString(R.string.short_hours);
+                    .getString(R.string.time_short_hours);
             text += " " + Long.toString(m) + applicationContext.getResources()
-                    .getString(R.string.short_minutes);
+                    .getString(R.string.time_short_minutes);
         } else {
             if (m == 0) {
                 text += Long.toString(m) + " " + applicationContext.getResources()
-                        .getString(R.string.long_minutes);
+                        .getString(R.string.time_long_minutes);
             } else {
                 text += Long.toString(m) + " " + applicationContext.getResources()
-                        .getString(R.string.long_minutes);
+                        .getString(R.string.time_long_minutes);
             }
         }
         return text;
@@ -199,17 +199,21 @@ public class ConversionUtils {
 
         if (inLine) {
             if (ConversionUtils.isToday(cal)) {
-                return (" " + applicationContext.getResources().getString(R.string.connector_time)
+                return (" " + applicationContext.getResources()
+                        .getString(R.string.time_connector_before_time)
                         + " " + timeFormat.format(cal.getTime()) + " " + noDeviceTimezoneNote);
             } else if (ConversionUtils.isTomorrow(cal)) {
-                return (" " + applicationContext.getResources().getString(R.string.next_day) + " "
-                        + applicationContext.getResources().getString(R.string.connector_time) + " "
+                return (" " + applicationContext.getResources()
+                        .getString(R.string.time_connector_next_day) + " "
+                        + applicationContext.getResources()
+                        .getString(R.string.time_connector_before_time) + " "
                         + timeFormat.format(cal.getTime()) + " " + noDeviceTimezoneNote);
             } else {
                 return (" " + applicationContext.getResources()
-                        .getString(R.string.connector_full_date) + " " + dateFormat
+                        .getString(R.string.time_connector_before_date) + " " + dateFormat
                         .format(cal.getTime()) + " " + applicationContext.getResources()
-                        .getString(R.string.connector_time) + " " + timeFormat.format(cal.getTime())
+                        .getString(R.string.time_connector_before_time) + " " + timeFormat
+                        .format(cal.getTime())
                         + " " + noDeviceTimezoneNote);
             }
         } else {
@@ -217,7 +221,8 @@ public class ConversionUtils {
                 return (timeFormat.format(cal.getTime()) + " " + noDeviceTimezoneNote);
             } else if (ConversionUtils.isTomorrow(cal)) {
                 return (" " + timeFormat.format(cal.getTime()) + ", "
-                        + applicationContext.getResources().getString(R.string.next_day) + " "
+                        + applicationContext.getResources()
+                        .getString(R.string.time_connector_next_day) + " "
                         + noDeviceTimezoneNote);
             } else {
                 return (timeFormat.format(cal.getTime()) + ", " + dateFormat.format(cal.getTime())

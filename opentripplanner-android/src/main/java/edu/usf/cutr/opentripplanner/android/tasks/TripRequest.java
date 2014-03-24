@@ -89,7 +89,7 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
             Activity activityRetrieved = activity.get();
             if (activityRetrieved != null) {
                 progressDialog = ProgressDialog.show(activityRetrieved, "",
-                        context.getText(R.string.tripplanner_progress), true);
+                        context.getText(R.string.task_progress_tripplanner_progress), true);
             }
         }
     }
@@ -247,7 +247,7 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 
         if (selectedServer == null) {
             Toast.makeText(context,
-                    context.getResources().getString(R.string.error_no_server_selected),
+                    context.getResources().getString(R.string.toast_no_server_selected_error),
                     Toast.LENGTH_SHORT).show();
             return null;
         }

@@ -85,7 +85,7 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
             if (activityRetrieved != null) {
                 progressDialog = ProgressDialog
                         .show(activityRetrieved, "",
-                                context.getString(R.string.server_checker_progress),
+                                context.getString(R.string.task_progress_server_checker_progress),
                                 true);
             }
         }
@@ -102,19 +102,19 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
             return null;
         } else {
             String message =
-                    context.getResources().getString(R.string.server_checker_info_dialog_region)
+                    context.getResources().getString(R.string.server_checker_info_region)
                             + " " + server.getRegion() + "\n" + context.getResources()
-                            .getString(R.string.server_checker_info_dialog_language) + " " + server
+                            .getString(R.string.server_checker_info_language) + " " + server
                             .getLanguage() + "\n" + context.getResources()
-                            .getString(R.string.server_checker_info_dialog_contact) + " " + server
+                            .getString(R.string.server_checker_info_contact) + " " + server
                             .getContactName() + " ("
                             + server.getContactEmail() + ")" + "\n" + context.getResources()
-                            .getString(R.string.server_checker_info_dialog_url) + " " + server
+                            .getString(R.string.server_checker_info_url) + " " + server
                             .getBaseURL()
                             + "\n" + context.getResources()
-                            .getString(R.string.server_checker_info_dialog_bounds) + " " + server
+                            .getString(R.string.server_checker_info_bounds) + " " + server
                             .getBounds() + "\n" + context.getResources()
-                            .getString(R.string.server_checker_info_dialog_reachable) + " ";
+                            .getString(R.string.server_checker_info_reachable) + " ";
 
             int status = 0;
             HttpURLConnection urlConnection = null;
@@ -128,7 +128,7 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
                 status = urlConnection.getResponseCode();
             } catch (IOException e) {
                 Log.e(OTPApp.TAG, "Unable to reach server: " + e.getMessage());
-                message = context.getResources().getString(R.string.server_checker_error_message)
+                message = context.getResources().getString(R.string.toast_server_checker_error_unreachable)
                         + " "
                         + e.getMessage();
                 return message;
@@ -139,10 +139,10 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
             }
 
             if (status == HttpURLConnection.HTTP_OK) {
-                message += context.getResources().getString(R.string.yes);
+                message += context.getResources().getString(android.R.string.yes);
                 isWorking = true;
             } else {
-                message += context.getResources().getString(R.string.no);
+                message += context.getResources().getString(android.R.string.no);
             }
 
             return message;
@@ -153,7 +153,7 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
     protected void onCancelled() {
         super.onCancelled();
 
-        Toast.makeText(context, context.getResources().getString(R.string.info_server_error),
+        Toast.makeText(context, context.getResources().getString(R.string.toast_server_checker_info_error),
                 Toast.LENGTH_SHORT).show();
     }
 
@@ -174,7 +174,7 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
             if (activityRetrieved != null) {
                 AlertDialog.Builder dialog = new AlertDialog.Builder(activityRetrieved);
                 dialog.setTitle(context.getResources()
-                        .getString(R.string.server_checker_info_dialog_title));
+                        .getString(R.string.server_checker_info_title));
                 dialog.setMessage(result);
                 dialog.setNeutralButton(context.getResources().getString(android.R.string.ok),
                         null);
@@ -183,11 +183,11 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
         } else {
             if (isWorking) {
                 Toast.makeText(context,
-                        context.getResources().getString(R.string.server_checker_successful),
+                        context.getResources().getString(R.string.toast_server_checker_successful),
                         Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(context,
-                        context.getResources().getString(R.string.custom_server_error),
+                        context.getResources().getString(R.string.settings_menu_custom_server_url_description_error_unreachable),
                         Toast.LENGTH_SHORT).show();
             }
         }
