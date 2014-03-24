@@ -128,15 +128,15 @@ public class Server {
         super();
         this.baseURL = baseURL;
         this.region = applicationContext.getResources()
-                .getString(R.string.custom_server_unknown_region);
+                .getString(R.string.server_checker_info_custom_server_unknown_region);
         this.bounds = applicationContext.getResources()
-                .getString(R.string.custom_server_unknown_bounds);
+                .getString(R.string.server_checker_info_custom_server_unknown_bounds);
         this.language = applicationContext.getResources()
-                .getString(R.string.custom_server_unknown_language);
+                .getString(R.string.server_checker_info_custom_server_unknown_language);
         this.contactName = applicationContext.getResources()
-                .getString(R.string.custom_server_unknown_name);
+                .getString(R.string.server_checker_info_custom_server_unknown_name);
         this.contactEmail = applicationContext.getResources()
-                .getString(R.string.custom_server_unknown_email);
+                .getString(R.string.server_checker_info_custom_server_unknown_email);
     }
 
     public String getRegion() {

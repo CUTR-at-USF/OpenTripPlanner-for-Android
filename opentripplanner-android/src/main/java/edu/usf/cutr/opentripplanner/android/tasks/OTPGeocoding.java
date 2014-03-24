@@ -98,7 +98,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
             return count;
         }
 
-        if (address.equalsIgnoreCase(context.getString(R.string.my_location))) {
+        if (address.equalsIgnoreCase(context.getString(R.string.text_box_my_location))) {
             String currentLat = reqs[1];
             String currentLng = reqs[2];
             LatLng latLng = new LatLng(Double.parseDouble(currentLat),
@@ -108,7 +108,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
             addressReturn.setLatitude(latLng.latitude);
             addressReturn.setLongitude(latLng.longitude);
             addressReturn.setAddressLine(addressReturn.getMaxAddressLineIndex() + 1,
-                    context.getString(R.string.my_location));
+                    context.getString(R.string.text_box_my_location));
 
             addressesReturn.add(addressReturn);
 
@@ -277,7 +277,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
         if (activityRetrieved != null) {
             AlertDialog.Builder geocoderAlert = new AlertDialog.Builder(activityRetrieved);
             geocoderAlert.setTitle(R.string.geocoder_results_title)
-                    .setMessage(R.string.geocoder_no_results_message)
+                    .setMessage(R.string.geocoder_results_no_results_message)
                     .setCancelable(false)
                     .setPositiveButton(context.getResources().getString(android.R.string.ok),
                             new DialogInterface.OnClickListener() {
