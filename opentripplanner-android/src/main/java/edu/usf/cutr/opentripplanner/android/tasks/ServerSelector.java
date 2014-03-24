@@ -122,7 +122,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
             progressDialog.setIndeterminate(true);
             progressDialog.setCancelable(true);
             progressDialog = ProgressDialog.show(activityRetrieved, "",
-                    context.getResources().getString(R.string.server_selector_progress), true);
+                    context.getResources().getString(R.string.task_progress_server_selector_progress), true);
         }
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -358,9 +358,9 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
             }
             if (showDialog || serverIsChanged) {
                 Toast.makeText(context,
-                        context.getResources().getString(R.string.server_selector_detected) + " "
+                        context.getResources().getString(R.string.toast_server_selector_detected) + " "
                                 + selectedServer.getRegion() + ". " + context.getResources()
-                                .getString(R.string.server_selector_server_change_info),
+                                .getString(R.string.toast_server_selector_server_change_info),
                         Toast.LENGTH_SHORT).show();
             }
             Editor e = prefs.edit();
@@ -380,7 +380,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
 
             Collections.sort(serverNames);
 
-            serverNames.add(0, context.getResources().getString(R.string.custom_server_name));
+            serverNames.add(0, context.getResources().getString(R.string.server_checker_info_custom_server_name));
 
             final CharSequence[] items = serverNames.toArray(new CharSequence[serverNames.size()]);
 
@@ -389,14 +389,14 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
             if (activityRetrieved != null) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(activityRetrieved);
                 builder.setTitle(context.getResources()
-                        .getString(R.string.server_selector_server_info_dialog_title));
+                        .getString(R.string.server_checker_info_title));
                 builder.setItems(items, new DialogInterface.OnClickListener() {
 
                     public void onClick(DialogInterface dialog, int item) {
 
                         //If the user selected to enter a custom URL, they are shown this EditText box to enter it
                         if (items[item].equals(context.getResources()
-                                .getString(R.string.custom_server_name))) {
+                                .getString(R.string.server_checker_info_custom_server_name))) {
                             SharedPreferences prefs = PreferenceManager
                                     .getDefaultSharedPreferences(context);
 
@@ -445,7 +445,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
                                                         Toast.makeText(context,
                                                                 context.getResources()
                                                                         .getString(
-                                                                                R.string.custom_server_url_error),
+                                                                                R.string.settings_menu_custom_server_url_description_error_url),
                                                                 Toast.LENGTH_SHORT).show();
                                                     }
                                                 }
@@ -482,7 +482,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
         } else {
             Log.e(OTPApp.TAG, "Server list could not be downloaded!!");
             Toast.makeText(context,
-                    context.getResources().getString(R.string.refresh_server_list_error),
+                    context.getResources().getString(R.string.toast_server_selector_refresh_server_list_error),
                     Toast.LENGTH_SHORT).show();
         }
     }
@@ -506,7 +506,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
             prefsEditor.putBoolean(PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, false);
             prefsEditor.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false);
             Toast.makeText(context,
-                    context.getResources().getString(R.string.custom_server_not_set),
+                    context.getResources().getString(R.string.toast_server_checker_error_bad_url),
                     Toast.LENGTH_SHORT).show();
         }
 

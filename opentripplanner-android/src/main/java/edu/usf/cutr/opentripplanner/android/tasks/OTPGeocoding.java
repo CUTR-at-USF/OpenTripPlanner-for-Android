@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.R;
@@ -98,7 +99,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
             return count;
         }
 
-        if (address.equalsIgnoreCase(context.getString(R.string.my_location))) {
+        if (address.equalsIgnoreCase(context.getString(R.string.text_box_my_location))) {
             String currentLat = reqs[1];
             String currentLng = reqs[2];
             LatLng latLng = new LatLng(Double.parseDouble(currentLat),
@@ -108,14 +109,14 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
             addressReturn.setLatitude(latLng.latitude);
             addressReturn.setLongitude(latLng.longitude);
             addressReturn.setAddressLine(addressReturn.getMaxAddressLineIndex() + 1,
-                    context.getString(R.string.my_location));
+                    context.getString(R.string.text_box_my_location));
 
             addressesReturn.add(addressReturn);
 
             return count;
         }
 
-        ArrayList<Address> addresses = null;
+        List<Address> addresses = null;
 
         if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_USE_ANDROID_GEOCODER, true)) {
             Geocoder gc = new Geocoder(context);
@@ -164,9 +165,9 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
      * @param addresses list of addresses to filter
      * @return a new list filtered
      */
-    private ArrayList<Address> filterAddressesBBox(ArrayList<Address> addresses) {
+    private List<Address> filterAddressesBBox(List<Address> addresses) {
         if (!(addresses == null || addresses.isEmpty())) {
-            ArrayList<Address> addressesFiltered = new ArrayList<Address>(addresses);
+            CopyOnWriteArrayList<Address> addressesFiltered = new CopyOnWriteArrayList<Address>(addresses);
 
             for (Address address : addressesFiltered) {
                 if (!LocationUtil.checkPointInBoundingBox(
@@ -210,7 +211,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
         return strKey;
     }
 
-    private ArrayList<Address> searchPlaces(String name) {
+    private List<Address> searchPlaces(String name) {
         HashMap<String, String> params = new HashMap<String, String>();
         Places p;
 
@@ -247,7 +248,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
         ArrayList<POI> pois = new ArrayList<POI>();
         pois.addAll(p.getPlaces(params));
 
-        ArrayList<Address> addresses = new ArrayList<Address>();
+        List<Address> addresses = new ArrayList<Address>();
 
         for (POI poi : pois) {
             Log.v(OTPApp.TAG, poi.getName() + " " + poi.getLatitude() + "," + poi.getLongitude());
@@ -277,7 +278,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
         if (activityRetrieved != null) {
             AlertDialog.Builder geocoderAlert = new AlertDialog.Builder(activityRetrieved);
             geocoderAlert.setTitle(R.string.geocoder_results_title)
-                    .setMessage(R.string.geocoder_no_results_message)
+                    .setMessage(R.string.geocoder_results_no_results_message)
                     .setCancelable(false)
                     .setPositiveButton(context.getResources().getString(android.R.string.ok),
                             new DialogInterface.OnClickListener() {

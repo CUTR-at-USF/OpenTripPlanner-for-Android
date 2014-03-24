@@ -190,9 +190,6 @@ public class MainFragment extends Fragment implements
 
     private Boolean mNeedToRunAutoDetect = false;
 
-    private boolean mIsRealLostFocus = true;
-
-
     private ImageButton mBtnPlanTrip;
 
     private ImageButton mBtnDateDialog;
@@ -512,13 +509,13 @@ public class MainFragment extends Fragment implements
                 android.R.layout.simple_list_item_single_choice,
                 new OptimizeSpinnerItem[]{
                         new OptimizeSpinnerItem(
-                                getResources().getString(R.string.optimization_quick),
+                                getResources().getString(R.string.left_panel_optimization_quick),
                                 OptimizeType.QUICK),
                         new OptimizeSpinnerItem(
-                                getResources().getString(R.string.optimization_safe),
+                                getResources().getString(R.string.left_panel_optimization_safe),
                                 OptimizeType.SAFE),
                         new OptimizeSpinnerItem(
-                                getResources().getString(R.string.optimization_fewest_transfers),
+                                getResources().getString(R.string.left_panel_optimization_fewest_transfers),
                                 OptimizeType.TRANSFERS)});
         mDdlOptimization.setAdapter(optimizationAdapter);
 
@@ -526,21 +523,21 @@ public class MainFragment extends Fragment implements
                 = new ArrayAdapter<TraverseModeSpinnerItem>(
                 getActivity(), android.R.layout.simple_list_item_single_choice,
                 new TraverseModeSpinnerItem[]{
-                        new TraverseModeSpinnerItem(getResources().getString(R.string.mode_transit),
+                        new TraverseModeSpinnerItem(getResources().getString(R.string.left_panel_mode_transit),
                                 new TraverseModeSet(TraverseMode.TRANSIT,
                                         TraverseMode.WALK)),
-                        new TraverseModeSpinnerItem(getResources().getString(R.string.mode_bus),
+                        new TraverseModeSpinnerItem(getResources().getString(R.string.left_panel_mode_bus),
                                 new TraverseModeSet(TraverseMode.BUSISH,
                                         TraverseMode.WALK)),
-                        new TraverseModeSpinnerItem(getResources().getString(R.string.mode_train),
+                        new TraverseModeSpinnerItem(getResources().getString(R.string.left_panel_mode_train),
                                 new TraverseModeSet(TraverseMode.TRAINISH,
                                         TraverseMode.WALK)),
-                        new TraverseModeSpinnerItem(getResources().getString(R.string.mode_walk),
+                        new TraverseModeSpinnerItem(getResources().getString(R.string.left_panel_mode_walk),
                                 new TraverseModeSet(TraverseMode.WALK)),
-                        new TraverseModeSpinnerItem(getResources().getString(R.string.mode_bicycle),
+                        new TraverseModeSpinnerItem(getResources().getString(R.string.left_panel_mode_bicycle),
                                 new TraverseModeSet(TraverseMode.BICYCLE)),
                         new TraverseModeSpinnerItem(
-                                getResources().getString(R.string.mode_transit_bicycle),
+                                getResources().getString(R.string.left_panel_mode_transit_bicycle),
                                 new TraverseModeSet(TraverseMode.TRANSIT,
                                         TraverseMode.BICYCLE))});
         mDdlTravelMode.setAdapter(traverseModeAdapter);
@@ -560,7 +557,7 @@ public class MainFragment extends Fragment implements
             mDdlTravelMode.setItemChecked(0, true);
             showBikeParameters(false);
             mArriveBy = false;
-            setTextBoxLocation(getResources().getString(R.string.my_location), true);
+            setTextBoxLocation(getResources().getString(R.string.text_box_my_location), true);
         }
 
         if (!mMapFailed) {
@@ -582,12 +579,149 @@ public class MainFragment extends Fragment implements
                 mApplicationContext.getResources().getString(R.string.map_tiles_default_server));
         updateOverlay(overlayString);
 
-        addMapListeners();
         addInterfaceListeners();
     }
 
 
     private void addInterfaceListeners() {
+
+        final OnMapClickListener onMapClickListener = new OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latlng) {
+                InputMethodManager imm = (InputMethodManager) MainFragment.this.getActivity()
+                        .getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(mTbEndLocation.getWindowToken(), 0);
+                imm.hideSoftInputFromWindow(mTbStartLocation.getWindowToken(), 0);
+
+                if (mTbStartLocation.hasFocus()) {
+                    setMarker(true, latlng, true);
+                } else {
+                    setMarker(false, latlng, true);
+                }
+            }
+        };
+        mMap.setOnMapClickListener(onMapClickListener);
+
+        OnMarkerDragListener onMarkerDragListener = new OnMarkerDragListener() {
+
+            @Override
+            public void onMarkerDrag(Marker marker) {
+            }
+
+            @Override
+            public void onMarkerDragEnd(Marker marker) {
+                LatLng markerLatlng = marker.getPosition();
+
+                if (((mOTPApp.getSelectedServer() != null) && LocationUtil
+                        .checkPointInBoundingBox(markerLatlng, mOTPApp.getSelectedServer(),
+                                OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))
+                        || (mOTPApp.getSelectedServer() == null)) {
+                    if ((mStartMarker != null) && (marker.hashCode() == mStartMarker.hashCode())) {
+                        if (mPrefs
+                                .getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true)) {
+                            updateMarkerPosition(markerLatlng, true);
+                        } else {
+                            mIsStartLocationGeocodingProcessed = true;
+                            removeFocus(true);
+                        }
+                        mStartMarkerPosition = markerLatlng;
+                    } else if ((mEndMarker != null) && (marker.hashCode() == mEndMarker
+                            .hashCode())) {
+                        if (mPrefs
+                                .getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true)) {
+                            updateMarkerPosition(markerLatlng, false);
+                        } else {
+                            mIsEndLocationGeocodingProcessed = true;
+                            removeFocus(false);
+                        }
+                        mEndMarkerPosition = markerLatlng;
+                    }
+                } else {
+
+                    if ((mStartMarker != null) && (marker.hashCode() == mStartMarker.hashCode())) {
+                        marker.setPosition(mStartMarkerPosition);
+                    } else {
+                        marker.setPosition(mEndMarkerPosition);
+                    }
+                    Toast.makeText(mApplicationContext, mApplicationContext.getResources()
+                            .getString(R.string.toast_map_markers_marker_out_of_boundaries), Toast.LENGTH_SHORT)
+                            .show();
+                }
+            }
+
+            @Override
+            public void onMarkerDragStart(Marker marker) {
+                InputMethodManager imm = (InputMethodManager) MainFragment.this.getActivity()
+                        .getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(mTbEndLocation.getWindowToken(), 0);
+                imm.hideSoftInputFromWindow(mTbStartLocation.getWindowToken(), 0);
+            }
+        };
+        mMap.setOnMarkerDragListener(onMarkerDragListener);
+
+        OnMapLongClickListener onMapLongClickListener = new OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng latlng) {
+                InputMethodManager imm = (InputMethodManager) MainFragment.this.getActivity()
+                        .getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(mTbEndLocation.getWindowToken(), 0);
+                imm.hideSoftInputFromWindow(mTbStartLocation.getWindowToken(), 0);
+
+                final LatLng latLngFinal = latlng;
+                final CharSequence[] items = {mApplicationContext.getResources()
+                        .getString(R.string.point_type_selector_start_marker_option),
+                        mApplicationContext.getResources()
+                                .getString(R.string.point_type_selector_end_marker_option)};
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(
+                        MainFragment.this.getActivity());
+                builder.setTitle(getResources().getString(R.string.point_type_selector_title));
+                builder.setItems(items, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int item) {
+                        if (item == 0) {
+                            setMarker(true, latLngFinal, true);
+                        } else {
+                            setMarker(false, latLngFinal, true);
+                        }
+                    }
+                });
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
+        };
+        mMap.setOnMapLongClickListener(onMapLongClickListener);
+
+        OnClickListener onClickListener = new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                mDrawerLayout.openDrawer(Gravity.LEFT);
+            }
+        };
+        mBtnHandle.setOnClickListener(onClickListener);
+
+        OnInfoWindowClickListener onInfoWindowClickListener = new OnInfoWindowClickListener() {
+
+            @Override
+            public void onInfoWindowClick(Marker modeMarker) {
+                saveOTPBundle();
+                OTPBundle otpBundle = getFragmentListener().getOTPBundle();
+                Matcher matcher = Pattern.compile("\\d+").matcher(modeMarker.getTitle());
+                if (matcher.find()) {
+                    String numberString = modeMarker.getTitle().substring(0, matcher.end());
+                    //Step indexes shown to the user are in a scale starting by 1 but instructions steps internally start by 0
+                    int currentStepIndex = Integer.parseInt(numberString) - 1;
+                    otpBundle.setCurrentStepIndex(currentStepIndex);
+                    otpBundle.setFromInfoWindow(true);
+                    getFragmentListener().setOTPBundle(otpBundle);
+                    getFragmentListener().onSwitchedToDirectionFragment();
+                }
+
+            }
+        };
+        mMap.setOnInfoWindowClickListener(onInfoWindowClickListener);
+
+
 
         DrawerListener dl = new DrawerListener() {
             @Override
@@ -605,8 +739,6 @@ public class MainFragment extends Fragment implements
 
             @Override
             public void onDrawerOpened(View arg0) {
-                mTbStartLocation.clearFocus();
-                mTbEndLocation.clearFocus();
             }
 
             @Override
@@ -620,22 +752,22 @@ public class MainFragment extends Fragment implements
             public boolean onDrawableTouch(final MotionEvent event) {
 
                 final CharSequence[] items = {
-                        getResources().getString(R.string.location_type_current_location),
-                        getResources().getString(R.string.location_type_contact),
-                        getResources().getString(R.string.location_type_map_point)};
+                        getResources().getString(R.string.text_box_dialog_location_type_current_location),
+                        getResources().getString(R.string.text_box_dialog_location_type_contact),
+                        getResources().getString(R.string.text_box_dialog_location_type_map_point)};
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(
                         MainFragment.this.getActivity());
-                builder.setTitle(getResources().getString(R.string.choose_location_type_start));
+                builder.setTitle(getResources().getString(R.string.text_box_dialog_choose_location_type_start));
                 builder.setItems(items, new DialogInterface.OnClickListener() {
 
                     public void onClick(DialogInterface dialog, int item) {
                         if (items[item].equals(getResources()
-                                .getString(R.string.location_type_current_location))) {
+                                .getString(R.string.text_box_dialog_location_type_current_location))) {
                             LatLng mCurrentLatLng = getLastLocation();
                             if (mCurrentLatLng != null) {
                                 SharedPreferences.Editor prefsEditor = mPrefs.edit();
-                                setTextBoxLocation(getResources().getString(R.string.my_location),
+                                setTextBoxLocation(getResources().getString(R.string.text_box_my_location),
                                         true);
                                 prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION,
                                         true);
@@ -649,13 +781,13 @@ public class MainFragment extends Fragment implements
                             } else {
                                 Toast.makeText(MainFragment.this.mApplicationContext,
                                         mApplicationContext.getResources()
-                                                .getString(R.string.current_location_error),
+                                                .getString(R.string.toast_tripplanner_current_location_error),
                                         Toast.LENGTH_LONG).show();
                             }
 
 
                         } else if (items[item]
-                                .equals(getResources().getString(R.string.location_type_contact))) {
+                                .equals(getResources().getString(R.string.text_box_dialog_location_type_contact))) {
                             Intent intent = new Intent(Intent.ACTION_PICK);
                             intent.setType(
                                     ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_TYPE);
@@ -672,7 +804,7 @@ public class MainFragment extends Fragment implements
                             } else {
                                 setTextBoxLocation("", true);
                                 mTbStartLocation.setHint(
-                                        getResources().getString(R.string.need_to_place_marker));
+                                        getResources().getString(R.string.text_box_need_to_place_marker));
                                 mTbStartLocation.requestFocus();
                             }
                         }
@@ -692,22 +824,22 @@ public class MainFragment extends Fragment implements
             public boolean onDrawableTouch(final MotionEvent event) {
 
                 final CharSequence[] items = {
-                        getResources().getString(R.string.location_type_current_location),
-                        getResources().getString(R.string.location_type_contact),
-                        getResources().getString(R.string.location_type_map_point)};
+                        getResources().getString(R.string.text_box_dialog_location_type_current_location),
+                        getResources().getString(R.string.text_box_dialog_location_type_contact),
+                        getResources().getString(R.string.text_box_dialog_location_type_map_point)};
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(
                         MainFragment.this.getActivity());
-                builder.setTitle(getResources().getString(R.string.choose_location_type_end));
+                builder.setTitle(getResources().getString(R.string.text_box_dialog_choose_location_type_end));
                 builder.setItems(items, new DialogInterface.OnClickListener() {
 
                     public void onClick(DialogInterface dialog, int item) {
                         if (items[item].equals(getResources()
-                                .getString(R.string.location_type_current_location))) {
+                                .getString(R.string.text_box_dialog_location_type_current_location))) {
                             LatLng mCurrentLatLng = getLastLocation();
                             if (mCurrentLatLng != null) {
                                 SharedPreferences.Editor prefsEditor = mPrefs.edit();
-                                setTextBoxLocation(getResources().getString(R.string.my_location),
+                                setTextBoxLocation(getResources().getString(R.string.text_box_my_location),
                                         false);
                                 prefsEditor.putBoolean(
                                         OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, true);
@@ -721,13 +853,13 @@ public class MainFragment extends Fragment implements
                             } else {
                                 Toast.makeText(MainFragment.this.mApplicationContext,
                                         mApplicationContext.getResources()
-                                                .getString(R.string.current_location_error),
+                                                .getString(R.string.toast_tripplanner_current_location_error),
                                         Toast.LENGTH_LONG).show();
                             }
 
 
                         } else if (items[item]
-                                .equals(getResources().getString(R.string.location_type_contact))) {
+                                .equals(getResources().getString(R.string.text_box_dialog_location_type_contact))) {
                             Intent intent = new Intent(Intent.ACTION_PICK);
                             intent.setType(
                                     ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_TYPE);
@@ -744,7 +876,7 @@ public class MainFragment extends Fragment implements
                             } else {
                                 setTextBoxLocation("", false);
                                 mTbEndLocation.setHint(
-                                        getResources().getString(R.string.need_to_place_marker));
+                                        getResources().getString(R.string.text_box_need_to_place_marker));
                                 mTbEndLocation.requestFocus();
                             }
                         }
@@ -770,10 +902,11 @@ public class MainFragment extends Fragment implements
         OnFocusChangeListener tbLocationOnFocusChangeListener = new OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if (!mIsRealLostFocus) {
-                    mIsRealLostFocus = true;
-                    return;
+
+                if (hasFocus) {
+                    mMap.setOnMapClickListener(onMapClickListener);
                 }
+
                 TextView tv = (TextView) v;
                 if (!hasFocus) {
                     CharSequence tvCharSequence = tv.getText();
@@ -797,9 +930,9 @@ public class MainFragment extends Fragment implements
                             }
                         } else {
                             if (v.getId() == R.id.tbStartLocation) {
-                                tv.setHint(getResources().getString(R.string.start_location_hint));
+                                tv.setHint(getResources().getString(R.string.text_box_start_location_hint));
                             } else if (v.getId() == R.id.tbEndLocation) {
-                                tv.setHint(getResources().getString(R.string.end_location_hint));
+                                tv.setHint(getResources().getString(R.string.text_box_end_location_hint));
                             }
                         }
                     } else {
@@ -873,7 +1006,6 @@ public class MainFragment extends Fragment implements
                             || (event != null
                             && event.getAction() == KeyEvent.ACTION_DOWN && event
                             .getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
-                        mIsRealLostFocus = false;
                         if (!mIsStartLocationGeocodingProcessed
                                 && !mPrefs
                                 .getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true)) {
@@ -926,7 +1058,7 @@ public class MainFragment extends Fragment implements
                 if (mCurrentLatLng == null) {
                     Toast.makeText(mApplicationContext,
                             mApplicationContext.getResources()
-                                    .getString(R.string.current_location_error),
+                                    .getString(R.string.toast_tripplanner_current_location_error),
                             Toast.LENGTH_LONG).show();
                 } else {
                     if (mMap.getCameraPosition().zoom < OTPApp.defaultMyLocationZoomLevel) {
@@ -1060,7 +1192,6 @@ public class MainFragment extends Fragment implements
      * necessary.
      */
     private void processRequestTrip() {
-        mIsRealLostFocus = false;
         Editable tbEditable;
 
         if (!mIsEndLocationGeocodingProcessed
@@ -1130,142 +1261,6 @@ public class MainFragment extends Fragment implements
         this.getFragmentListener().setOTPBundle(bundle);
     }
 
-
-    private void addMapListeners() {
-        OnMapClickListener onMapClickListener = new OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latlng) {
-                InputMethodManager imm = (InputMethodManager) MainFragment.this.getActivity()
-                        .getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(mTbEndLocation.getWindowToken(), 0);
-                imm.hideSoftInputFromWindow(mTbStartLocation.getWindowToken(), 0);
-
-                if (mTbStartLocation.hasFocus()) {
-                    setMarker(true, latlng, true);
-                } else {
-                    setMarker(false, latlng, true);
-                }
-            }
-        };
-        mMap.setOnMapClickListener(onMapClickListener);
-
-        OnMarkerDragListener onMarkerDragListener = new OnMarkerDragListener() {
-
-            @Override
-            public void onMarkerDrag(Marker marker) {
-            }
-
-            @Override
-            public void onMarkerDragEnd(Marker marker) {
-                LatLng markerLatlng = marker.getPosition();
-
-                if (((mOTPApp.getSelectedServer() != null) && LocationUtil
-                        .checkPointInBoundingBox(markerLatlng, mOTPApp.getSelectedServer(),
-                                OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))
-                        || (mOTPApp.getSelectedServer() == null)) {
-                    if ((mStartMarker != null) && (marker.hashCode() == mStartMarker.hashCode())) {
-                        if (mPrefs
-                                .getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true)) {
-                            updateMarkerPosition(markerLatlng, true);
-                        } else {
-                            mIsStartLocationGeocodingProcessed = true;
-                        }
-                        mStartMarkerPosition = markerLatlng;
-                    } else if ((mEndMarker != null) && (marker.hashCode() == mEndMarker
-                            .hashCode())) {
-                        if (mPrefs
-                                .getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true)) {
-                            updateMarkerPosition(markerLatlng, false);
-                        } else {
-                            mIsEndLocationGeocodingProcessed = true;
-                        }
-                        mEndMarkerPosition = markerLatlng;
-                    }
-                } else {
-
-                    if ((mStartMarker != null) && (marker.hashCode() == mStartMarker.hashCode())) {
-                        marker.setPosition(mStartMarkerPosition);
-                    } else {
-                        marker.setPosition(mEndMarkerPosition);
-                    }
-                    Toast.makeText(mApplicationContext, mApplicationContext.getResources()
-                            .getString(R.string.marker_out_of_boundaries), Toast.LENGTH_SHORT)
-                            .show();
-                }
-            }
-
-            @Override
-            public void onMarkerDragStart(Marker marker) {
-                InputMethodManager imm = (InputMethodManager) MainFragment.this.getActivity()
-                        .getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(mTbEndLocation.getWindowToken(), 0);
-                imm.hideSoftInputFromWindow(mTbStartLocation.getWindowToken(), 0);
-            }
-        };
-        mMap.setOnMarkerDragListener(onMarkerDragListener);
-
-        OnMapLongClickListener onMapLongClickListener = new OnMapLongClickListener() {
-            @Override
-            public void onMapLongClick(LatLng latlng) {
-                InputMethodManager imm = (InputMethodManager) MainFragment.this.getActivity()
-                        .getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(mTbEndLocation.getWindowToken(), 0);
-                imm.hideSoftInputFromWindow(mTbStartLocation.getWindowToken(), 0);
-
-                final LatLng latLngFinal = latlng;
-                final CharSequence[] items = {mApplicationContext.getResources()
-                        .getString(R.string.start_marker_activated),
-                        mApplicationContext.getResources()
-                                .getString(R.string.end_marker_activated)};
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(
-                        MainFragment.this.getActivity());
-                builder.setTitle(getResources().getString(R.string.markers_dialog_title));
-                builder.setItems(items, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int item) {
-                        if (item == 0) {
-                            setMarker(true, latLngFinal, true);
-                        } else {
-                            setMarker(false, latLngFinal, true);
-                        }
-                    }
-                });
-                AlertDialog alert = builder.create();
-                alert.show();
-            }
-        };
-        mMap.setOnMapLongClickListener(onMapLongClickListener);
-
-        OnClickListener onClickListener = new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                mDrawerLayout.openDrawer(Gravity.LEFT);
-            }
-        };
-        mBtnHandle.setOnClickListener(onClickListener);
-
-        OnInfoWindowClickListener onInfoWindowClickListener = new OnInfoWindowClickListener() {
-
-            @Override
-            public void onInfoWindowClick(Marker modeMarker) {
-                saveOTPBundle();
-                OTPBundle otpBundle = getFragmentListener().getOTPBundle();
-                Matcher matcher = Pattern.compile("\\d+").matcher(modeMarker.getTitle());
-                if (matcher.find()) {
-                    String numberString = modeMarker.getTitle().substring(0, matcher.end());
-                    //Step indexes shown to the user are in a scale starting by 1 but instructions steps internally start by 0
-                    int currentStepIndex = Integer.parseInt(numberString) - 1;
-                    otpBundle.setCurrentStepIndex(currentStepIndex);
-                    otpBundle.setFromInfoWindow(true);
-                    getFragmentListener().setOTPBundle(otpBundle);
-                    getFragmentListener().onSwitchedToDirectionFragment();
-                }
-
-            }
-        };
-        mMap.setOnInfoWindowClickListener(onInfoWindowClickListener);
-    }
 
 
     private void restoreState(Bundle savedInstanceState) {
@@ -1478,14 +1473,14 @@ public class MainFragment extends Fragment implements
 
         if (isOriginMyLocation && isDestinationMyLocation) {
             Toast.makeText(MainFragment.this.mApplicationContext, mApplicationContext.getResources()
-                    .getString(R.string.origin_destination_are_mylocation), Toast.LENGTH_SHORT)
+                    .getString(R.string.toast_tripplanner_origin_destination_are_mylocation), Toast.LENGTH_SHORT)
                     .show();
             return;
         } else if (isOriginMyLocation || isDestinationMyLocation) {
             if (mCurrentLatLng == null) {
                 Toast.makeText(MainFragment.this.mApplicationContext,
                         mApplicationContext.getResources()
-                                .getString(R.string.current_location_error),
+                                .getString(R.string.toast_tripplanner_current_location_error),
                         Toast.LENGTH_LONG).show();
                 return;
             } else {
@@ -1494,7 +1489,7 @@ public class MainFragment extends Fragment implements
                     if (mEndMarker == null) {
                         Toast.makeText(MainFragment.this.mApplicationContext,
                                 mApplicationContext.getResources()
-                                        .getString(R.string.need_to_place_markers_before_planning),
+                                        .getString(R.string.toast_tripplanner_need_to_place_markers_before_planning),
                                 Toast.LENGTH_SHORT).show();
                         return;
                     } else {
@@ -1506,7 +1501,7 @@ public class MainFragment extends Fragment implements
                     if (mStartMarker == null) {
                         Toast.makeText(MainFragment.this.mApplicationContext,
                                 mApplicationContext.getResources()
-                                        .getString(R.string.need_to_place_markers_before_planning),
+                                        .getString(R.string.toast_tripplanner_need_to_place_markers_before_planning),
                                 Toast.LENGTH_SHORT).show();
                         return;
                     } else {
@@ -1520,7 +1515,7 @@ public class MainFragment extends Fragment implements
             if ((mStartMarker == null) || (mEndMarker == null)) {
                 Toast.makeText(MainFragment.this.mApplicationContext,
                         mApplicationContext.getResources()
-                                .getString(R.string.need_to_place_markers_before_planning),
+                                .getString(R.string.toast_tripplanner_need_to_place_markers_before_planning),
                         Toast.LENGTH_SHORT).show();
                 return;
             } else {
@@ -1533,12 +1528,12 @@ public class MainFragment extends Fragment implements
 
         if (!mIsStartLocationGeocodingProcessed && !isOriginMyLocation) {
             Toast.makeText(MainFragment.this.mApplicationContext, mApplicationContext.getResources()
-                    .getString(R.string.need_to_place_markers_before_planning), Toast.LENGTH_SHORT)
+                    .getString(R.string.toast_tripplanner_need_to_place_markers_before_planning), Toast.LENGTH_SHORT)
                     .show();
             return;
         } else if (!mIsEndLocationGeocodingProcessed && !isDestinationMyLocation) {
             Toast.makeText(MainFragment.this.mApplicationContext, mApplicationContext.getResources()
-                    .getString(R.string.need_to_place_markers_before_planning), Toast.LENGTH_SHORT)
+                    .getString(R.string.toast_tripplanner_need_to_place_markers_before_planning), Toast.LENGTH_SHORT)
                     .show();
             return;
         }
@@ -1696,13 +1691,13 @@ public class MainFragment extends Fragment implements
                     android.R.layout.simple_list_item_single_choice,
                     new OptimizeSpinnerItem[]{
                             new OptimizeSpinnerItem(
-                                    getResources().getString(R.string.optimization_quick),
+                                    getResources().getString(R.string.left_panel_optimization_quick),
                                     OptimizeType.QUICK),
                             new OptimizeSpinnerItem(
-                                    getResources().getString(R.string.optimization_safe),
+                                    getResources().getString(R.string.left_panel_optimization_safe),
                                     OptimizeType.SAFE),
                             new OptimizeSpinnerItem(
-                                    getResources().getString(R.string.optimization_bike_triangle),
+                                    getResources().getString(R.string.left_panel_optimization_bike_triangle),
                                     OptimizeType.TRIANGLE)});
             mDdlOptimization.setAdapter(optimizationAdapter);
             mDdlOptimization.setItemChecked(2, true);
@@ -1712,13 +1707,13 @@ public class MainFragment extends Fragment implements
                     android.R.layout.simple_list_item_single_choice,
                     new OptimizeSpinnerItem[]{
                             new OptimizeSpinnerItem(
-                                    getResources().getString(R.string.optimization_quick),
+                                    getResources().getString(R.string.left_panel_optimization_quick),
                                     OptimizeType.QUICK),
                             new OptimizeSpinnerItem(
-                                    getResources().getString(R.string.optimization_safe),
+                                    getResources().getString(R.string.left_panel_optimization_safe),
                                     OptimizeType.SAFE),
                             new OptimizeSpinnerItem(getResources()
-                                    .getString(R.string.optimization_fewest_transfers),
+                                    .getString(R.string.left_panel_optimization_fewest_transfers),
                                     OptimizeType.TRANSFERS)});
             mDdlOptimization.setAdapter(optimizationAdapter);
             mDdlOptimization.setItemChecked(0, true);
@@ -1770,6 +1765,27 @@ public class MainFragment extends Fragment implements
 
 
     /**
+     * Removes focus from the text box chosen by the parameter and deletes map click listener if
+     * none of the text boxes remain focused.
+     *
+     * @param isStartTextbox to select text box to removes focus from
+     */
+    private void removeFocus(boolean isStartTextbox) {
+        if (isStartTextbox) {
+            mTbStartLocation.clearFocus();
+            if (!mTbEndLocation.hasFocus()){
+                mMap.setOnMapClickListener(null);
+            }
+        } else {
+            mTbEndLocation.clearFocus();
+            if (!mTbStartLocation.hasFocus()){
+                mMap.setOnMapClickListener(null);
+            }
+        }
+    }
+
+
+    /**
      * Triggers ServerSelector task to retrieve servers list.
      * <p>
      * Server list will be downloaded or retrieved from the database.
@@ -1786,7 +1802,7 @@ public class MainFragment extends Fragment implements
     public void runAutoDetectServer(LatLng mCurrentLatLng, boolean showDialog) {
         if ((mCurrentLatLng == null) || (mMap == null)) {
             Toast.makeText(mApplicationContext,
-                    mApplicationContext.getResources().getString(R.string.current_location_error),
+                    mApplicationContext.getResources().getString(R.string.toast_tripplanner_current_location_error),
                     Toast.LENGTH_LONG).show();
         } else {
             ServersDataSource dataSource = ServersDataSource.getInstance(mApplicationContext);
@@ -1883,7 +1899,7 @@ public class MainFragment extends Fragment implements
      */
     private void restartTextBoxes() {
         SharedPreferences.Editor prefsEditor = mPrefs.edit();
-        setTextBoxLocation(mApplicationContext.getResources().getString(R.string.my_location),
+        setTextBoxLocation(mApplicationContext.getResources().getString(R.string.text_box_my_location),
                 true);
         prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true);
         prefsEditor.commit();
@@ -1936,13 +1952,15 @@ public class MainFragment extends Fragment implements
                 String toastText;
                 if (isStartMarker) {
                     toastText = mApplicationContext.getResources()
-                            .getString(R.string.start_marker_activated);
+                            .getString(R.string.toast_map_markers_start_marker_activated);
                 } else {
                     toastText = mApplicationContext.getResources()
-                            .getString(R.string.end_marker_activated);
+                            .getString(R.string.toast_map_markers_end_marker_activated);
                 }
                 Toast.makeText(mApplicationContext, toastText, Toast.LENGTH_SHORT).show();
             }
+
+            removeFocus(isStartMarker);
 
             if (isStartMarker) {
                 if (mStartMarker == null) {
@@ -1977,7 +1995,7 @@ public class MainFragment extends Fragment implements
         } else {
             if (showMessage) {
                 Toast.makeText(mApplicationContext, mApplicationContext.getResources()
-                        .getString(R.string.marker_out_of_boundaries), Toast.LENGTH_SHORT).show();
+                        .getString(R.string.toast_map_markers_marker_out_of_boundaries), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -2024,17 +2042,17 @@ public class MainFragment extends Fragment implements
         if (isStartMarker) {
             markerOptions
                     .title(mApplicationContext.getResources()
-                            .getString(R.string.start_marker_title))
+                            .getString(R.string.map_markers_start_marker_title))
                     .snippet(mApplicationContext.getResources()
-                            .getString(R.string.start_marker_description))
+                            .getString(R.string.map_markers_start_marker_description))
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
             mStartMarkerPosition = latLng;
             return mMap.addMarker(markerOptions);
         } else {
             markerOptions
-                    .title(mApplicationContext.getResources().getString(R.string.end_marker_title))
+                    .title(mApplicationContext.getResources().getString(R.string.map_markers_end_marker_title))
                     .snippet(mApplicationContext.getResources()
-                            .getString(R.string.end_marker_description))
+                            .getString(R.string.map_markers_end_marker_description))
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
             mEndMarkerPosition = latLng;
             return mMap.addMarker(markerOptions);
@@ -2215,14 +2233,14 @@ public class MainFragment extends Fragment implements
                 this);
         LatLng mCurrentLatLng = getLastLocation();
 
-        if (address.equalsIgnoreCase(this.getResources().getString(R.string.my_location))) {
+        if (address.equalsIgnoreCase(this.getResources().getString(R.string.text_box_my_location))) {
             if (mCurrentLatLng != null) {
                 geocodingTask.execute(address, String.valueOf(mCurrentLatLng.latitude),
                         String.valueOf(mCurrentLatLng.longitude));
             } else {
                 Toast.makeText(mApplicationContext,
                         mApplicationContext.getResources()
-                                .getString(R.string.current_location_error),
+                                .getString(R.string.toast_tripplanner_current_location_error),
                         Toast.LENGTH_LONG).show();
             }
         } else {
@@ -2313,9 +2331,9 @@ public class MainFragment extends Fragment implements
     @Override
     public void onPrepareOptionsMenu(final Menu pMenu) {
         if (isGPSEnabled()) {
-            mGPS.setTitle(R.string.disable_gps);
+            mGPS.setTitle(R.string.menu_button_disable_gps);
         } else {
-            mGPS.setTitle(R.string.enable_gps);
+            mGPS.setTitle(R.string.menu_button_enable_gps);
         }
         super.onPrepareOptionsMenu(pMenu);
     }
@@ -2346,7 +2364,7 @@ public class MainFragment extends Fragment implements
                 }
 
                 String subject = "";
-                subject += getResources().getString(R.string.feedback_subject);
+                subject += getResources().getString(R.string.menu_button_feedback_subject);
                 Date d = Calendar.getInstance().getTime();
                 subject += "[" + d.toString() + "]";
                 uriText += "?subject=" + subject;
@@ -2365,7 +2383,7 @@ public class MainFragment extends Fragment implements
                 Intent sendIntent = new Intent(Intent.ACTION_SENDTO);
                 sendIntent.setData(uri);
                 startActivity(Intent.createChooser(sendIntent,
-                        getResources().getString(R.string.feedback_send_email)));
+                        getResources().getString(R.string.menu_button_feedback_send_email)));
 
                 break;
             case R.id.server_info:
@@ -2375,7 +2393,7 @@ public class MainFragment extends Fragment implements
                     Log.w(OTPApp.TAG,
                             "Tried to get server info when no server was selected");
                     Toast.makeText(mApplicationContext, mApplicationContext.getResources()
-                            .getString(R.string.error_no_server_selected), Toast.LENGTH_SHORT)
+                            .getString(R.string.toast_no_server_selected_error), Toast.LENGTH_SHORT)
                             .show();
                     break;
                 }
@@ -2450,7 +2468,7 @@ public class MainFragment extends Fragment implements
             setMarkerPosition(isStartMarker, newLatlng);
             setTextBoxLocation(getStringAddress(address, false), isStartMarker);
         } else {
-            setTextBoxLocation(getResources().getString(R.string.textbox_close_to_marker) + " "
+            setTextBoxLocation(getResources().getString(R.string.text_box_close_to_marker) + " "
                     + getStringAddress(address, false), isStartMarker);
         }
 
@@ -2514,7 +2532,7 @@ public class MainFragment extends Fragment implements
                         .getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false)) {
                     if (mCurrentLatLng == null) {
                         Toast.makeText(mApplicationContext, mApplicationContext.getResources()
-                                .getString(R.string.current_location_error), Toast.LENGTH_LONG)
+                                .getString(R.string.toast_tripplanner_current_location_error), Toast.LENGTH_LONG)
                                 .show();
                     } else {
                         zoomToTwoPoints(latlng, mCurrentLatLng);
@@ -2530,7 +2548,7 @@ public class MainFragment extends Fragment implements
                 } else if (mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, false)) {
                     if (mCurrentLatLng == null) {
                         Toast.makeText(mApplicationContext, mApplicationContext.getResources()
-                                .getString(R.string.current_location_error), Toast.LENGTH_LONG)
+                                .getString(R.string.toast_tripplanner_current_location_error), Toast.LENGTH_LONG)
                                 .show();
                     } else {
                         zoomToTwoPoints(mCurrentLatLng, latlng);
@@ -2679,8 +2697,8 @@ public class MainFragment extends Fragment implements
 
                 if (traverseMode.isTransit()) {
                     modeMarkerOption.title(stepIndex + ". " + getResources()
-                            .getString(R.string.before_route) + " " + leg.getRouteShortName()
-                            + " " + getResources().getString(R.string.connector_stop) + " "
+                            .getString(R.string.connector_before_route) + " " + leg.getRouteShortName()
+                            + " " + getResources().getString(R.string.map_markers_connector_before_stop) + " "
                             + DirectionsGenerator.getLocalizedStreetName(leg.getFrom().name,
                             mApplicationContext.getResources()));
                     String modeMarkerSnippet = ConversionUtils
@@ -2688,20 +2706,20 @@ public class MainFragment extends Fragment implements
                                     Long.parseLong(leg.getStartTime()), false);
                     if (leg.getHeadsign() != null) {
                         modeMarkerSnippet += " " + getResources()
-                                .getString(R.string.step_by_step_to) + " " + leg.getHeadsign();
+                                .getString(R.string.step_by_step_non_transit_to) + " " + leg.getHeadsign();
                     }
                     modeMarkerOption.snippet(modeMarkerSnippet);
                 } else {
                     if (traverseMode.equals(TraverseMode.WALK)) {
                         modeMarkerOption.title(stepIndex + ". " + getResources()
-                                .getString(R.string.before_distance_walk)
-                                + " " + getResources().getString(R.string.connector_destination)
+                                .getString(R.string.map_markers_mode_walk_action)
+                                + " " + getResources().getString(R.string.map_markers_connector_before_destination)
                                 + " " + DirectionsGenerator.getLocalizedStreetName(leg.getTo().name,
                                 mApplicationContext.getResources()));
                     } else if (traverseMode.equals(TraverseMode.BICYCLE)) {
                         modeMarkerOption.title(stepIndex + ". " + getResources()
-                                .getString(R.string.before_distance_bike)
-                                + " " + getResources().getString(R.string.connector_destination)
+                                .getString(R.string.map_markers_mode_bicycle_action)
+                                + " " + getResources().getString(R.string.map_markers_connector_before_destination)
                                 + " " + DirectionsGenerator.getLocalizedStreetName(leg.getTo().name,
                                 mApplicationContext.getResources()));
                     }
@@ -2856,7 +2874,7 @@ public class MainFragment extends Fragment implements
                             .getTimeWithContext(mApplicationContext, leg.getAgencyTimeZoneOffset(),
                                     Long.parseLong(leg.getStartTime()), false);
                     itinerarySummaryList[i] += ". " + getResources()
-                            .getString(R.string.before_route) + " " + leg.getRouteShortName();
+                            .getString(R.string.connector_before_route) + " " + leg.getRouteShortName();
                     itinerarySummaryList[i] += " - " + ConversionUtils
                             .getFormattedDurationTextNoSeconds(it.duration / 1000,
                                     mApplicationContext);
@@ -2890,6 +2908,8 @@ public class MainFragment extends Fragment implements
     public void onOTPGeocodingComplete(final boolean isStartTextbox,
             ArrayList<Address> addressesReturn, boolean geocodingForMarker) {
         if (getActivity() != null) {
+            removeFocus(isStartTextbox);
+
             if (isStartTextbox) {
                 mIsStartLocationGeocodingProcessed = true;
             } else {
@@ -2900,7 +2920,7 @@ public class MainFragment extends Fragment implements
                 AlertDialog.Builder geocoderAlert = new AlertDialog.Builder(
                         getActivity());
                 geocoderAlert.setTitle(R.string.geocoder_results_title)
-                        .setMessage(R.string.geocoder_no_results_message)
+                        .setMessage(R.string.geocoder_results_no_results_message)
                         .setCancelable(false)
                         .setPositiveButton(getResources().getString(android.R.string.ok),
                                 new DialogInterface.OnClickListener() {
@@ -2929,7 +2949,7 @@ public class MainFragment extends Fragment implements
 
                 AlertDialog.Builder geocoderSelector = new AlertDialog.Builder(
                         getActivity());
-                geocoderSelector.setTitle(R.string.choose_geocoder);
+                geocoderSelector.setTitle(R.string.geocoder_results_title);
 
                 final CharSequence[] addressesText = new CharSequence[addressesReturn
                         .size()];

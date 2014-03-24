@@ -65,7 +65,7 @@ public class DateTimeDialog extends
         btnOk = (Button) view.findViewById(R.id.btnOk);
         btnCancel = (Button) view.findViewById(R.id.btnCancel);
 
-        getDialog().setTitle(getResources().getString(R.string.date_time_title));
+        getDialog().setTitle(getResources().getString(R.string.date_time_selector_title));
         getDialog().setCanceledOnTouchOutside(true);
 
         pickerTime.setIs24HourView(DateFormat.is24HourFormat(getActivity()));
@@ -106,9 +106,9 @@ public class DateTimeDialog extends
                 getActivity(),
                 android.R.layout.simple_spinner_dropdown_item,
                 new ArriveBySpinnerItem[]{new ArriveBySpinnerItem(
-                        getResources().getString(R.string.date_time_spinner_depart), false),
+                        getResources().getString(R.string.date_time_selector_spinner_depart), false),
                         new ArriveBySpinnerItem(
-                                getResources().getString(R.string.date_time_spinner_arrive),
+                                getResources().getString(R.string.date_time_selector_spinner_arrive),
                                 true)});
         spinScheduleType.setAdapter(arriveByTypeAdapter);
 
