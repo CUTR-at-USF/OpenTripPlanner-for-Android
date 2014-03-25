@@ -278,7 +278,7 @@
                     </TextView>
 
                     <TextView
-                            android:id="@+id/bikeParametersFriendltyTag"
+                            android:id="@+id/bikeParametersFriendlyTag"
                             android:textSize="15sp"
                             android:textColor="@layout/color_bike_headers_blue"
                             android:layout_width="0dp"
