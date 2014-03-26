@@ -22,9 +22,11 @@ import org.opentripplanner.v092snapshot.api.model.Itinerary;
 import org.opentripplanner.v092snapshot.api.model.Leg;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -122,14 +124,25 @@ public class MyActivity extends FragmentActivity implements OtpFragment {
                 }
             case OTPApp.CHOOSE_CONTACT_REQUEST_CODE:
                 if (resultCode == RESULT_OK) {
-//				Log.v(TAG, "CHOOSE CONTACT RESULT OK");
+                    Log.v(OTPApp.TAG, "CHOOSE CONTACT RESULT OK");
 
                     Uri contactData = data.getData();
                     Cursor c = managedQuery(contactData, null, null, null, null);
                     if (c.moveToFirst()) {
                         String address = c.getString(c.getColumnIndexOrThrow(
                                 ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS));
+
                         mainFragment.setTextBoxLocation(address, isButtonStartLocation);
+
+                        SharedPreferences.Editor prefsEditor = PreferenceManager
+                                .getDefaultSharedPreferences(this).edit();
+                        if (isButtonStartLocation){
+                            prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, false);
+                        }
+                        else{
+                            prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false);
+                        }
+                        prefsEditor.commit();
                         mainFragment.processAddress(isButtonStartLocation, address, false);
                     }
 
