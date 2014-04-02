@@ -85,7 +85,7 @@
             <!-- Errors -->
 
                     <!-- Triggering planning trip task -->
-                    <!--<string name="toast_tripplanner_need_to_place_markers_before_planning">Set an origin and destination first</string>-->
+                    <string name="toast_tripplanner_need_to_place_markers_before_planning">Setati punctele de plecare/sosire</string>
                     <!--<string name="toast_tripplanner_origin_destination_are_mylocation">Can\'t plan: origin and destination are the same"</string>-->
 
                     <!-- Obtaining server list -->
@@ -100,7 +100,7 @@
                     <!--<string name="toast_server_checker_error_bad_url">Bad URL for custom region</string>-->
 
                     <!-- Obtaining user location: to select server, to display user location address in text box, ... -->
-                    <string name="toast_tripplanner_current_location_error">No sa putut obține locația actuală</string>
+                    <string name="toast_tripplanner_current_location_error">Nu s-a putut obține locația actuală</string>
 
 
         <!-- Dialogs -->
