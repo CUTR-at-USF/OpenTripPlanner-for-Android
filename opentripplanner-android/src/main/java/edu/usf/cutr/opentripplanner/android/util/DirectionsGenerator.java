@@ -491,7 +491,7 @@ public class DirectionsGenerator {
     }
 
     public static int getModeIcon(TraverseModeSet mode) {
-        if (mode.contains(TraverseMode.FERRY) &&
+        if (/*mode.contains(TraverseMode.FERRY) && TODO */
                 mode.contains(TraverseMode.BUSISH) &&
                 mode.contains(TraverseMode.TRAINISH)) {
             return R.drawable.mode_transit;
