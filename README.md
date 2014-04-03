@@ -1,4 +1,4 @@
-OpenTripPlanner for Android
+OpenTripPlanner for Android [![Build Status](https://travis-ci.org/CUTR-at-USF/OpenTripPlanner-for-Android.svg?branch=master)](https://travis-ci.org/CUTR-at-USF/OpenTripPlanner-for-Android)
 ===========================
 
 An Android app for multi-modal trip planning and navigation using any OpenTripPlanner server.
