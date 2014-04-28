@@ -2237,8 +2237,8 @@ public class MainFragment extends Fragment implements
 
         if (address.equalsIgnoreCase(this.getResources().getString(R.string.text_box_my_location))) {
             if (mCurrentLatLng != null) {
-                geocodingTask.execute(address, String.valueOf(mCurrentLatLng.latitude),
-                        String.valueOf(mCurrentLatLng.longitude));
+                        geocodingTask.execute(address, String.valueOf(mCurrentLatLng.latitude),
+                                String.valueOf(mCurrentLatLng.longitude));
             } else {
                 Toast.makeText(mApplicationContext,
                         mApplicationContext.getResources()
@@ -2246,9 +2246,9 @@ public class MainFragment extends Fragment implements
                         Toast.LENGTH_LONG).show();
             }
         } else {
-            geocodingTask.execute(address);
-        }
-    }
+                    geocodingTask.execute(address);
+                }
+            }
 
 
     @Override
@@ -2698,8 +2698,9 @@ public class MainFragment extends Fragment implements
                 TraverseMode traverseMode = TraverseMode.valueOf(leg.mode);
 
                 if (traverseMode.isTransit()) {
-                    modeMarkerOption.title(stepIndex + ". " + getResources()
-                            .getString(R.string.connector_before_route) + " " + leg.getRouteShortName()
+                    modeMarkerOption.title(stepIndex + ". " + ConversionUtils
+                            .getRouteShortNameSafe(leg.getRouteShortName(), leg.getRouteLongName(),
+                                    mApplicationContext)
                             + " " + getResources().getString(R.string.map_markers_connector_before_stop) + " "
                             + DirectionsGenerator.getLocalizedStreetName(leg.getFrom().name,
                             mApplicationContext.getResources()));
@@ -2755,7 +2756,7 @@ public class MainFragment extends Fragment implements
             }
             if (animateCamera) {
                 mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsCreator.build(),
-                        getResources().getInteger(R.integer.default_padding)));
+                            getResources().getInteger(R.integer.default_padding)));
             }
         }
     }
@@ -2876,7 +2877,9 @@ public class MainFragment extends Fragment implements
                             .getTimeWithContext(mApplicationContext, leg.getAgencyTimeZoneOffset(),
                                     Long.parseLong(leg.getStartTime()), false);
                     itinerarySummaryList[i] += ". " + getResources()
-                            .getString(R.string.connector_before_route) + " " + leg.getRouteShortName();
+                            .getString(R.string.connector_before_route) + " " + ConversionUtils
+                            .getRouteShortNameSafe(leg.getRouteShortName(),leg.getRouteLongName(),
+                                    mApplicationContext);
                     itinerarySummaryList[i] += " - " + ConversionUtils
                             .getFormattedDurationTextNoSeconds(it.duration / 1000,
                                     mApplicationContext);
