@@ -258,9 +258,13 @@ public class MainFragment extends Fragment implements
 
     private LatLng mEndMarkerPosition;
 
-    private boolean mIsStartLocationGeocodingProcessed = false;
+    private boolean mIsStartLocationGeocodingCompleted = false;
 
-    private boolean mIsEndLocationGeocodingProcessed = false;
+    private boolean mIsEndLocationGeocodingCompleted = false;
+
+    private boolean mIsStartLocationGeocodingBeenRequested = false;
+
+    private boolean mDestinationGeocodingBeenRequested = false;
 
     private boolean mIsStartLocationChangedByUser = true;
 
@@ -271,9 +275,6 @@ public class MainFragment extends Fragment implements
     private boolean mRequestTripAfterEndGeocoding = false;
 
     private boolean mRequestTripAfterStartEndGeocoding = false;
-
-    private boolean mGeocodingBeenRequested = false;
-
     private ArrayList<Marker> mModeMarkers;
 
     private List<Polyline> mRoute;
@@ -621,7 +622,7 @@ public class MainFragment extends Fragment implements
                                 .getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true)) {
                             updateMarkerPosition(markerLatlng, true);
                         } else {
-                            mIsStartLocationGeocodingProcessed = true;
+                            mIsStartLocationGeocodingCompleted = true;
                             removeFocus(true);
                             setMarker(true, markerLatlng, false);
                         }
@@ -632,7 +633,7 @@ public class MainFragment extends Fragment implements
                                 .getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true)) {
                             updateMarkerPosition(markerLatlng, false);
                         } else {
-                            mIsEndLocationGeocodingProcessed = true;
+                            mIsEndLocationGeocodingCompleted = true;
                             removeFocus(false);
                             setMarker(false, markerLatlng, false);
                         }
@@ -918,13 +919,13 @@ public class MainFragment extends Fragment implements
 
                         if (!TextUtils.isEmpty(text)) {
                             if (v.getId() == R.id.tbStartLocation
-                                    && !mIsStartLocationGeocodingProcessed
+                                    && !mIsStartLocationGeocodingCompleted
                                     && !mPrefs
                                     .getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION,
                                             true)) {
                                 processAddress(true, text, false);
                             } else if (v.getId() == R.id.tbEndLocation
-                                    && !mIsEndLocationGeocodingProcessed
+                                    && !mIsEndLocationGeocodingCompleted
                                     && !mPrefs
                                     .getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION,
                                             true)) {
@@ -965,7 +966,7 @@ public class MainFragment extends Fragment implements
                     SharedPreferences.Editor prefsEditor = mPrefs.edit();
                     prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, false);
                     prefsEditor.commit();
-                    mIsStartLocationGeocodingProcessed = false;
+                    mIsStartLocationGeocodingCompleted = false;
                 } else {
                     mIsStartLocationChangedByUser = true;
                 }
@@ -989,7 +990,7 @@ public class MainFragment extends Fragment implements
                     SharedPreferences.Editor prefsEditor = mPrefs.edit();
                     prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false);
                     prefsEditor.commit();
-                    mIsEndLocationGeocodingProcessed = false;
+                    mIsEndLocationGeocodingCompleted = false;
                 } else {
                     mIsEndLocationChangedByUser = true;
                 }
@@ -1008,11 +1009,9 @@ public class MainFragment extends Fragment implements
                             || (event != null
                             && event.getAction() == KeyEvent.ACTION_DOWN && event
                             .getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
-                        if (!mIsStartLocationGeocodingProcessed
+                        if (!mIsStartLocationGeocodingCompleted
                                 && !mPrefs
                                 .getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true)) {
-                            mGeocodingBeenRequested = true;
-
                             CharSequence tvCharSequence = v.getText();
                             if (tvCharSequence != null) {
                                 processAddress(true, tvCharSequence.toString(), false);
@@ -1196,11 +1195,9 @@ public class MainFragment extends Fragment implements
     private void processRequestTrip() {
         Editable tbEditable;
 
-        if (!mIsEndLocationGeocodingProcessed
-                && !mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, true)
-                && !mGeocodingBeenRequested) {
+        if (!mIsEndLocationGeocodingCompleted
+                && !mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, true)) {
             mRequestTripAfterEndGeocoding = true;
-            mGeocodingBeenRequested = true;
             if ((tbEditable = mTbEndLocation.getText()) != null) {
                 processAddress(false, tbEditable.toString(), false);
             } else {
@@ -1208,11 +1205,9 @@ public class MainFragment extends Fragment implements
                         "Trip won't be requested because there was an error fetching destination"
                                 + " from input field");
             }
-        } else if (!mIsStartLocationGeocodingProcessed
-                && !mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true)
-                && !mGeocodingBeenRequested) {
+        } else if (!mIsStartLocationGeocodingCompleted
+                && !mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true)) {
             mRequestTripAfterStartGeocoding = true;
-            mGeocodingBeenRequested = true;
             if ((tbEditable = mTbStartLocation.getText()) != null) {
                 processAddress(true, tbEditable.toString(), false);
 
@@ -1221,15 +1216,13 @@ public class MainFragment extends Fragment implements
                         "Trip won't be requested because there was an error fetching origin from"
                                 + " input field");
             }
-        } else if (!mIsStartLocationGeocodingProcessed
+        } else if (!mIsStartLocationGeocodingCompleted
                 && !mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true)
-                && !mIsEndLocationGeocodingProcessed
-                && !mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, true)
-                && !mGeocodingBeenRequested) {
+                && !mIsEndLocationGeocodingCompleted
+                && !mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, true)) {
             mRequestTripAfterStartGeocoding = true;
             mRequestTripAfterEndGeocoding = true;
             mRequestTripAfterStartEndGeocoding = true;
-            mGeocodingBeenRequested = true;
             if ((tbEditable = mTbStartLocation.getText()) != null) {
                 processAddress(true, tbEditable.toString(), false);
             } else {
@@ -1305,9 +1298,9 @@ public class MainFragment extends Fragment implements
                     mEndMarker = addStartEndMarker(mEndMarkerPosition, false);
                 }
 
-                mIsStartLocationGeocodingProcessed = savedInstanceState
+                mIsStartLocationGeocodingCompleted = savedInstanceState
                         .getBoolean(OTPApp.BUNDLE_KEY_IS_START_LOCATION_GEOCODING_PROCESSED);
-                mIsEndLocationGeocodingProcessed = savedInstanceState
+                mIsEndLocationGeocodingCompleted = savedInstanceState
                         .getBoolean(OTPApp.BUNDLE_KEY_IS_END_LOCATION_GEOCODING_PROCESSED);
                 mAppStarts = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_APP_STARTS);
                 mIsStartLocationChangedByUser = savedInstanceState
@@ -1528,12 +1521,12 @@ public class MainFragment extends Fragment implements
             }
         }
 
-        if (!mIsStartLocationGeocodingProcessed && !isOriginMyLocation) {
+        if (!mIsStartLocationGeocodingCompleted && !isOriginMyLocation) {
             Toast.makeText(MainFragment.this.mApplicationContext, mApplicationContext.getResources()
                     .getString(R.string.toast_tripplanner_need_to_place_markers_before_planning), Toast.LENGTH_SHORT)
                     .show();
             return;
-        } else if (!mIsEndLocationGeocodingProcessed && !isDestinationMyLocation) {
+        } else if (!mIsEndLocationGeocodingCompleted && !isDestinationMyLocation) {
             Toast.makeText(MainFragment.this.mApplicationContext, mApplicationContext.getResources()
                     .getString(R.string.toast_tripplanner_need_to_place_markers_before_planning), Toast.LENGTH_SHORT)
                     .show();
@@ -1976,7 +1969,7 @@ public class MainFragment extends Fragment implements
                 if (mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true)) {
                     updateMarkerPosition(latlng, true);
                 } else {
-                    mIsStartLocationGeocodingProcessed = true;
+                    mIsStartLocationGeocodingCompleted = true;
                 }
             } else {
                 if (mEndMarker == null) {
@@ -1990,7 +1983,7 @@ public class MainFragment extends Fragment implements
                 if (mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true)) {
                     updateMarkerPosition(latlng, false);
                 } else {
-                    mIsEndLocationGeocodingProcessed = true;
+                    mIsEndLocationGeocodingCompleted = true;
                 }
             }
             prefsEditor.commit();
@@ -2155,9 +2148,9 @@ public class MainFragment extends Fragment implements
             bundle.putParcelable(OTPApp.BUNDLE_KEY_MAP_END_MARKER_POSITION, mEndMarkerPosition);
             bundle.putBoolean(OTPApp.BUNDLE_KEY_APP_STARTS, mAppStarts);
             bundle.putBoolean(OTPApp.BUNDLE_KEY_IS_START_LOCATION_GEOCODING_PROCESSED,
-                    mIsStartLocationGeocodingProcessed);
+                    mIsStartLocationGeocodingCompleted);
             bundle.putBoolean(OTPApp.BUNDLE_KEY_IS_END_LOCATION_GEOCODING_PROCESSED,
-                    mIsEndLocationGeocodingProcessed);
+                    mIsEndLocationGeocodingCompleted);
             bundle.putBoolean(OTPApp.BUNDLE_KEY_IS_START_LOCATION_CHANGED_BY_USER,
                     mIsStartLocationChangedByUser);
             bundle.putBoolean(OTPApp.BUNDLE_KEY_IS_END_LOCATION_CHANGED_BY_USER,
@@ -2237,8 +2230,20 @@ public class MainFragment extends Fragment implements
 
         if (address.equalsIgnoreCase(this.getResources().getString(R.string.text_box_my_location))) {
             if (mCurrentLatLng != null) {
-                geocodingTask.execute(address, String.valueOf(mCurrentLatLng.latitude),
-                        String.valueOf(mCurrentLatLng.longitude));
+                if (isStartTextBox){
+                    if (!mIsStartLocationGeocodingBeenRequested){
+                        mIsStartLocationGeocodingBeenRequested = true;
+                        geocodingTask.execute(address, String.valueOf(mCurrentLatLng.latitude),
+                                String.valueOf(mCurrentLatLng.longitude));
+                    }
+                }
+                else{
+                    if (!mDestinationGeocodingBeenRequested){
+                        mDestinationGeocodingBeenRequested = true;
+                        geocodingTask.execute(address, String.valueOf(mCurrentLatLng.latitude),
+                                String.valueOf(mCurrentLatLng.longitude));
+                    }
+                }
             } else {
                 Toast.makeText(mApplicationContext,
                         mApplicationContext.getResources()
@@ -2246,7 +2251,18 @@ public class MainFragment extends Fragment implements
                         Toast.LENGTH_LONG).show();
             }
         } else {
-            geocodingTask.execute(address);
+            if (isStartTextBox){
+                if (!mIsStartLocationGeocodingBeenRequested){
+                    mIsStartLocationGeocodingBeenRequested = true;
+                    geocodingTask.execute(address);
+                }
+            }
+            else{
+                if (!mDestinationGeocodingBeenRequested){
+                    mDestinationGeocodingBeenRequested = true;
+                    geocodingTask.execute(address);
+                }
+            }
         }
     }
 
@@ -2755,7 +2771,7 @@ public class MainFragment extends Fragment implements
             }
             if (animateCamera) {
                 mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsCreator.build(),
-                        getResources().getInteger(R.integer.default_padding)));
+                            getResources().getInteger(R.integer.default_padding)));
             }
         }
     }
@@ -2912,10 +2928,14 @@ public class MainFragment extends Fragment implements
         if (getActivity() != null) {
             removeFocus(isStartTextbox);
 
+            boolean geocodingWasRequested = mIsStartLocationGeocodingBeenRequested || mDestinationGeocodingBeenRequested;
+
             if (isStartTextbox) {
-                mIsStartLocationGeocodingProcessed = true;
+                mIsStartLocationGeocodingCompleted = true;
+                mIsStartLocationGeocodingBeenRequested = false;
             } else {
-                mIsEndLocationGeocodingProcessed = true;
+                mIsEndLocationGeocodingCompleted = true;
+                mDestinationGeocodingBeenRequested = false;
             }
 
             try {
@@ -2931,7 +2951,6 @@ public class MainFragment extends Fragment implements
                                 });
 
                 if (addressesReturn.isEmpty()) {
-                    mGeocodingBeenRequested = false;
                     restartTextBoxLocation(isStartTextbox);
                     AlertDialog alert = geocoderAlert.create();
                     alert.show();
@@ -2942,10 +2961,9 @@ public class MainFragment extends Fragment implements
                     } else {
                         moveMarker(isStartTextbox, addressesReturn.get(0));
                     }
-                    if (mGeocodingBeenRequested) {
+                    if (geocodingWasRequested) {
                         requestTripAfterGeocoding();
                     }
-                    mGeocodingBeenRequested = false;
                     return;
                 }
 
@@ -2984,7 +3002,6 @@ public class MainFragment extends Fragment implements
                 Log.e(OTPApp.TAG, "Error in Main Fragment Geocoding callback: " + e);
             }
         }
-        mGeocodingBeenRequested = false;
     }
 
     /**
