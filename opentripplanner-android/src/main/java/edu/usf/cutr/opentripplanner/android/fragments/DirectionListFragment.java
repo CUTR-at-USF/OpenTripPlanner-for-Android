@@ -152,9 +152,7 @@ public class DirectionListFragment extends ExpandableListFragment {
             for (Leg leg : it.legs) {
                 TraverseMode traverseMode = TraverseMode.valueOf(leg.mode);
                 if (traverseMode.isTransit()) {
-                    itinerarySummaryList[i] = getResources()
-                            .getString(R.string.connector_before_route) + " "
-                            + ConversionUtils
+                    itinerarySummaryList[i] = ConversionUtils
                             .getRouteShortNameSafe(leg.getRouteShortName(),
                                     leg.getRouteLongName(),
                                     getActivity().getApplicationContext()) + ". ";

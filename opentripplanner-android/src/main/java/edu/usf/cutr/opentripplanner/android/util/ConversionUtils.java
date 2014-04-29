@@ -295,9 +295,9 @@ public class ConversionUtils {
             routeName += context.getResources()
                     .getString(R.string.connector_before_route);
             if (routeShortName != null) {
-                routeName += routeShortName;
+                routeName += " " + routeShortName;
             } else if (routeLongName != null) {
-                routeName += tailAndTruncateSentence(routeLongName, context.getResources().getInteger(R.integer.route_short_name_max_size));
+                routeName += " " + tailAndTruncateSentence(routeLongName, context.getResources().getInteger(R.integer.route_short_name_max_size));
             }
         }
 
