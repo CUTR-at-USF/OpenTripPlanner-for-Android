@@ -2714,8 +2714,9 @@ public class MainFragment extends Fragment implements
                 TraverseMode traverseMode = TraverseMode.valueOf(leg.mode);
 
                 if (traverseMode.isTransit()) {
-                    modeMarkerOption.title(stepIndex + ". " + getResources()
-                            .getString(R.string.connector_before_route) + " " + leg.getRouteShortName()
+                    modeMarkerOption.title(stepIndex + ". " + ConversionUtils
+                            .getRouteShortNameSafe(leg.getRouteShortName(), leg.getRouteLongName(),
+                                    mApplicationContext)
                             + " " + getResources().getString(R.string.map_markers_connector_before_stop) + " "
                             + DirectionsGenerator.getLocalizedStreetName(leg.getFrom().name,
                             mApplicationContext.getResources()));
@@ -2891,8 +2892,9 @@ public class MainFragment extends Fragment implements
                     itinerarySummaryList[i] = ConversionUtils
                             .getTimeWithContext(mApplicationContext, leg.getAgencyTimeZoneOffset(),
                                     Long.parseLong(leg.getStartTime()), false);
-                    itinerarySummaryList[i] += ". " + getResources()
-                            .getString(R.string.connector_before_route) + " " + leg.getRouteShortName();
+                    itinerarySummaryList[i] += ". " + getResources() + ConversionUtils
+                            .getRouteShortNameSafe(leg.getRouteShortName(),leg.getRouteLongName(),
+                                    mApplicationContext);
                     itinerarySummaryList[i] += " - " + ConversionUtils
                             .getFormattedDurationTextNoSeconds(it.duration / 1000,
                                     mApplicationContext);

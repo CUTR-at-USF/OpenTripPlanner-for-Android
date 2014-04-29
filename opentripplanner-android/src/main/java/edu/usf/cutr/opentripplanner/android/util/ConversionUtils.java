@@ -26,7 +26,9 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -247,6 +249,82 @@ public class ConversionUtils {
         return (tomorrowTime.get(Calendar.ERA) == cal.get(Calendar.ERA) &&
                 tomorrowTime.get(Calendar.YEAR) == cal.get(Calendar.YEAR) &&
                 tomorrowTime.get(Calendar.DAY_OF_YEAR) == cal.get(Calendar.DAY_OF_YEAR));
+    }
+
+    /**
+     * Shows only the last n words of a sentence, being n the number of words to make the longer
+     * sentence that still is smaller than maxLength.
+     *
+     * @param sentence phrase to shrink
+     * @param maxLength max length of the new sentence
+     * @return the reduced sentence
+     */
+    public static String tailAndTruncateSentence(String sentence, int maxLength) {
+        String[] words = sentence.split(" ");
+        List<String> list = Arrays.asList(words);
+        Collections.reverse(list);
+        String[] reversedWords = (String[])list.toArray();
+
+        String modifiedSentence = "";
+
+        for (String word : reversedWords){
+            if (modifiedSentence.length() >= maxLength){
+                return modifiedSentence;
+            }
+            modifiedSentence = word + " " + modifiedSentence;
+        }
+
+        return modifiedSentence;
+    }
+
+    /**
+     * Always creates a correct value for the short name of the route. Using the routeShortName,
+     * processing the long name if the short is null or returning an empty string if both names are
+     * null.
+     *
+     * Route short name will be preceded by adequate connector.
+     *
+     * @param routeLongName to convert it to a route short name if necessary
+     * @param routeShortName to be returned if is not null
+     * @return a valid route short name
+     */
+    public static String getRouteShortNameSafe(String routeShortName, String routeLongName, Context context) {
+        String routeName = "";
+
+        if (routeShortName != null || routeLongName != null) {
+            routeName += context.getResources()
+                    .getString(R.string.connector_before_route);
+            if (routeShortName != null) {
+                routeName += " " + routeShortName;
+            } else if (routeLongName != null) {
+                routeName += " " + tailAndTruncateSentence(routeLongName, context.getResources().getInteger(R.integer.route_short_name_max_size));
+            }
+        }
+
+        return routeName;
+    }
+
+    /**
+     * Always creates a correct value for the long name of the route. Using the routeLongName,
+     * returning the short name if the long is null or returning an empty string if both names are
+     * null.
+     *
+     * @param routeLongName to be returned if is not null
+     * @param routeShortName to use if necessary
+     * @return a valid route long name
+     */
+    public static String getRouteLongNameSafe(String routeLongName, String routeShortName) {
+        String routeName = "";
+
+        if (routeShortName != null || routeLongName != null) {
+            if (routeLongName != null) {
+                routeName += routeLongName;
+            } else if (routeShortName != null) {
+                routeName += routeShortName;
+            }
+        }
+
+        return routeName;
     }
 
 }
