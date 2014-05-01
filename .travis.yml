@@ -5,4 +5,4 @@ android:
   components:
     - build-tools-19.0.1
 
-script: ./gradlew assembleDebug
+script: TERM=dumb ./gradlew assembleDebug
