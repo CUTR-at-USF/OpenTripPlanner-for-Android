@@ -2892,7 +2892,7 @@ public class MainFragment extends Fragment implements
                     itinerarySummaryList[i] = ConversionUtils
                             .getTimeWithContext(mApplicationContext, leg.getAgencyTimeZoneOffset(),
                                     Long.parseLong(leg.getStartTime()), false);
-                    itinerarySummaryList[i] += ". " + getResources() + ConversionUtils
+                    itinerarySummaryList[i] += ". " + ConversionUtils
                             .getRouteShortNameSafe(leg.getRouteShortName(),leg.getRouteLongName(),
                                     mApplicationContext);
                     itinerarySummaryList[i] += " - " + ConversionUtils
