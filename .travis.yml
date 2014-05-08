@@ -5,10 +5,6 @@ android:
   components:
     - build-tools-19.0.1
 
-install:
-  # Prevent `gradle assemble` from being invoked by overriding with no-op
-  - true
-
 script:
   # Use `TERM=dumb` to simplify console output
   - TERM=dumb ./gradlew assembleDebug -PdisablePreDex
