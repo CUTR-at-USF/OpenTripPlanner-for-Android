@@ -1,9 +1,5 @@
 language: android
 jdk: oraclejdk7
 
-android:
-  components:
-    - build-tools-19.0.1
-
 script:
   - ./gradlew assembleDebug -PdisablePreDex
