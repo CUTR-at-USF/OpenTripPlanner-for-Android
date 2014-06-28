@@ -2,7 +2,7 @@
 <resources>
     <integer name="geocoder_max_results">5</integer>
     <integer name="max_walking_distance">1600</integer>
-    <integer name="default_padding">140</integer>
+    <integer name="route_zoom_padding">10</integer>
     <integer name="map_padding_margin">5</integer>
     <integer name="mode_icons_position_vertical_correction">-33</integer>
     <integer name="mode_icons_position_horizontal_correction">-1</integer>

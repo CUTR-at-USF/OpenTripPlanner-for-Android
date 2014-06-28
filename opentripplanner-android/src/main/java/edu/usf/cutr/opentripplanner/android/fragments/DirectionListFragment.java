@@ -188,7 +188,9 @@ public class DirectionListFragment extends ExpandableListFragment {
                 = new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                fragmentListener.onItinerarySelected(position);
+                if (fragmentListener.getCurrentItineraryIndex() != position) {
+                    fragmentListener.onItinerarySelected(position, 3);
+                }
 
                 setDepartureArrivalHeaders();
 

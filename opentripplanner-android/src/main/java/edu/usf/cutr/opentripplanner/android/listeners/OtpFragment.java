@@ -38,7 +38,7 @@ public interface OtpFragment {
 
     public void onItinerariesLoaded(List<Itinerary> itineraries);
 
-    public void onItinerarySelected(int i);
+    public void onItinerarySelected(int i, int animateCamera);
 
     public List<Leg> getCurrentItinerary();
 
