@@ -3198,6 +3198,7 @@ public class MainFragment extends Fragment implements
     @Override
     public void onConnected(Bundle connectionHint) {
         Location mCurrentLocation = mLocationClient.getLastLocation();
+        boolean autodetectServerTriggered = false;
 
         if ((!mMapFailed)) {
             if (mCurrentLocation != null) {
@@ -3220,6 +3221,7 @@ public class MainFragment extends Fragment implements
                     runAutoDetectServer(mCurrentLatLng, false);
                 } else {
                     if (mNeedToRunAutoDetect) {
+                        autodetectServerTriggered = true;
                         runAutoDetectServer(mCurrentLatLng, true);
                     } else if (mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER, true)) {
 
@@ -3231,11 +3233,14 @@ public class MainFragment extends Fragment implements
                                 && (((mSavedLastLocationCheckedForServer != null) && (distance[0]
                                 > OTPApp.COORDINATES_IMPORTANT_DIFFERENCE))
                                 || (mSavedLastLocationCheckedForServer == null))) {
+                            autodetectServerTriggered = true;
                             runAutoDetectServer(mCurrentLatLng, false);
                         } else if (mOTPApp.getSelectedServer() == null) {
+                            autodetectServerTriggered = true;
                             runAutoDetectServer(mCurrentLatLng, true);
                         }
-                    } else {
+                    }
+                    if (!autodetectServerTriggered){
                         if (mAppStarts) {
                             Server selectedServer = mOTPApp.getSelectedServer();
                             if ((selectedServer != null) && selectedServer.areBoundsSet()) {
