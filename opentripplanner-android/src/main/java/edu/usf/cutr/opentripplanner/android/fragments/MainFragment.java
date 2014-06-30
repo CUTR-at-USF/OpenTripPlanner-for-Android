@@ -61,6 +61,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
@@ -184,8 +185,6 @@ public class MainFragment extends Fragment implements
 
     private boolean mAppStarts = true;
 
-    private boolean mAppResumed;
-
     private Boolean mNeedToUpdateServersList = false;
 
     private Boolean mNeedToRunAutoDetect = false;
@@ -283,6 +282,14 @@ public class MainFragment extends Fragment implements
 
     private boolean mArriveBy;
 
+    private int mMapPaddingLeft;
+
+    private int mMapPaddingTop;
+
+    private int mMapPaddingRight;
+
+    private int mMapPaddingBottom;
+
     @SuppressWarnings("deprecation")
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private static void removeOnGlobalLayoutListener(View v,
@@ -370,14 +377,16 @@ public class MainFragment extends Fragment implements
                         int windowHeight = metrics.heightPixels;
                         int paddingMargin = MainFragment.this.getResources()
                                 .getInteger(R.integer.map_padding_margin);
+                        mMapPaddingLeft = locationBtnHandle[0] + mBtnHandle.getWidth() / 2
+                                + paddingMargin;
+                        mMapPaddingTop = locationTbEndLocation[1] + mTbEndLocation.getHeight() / 2
+                                + paddingMargin;
+                        mMapPaddingRight = 0;
+                        mMapPaddingBottom = windowHeight - locationItinerarySelectionSpinner[1]
+                                + paddingMargin;
+
                         if (mMap != null) {
-                            mMap.setPadding(locationBtnHandle[0] + mBtnHandle.getWidth() / 2
-                                    + paddingMargin,
-                                    locationTbEndLocation[1] + mTbEndLocation.getHeight() / 2
-                                            + paddingMargin,
-                                    0,
-                                    windowHeight - locationItinerarySelectionSpinner[1]
-                                            + paddingMargin);
+                            mMap.setPadding(mMapPaddingLeft, mMapPaddingTop, mMapPaddingRight, mMapPaddingBottom);
                         }
                     }
                 });
@@ -1111,13 +1120,11 @@ public class MainFragment extends Fragment implements
                 = new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mFragmentListener.onItinerarySelected(position);
 
-                if (!mAppResumed) {
-                    showRouteOnMap(mFragmentListener.getCurrentItinerary(), true);
-                } else {
-                    showRouteOnMap(mFragmentListener.getCurrentItinerary(), false);
-                    mAppResumed = false;
+                if (mFragmentListener.getCurrentItinerary() != null){
+                    if (mFragmentListener.getCurrentItineraryIndex() != position) {
+                        mFragmentListener.onItinerarySelected(position, 2);
+                    }
                 }
             }
 
@@ -1347,10 +1354,9 @@ public class MainFragment extends Fragment implements
                 if (otpBundle != null) {
                     List<Itinerary> itineraries = otpBundle.getItineraryList();
                     getFragmentListener().onItinerariesLoaded(itineraries);
-                    getFragmentListener().onItinerarySelected(otpBundle.getCurrentItineraryIndex());
+                    getFragmentListener().onItinerarySelected(otpBundle.getCurrentItineraryIndex(), 0);
                     fillItinerariesSpinner(itineraries);
                 }
-                showRouteOnMap(getFragmentListener().getCurrentItinerary(), false);
 
                 Date savedTripDate = (Date) savedInstanceState
                         .getSerializable(OTPApp.BUNDLE_KEY_TRIP_DATE);
@@ -2270,7 +2276,6 @@ public class MainFragment extends Fragment implements
     @Override
     public void onResume() {
         super.onResume();
-        mAppResumed = true;
 
         Log.v(OTPApp.TAG, "MainFragment onResume");
     }
@@ -2593,7 +2598,7 @@ public class MainFragment extends Fragment implements
             boundsCreator.include(pointB);
 
             mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsCreator.build(),
-                    getResources().getInteger(R.integer.default_padding)));
+                    getResources().getInteger(R.integer.route_zoom_padding)));
         }
     }
 
@@ -2661,10 +2666,12 @@ public class MainFragment extends Fragment implements
      * Previous routes are removed from the map.
      *
      * @param itinerary     the information to be drawn
-     * @param animateCamera if true map will be zoomed to exactly fit the route
-     *                      after the drawing
+     * @param animateCamera type of camera animation: - 0 camera wouldn't be animated
+     *                                                - 1 animated to fit the route
+     *                                                - 2 animated to fit first transit marker if
+     *                                                  any, otherwise to route.
      */
-    public void showRouteOnMap(List<Leg> itinerary, boolean animateCamera) {
+    public void showRouteOnMap(List<Leg> itinerary, int animateCamera) {
         Log.v(OTPApp.TAG,
                 "(TripRequest) legs size = "
                         + Integer.toString(itinerary.size()));
@@ -2758,7 +2765,9 @@ public class MainFragment extends Fragment implements
 
                     if (firstTransitMarker == null) {
                         firstTransitMarker = modeMarker;
-                        firstTransitMarker.showInfoWindow();
+                        if (animateCamera == 1){
+                            firstTransitMarker.showInfoWindow();
+                        }
                     }
                 }
                 PolylineOptions options = new PolylineOptions().addAll(points)
@@ -2770,10 +2779,95 @@ public class MainFragment extends Fragment implements
                     boundsCreator.include(point);
                 }
             }
-            if (animateCamera) {
-                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsCreator.build(),
-                            getResources().getInteger(R.integer.default_padding)));
+            if (animateCamera > 0) {
+                LatLngBounds routeBounds = boundsCreator.build();
+                showRouteOnMapAnimateCamera(routeBounds, firstTransitMarker, animateCamera);
             }
+        }
+    }
+
+    /**
+     * Moves the camera to correctly display the route on map. Several options are possible to move
+     * the camera according to animateCamera parameter.
+     * <p>
+     * If the route contains any transit leg, Info Window of start point of the first one will be
+     * opened and centered in the screen, to display stop address from where route starts.
+     * To fit the whole route in the screen and let the first transit stop in the center, next steps
+     * are performed (the objective is to create new bounds with this characteristic):
+     * - Measure screen horizontal and vertical distance to northeast and southwest points of route
+     * bounds. Obtain the highest.
+     * - Add this distance in the other 3 dimensions to the first transit marker screen position in
+     * order to obtain new points to have all the route fitted and the transit marker in the middle
+     * (approximately due to projection restrictions).
+     * - Calculate the coordinates of these new points and add them to the route points to calculate
+     * the new bounds.
+     * - Pass the new bounds to the camera movement function and correct result will be obtained.
+     *
+     * @param routeBounds original route bounds
+     * @param firstTransitMarker position of first transit stop that will be centered
+     * @param animateCamera type of camera animation: - 0 camera wouldn't be animated
+     *                                                - 1 animated to fit the route
+     *                                                - 2 animated to fit first transit marker if
+     *                                                  any, otherwise to route.
+     *                                                - 3 moved with no animation to fit first
+     *                                                transit marker if any, otherwise to route.
+     */
+    private void showRouteOnMapAnimateCamera(LatLngBounds routeBounds, Marker firstTransitMarker, int animateCamera){
+
+        int windowWidth = getResources().getDisplayMetrics().widthPixels;
+        int windowHeight = getResources().getDisplayMetrics().heightPixels;
+        int limitNortheastRight = windowWidth - mMapPaddingRight;
+        int limitNortheastTop = mMapPaddingTop;
+        int limitSouthwestLeft = mMapPaddingLeft;
+        int limitSouthwestBottom = windowHeight - mMapPaddingBottom;
+        Point northeastInScreen = mMap.getProjection().toScreenLocation(routeBounds.northeast);
+        Point southwestInScreen = mMap.getProjection().toScreenLocation(routeBounds.southwest);
+
+        if ((firstTransitMarker != null) && (animateCamera == 1)){
+            Point firstTransitMarkerInScreen = mMap.getProjection().toScreenLocation(firstTransitMarker.getPosition());
+            int maxDistanceToRouteEdge = 0;
+            int distanceHorizontalNortheast = northeastInScreen.x - firstTransitMarkerInScreen.x;
+            int distanceVerticalNortheast = firstTransitMarkerInScreen.y - northeastInScreen.y;
+            int distanceHorizontalSouthwest = firstTransitMarkerInScreen.x - southwestInScreen.x;
+            int distanceVerticalSouthwest = southwestInScreen.y - firstTransitMarkerInScreen.y;
+            if (distanceHorizontalNortheast > maxDistanceToRouteEdge){
+                maxDistanceToRouteEdge = distanceHorizontalNortheast;
+            }
+            if (distanceVerticalNortheast > maxDistanceToRouteEdge){
+                maxDistanceToRouteEdge = distanceVerticalNortheast;
+            }
+            if (distanceHorizontalSouthwest > maxDistanceToRouteEdge){
+                maxDistanceToRouteEdge = distanceHorizontalSouthwest;
+            }
+            if (distanceVerticalSouthwest > maxDistanceToRouteEdge) {
+                maxDistanceToRouteEdge = distanceVerticalSouthwest;
+            }
+
+            Point newLimitSouthWest = new Point(firstTransitMarkerInScreen.x - maxDistanceToRouteEdge, firstTransitMarkerInScreen.y + maxDistanceToRouteEdge);
+            Point newLimitNorthEast = new Point(firstTransitMarkerInScreen.x + maxDistanceToRouteEdge, firstTransitMarkerInScreen.y - maxDistanceToRouteEdge);
+            LatLng newLimitSouthWestLatLng = mMap.getProjection().fromScreenLocation(newLimitSouthWest);
+            LatLng newLimitNorthEastLatLng = mMap.getProjection().fromScreenLocation(newLimitNorthEast);
+
+            routeBounds = new LatLngBounds(newLimitSouthWestLatLng, newLimitNorthEastLatLng);
+        }
+
+        int routeDefaultPadding = getResources().getInteger(R.integer.route_zoom_padding);
+        routeDefaultPadding = Math.round(routeDefaultPadding * getResources().getDisplayMetrics().density);
+        int padding = routeDefaultPadding;
+        int maxHorizontalPadding = (limitNortheastRight - limitSouthwestLeft) / 2;
+        int maxVerticalPadding = (limitSouthwestBottom - limitNortheastTop) / 2;
+        if (padding > maxHorizontalPadding){
+            padding = maxHorizontalPadding;
+        }
+        if (padding > maxVerticalPadding){
+            padding = maxVerticalPadding;
+        }
+
+        if (animateCamera == 3){
+            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(routeBounds, padding));
+        }
+        else{
+            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(routeBounds, padding));
         }
     }
 
@@ -2842,12 +2936,11 @@ public class MainFragment extends Fragment implements
             fillItinerariesSpinner(itineraries);
             toggleItinerarySelectionSpinner(!itineraries.isEmpty());
 
-            showRouteOnMap(itineraries.get(0).legs, true);
             OtpFragment ofl = getFragmentListener();
 
             // onItinerariesLoaded must be invoked before onItinerarySelected(0)
             ofl.onItinerariesLoaded(itineraries);
-            ofl.onItinerarySelected(0);
+            ofl.onItinerarySelected(0, 1);
             MyActivity myActivity = (MyActivity) getActivity();
             myActivity.setCurrentRequestString(currentRequestString);
 
