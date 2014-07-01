@@ -2842,11 +2842,27 @@ public class MainFragment extends Fragment implements
             if (distanceVerticalSouthwest > maxDistanceToRouteEdge) {
                 maxDistanceToRouteEdge = distanceVerticalSouthwest;
             }
+            maxDistanceToRouteEdge = Math.abs(maxDistanceToRouteEdge);
 
             Point newLimitSouthWest = new Point(firstTransitMarkerInScreen.x - maxDistanceToRouteEdge, firstTransitMarkerInScreen.y + maxDistanceToRouteEdge);
             Point newLimitNorthEast = new Point(firstTransitMarkerInScreen.x + maxDistanceToRouteEdge, firstTransitMarkerInScreen.y - maxDistanceToRouteEdge);
             LatLng newLimitSouthWestLatLng = mMap.getProjection().fromScreenLocation(newLimitSouthWest);
             LatLng newLimitNorthEastLatLng = mMap.getProjection().fromScreenLocation(newLimitNorthEast);
+
+            double diffLatitude, diffLongitude;
+            if ((diffLatitude = newLimitNorthEastLatLng.latitude
+                        - newLimitSouthWestLatLng.latitude)
+                    < 0){
+                newLimitNorthEastLatLng = new LatLng(newLimitNorthEastLatLng.latitude
+                            + Math.abs(diffLatitude),
+                        newLimitNorthEastLatLng.longitude) ;
+            }
+            if ((diffLongitude = newLimitNorthEastLatLng.longitude
+                        - newLimitSouthWestLatLng.longitude)
+                    < 0){
+                newLimitNorthEastLatLng = new LatLng(newLimitNorthEastLatLng.latitude,
+                        newLimitNorthEastLatLng.longitude + Math.abs(diffLongitude)) ;
+            }
 
             routeBounds = new LatLngBounds(newLimitSouthWestLatLng, newLimitNorthEastLatLng);
         }
