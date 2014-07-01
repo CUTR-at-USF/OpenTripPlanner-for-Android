@@ -168,7 +168,7 @@ public class MyActivity extends FragmentActivity implements OtpFragment {
     }
 
     @Override
-    public void onItinerarySelected(int i) {
+    public void onItinerarySelected(int i, int animateCamera) {
         if (i >= currentItineraryList.size()) {
             return;
         }
@@ -176,6 +176,8 @@ public class MyActivity extends FragmentActivity implements OtpFragment {
         currentItineraryIndex = i;
         currentItinerary.clear();
         currentItinerary.addAll(currentItineraryList.get(i).legs);
+
+        mainFragment.showRouteOnMap(currentItinerary, animateCamera);
     }
 
     @Override
@@ -216,8 +218,6 @@ public class MyActivity extends FragmentActivity implements OtpFragment {
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         fm.popBackStack();
         transaction.commit();
-
-        mainFragment.showRouteOnMap(currentItinerary, true);
     }
 
     @Override

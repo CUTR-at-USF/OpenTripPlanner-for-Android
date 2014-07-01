@@ -19,7 +19,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.9.+'
+        classpath 'com.android.tools.build:gradle:0.12.+'
     }
 }
 apply plugin: 'android'
@@ -38,7 +38,7 @@ repositories {
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.0.1"
+    buildToolsVersion "19.1.0"
 
     defaultConfig {
         minSdkVersion 8
@@ -49,6 +49,10 @@ android {
     packagingOptions {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/NOTICE'
+    }
+
+    lintOptions {
+        disable 'MissingTranslation', 'ExtraTranslation'
     }
 
     if (project.hasProperty("secure.properties")
@@ -105,11 +109,11 @@ tasks.whenTaskAdded { theTask ->
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:19.0.+'
+    compile 'com.android.support:support-v4:19.1.+'
     compile 'com.google.android.gms:play-services:3.2.65'
-    compile 'com.fasterxml.jackson.core:jackson-core:2.3.1'
-    compile 'com.fasterxml.jackson.core:jackson-annotations:2.3.1'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.3.1'
+    compile 'com.fasterxml.jackson.core:jackson-core:2.3.3'
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.3.3'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.3.3'
     // POJOs used for full data-binding via Jackson
     compile 'edu.usf.cutr.opentripplanner.android:opentripplanner-pojos:1.0.0-SNAPSHOT'
     // OpenCSV, for parsing the OTP Server Directory Google Doc

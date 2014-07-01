@@ -1,4 +1,4 @@
-OpenTripPlanner for Android
+OpenTripPlanner for Android [![Build Status](https://travis-ci.org/CUTR-at-USF/OpenTripPlanner-for-Android.svg?branch=master)](https://travis-ci.org/CUTR-at-USF/OpenTripPlanner-for-Android)
 ===========================
 
 An Android app for multi-modal trip planning and navigation using any OpenTripPlanner server.
@@ -93,6 +93,3 @@ the "JAVA_HOME" environmental variables to point to your JDK folder.
 Want to learn more about the main OpenTripPlanner project? Read up here:
 
 http://opentripplanner.org
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/CUTR-at-USF/opentripplanner-for-android/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-

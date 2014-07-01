@@ -152,8 +152,10 @@ public class DirectionListFragment extends ExpandableListFragment {
             for (Leg leg : it.legs) {
                 TraverseMode traverseMode = TraverseMode.valueOf(leg.mode);
                 if (traverseMode.isTransit()) {
-                    itinerarySummaryList[i] = getResources().getString(R.string.connector_before_route) + " "
-                            + leg.getRouteShortName() + ". ";
+                    itinerarySummaryList[i] = ConversionUtils
+                            .getRouteShortNameSafe(leg.getRouteShortName(),
+                                    leg.getRouteLongName(),
+                                    getActivity().getApplicationContext()) + ". ";
                     isTransitIsTagSet = true;
                     break;
                 }
@@ -186,7 +188,9 @@ public class DirectionListFragment extends ExpandableListFragment {
                 = new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                fragmentListener.onItinerarySelected(position);
+                if (fragmentListener.getCurrentItineraryIndex() != position) {
+                    fragmentListener.onItinerarySelected(position, 3);
+                }
 
                 setDepartureArrivalHeaders();
 

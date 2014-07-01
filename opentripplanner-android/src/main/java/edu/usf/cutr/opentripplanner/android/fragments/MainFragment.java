@@ -61,6 +61,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
@@ -188,8 +189,6 @@ public class MainFragment extends Fragment implements
 
     private boolean mAppStarts = true;
 
-    private boolean mAppResumed;
-
     private Boolean mNeedToUpdateServersList = false;
 
     private Boolean mNeedToRunAutoDetect = false;
@@ -272,9 +271,13 @@ public class MainFragment extends Fragment implements
 
     private LatLng mEndMarkerPosition;
 
-    private boolean mIsStartLocationGeocodingProcessed = false;
+    private boolean mIsStartLocationGeocodingCompleted = false;
 
-    private boolean mIsEndLocationGeocodingProcessed = false;
+    private boolean mIsEndLocationGeocodingCompleted = false;
+
+    private boolean mIsStartLocationGeocodingBeenRequested = false;
+
+    private boolean mDestinationGeocodingBeenRequested = false;
 
     private boolean mIsStartLocationChangedByUser = true;
 
@@ -285,9 +288,6 @@ public class MainFragment extends Fragment implements
     private boolean mRequestTripAfterEndGeocoding = false;
 
     private boolean mRequestTripAfterStartEndGeocoding = false;
-
-    private boolean mGeocodingBeenRequested = false;
-
     private ArrayList<Marker> mModeMarkers;
 
     private List<Polyline> mRoute;
@@ -295,6 +295,14 @@ public class MainFragment extends Fragment implements
     private Date mTripDate;
 
     private boolean mArriveBy;
+
+    private int mMapPaddingLeft;
+
+    private int mMapPaddingTop;
+
+    private int mMapPaddingRight;
+
+    private int mMapPaddingBottom;
 
     @SuppressWarnings("deprecation")
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -383,14 +391,16 @@ public class MainFragment extends Fragment implements
                         int windowHeight = metrics.heightPixels;
                         int paddingMargin = MainFragment.this.getResources()
                                 .getInteger(R.integer.map_padding_margin);
+                        mMapPaddingLeft = locationBtnHandle[0] + mBtnHandle.getWidth() / 2
+                                + paddingMargin;
+                        mMapPaddingTop = locationTbEndLocation[1] + mTbEndLocation.getHeight() / 2
+                                + paddingMargin;
+                        mMapPaddingRight = 0;
+                        mMapPaddingBottom = windowHeight - locationItinerarySelectionSpinner[1]
+                                + paddingMargin;
+
                         if (mMap != null) {
-                            mMap.setPadding(locationBtnHandle[0] + mBtnHandle.getWidth() / 2
-                                    + paddingMargin,
-                                    locationTbEndLocation[1] + mTbEndLocation.getHeight() / 2
-                                            + paddingMargin,
-                                    0,
-                                    windowHeight - locationItinerarySelectionSpinner[1]
-                                            + paddingMargin);
+                            mMap.setPadding(mMapPaddingLeft, mMapPaddingTop, mMapPaddingRight, mMapPaddingBottom);
                         }
                     }
                 });
@@ -619,7 +629,7 @@ public class MainFragment extends Fragment implements
                                 .getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true)) {
                             updateMarkerPosition(markerLatlng, true);
                         } else {
-                            mIsStartLocationGeocodingProcessed = true;
+                            mIsStartLocationGeocodingCompleted = true;
                             removeFocus(true);
                             setMarker(true, markerLatlng, false);
                         }
@@ -630,7 +640,7 @@ public class MainFragment extends Fragment implements
                                 .getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true)) {
                             updateMarkerPosition(markerLatlng, false);
                         } else {
-                            mIsEndLocationGeocodingProcessed = true;
+                            mIsEndLocationGeocodingCompleted = true;
                             removeFocus(false);
                             setMarker(false, markerLatlng, false);
                         }
@@ -916,13 +926,13 @@ public class MainFragment extends Fragment implements
 
                         if (!TextUtils.isEmpty(text)) {
                             if (v.getId() == R.id.tbStartLocation
-                                    && !mIsStartLocationGeocodingProcessed
+                                    && !mIsStartLocationGeocodingCompleted
                                     && !mPrefs
                                     .getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION,
                                             true)) {
                                 processAddress(true, text, false);
                             } else if (v.getId() == R.id.tbEndLocation
-                                    && !mIsEndLocationGeocodingProcessed
+                                    && !mIsEndLocationGeocodingCompleted
                                     && !mPrefs
                                     .getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION,
                                             true)) {
@@ -963,7 +973,7 @@ public class MainFragment extends Fragment implements
                     SharedPreferences.Editor prefsEditor = mPrefs.edit();
                     prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, false);
                     prefsEditor.commit();
-                    mIsStartLocationGeocodingProcessed = false;
+                    mIsStartLocationGeocodingCompleted = false;
                 } else {
                     mIsStartLocationChangedByUser = true;
                 }
@@ -987,7 +997,7 @@ public class MainFragment extends Fragment implements
                     SharedPreferences.Editor prefsEditor = mPrefs.edit();
                     prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false);
                     prefsEditor.commit();
-                    mIsEndLocationGeocodingProcessed = false;
+                    mIsEndLocationGeocodingCompleted = false;
                 } else {
                     mIsEndLocationChangedByUser = true;
                 }
@@ -1006,11 +1016,9 @@ public class MainFragment extends Fragment implements
                             || (event != null
                             && event.getAction() == KeyEvent.ACTION_DOWN && event
                             .getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
-                        if (!mIsStartLocationGeocodingProcessed
+                        if (!mIsStartLocationGeocodingCompleted
                                 && !mPrefs
                                 .getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true)) {
-                            mGeocodingBeenRequested = true;
-
                             CharSequence tvCharSequence = v.getText();
                             if (tvCharSequence != null) {
                                 processAddress(true, tvCharSequence.toString(), false);
@@ -1110,13 +1118,11 @@ public class MainFragment extends Fragment implements
                 = new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mFragmentListener.onItinerarySelected(position);
 
-                if (!mAppResumed) {
-                    showRouteOnMap(mFragmentListener.getCurrentItinerary(), true);
-                } else {
-                    showRouteOnMap(mFragmentListener.getCurrentItinerary(), false);
-                    mAppResumed = false;
+                if (mFragmentListener.getCurrentItinerary() != null){
+                    if (mFragmentListener.getCurrentItineraryIndex() != position) {
+                        mFragmentListener.onItinerarySelected(position, 2);
+                    }
                 }
             }
 
@@ -1230,11 +1236,9 @@ public class MainFragment extends Fragment implements
     private void processRequestTrip() {
         Editable tbEditable;
 
-        if (!mIsEndLocationGeocodingProcessed
-                && !mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, true)
-                && !mGeocodingBeenRequested) {
+        if (!mIsEndLocationGeocodingCompleted
+                && !mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, true)) {
             mRequestTripAfterEndGeocoding = true;
-            mGeocodingBeenRequested = true;
             if ((tbEditable = mTbEndLocation.getText()) != null) {
                 processAddress(false, tbEditable.toString(), false);
             } else {
@@ -1242,11 +1246,9 @@ public class MainFragment extends Fragment implements
                         "Trip won't be requested because there was an error fetching destination"
                                 + " from input field");
             }
-        } else if (!mIsStartLocationGeocodingProcessed
-                && !mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true)
-                && !mGeocodingBeenRequested) {
+        } else if (!mIsStartLocationGeocodingCompleted
+                && !mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true)) {
             mRequestTripAfterStartGeocoding = true;
-            mGeocodingBeenRequested = true;
             if ((tbEditable = mTbStartLocation.getText()) != null) {
                 processAddress(true, tbEditable.toString(), false);
 
@@ -1255,15 +1257,13 @@ public class MainFragment extends Fragment implements
                         "Trip won't be requested because there was an error fetching origin from"
                                 + " input field");
             }
-        } else if (!mIsStartLocationGeocodingProcessed
+        } else if (!mIsStartLocationGeocodingCompleted
                 && !mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true)
-                && !mIsEndLocationGeocodingProcessed
-                && !mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, true)
-                && !mGeocodingBeenRequested) {
+                && !mIsEndLocationGeocodingCompleted
+                && !mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, true)) {
             mRequestTripAfterStartGeocoding = true;
             mRequestTripAfterEndGeocoding = true;
             mRequestTripAfterStartEndGeocoding = true;
-            mGeocodingBeenRequested = true;
             if ((tbEditable = mTbStartLocation.getText()) != null) {
                 processAddress(true, tbEditable.toString(), false);
             } else {
@@ -1339,9 +1339,9 @@ public class MainFragment extends Fragment implements
                     mEndMarker = addStartEndMarker(mEndMarkerPosition, false);
                 }
 
-                mIsStartLocationGeocodingProcessed = savedInstanceState
+                mIsStartLocationGeocodingCompleted = savedInstanceState
                         .getBoolean(OTPApp.BUNDLE_KEY_IS_START_LOCATION_GEOCODING_PROCESSED);
-                mIsEndLocationGeocodingProcessed = savedInstanceState
+                mIsEndLocationGeocodingCompleted = savedInstanceState
                         .getBoolean(OTPApp.BUNDLE_KEY_IS_END_LOCATION_GEOCODING_PROCESSED);
                 mAppStarts = savedInstanceState.getBoolean(OTPApp.BUNDLE_KEY_APP_STARTS);
                 mIsStartLocationChangedByUser = savedInstanceState
@@ -1388,10 +1388,9 @@ public class MainFragment extends Fragment implements
                 if (otpBundle != null) {
                     List<Itinerary> itineraries = otpBundle.getItineraryList();
                     getFragmentListener().onItinerariesLoaded(itineraries);
-                    getFragmentListener().onItinerarySelected(otpBundle.getCurrentItineraryIndex());
+                    getFragmentListener().onItinerarySelected(otpBundle.getCurrentItineraryIndex(), 0);
                     fillItinerariesSpinner(itineraries);
                 }
-                showRouteOnMap(getFragmentListener().getCurrentItinerary(), false);
 
                 Date savedTripDate = (Date) savedInstanceState
                         .getSerializable(OTPApp.BUNDLE_KEY_TRIP_DATE);
@@ -1562,12 +1561,12 @@ public class MainFragment extends Fragment implements
             }
         }
 
-        if (!mIsStartLocationGeocodingProcessed && !isOriginMyLocation) {
+        if (!mIsStartLocationGeocodingCompleted && !isOriginMyLocation) {
             Toast.makeText(MainFragment.this.mApplicationContext, mApplicationContext.getResources()
                     .getString(R.string.toast_tripplanner_need_to_place_markers_before_planning), Toast.LENGTH_SHORT)
                     .show();
             return;
-        } else if (!mIsEndLocationGeocodingProcessed && !isDestinationMyLocation) {
+        } else if (!mIsEndLocationGeocodingCompleted && !isDestinationMyLocation) {
             Toast.makeText(MainFragment.this.mApplicationContext, mApplicationContext.getResources()
                     .getString(R.string.toast_tripplanner_need_to_place_markers_before_planning), Toast.LENGTH_SHORT)
                     .show();
@@ -1998,7 +1997,7 @@ public class MainFragment extends Fragment implements
                 if (mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true)) {
                     updateMarkerPosition(latlng, true);
                 } else {
-                    mIsStartLocationGeocodingProcessed = true;
+                    mIsStartLocationGeocodingCompleted = true;
                 }
             } else {
                 if (mEndMarker == null) {
@@ -2012,7 +2011,7 @@ public class MainFragment extends Fragment implements
                 if (mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true)) {
                     updateMarkerPosition(latlng, false);
                 } else {
-                    mIsEndLocationGeocodingProcessed = true;
+                    mIsEndLocationGeocodingCompleted = true;
                 }
             }
             prefsEditor.commit();
@@ -2177,9 +2176,9 @@ public class MainFragment extends Fragment implements
             bundle.putParcelable(OTPApp.BUNDLE_KEY_MAP_END_MARKER_POSITION, mEndMarkerPosition);
             bundle.putBoolean(OTPApp.BUNDLE_KEY_APP_STARTS, mAppStarts);
             bundle.putBoolean(OTPApp.BUNDLE_KEY_IS_START_LOCATION_GEOCODING_PROCESSED,
-                    mIsStartLocationGeocodingProcessed);
+                    mIsStartLocationGeocodingCompleted);
             bundle.putBoolean(OTPApp.BUNDLE_KEY_IS_END_LOCATION_GEOCODING_PROCESSED,
-                    mIsEndLocationGeocodingProcessed);
+                    mIsEndLocationGeocodingCompleted);
             bundle.putBoolean(OTPApp.BUNDLE_KEY_IS_START_LOCATION_CHANGED_BY_USER,
                     mIsStartLocationChangedByUser);
             bundle.putBoolean(OTPApp.BUNDLE_KEY_IS_END_LOCATION_CHANGED_BY_USER,
@@ -2259,8 +2258,20 @@ public class MainFragment extends Fragment implements
 
         if (address.equalsIgnoreCase(this.getResources().getString(R.string.text_box_my_location))) {
             if (mCurrentLatLng != null) {
-                geocodingTask.execute(address, String.valueOf(mCurrentLatLng.latitude),
-                        String.valueOf(mCurrentLatLng.longitude));
+                if (isStartTextBox){
+                    if (!mIsStartLocationGeocodingBeenRequested){
+                        mIsStartLocationGeocodingBeenRequested = true;
+                        geocodingTask.execute(address, String.valueOf(mCurrentLatLng.latitude),
+                                String.valueOf(mCurrentLatLng.longitude));
+                    }
+                }
+                else{
+                    if (!mDestinationGeocodingBeenRequested){
+                        mDestinationGeocodingBeenRequested = true;
+                        geocodingTask.execute(address, String.valueOf(mCurrentLatLng.latitude),
+                                String.valueOf(mCurrentLatLng.longitude));
+                    }
+                }
             } else {
                 Toast.makeText(mApplicationContext,
                         mApplicationContext.getResources()
@@ -2268,7 +2279,18 @@ public class MainFragment extends Fragment implements
                         Toast.LENGTH_LONG).show();
             }
         } else {
-            geocodingTask.execute(address);
+            if (isStartTextBox){
+                if (!mIsStartLocationGeocodingBeenRequested){
+                    mIsStartLocationGeocodingBeenRequested = true;
+                    geocodingTask.execute(address);
+                }
+            }
+            else{
+                if (!mDestinationGeocodingBeenRequested){
+                    mDestinationGeocodingBeenRequested = true;
+                    geocodingTask.execute(address);
+                }
+            }
         }
     }
 
@@ -2276,7 +2298,6 @@ public class MainFragment extends Fragment implements
     @Override
     public void onResume() {
         super.onResume();
-        mAppResumed = true;
 
         Log.v(OTPApp.TAG, "MainFragment onResume");
     }
@@ -2599,7 +2620,7 @@ public class MainFragment extends Fragment implements
             boundsCreator.include(pointB);
 
             mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsCreator.build(),
-                    getResources().getInteger(R.integer.default_padding)));
+                    getResources().getInteger(R.integer.route_zoom_padding)));
         }
     }
 
@@ -2667,10 +2688,12 @@ public class MainFragment extends Fragment implements
      * Previous routes are removed from the map.
      *
      * @param itinerary     the information to be drawn
-     * @param animateCamera if true map will be zoomed to exactly fit the route
-     *                      after the drawing
+     * @param animateCamera type of camera animation: - 0 camera wouldn't be animated
+     *                                                - 1 animated to fit the route
+     *                                                - 2 animated to fit first transit marker if
+     *                                                  any, otherwise to route.
      */
-    public void showRouteOnMap(List<Leg> itinerary, boolean animateCamera) {
+    public void showRouteOnMap(List<Leg> itinerary, int animateCamera) {
         Log.v(OTPApp.TAG,
                 "(TripRequest) legs size = "
                         + Integer.toString(itinerary.size()));
@@ -2720,8 +2743,9 @@ public class MainFragment extends Fragment implements
                 TraverseMode traverseMode = TraverseMode.valueOf(leg.mode);
 
                 if (traverseMode.isTransit()) {
-                    modeMarkerOption.title(stepIndex + ". " + getResources()
-                            .getString(R.string.connector_before_route) + " " + leg.getRouteShortName()
+                    modeMarkerOption.title(stepIndex + ". " + ConversionUtils
+                            .getRouteShortNameSafe(leg.getRouteShortName(), leg.getRouteLongName(),
+                                    mApplicationContext)
                             + " " + getResources().getString(R.string.map_markers_connector_before_stop) + " "
                             + DirectionsGenerator.getLocalizedStreetName(leg.getFrom().name,
                             mApplicationContext.getResources()));
@@ -2763,7 +2787,9 @@ public class MainFragment extends Fragment implements
 
                     if (firstTransitMarker == null) {
                         firstTransitMarker = modeMarker;
-                        firstTransitMarker.showInfoWindow();
+                        if (animateCamera == 1){
+                            firstTransitMarker.showInfoWindow();
+                        }
                     }
                 }
                 PolylineOptions options = new PolylineOptions().addAll(points)
@@ -2775,10 +2801,95 @@ public class MainFragment extends Fragment implements
                     boundsCreator.include(point);
                 }
             }
-            if (animateCamera) {
-                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsCreator.build(),
-                        getResources().getInteger(R.integer.default_padding)));
+            if (animateCamera > 0) {
+                LatLngBounds routeBounds = boundsCreator.build();
+                showRouteOnMapAnimateCamera(routeBounds, firstTransitMarker, animateCamera);
             }
+        }
+    }
+
+    /**
+     * Moves the camera to correctly display the route on map. Several options are possible to move
+     * the camera according to animateCamera parameter.
+     * <p>
+     * If the route contains any transit leg, Info Window of start point of the first one will be
+     * opened and centered in the screen, to display stop address from where route starts.
+     * To fit the whole route in the screen and let the first transit stop in the center, next steps
+     * are performed (the objective is to create new bounds with this characteristic):
+     * - Measure screen horizontal and vertical distance to northeast and southwest points of route
+     * bounds. Obtain the highest.
+     * - Add this distance in the other 3 dimensions to the first transit marker screen position in
+     * order to obtain new points to have all the route fitted and the transit marker in the middle
+     * (approximately due to projection restrictions).
+     * - Calculate the coordinates of these new points and add them to the route points to calculate
+     * the new bounds.
+     * - Pass the new bounds to the camera movement function and correct result will be obtained.
+     *
+     * @param routeBounds original route bounds
+     * @param firstTransitMarker position of first transit stop that will be centered
+     * @param animateCamera type of camera animation: - 0 camera wouldn't be animated
+     *                                                - 1 animated to fit the route
+     *                                                - 2 animated to fit first transit marker if
+     *                                                  any, otherwise to route.
+     *                                                - 3 moved with no animation to fit first
+     *                                                transit marker if any, otherwise to route.
+     */
+    private void showRouteOnMapAnimateCamera(LatLngBounds routeBounds, Marker firstTransitMarker, int animateCamera){
+
+        int windowWidth = getResources().getDisplayMetrics().widthPixels;
+        int windowHeight = getResources().getDisplayMetrics().heightPixels;
+        int limitNortheastRight = windowWidth - mMapPaddingRight;
+        int limitNortheastTop = mMapPaddingTop;
+        int limitSouthwestLeft = mMapPaddingLeft;
+        int limitSouthwestBottom = windowHeight - mMapPaddingBottom;
+        Point northeastInScreen = mMap.getProjection().toScreenLocation(routeBounds.northeast);
+        Point southwestInScreen = mMap.getProjection().toScreenLocation(routeBounds.southwest);
+
+        if ((firstTransitMarker != null) && (animateCamera == 1)){
+            Point firstTransitMarkerInScreen = mMap.getProjection().toScreenLocation(firstTransitMarker.getPosition());
+            int maxDistanceToRouteEdge = 0;
+            int distanceHorizontalNortheast = northeastInScreen.x - firstTransitMarkerInScreen.x;
+            int distanceVerticalNortheast = firstTransitMarkerInScreen.y - northeastInScreen.y;
+            int distanceHorizontalSouthwest = firstTransitMarkerInScreen.x - southwestInScreen.x;
+            int distanceVerticalSouthwest = southwestInScreen.y - firstTransitMarkerInScreen.y;
+            if (distanceHorizontalNortheast > maxDistanceToRouteEdge){
+                maxDistanceToRouteEdge = distanceHorizontalNortheast;
+            }
+            if (distanceVerticalNortheast > maxDistanceToRouteEdge){
+                maxDistanceToRouteEdge = distanceVerticalNortheast;
+            }
+            if (distanceHorizontalSouthwest > maxDistanceToRouteEdge){
+                maxDistanceToRouteEdge = distanceHorizontalSouthwest;
+            }
+            if (distanceVerticalSouthwest > maxDistanceToRouteEdge) {
+                maxDistanceToRouteEdge = distanceVerticalSouthwest;
+            }
+
+            Point newLimitSouthWest = new Point(firstTransitMarkerInScreen.x - maxDistanceToRouteEdge, firstTransitMarkerInScreen.y + maxDistanceToRouteEdge);
+            Point newLimitNorthEast = new Point(firstTransitMarkerInScreen.x + maxDistanceToRouteEdge, firstTransitMarkerInScreen.y - maxDistanceToRouteEdge);
+            LatLng newLimitSouthWestLatLng = mMap.getProjection().fromScreenLocation(newLimitSouthWest);
+            LatLng newLimitNorthEastLatLng = mMap.getProjection().fromScreenLocation(newLimitNorthEast);
+
+            routeBounds = new LatLngBounds(newLimitSouthWestLatLng, newLimitNorthEastLatLng);
+        }
+
+        int routeDefaultPadding = getResources().getInteger(R.integer.route_zoom_padding);
+        routeDefaultPadding = Math.round(routeDefaultPadding * getResources().getDisplayMetrics().density);
+        int padding = routeDefaultPadding;
+        int maxHorizontalPadding = (limitNortheastRight - limitSouthwestLeft) / 2;
+        int maxVerticalPadding = (limitSouthwestBottom - limitNortheastTop) / 2;
+        if (padding > maxHorizontalPadding){
+            padding = maxHorizontalPadding;
+        }
+        if (padding > maxVerticalPadding){
+            padding = maxVerticalPadding;
+        }
+
+        if (animateCamera == 3){
+            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(routeBounds, padding));
+        }
+        else{
+            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(routeBounds, padding));
         }
     }
 
@@ -2847,12 +2958,11 @@ public class MainFragment extends Fragment implements
             fillItinerariesSpinner(itineraries);
             toggleItinerarySelectionSpinner(!itineraries.isEmpty());
 
-            showRouteOnMap(itineraries.get(0).legs, true);
             OtpFragment ofl = getFragmentListener();
 
             // onItinerariesLoaded must be invoked before onItinerarySelected(0)
             ofl.onItinerariesLoaded(itineraries);
-            ofl.onItinerarySelected(0);
+            ofl.onItinerarySelected(0, 1);
             MyActivity myActivity = (MyActivity) getActivity();
             myActivity.setCurrentRequestString(currentRequestString);
 
@@ -2897,8 +3007,9 @@ public class MainFragment extends Fragment implements
                     itinerarySummaryList[i] = ConversionUtils
                             .getTimeWithContext(mApplicationContext, leg.getAgencyTimeZoneOffset(),
                                     Long.parseLong(leg.getStartTime()), false);
-                    itinerarySummaryList[i] += ". " + getResources()
-                            .getString(R.string.connector_before_route) + " " + leg.getRouteShortName();
+                    itinerarySummaryList[i] += ". " + ConversionUtils
+                            .getRouteShortNameSafe(leg.getRouteShortName(),leg.getRouteLongName(),
+                                    mApplicationContext);
                     itinerarySummaryList[i] += " - " + ConversionUtils
                             .getFormattedDurationTextNoSeconds(it.duration / 1000,
                                     mApplicationContext);
@@ -2934,10 +3045,14 @@ public class MainFragment extends Fragment implements
         if (getActivity() != null) {
             removeFocus(isStartTextbox);
 
+            boolean geocodingWasRequested = mIsStartLocationGeocodingBeenRequested || mDestinationGeocodingBeenRequested;
+
             if (isStartTextbox) {
-                mIsStartLocationGeocodingProcessed = true;
+                mIsStartLocationGeocodingCompleted = true;
+                mIsStartLocationGeocodingBeenRequested = false;
             } else {
-                mIsEndLocationGeocodingProcessed = true;
+                mIsEndLocationGeocodingCompleted = true;
+                mDestinationGeocodingBeenRequested = false;
             }
 
             try {
@@ -2953,7 +3068,6 @@ public class MainFragment extends Fragment implements
                                 });
 
                 if (addressesReturn.isEmpty()) {
-                    mGeocodingBeenRequested = false;
                     restartTextBoxLocation(isStartTextbox);
                     AlertDialog alert = geocoderAlert.create();
                     alert.show();
@@ -2964,10 +3078,9 @@ public class MainFragment extends Fragment implements
                     } else {
                         moveMarker(isStartTextbox, addressesReturn.get(0));
                     }
-                    if (mGeocodingBeenRequested) {
+                    if (geocodingWasRequested) {
                         requestTripAfterGeocoding();
                     }
-                    mGeocodingBeenRequested = false;
                     return;
                 }
 
@@ -3006,7 +3119,6 @@ public class MainFragment extends Fragment implements
                 Log.e(OTPApp.TAG, "Error in Main Fragment Geocoding callback: " + e);
             }
         }
-        mGeocodingBeenRequested = false;
     }
 
     /**
@@ -3201,6 +3313,7 @@ public class MainFragment extends Fragment implements
     @Override
     public void onConnected(Bundle connectionHint) {
         Location mCurrentLocation = mLocationClient.getLastLocation();
+        boolean autodetectServerTriggered = false;
 
         if ((!mMapFailed)) {
             if (mCurrentLocation != null) {
@@ -3223,6 +3336,7 @@ public class MainFragment extends Fragment implements
                     runAutoDetectServer(mCurrentLatLng, false);
                 } else {
                     if (mNeedToRunAutoDetect) {
+                        autodetectServerTriggered = true;
                         runAutoDetectServer(mCurrentLatLng, true);
                     } else if (mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER, true)) {
 
@@ -3234,11 +3348,14 @@ public class MainFragment extends Fragment implements
                                 && (((mSavedLastLocationCheckedForServer != null) && (distance[0]
                                 > OTPApp.COORDINATES_IMPORTANT_DIFFERENCE))
                                 || (mSavedLastLocationCheckedForServer == null))) {
+                            autodetectServerTriggered = true;
                             runAutoDetectServer(mCurrentLatLng, false);
                         } else if (mOTPApp.getSelectedServer() == null) {
+                            autodetectServerTriggered = true;
                             runAutoDetectServer(mCurrentLatLng, true);
                         }
-                    } else {
+                    }
+                    if (!autodetectServerTriggered){
                         if (mAppStarts) {
                             Server selectedServer = mOTPApp.getSelectedServer();
                             if ((selectedServer != null) && selectedServer.areBoundsSet()) {
