@@ -2849,19 +2849,17 @@ public class MainFragment extends Fragment implements
             LatLng newLimitSouthWestLatLng = mMap.getProjection().fromScreenLocation(newLimitSouthWest);
             LatLng newLimitNorthEastLatLng = mMap.getProjection().fromScreenLocation(newLimitNorthEast);
 
-            double diffLatitude, diffLongitude;
-            if ((diffLatitude = newLimitNorthEastLatLng.latitude
-                        - newLimitSouthWestLatLng.latitude)
-                    < 0){
-                newLimitNorthEastLatLng = new LatLng(newLimitNorthEastLatLng.latitude
-                            + Math.abs(diffLatitude),
-                        newLimitNorthEastLatLng.longitude) ;
+            if (newLimitNorthEastLatLng.latitude < newLimitSouthWestLatLng.latitude){
+                newLimitNorthEastLatLng = new LatLng(newLimitSouthWestLatLng.latitude,
+                        newLimitNorthEastLatLng.longitude);
+                newLimitSouthWestLatLng = new LatLng(newLimitNorthEastLatLng.latitude,
+                        newLimitSouthWestLatLng.longitude);
             }
-            if ((diffLongitude = newLimitNorthEastLatLng.longitude
-                        - newLimitSouthWestLatLng.longitude)
-                    < 0){
+            if (newLimitNorthEastLatLng.longitude < newLimitSouthWestLatLng.longitude){
                 newLimitNorthEastLatLng = new LatLng(newLimitNorthEastLatLng.latitude,
-                        newLimitNorthEastLatLng.longitude + Math.abs(diffLongitude)) ;
+                        newLimitSouthWestLatLng.longitude);
+                newLimitSouthWestLatLng = new LatLng(newLimitSouthWestLatLng.latitude,
+                        newLimitNorthEastLatLng.longitude);
             }
 
             routeBounds = new LatLngBounds(newLimitSouthWestLatLng, newLimitNorthEastLatLng);
