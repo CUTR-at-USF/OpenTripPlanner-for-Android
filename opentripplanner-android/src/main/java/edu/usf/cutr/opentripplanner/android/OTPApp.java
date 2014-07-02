@@ -18,6 +18,8 @@ package edu.usf.cutr.opentripplanner.android;
 
 import android.app.Application;
 
+import java.util.concurrent.TimeUnit;
+
 import edu.usf.cutr.opentripplanner.android.model.Server;
 
 /*
@@ -35,6 +37,8 @@ public class OTPApp extends Application {
     public static final int CHOOSE_CONTACT_REQUEST_CODE = 1;
 
     public static final String METADATA_LOCATION = "/metadata";
+
+    public static final String BIKE_RENTAL_LOCATION = "/bike_rental";
 
     public static final String URL_ENCODING = "UTF-8";
 
@@ -100,10 +104,6 @@ public class OTPApp extends Application {
 
     public static final String BUNDLE_KEY_TB_END_LOCATION = "tbEndLocation";
 
-    public static final String BUNDLE_KEY_DDL_OPTIMIZATION = "ddlOptimization";
-
-    public static final String BUNDLE_KEY_DDL_TRAVEL_MODE = "ddlTravelMode";
-
     public static final String BUNDLE_KEY_OTP_BUNDLE = "OTP bundle";
 
     public static final String BUNDLE_KEY_APP_STARTS = "app starts";
@@ -129,11 +129,6 @@ public class OTPApp extends Application {
     public static final String BUNDLE_KEY_SAVED_LAST_LOCATION_CHECKED_FOR_SERVER
             = "saved last location checked for server";
 
-
-    public static final String BUNDLE_KEY_SEEKBAR_MIN_VALUE = "seekbar min value";
-
-    public static final String BUNDLE_KEY_SEEKBAR_MAX_VALUE = "seekbar max value";
-
     public static final String BUNDLE_KEY_TRIP_DATE = "trip date";
 
     public static final String BUNDLE_KEY_ARRIVE_BY = "arrive by";
@@ -143,6 +138,8 @@ public class OTPApp extends Application {
     public static final String BUNDLE_KEY_TIMEPICKER_SAVED_MINUTE = "timepicker minutes";
 
     public static final String BUNDLE_KEY_SETTINGS_INTENT = "timepicker minutes";
+
+    public static final String BUNDLE_KEY__IS_ALARM_BIKE_RENTAL_ACTIVE = "is alarm bike rental active";
 
     public static final int COLOR_ROUTE_LINE = 0x7F0000FF;
 
@@ -185,6 +182,13 @@ public class OTPApp extends Application {
 
     public static final String PREFERENCE_KEY_USE_DEVICE_TIMEZONE = "use_device_timezone";
 
+    public static final String PREFERENCE_KEY_LAST_TRAVERSE_MODE_SET = "last_traverse_mode_set";
+
+    public static final String PREFERENCE_KEY_LAST_BIKE_TRIANGLE_MIN_VALUE = "last_bike_triangle_min_value";
+
+    public static final String PREFERENCE_KEY_LAST_BIKE_TRIANGLE_MAX_VALUE = "last_bike_triangle_max_value";
+
+    public static final String PREFERENCE_KEY_LAST_OPTIMIZATION = "last_optimization";
 
     private static Server selectedServer;
 
@@ -209,6 +213,11 @@ public class OTPApp extends Application {
     public static final String FORMAT_OTP_SERVER_DATE_QUERY = "MM/dd/yy";
 
     public static final String FORMAT_OTP_SERVER_TIME_QUERY = "kk:mm";
+
+    public static final long DEFAULT_UPDATE_INTERVAL = TimeUnit.SECONDS.toMillis(40);
+
+    public static final String INTENT_UPDATE_BIKE_RENTAL_ACTION
+            = "edu.usf.cutr.opentripplanner.android.OpenTripPlanner.UPDATE_BIKE_RENTAL";
 
 
     /**

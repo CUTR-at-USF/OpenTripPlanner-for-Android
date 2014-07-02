@@ -115,7 +115,7 @@ public class MyActivity extends FragmentActivity implements OtpFragment {
                         mainFragment.setNeedToUpdateServersList(true);
                     }
                     if (changedSelectedCustomServer) {
-                        mainFragment.updateSelectedServer();
+                        mainFragment.updateSelectedServer(true);
                     }
                     if (changedTileProvider) {
                         mainFragment.updateOverlay(null);

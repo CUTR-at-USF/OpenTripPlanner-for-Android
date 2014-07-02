@@ -51,6 +51,8 @@ public class OtpSQLiteHelper extends SQLiteOpenHelper {
 
     public static final String COLUMN_CONTACT_EMAIL = "ContactEmail";
 
+    public static final String COLUMN_OFFERS_BIKE_RENTAL = "OffersBikeRental";
+
     private static final String DATABASE_NAME = "OTPServers.db";
 
     private static final int DATABASE_VERSION = 2;
@@ -69,7 +71,8 @@ public class OtpSQLiteHelper extends SQLiteOpenHelper {
             + COLUMN_CONTACT_NAME + " TEXT NOT NULL, "
             + COLUMN_CONTACT_EMAIL + " TEXT NOT NULL, "
             + COLUMN_CENTER + " TEXT NOT NULL, "
-            + COLUMN_ZOOM + " TEXT NOT NULL"
+            + COLUMN_ZOOM + " TEXT NOT NULL, "
+            + COLUMN_OFFERS_BIKE_RENTAL + " INTEGER"
             + ");";
 
     private OtpSQLiteHelper(Context context) {

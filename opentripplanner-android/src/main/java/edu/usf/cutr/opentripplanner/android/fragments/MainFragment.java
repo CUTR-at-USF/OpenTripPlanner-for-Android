@@ -41,6 +41,7 @@ import com.google.android.gms.maps.model.TileOverlayOptions;
 
 import org.opentripplanner.api.ws.GraphMetadata;
 import org.opentripplanner.api.ws.Request;
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -50,12 +51,16 @@ import org.opentripplanner.v092snapshot.api.model.Leg;
 import android.animation.LayoutTransition;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -108,10 +113,8 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -134,6 +137,7 @@ import edu.usf.cutr.opentripplanner.android.MyActivity;
 import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.R;
 import edu.usf.cutr.opentripplanner.android.SettingsActivity;
+import edu.usf.cutr.opentripplanner.android.listeners.BikeRentalLoadCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.DateCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.MetadataRequestCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.OTPGeocodingListener;
@@ -145,6 +149,7 @@ import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
 import edu.usf.cutr.opentripplanner.android.model.OptimizeSpinnerItem;
 import edu.usf.cutr.opentripplanner.android.model.Server;
 import edu.usf.cutr.opentripplanner.android.sqlite.ServersDataSource;
+import edu.usf.cutr.opentripplanner.android.tasks.BikeRentalLoad;
 import edu.usf.cutr.opentripplanner.android.tasks.MetadataRequest;
 import edu.usf.cutr.opentripplanner.android.tasks.OTPGeocoding;
 import edu.usf.cutr.opentripplanner.android.tasks.ServerChecker;
@@ -158,8 +163,6 @@ import edu.usf.cutr.opentripplanner.android.util.RangeSeekBar;
 import edu.usf.cutr.opentripplanner.android.util.RangeSeekBar.OnRangeSeekBarChangeListener;
 import edu.usf.cutr.opentripplanner.android.util.RightDrawableOnTouchListener;
 
-import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS;
-
 /**
  * Main UI screen of the mOTPApp, showing the map.
  *
@@ -169,8 +172,8 @@ import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_CUSTOM_
 public class MainFragment extends Fragment implements
         ServerSelectorCompleteListener,
         TripRequestCompleteListener, MetadataRequestCompleteListener,
-        OTPGeocodingListener, DateCompleteListener, OnRangeSeekBarChangeListener<Double>,
-        GooglePlayServicesClient.OnConnectionFailedListener,
+        BikeRentalLoadCompleteListener, OTPGeocodingListener, DateCompleteListener,
+        OnRangeSeekBarChangeListener<Double>, GooglePlayServicesClient.OnConnectionFailedListener,
         GooglePlayServicesClient.ConnectionCallbacks,
         GoogleMap.OnCameraChangeListener {
 
@@ -206,8 +209,6 @@ public class MainFragment extends Fragment implements
     private ViewGroup mNavigationDrawerLeftPane;
 
     private ListView mDdlOptimization;
-
-    private RadioGroup mDdlTravelModeNonTransit;
 
     private CheckBox mBtnModeBus;
 
@@ -292,6 +293,10 @@ public class MainFragment extends Fragment implements
 
     private List<Polyline> mRoute;
 
+    private ArrayList<Marker> mBikeRentalStationsMarkers;
+
+    private int mOptimizationValueToRestoreWhenNoBike;
+
     private Date mTripDate;
 
     private boolean mArriveBy;
@@ -303,6 +308,18 @@ public class MainFragment extends Fragment implements
     private int mMapPaddingRight;
 
     private int mMapPaddingBottom;
+
+    private AlarmManager mAlarmMgr;
+
+    PendingIntent mAlarmIntentBikeRental;
+
+    boolean mIsAlarmBikeRentalActive;
+
+    AlarmReceiver mAlarmReceiver;
+
+    IntentFilter intentFilter;
+
+    Intent bikeRentalIntent;
 
     @SuppressWarnings("deprecation")
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -418,8 +435,6 @@ public class MainFragment extends Fragment implements
             mDdlOptimization = (ListView) mainView
                     .findViewById(R.id.spinOptimization);
 
-            mDdlTravelModeNonTransit = (RadioGroup) mainView.findViewById(R.id.layoutModeNonTransit);
-
             mBtnModeWalk = (RadioButton) mainView.findViewById(R.id.btnModeWalk);
             mBtnModeBike = (RadioButton) mainView.findViewById(R.id.btnModeBike);
             mBtnModeBus = (CheckBox) mainView.findViewById(R.id.btnModeBus);
@@ -484,6 +499,13 @@ public class MainFragment extends Fragment implements
 
         mApplicationContext = getActivity().getApplicationContext();
 
+        intentFilter = new IntentFilter(OTPApp.INTENT_UPDATE_BIKE_RENTAL_ACTION);
+        bikeRentalIntent = new Intent(OTPApp.INTENT_UPDATE_BIKE_RENTAL_ACTION);
+        mAlarmIntentBikeRental = PendingIntent.getBroadcast(mApplicationContext, 0, bikeRentalIntent, 0);
+        mAlarmMgr = (AlarmManager)mApplicationContext.getSystemService(Context.ALARM_SERVICE);
+        mIsAlarmBikeRentalActive = false;
+        mAlarmReceiver = new AlarmReceiver();
+
         mMap = retrieveMap(mMap);
 
         mOTPApp = ((OTPApp) getActivity().getApplication());
@@ -499,39 +521,10 @@ public class MainFragment extends Fragment implements
             prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true);
             prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false);
             prefsEditor.commit();
-            mBikeTriangleParameters.setSelectedMinValue(OTPApp.BIKE_PARAMETERS_QUICK_DEFAULT_VALUE);
-            mBikeTriangleParameters.setSelectedMaxValue(OTPApp.BIKE_PARAMETERS_FLAT_DEFAULT_VALUE);
         }
 
         if (!mMapFailed) {
-            if (mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)) {
-                String baseURL = mPrefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, "");
-                Server s = new Server(baseURL, mApplicationContext);
-                String bounds;
-                setSelectedServer(s, false);
-                if ((bounds = mPrefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS, null))
-                        != null) {
-                    s.setBounds(bounds);
-                    addBoundariesRectangle(s);
-                }
-
-                Log.v(OTPApp.TAG, "Now using custom OTP server: " + baseURL);
-            } else {
-                ServersDataSource dataSource = ServersDataSource.getInstance(mApplicationContext);
-                long serverId = mPrefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0);
-                if (serverId != 0) {
-                    dataSource.open();
-                    Server s = dataSource
-                            .getServer(mPrefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0));
-                    dataSource.close();
-
-                    if (s != null) {
-                        setSelectedServer(s, false);
-                        addBoundariesRectangle(s);
-                        Log.v(OTPApp.TAG, "Now using OTP server: " + s.getRegion());
-                    }
-                }
-            }
+            updateSelectedServer(false);
         }
 
         ArrayAdapter<OptimizeSpinnerItem> optimizationAdapter
@@ -561,9 +554,7 @@ public class MainFragment extends Fragment implements
         restoreState(savedInstanceState);
 
         if (savedInstanceState == null) {
-            mDdlOptimization.setItemChecked(0, true);
-//            mDdlTravelMode.setItemChecked(0, true);
-            showBikeParameters(false);
+            restorePanelUI();
             mArriveBy = false;
             setTextBoxLocation(getResources().getString(R.string.text_box_my_location), true);
         }
@@ -1148,51 +1139,57 @@ public class MainFragment extends Fragment implements
                     }
              });
 
-        mDdlTravelModeNonTransit.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (mBtnModeBike.getId() == checkedId) {
-                    setBikeOptimizationAdapter(true);
-                    showBikeParameters(true);
-                } else {
-                    setBikeOptimizationAdapter(false);
-                    showBikeParameters(false);
-                }
 
-                updatePlanTripButton(getSelectedTraverseModeSet(), mBtnPlanTrip);
+        mBtnModeWalk.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                updateModes(getSelectedTraverseModeSet(), mBtnPlanTrip);
+            }
+        });
+
+        mBtnModeBike.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                setBikeOptimizationAdapter(isChecked, true);
+                showBikeParameters(isChecked);
+                mBtnModeRentedBike.setEnabled(!isChecked);
+                updateModes(getSelectedTraverseModeSet(), mBtnPlanTrip);
             }
         });
 
         mBtnModeRentedBike.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    setBikeOptimizationAdapter(true);
-                    showBikeParameters(true);
-                }
-
-                updatePlanTripButton(getSelectedTraverseModeSet(), mBtnPlanTrip);
+                setBikeOptimizationAdapter(isChecked, true);
+                showBikeParameters(isChecked);
+                mBtnModeBike.setEnabled(!isChecked);
+                updateModes(getSelectedTraverseModeSet(), mBtnPlanTrip);
             }
         });
 
         mBtnModeBus.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                updatePlanTripButton(getSelectedTraverseModeSet(), mBtnPlanTrip);
+                updateModes(getSelectedTraverseModeSet(), mBtnPlanTrip);
             }
         });
 
         mBtnModeTrain.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                updatePlanTripButton(getSelectedTraverseModeSet(), mBtnPlanTrip);
+                updateModes(getSelectedTraverseModeSet(), mBtnPlanTrip);
             }
         });
 
         mDdlOptimization.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                     int position, long id) {
-
+                if (getSelectedTraverseModeSet().getBicycle()) {
+                    mOptimizationValueToRestoreWhenNoBike = position;
+                }
+                SharedPreferences.Editor editor = mPrefs.edit();
+                editor.putInt(OTPApp.PREFERENCE_KEY_LAST_OPTIMIZATION, position);
+                editor.commit();
                 OptimizeSpinnerItem optimizeSpinnerItem = (OptimizeSpinnerItem) mDdlOptimization
                         .getItemAtPosition(position);
                 if (optimizeSpinnerItem != null) {
@@ -1208,19 +1205,118 @@ public class MainFragment extends Fragment implements
         mBikeTriangleParameters.setOnRangeSeekBarChangeListener(this);
     }
 
-    private TraverseModeSet getSelectedTraverseModeSet(){
-        TraverseModeSet selectedTraverseModeSet = new TraverseModeSet();
-        selectedTraverseModeSet.setWalk(mBtnModeWalk.isChecked());
-        selectedTraverseModeSet.setBicycle(mBtnModeBike.isChecked());
-        selectedTraverseModeSet.setBus(mBtnModeBus.isChecked());
-        selectedTraverseModeSet.setTrainish(mBtnModeTrain.isChecked());
+    /**
+     * Wrapper to call the functions to recover trip options (traverse mode, optimization type and
+     * bike parameters) to last state, before closing the app, if there isn't data functions set
+     * options to default value. If it's needed UI update is also processed.
+     */
+    private void restorePanelUI(){
+        restoreTraverseModes();
+        restoreBikeParameters();
+        restoreOptimization();
+    }
 
-        if (mBtnModeRentedBike.isChecked()){
-            selectedTraverseModeSet.setWalk(true);
-            selectedTraverseModeSet.setBicycle(true);
+    /**
+     * Recovers trip optimization value to last state, before closing the app, if there isn't data
+     * sets default value.
+     */
+    private void restoreOptimization(){
+        int previousOptimization;
+        if ((previousOptimization =
+                mPrefs.getInt(mOTPApp.PREFERENCE_KEY_LAST_OPTIMIZATION, -1)) != -1){
+            mDdlOptimization.setItemChecked(previousOptimization, true);
+        }
+        else{
+            SharedPreferences.Editor editor = mPrefs.edit();
+            editor.putInt(OTPApp.PREFERENCE_KEY_LAST_OPTIMIZATION, 0);
+            editor.commit();
+            mDdlOptimization.setItemChecked(0, true);
+        }
+    }
+
+    /**
+     * Recovers bike parameters to last state, before closing the app, if there isn't data sets
+     * default value.
+     */
+    private void restoreBikeParameters(){
+        double previousMinValue, previousMaxValue;
+        if ((previousMinValue = mPrefs.getFloat(OTPApp.PREFERENCE_KEY_LAST_BIKE_TRIANGLE_MIN_VALUE, -1)) != -1){
+            mBikeTriangleParameters.setSelectedMinValue(previousMinValue);
+        }
+        else {
+            mBikeTriangleParameters.setSelectedMinValue(OTPApp.BIKE_PARAMETERS_QUICK_DEFAULT_VALUE);
+        }
+        if ((previousMaxValue = mPrefs.getFloat(OTPApp.PREFERENCE_KEY_LAST_BIKE_TRIANGLE_MAX_VALUE, -1)) != -1){
+            mBikeTriangleParameters.setSelectedMaxValue(previousMaxValue);
+        }
+        else{
+            mBikeTriangleParameters.setSelectedMaxValue(OTPApp.BIKE_PARAMETERS_FLAT_DEFAULT_VALUE);
         }
 
+    }
+
+    /**
+     * Recovers trip traverse mode to last state, before closing the app, if there isn't data
+     * sets default value. It also updates UI according to the new modes.
+     */
+    private void restoreTraverseModes(){
+        String lastTraverseModeSet;
+        if ((lastTraverseModeSet =
+                mPrefs.getString(OTPApp.PREFERENCE_KEY_LAST_TRAVERSE_MODE_SET, "")).equals("")){
+            mBtnModeWalk.setChecked(true);
+            mBtnModeBus.setChecked(true);
+            mBtnModeTrain.setChecked(true);
+            showBikeParameters(false);
+            setBikeOptimizationAdapter(false, false);
+        }
+        else {
+            TraverseModeSet traverseModeSet = new TraverseModeSet(lastTraverseModeSet);
+            if (traverseModeSet != null) {
+                mBtnModeWalk.setChecked(traverseModeSet.getWalk());
+                mBtnModeBus.setChecked(traverseModeSet.getBus());
+                mBtnModeTrain.setChecked(traverseModeSet.getRail());
+                if (traverseModeSet.getWalk() && traverseModeSet.getBicycle()) {
+                    mBtnModeRentedBike.setEnabled(true);
+                    mBtnModeRentedBike.setChecked(true);
+                    mBtnModeBike.setEnabled(false);
+                } else if (!traverseModeSet.getWalk() && traverseModeSet.getBicycle()) {
+                    mBtnModeBike.setEnabled(true);
+                    mBtnModeBike.setChecked(true);
+                    mBtnModeRentedBike.setEnabled(false);
+                } else {
+                    mBtnModeBike.setEnabled(true);
+                    mBtnModeRentedBike.setEnabled(true);
+                    setBikeOptimizationAdapter(false, false);
+                    showBikeParameters(false);
+                }
+                if (traverseModeSet.getBicycle()){
+                    setBikeOptimizationAdapter(true, false);
+                    showBikeParameters(mPrefs.getInt(OTPApp.PREFERENCE_KEY_LAST_OPTIMIZATION, -1) == 2);
+                }
+            } else {
+                Log.e(OTPApp.TAG, "Traverse mode set is null, UI not updated");
+            }
+        }
+    }
+
+    private TraverseModeSet getSelectedTraverseModeSet(){
+        TraverseModeSet selectedTraverseModeSet = new TraverseModeSet();
+        selectedTraverseModeSet.setWalk(mBtnModeWalk.isChecked()
+                || mBtnModeRentedBike.isChecked());
+        selectedTraverseModeSet.setBicycle(mBtnModeBike.isChecked()
+                || mBtnModeRentedBike.isChecked());
+        selectedTraverseModeSet.setBus(mBtnModeBus.isChecked());
+        selectedTraverseModeSet.setRail(mBtnModeTrain.isChecked());
+
         return selectedTraverseModeSet;
+    }
+
+    private void updateModes(TraverseModeSet modeSet, ImageButton btnPlanTrip){
+        SharedPreferences.Editor editor = mPrefs.edit();
+        String modesString = modeSet.getAsStr();
+        editor.putString(OTPApp.PREFERENCE_KEY_LAST_TRAVERSE_MODE_SET, modesString);
+        editor.commit();
+        updatePlanTripButton(modeSet, btnPlanTrip);
     }
 
     private void updatePlanTripButton(TraverseModeSet modeSet, ImageButton btnPlanTrip){
@@ -1354,34 +1450,7 @@ public class MainFragment extends Fragment implements
                 mSavedLastLocationCheckedForServer = savedInstanceState
                         .getParcelable(OTPApp.BUNDLE_KEY_SAVED_LAST_LOCATION_CHECKED_FOR_SERVER);
 
-                showBikeParameters(false);
-
-//                mDdlTravelMode.setItemChecked(
-//                        savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE), true);
-//                TraverseModeSpinnerItem traverseModeSpinnerItem
-//                        = (TraverseModeSpinnerItem) mDdlTravelMode
-//                        .getItemAtPosition(mDdlTravelMode.getCheckedItemPosition());
-//                if (traverseModeSpinnerItem != null) {
-//                    // This should always be the case because if it's stored it was already checked
-//                    if (traverseModeSpinnerItem.getTraverseModeSet()
-//                            .contains(TraverseMode.BICYCLE)) {
-//                        setBikeOptimizationAdapter(true);
-//                        mDdlOptimization.setItemChecked(
-//                                savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION),
-//                                true);
-//                        OptimizeSpinnerItem optimizeSpinnerItem
-//                                = (OptimizeSpinnerItem) mDdlOptimization
-//                                .getItemAtPosition(mDdlOptimization.getCheckedItemPosition());
-//                        if (optimizeSpinnerItem != null) {
-//                            if (optimizeSpinnerItem.getOptimizeType()
-//                                    .equals(OptimizeType.TRIANGLE)) {
-//                                showBikeParameters(true);
-//                            }
-//                        }
-//                    }
-//                }
-//                mDdlTravelMode.setItemChecked(
-//                        savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE), true);
+                restorePanelUI();
 
                 OTPBundle otpBundle = (OTPBundle) savedInstanceState
                         .getSerializable(OTPApp.BUNDLE_KEY_OTP_BUNDLE);
@@ -1410,15 +1479,11 @@ public class MainFragment extends Fragment implements
                             .getString(OTPApp.BUNDLE_KEY_RESULT_TRIP_END_LOCATION);
                 }
 
-                mBikeTriangleMinValue = savedInstanceState
-                        .getDouble(OTPApp.BUNDLE_KEY_SEEKBAR_MIN_VALUE);
-                mBikeTriangleMaxValue = savedInstanceState
-                        .getDouble(OTPApp.BUNDLE_KEY_SEEKBAR_MAX_VALUE);
-                mBikeTriangleParameters.setSelectedMinValue(mBikeTriangleMinValue);
-                mBikeTriangleParameters.setSelectedMaxValue(mBikeTriangleMaxValue);
-
                 mIsStartLocationChangedByUser = false;
                 mIsEndLocationChangedByUser = false;
+
+                mIsAlarmBikeRentalActive = savedInstanceState
+                        .getBoolean(OTPApp.BUNDLE_KEY__IS_ALARM_BIKE_RENTAL_ACTIVE, false);
             }
         }
     }
@@ -1606,7 +1671,7 @@ public class MainFragment extends Fragment implements
         request.setModes(getSelectedTraverseModeSet());
 
         Integer defaultMaxWalkInt = mApplicationContext.getResources()
-                .getInteger(R.integer.max_walking_distance);
+                 .getInteger(R.integer.max_walking_distance);
 
         try {
             Double maxWalk = Double
@@ -1698,15 +1763,26 @@ public class MainFragment extends Fragment implements
     }
 
     /**
-     * Changes optimization spinner values to show values compatibles with
-     * bikes or with transit.
+     * Changes optimization spinner values to show ones compatible with
+     * bikes or with transit. If updateOptimizationValue is true values of the spinner are also
+     * modified to adapt to bike.
      * <p>
      * Replaces fewest transfers with safer trip options.
      *
      * @param enable when true spinner is set to bike values
+     * @param updateOptimizationValue when true optimization spinner values are modified to select
+     *                                by default "custom trip" by bike and restore previous value
+     *                                when bike mode is abandoned
      */
-    private void setBikeOptimizationAdapter(boolean enable) {
+    private void setBikeOptimizationAdapter(boolean enable, boolean updateOptimizationValue) {
         ArrayAdapter<OptimizeSpinnerItem> optimizationAdapter;
+        int newOptimizationValue;
+
+        if (updateOptimizationValue){
+            if (enable){
+                mOptimizationValueToRestoreWhenNoBike = mDdlOptimization.getCheckedItemPosition();
+            }
+        }
 
         if (enable) {
             optimizationAdapter = new ArrayAdapter<OptimizeSpinnerItem>(
@@ -1723,7 +1799,6 @@ public class MainFragment extends Fragment implements
                                     getResources().getString(R.string.left_panel_optimization_bike_triangle),
                                     OptimizeType.TRIANGLE)});
             mDdlOptimization.setAdapter(optimizationAdapter);
-            mDdlOptimization.setItemChecked(2, true);
         } else {
             optimizationAdapter = new ArrayAdapter<OptimizeSpinnerItem>(
                     getActivity(),
@@ -1739,7 +1814,26 @@ public class MainFragment extends Fragment implements
                                     .getString(R.string.left_panel_optimization_fewest_transfers),
                                     OptimizeType.TRANSFERS)});
             mDdlOptimization.setAdapter(optimizationAdapter);
-            mDdlOptimization.setItemChecked(0, true);
+        }
+        if (updateOptimizationValue){
+            if (enable){
+                newOptimizationValue = 2;
+            }
+            else{
+                if (mOptimizationValueToRestoreWhenNoBike != -1){
+                    newOptimizationValue = mOptimizationValueToRestoreWhenNoBike;
+                }
+                else if (mPrefs.getInt(OTPApp.PREFERENCE_KEY_LAST_OPTIMIZATION, -1) != -1){
+                    newOptimizationValue = mPrefs.getInt(OTPApp.PREFERENCE_KEY_LAST_OPTIMIZATION, -1);
+                }
+                else{
+                    newOptimizationValue = 0;
+                }
+            }
+            mDdlOptimization.setItemChecked(newOptimizationValue, true);
+            SharedPreferences.Editor editor = mPrefs.edit();
+            editor.putInt(OTPApp.PREFERENCE_KEY_LAST_OPTIMIZATION, newOptimizationValue);
+            editor.commit();
         }
     }
 
@@ -1864,10 +1958,13 @@ public class MainFragment extends Fragment implements
     /**
      * Registers the server in the OTPApp class.
      * <p>
-     * UI is restored to avoid presence of all server data, removing all
+     * UI may be restored to avoid presence of all server data, removing all
      * objects from the map and restarting text boxes to default contents.
      * <p>
      * OTPApp can be requested calling to getActivity by other fragments.
+     *
+     * @param s new server to be set
+     * @param restartUI if true UI will be restarted to adapt to new server
      */
     private void setSelectedServer(Server s, boolean restartUI) {
         if (restartUI) {
@@ -2199,10 +2296,6 @@ public class MainFragment extends Fragment implements
             }
             bundle.putString(OTPApp.BUNDLE_KEY_TB_END_LOCATION,
                     mTbEndLocation.getText().toString());
-            bundle.putInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION,
-                    mDdlOptimization.getCheckedItemPosition());
-//            bundle.putInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE,
-//                    mDdlTravelMode.getCheckedItemPosition());
 
             bundle.putParcelable(OTPApp.BUNDLE_KEY_SAVED_LAST_LOCATION, mSavedLastLocation);
             bundle.putParcelable(OTPApp.BUNDLE_KEY_SAVED_LAST_LOCATION_CHECKED_FOR_SERVER,
@@ -2217,11 +2310,10 @@ public class MainFragment extends Fragment implements
                         mResultTripEndLocation);
             }
 
-            bundle.putDouble(OTPApp.BUNDLE_KEY_SEEKBAR_MIN_VALUE, mBikeTriangleMinValue);
-            bundle.putDouble(OTPApp.BUNDLE_KEY_SEEKBAR_MAX_VALUE, mBikeTriangleMaxValue);
-
             bundle.putSerializable(OTPApp.BUNDLE_KEY_TRIP_DATE, mTripDate);
             bundle.putBoolean(OTPApp.BUNDLE_KEY_ARRIVE_BY, mArriveBy);
+
+            bundle.putBoolean(OTPApp.BUNDLE_KEY__IS_ALARM_BIKE_RENTAL_ACTIVE, mIsAlarmBikeRentalActive);
 
             if (!mFragmentListener.getCurrentItineraryList().isEmpty()) {
                 OTPBundle otpBundle = new OTPBundle();
@@ -2299,13 +2391,16 @@ public class MainFragment extends Fragment implements
     public void onResume() {
         super.onResume();
 
+        listenForBikeUpdates(mIsAlarmBikeRentalActive);
+
         Log.v(OTPApp.TAG, "MainFragment onResume");
     }
 
     @Override
     public void onPause() {
-
         super.onPause();
+
+        listenForBikeUpdates(false);
     }
 
     @Override
@@ -2326,43 +2421,69 @@ public class MainFragment extends Fragment implements
     }
 
 
-    public void updateSelectedServer() {
+    /**
+     * Updates server to the new one set in preferences and also makes some UI changes (camera
+     * movements) if specified.
+     *
+     * @param updateUI also updateUI, not useful if changes should occur on background
+     */
+    public void updateSelectedServer(boolean updateUI) {
+        long serverId;
+        Server server;
         if (mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)) {
-            setSelectedServer(
-                    new Server(mPrefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""),
-                            mApplicationContext), true);
-            Log.v(OTPApp.TAG, "Now using custom OTP server: " + mPrefs
-                    .getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
+            server = new Server(mPrefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""),
+                    mApplicationContext);
+            setSelectedServer(server, updateUI);
+            String bounds;
+            if ((bounds = mPrefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS, null))
+                    != null) {
+                server.setBounds(bounds);
+                addBoundariesRectangle(server);
+            }
             WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
 
             MetadataRequest metaRequest = new MetadataRequest(weakContext, mApplicationContext,
                     this);
             metaRequest.execute(mPrefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
-        } else {
-            long serverId = mPrefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0);
-            if (serverId != 0) {
-                ServersDataSource dataSource = ServersDataSource.getInstance(mApplicationContext);
-                dataSource.open();
-                Server s = new Server(dataSource
-                        .getServer(mPrefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)));
-                dataSource.close();
+            Log.v(OTPApp.TAG, "Now using custom OTP server: " + mPrefs
+                    .getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
+        } else if ((serverId = mPrefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)) != 0){
+            ServersDataSource dataSource = ServersDataSource.getInstance(mApplicationContext);
+            dataSource.open();
+            server = new Server(dataSource
+                    .getServer(mPrefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)));
+            dataSource.close();
 
-                setSelectedServer(s, true);
-                addBoundariesRectangle(s);
+            setSelectedServer(server, updateUI);
+            addBoundariesRectangle(server);
 
+            if (updateUI){
                 LatLng mCurrentLatLng = getLastLocation();
 
                 if ((mCurrentLatLng != null) && (LocationUtil
-                        .checkPointInBoundingBox(mCurrentLatLng, s,
+                        .checkPointInBoundingBox(mCurrentLatLng, server,
                                 OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))) {
                     mMap.animateCamera(CameraUpdateFactory
-                            .newLatLngZoom(mCurrentLatLng, getServerInitialZoom(s)));
+                            .newLatLngZoom(mCurrentLatLng, getServerInitialZoom(server)));
                 } else {
                     mMap.animateCamera(CameraUpdateFactory
-                            .newLatLngZoom(getServerCenter(s), getServerInitialZoom(s)));
-                    setMarker(true, getServerCenter(s), false);
+                            .newLatLngZoom(getServerCenter(server), getServerInitialZoom(server)));
+                    setMarker(true, getServerCenter(server), false);
                 }
             }
+
+            Log.v(OTPApp.TAG, "Now using OTP server: " + server.getRegion());
+        } else {
+            Log.v(OTPApp.TAG, "Server not selected yet, should be first start");
+            return;
+        }
+        if (server.getOffersBikeRental()){
+            BikeRentalLoad bikeRentalGetStations = new BikeRentalLoad(mApplicationContext, true,
+                    this);
+            bikeRentalGetStations.execute(server.getBaseURL());
+        }
+        else{
+            listenForBikeUpdates(false);
         }
     }
 
@@ -2731,11 +2852,8 @@ public class MainFragment extends Fragment implements
                 if (drawable != null) {
                     BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable.getCurrent();
                     Bitmap bitmap = bitmapDrawable.getBitmap();
-                    Bitmap bitmapHalfSize = Bitmap.createScaledBitmap(bitmap,
-                            (int) (bitmap.getWidth() / scaleFactor),
-                            (int) (bitmap.getHeight() / scaleFactor), false);
                     modeMarkerOption.icon(
-                            BitmapDescriptorFactory.fromBitmap(bitmapHalfSize));
+                            BitmapDescriptorFactory.fromBitmap(bitmap));
                 } else {
                     Log.e(OTPApp.TAG, "Error obtaining drawable to add mode icons to the map");
                 }
@@ -2944,8 +3062,7 @@ public class MainFragment extends Fragment implements
     public void onServerSelectorComplete(Server server) {
         //Update application server
         if (getActivity() != null) {
-            setSelectedServer(server, true);
-            updateSelectedServer();
+            updateSelectedServer(true);
         }
     }
 
@@ -3163,7 +3280,7 @@ public class MainFragment extends Fragment implements
 
             SharedPreferences.Editor prefsEditor = PreferenceManager
                     .getDefaultSharedPreferences(mApplicationContext).edit();
-            prefsEditor.putString(PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS, bounds);
+            prefsEditor.putString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS, bounds);
             prefsEditor.commit();
 
             Log.v(OTPApp.TAG, "LowerLeft: " + Double.toString(lowerLeftLatitude) + "," + Double
@@ -3257,17 +3374,19 @@ public class MainFragment extends Fragment implements
      * @return a LatLng object with the most updated user coordinates
      */
     public LatLng getLastLocation() {
-        if (mLocationClient.isConnected()) {
-            Location loc = mLocationClient.getLastLocation();
+        if (mLocationClient != null){
+            if (mLocationClient.isConnected()) {
+                Location loc = mLocationClient.getLastLocation();
 
-            if (loc != null) {
-                LatLng mCurrentLocation = new LatLng(loc.getLatitude(), loc.getLongitude());
-                mSavedLastLocation = mCurrentLocation;
-                return mCurrentLocation;
+                if (loc != null) {
+                    LatLng mCurrentLocation = new LatLng(loc.getLatitude(), loc.getLongitude());
+                    mSavedLastLocation = mCurrentLocation;
+                    return mCurrentLocation;
+                }
             }
-        }
-        if (mSavedLastLocation != null) {
-            return mSavedLastLocation;
+            if (mSavedLastLocation != null) {
+                return mSavedLastLocation;
+            }
         }
         return null;
     }
@@ -3461,10 +3580,108 @@ public class MainFragment extends Fragment implements
     @Override
     public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar,
             Double minValue, Double maxValue) {
+        SharedPreferences.Editor editor = mPrefs.edit();
+        editor.putFloat(OTPApp.PREFERENCE_KEY_LAST_BIKE_TRIANGLE_MIN_VALUE, minValue.floatValue());
+        editor.putFloat(OTPApp.PREFERENCE_KEY_LAST_BIKE_TRIANGLE_MAX_VALUE, maxValue.floatValue());
+        editor.commit();
+
         mBikeTriangleMinValue = minValue;
         mBikeTriangleMaxValue = maxValue;
         String bikeParam = minValue.toString() + maxValue.toString();
         Log.v(OTPApp.TAG, bikeParam);
     }
 
+    @Override
+    public void onBikeRentalStationListLoad(List<BikeRentalStation> bikeRentalStationList) {
+        if ((bikeRentalStationList != null) && !bikeRentalStationList.isEmpty()){
+            mBikeRentalStationsMarkers = new ArrayList<Marker>(bikeRentalStationList.size());
+
+            MarkerOptions bikeRentalStationMarkerOption = new MarkerOptions();
+
+            Drawable drawable = getResources().getDrawable(R.drawable.parking_bicycle);
+            if (drawable != null) {
+                BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable.getCurrent();
+                Bitmap bitmap = bitmapDrawable.getBitmap();
+                bikeRentalStationMarkerOption.icon(
+                        BitmapDescriptorFactory.fromBitmap(bitmap));
+            } else {
+                Log.e(OTPApp.TAG, "Error obtaining drawable to add bike rental icons to the map");
+            }
+
+            for (BikeRentalStation bikeRentalStation : bikeRentalStationList){
+                bikeRentalStationMarkerOption.position(new LatLng(bikeRentalStation.y,
+                        bikeRentalStation.x));
+                bikeRentalStationMarkerOption.title(bikeRentalStation.name);
+                bikeRentalStationMarkerOption.snippet(getResources()
+                        .getString(R.string.map_markers_bike_rental_available_bikes) + " " +
+                        bikeRentalStation.bikesAvailable + " | " + getResources()
+                        .getString(R.string.map_markers_bike_rental_available_spaces) + " " +
+                        bikeRentalStation.spacesAvailable);
+                Marker bikeRentalStationMarker = mMap.addMarker(bikeRentalStationMarkerOption);
+                mBikeRentalStationsMarkers.add(bikeRentalStationMarker);
+            }
+            listenForBikeUpdates(true);
+        }
+        else{
+            Toast.makeText(mApplicationContext, mApplicationContext.getResources().getString(R.string.toast_bike_rental_load_request_error),
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onBikeRentalStationListUpdate(List<BikeRentalStation> bikeRentalStationList) {
+        if (getActivity() != null){
+            if ((bikeRentalStationList != null) && !bikeRentalStationList.isEmpty()
+                    && (mBikeRentalStationsMarkers != null) && !mBikeRentalStationsMarkers.isEmpty()){
+                for (BikeRentalStation bikeRentalStation : bikeRentalStationList){
+                    for (Marker bikeRentalStationMarker : mBikeRentalStationsMarkers){
+                        if (bikeRentalStationMarker.getTitle().equals(bikeRentalStation.name)){
+                            bikeRentalStationMarker.setSnippet(getResources()
+                                    .getString(R.string.map_markers_bike_rental_available_bikes) + " " +
+                                    bikeRentalStation.bikesAvailable + " | " + getResources()
+                                    .getString(R.string.map_markers_bike_rental_available_spaces) + " " +
+                                    bikeRentalStation.spacesAvailable);
+                        }
+                    }
+                }
+            }
+            else{
+                Toast.makeText(mApplicationContext, mApplicationContext.getResources().getString(R.string.toast_bike_rental_load_request_error),
+                        Toast.LENGTH_SHORT).show();
+                mAlarmMgr.cancel(mAlarmIntentBikeRental);
+            }
+        }
+    }
+
+    @Override
+    public void onBikeRentalStationListFail() {
+        listenForBikeUpdates(false);
+    }
+
+    public void listenForBikeUpdates(boolean enable){
+        if (enable){
+            mApplicationContext.registerReceiver(new AlarmReceiver(), intentFilter);
+            mAlarmMgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, OTPApp.DEFAULT_UPDATE_INTERVAL,
+                    OTPApp.DEFAULT_UPDATE_INTERVAL, mAlarmIntentBikeRental);
+        }
+        else{
+            if (!mApplicationContext.getPackageManager()
+                    .queryBroadcastReceivers(bikeRentalIntent, bikeRentalIntent.getFlags())
+                    .isEmpty()){
+                mApplicationContext.unregisterReceiver(mAlarmReceiver);
+            }
+            mAlarmMgr.cancel(mAlarmIntentBikeRental);
+        }
+    }
+
+    public class AlarmReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(OTPApp.INTENT_UPDATE_BIKE_RENTAL_ACTION)){
+                BikeRentalLoad bikeRentalLoad = new BikeRentalLoad(mApplicationContext, false, MainFragment.this);
+                bikeRentalLoad.execute(mOTPApp.getSelectedServer().getBaseURL());
+            }
+        }
+    }
 }

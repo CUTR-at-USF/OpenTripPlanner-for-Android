@@ -38,6 +38,12 @@
                 map:mapType="none">
         </fragment>
 
+        <FrameLayout android:layout_width="match_parent"
+                     android:layout_height="match_parent"
+                     android:background="@android:color/transparent">
+
+        </FrameLayout>
+
         <ImageButton
                 android:id="@+id/btnPlanTrip"
                 android:layout_height="match_parent"
@@ -195,7 +201,8 @@
                 android:orientation="vertical"
                 android:layout_below="@id/layoutOptimization"
                 android:layout_above="@+id/layoutBike"
-                android:layout_margin="4dp">
+                android:layout_margin="4dp"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/headerSpinTravelmode"

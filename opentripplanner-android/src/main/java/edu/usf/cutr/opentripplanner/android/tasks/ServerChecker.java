@@ -114,6 +114,15 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
                             + "\n" + context.getResources()
                             .getString(R.string.server_checker_info_bounds) + " " + server
                             .getBounds() + "\n" + context.getResources()
+                            .getString(R.string.server_checker_info_bike_rental) + " ";
+            if (server.getOffersBikeRental()){
+                message +=  context.getResources().getString(android.R.string.yes);
+            }
+            else{
+                message += context.getResources().getString(android.R.string.no);
+            }
+
+            message += "\n" + context.getResources()
                             .getString(R.string.server_checker_info_reachable) + " ";
 
             int status = 0;

@@ -41,7 +41,7 @@
         <ImageButton
                 android:id="@+id/btnPlanTrip"
                 android:layout_height="match_parent"
-                android:layout_width="55dp"
+                android:layout_width="45dp"
                 android:layout_alignTop="@+id/tbStartLocation"
                 android:layout_alignBottom="@+id/tbEndLocation"
                 android:layout_alignParentRight="true"
@@ -51,8 +51,8 @@
 
         <ImageButton
                 android:id="@+id/btnDateDialog"
-                android:layout_height="55dp"
-                android:layout_width="55dp"
+                android:layout_height="45dp"
+                android:layout_width="45dp"
                 android:layout_below="@+id/btnPlanTrip"
                 android:layout_alignParentRight="true"
                 android:src="@drawable/device_access_time"
@@ -88,8 +88,8 @@
 
         <ImageButton
                 android:id="@+id/btnMyLocation"
-                android:layout_height="55dp"
-                android:layout_width="55dp"
+                android:layout_height="45dp"
+                android:layout_width="45dp"
                 android:layout_alignParentRight="true"
                 android:layout_above="@+id/panelDisplayDirection"
                 android:src="@drawable/device_access_location_found"
@@ -99,8 +99,8 @@
 
         <ImageButton
                 android:id="@+id/btnHandle"
-                android:layout_width="20dp"
-                android:layout_height="48dp"
+                android:layout_width="14dp"
+                android:layout_height="38dp"
                 android:layout_alignParentLeft="true"
                 android:layout_above="@id/panelDisplayDirection"
                 android:orientation="vertical"
@@ -142,7 +142,7 @@
                     android:id="@+id/itinerarySelection"
                     android:layout_toLeftOf="@id/separator"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
+                    android:layout_height="45dp"
                     android:layout_margin="4dp">
             </Spinner>
 
@@ -196,6 +196,7 @@
                 android:layout_below="@id/layoutOptimization"
                 android:layout_above="@+id/layoutBike"
                 android:layout_margin="4dp">
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/headerSpinTravelmode"
