@@ -504,34 +504,7 @@ public class MainFragment extends Fragment implements
         }
 
         if (!mMapFailed) {
-            if (mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)) {
-                String baseURL = mPrefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, "");
-                Server s = new Server(baseURL, mApplicationContext);
-                String bounds;
-                setSelectedServer(s, false);
-                if ((bounds = mPrefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS, null))
-                        != null) {
-                    s.setBounds(bounds);
-                    addBoundariesRectangle(s);
-                }
-
-                Log.v(OTPApp.TAG, "Now using custom OTP server: " + baseURL);
-            } else {
-                ServersDataSource dataSource = ServersDataSource.getInstance(mApplicationContext);
-                long serverId = mPrefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0);
-                if (serverId != 0) {
-                    dataSource.open();
-                    Server s = dataSource
-                            .getServer(mPrefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0));
-                    dataSource.close();
-
-                    if (s != null) {
-                        setSelectedServer(s, false);
-                        addBoundariesRectangle(s);
-                        Log.v(OTPApp.TAG, "Now using OTP server: " + s.getRegion());
-                    }
-                }
-            }
+            updateSelectedServer(false);
         }
 
         ArrayAdapter<OptimizeSpinnerItem> optimizationAdapter
@@ -2326,43 +2299,54 @@ public class MainFragment extends Fragment implements
     }
 
 
-    public void updateSelectedServer() {
+    public void updateSelectedServer(boolean updateUI) {
+        long serverId;
+        Server server;
         if (mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)) {
-            setSelectedServer(
-                    new Server(mPrefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""),
-                            mApplicationContext), true);
-            Log.v(OTPApp.TAG, "Now using custom OTP server: " + mPrefs
-                    .getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
+            server = new Server(mPrefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""),
+                    mApplicationContext);
+            setSelectedServer(server, updateUI);
+            String bounds;
+            if ((bounds = mPrefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS, null))
+                    != null) {
+                server.setBounds(bounds);
+                addBoundariesRectangle(server);
+            }
             WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
 
             MetadataRequest metaRequest = new MetadataRequest(weakContext, mApplicationContext,
                     this);
-            metaRequest.execute(mPrefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
-        } else {
-            long serverId = mPrefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0);
-            if (serverId != 0) {
-                ServersDataSource dataSource = ServersDataSource.getInstance(mApplicationContext);
-                dataSource.open();
-                Server s = new Server(dataSource
-                        .getServer(mPrefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)));
-                dataSource.close();
+            metaRequest.execute(mPrefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));            Log.v(OTPApp.TAG, "Now using custom OTP server: " + mPrefs
+                    .getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
+        } else if ((serverId = mPrefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)) != 0){
+            ServersDataSource dataSource = ServersDataSource.getInstance(mApplicationContext);
+            dataSource.open();
+            server = new Server(dataSource
+                    .getServer(mPrefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)));
+            dataSource.close();
 
-                setSelectedServer(s, true);
-                addBoundariesRectangle(s);
+            setSelectedServer(server, updateUI);
+            addBoundariesRectangle(server);
 
+            if (updateUI){
                 LatLng mCurrentLatLng = getLastLocation();
 
                 if ((mCurrentLatLng != null) && (LocationUtil
-                        .checkPointInBoundingBox(mCurrentLatLng, s,
+                        .checkPointInBoundingBox(mCurrentLatLng, server,
                                 OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))) {
                     mMap.animateCamera(CameraUpdateFactory
-                            .newLatLngZoom(mCurrentLatLng, getServerInitialZoom(s)));
+                            .newLatLngZoom(mCurrentLatLng, getServerInitialZoom(server)));
                 } else {
                     mMap.animateCamera(CameraUpdateFactory
-                            .newLatLngZoom(getServerCenter(s), getServerInitialZoom(s)));
-                    setMarker(true, getServerCenter(s), false);
+                            .newLatLngZoom(getServerCenter(server), getServerInitialZoom(server)));
+                    setMarker(true, getServerCenter(server), false);
                 }
             }
+
+            Log.v(OTPApp.TAG, "Now using OTP server: " + server.getRegion());
+        } else {
+            Log.v(OTPApp.TAG, "Server not selected yet, should be first start");
+            return;
         }
     }
 
@@ -2944,8 +2928,7 @@ public class MainFragment extends Fragment implements
     public void onServerSelectorComplete(Server server) {
         //Update application server
         if (getActivity() != null) {
-            setSelectedServer(server, true);
-            updateSelectedServer();
+            updateSelectedServer(true);
         }
     }
 
@@ -3257,17 +3240,19 @@ public class MainFragment extends Fragment implements
      * @return a LatLng object with the most updated user coordinates
      */
     public LatLng getLastLocation() {
-        if (mLocationClient.isConnected()) {
-            Location loc = mLocationClient.getLastLocation();
+        if (mLocationClient != null){
+            if (mLocationClient.isConnected()) {
+                Location loc = mLocationClient.getLastLocation();
 
-            if (loc != null) {
-                LatLng mCurrentLocation = new LatLng(loc.getLatitude(), loc.getLongitude());
-                mSavedLastLocation = mCurrentLocation;
-                return mCurrentLocation;
+                if (loc != null) {
+                    LatLng mCurrentLocation = new LatLng(loc.getLatitude(), loc.getLongitude());
+                    mSavedLastLocation = mCurrentLocation;
+                    return mCurrentLocation;
+                }
             }
-        }
-        if (mSavedLastLocation != null) {
-            return mSavedLastLocation;
+            if (mSavedLastLocation != null) {
+                return mSavedLastLocation;
+            }
         }
         return null;
     }
