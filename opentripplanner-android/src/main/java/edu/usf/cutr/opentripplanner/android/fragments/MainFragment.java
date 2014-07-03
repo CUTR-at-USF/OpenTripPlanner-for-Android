@@ -2709,11 +2709,8 @@ public class MainFragment extends Fragment implements
                 if (drawable != null) {
                     BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable.getCurrent();
                     Bitmap bitmap = bitmapDrawable.getBitmap();
-                    Bitmap bitmapHalfSize = Bitmap.createScaledBitmap(bitmap,
-                            (int) (bitmap.getWidth() / scaleFactor),
-                            (int) (bitmap.getHeight() / scaleFactor), false);
                     modeMarkerOption.icon(
-                            BitmapDescriptorFactory.fromBitmap(bitmapHalfSize));
+                            BitmapDescriptorFactory.fromBitmap(bitmap));
                 } else {
                     Log.e(OTPApp.TAG, "Error obtaining drawable to add mode icons to the map");
                 }
