@@ -64,6 +64,14 @@
                 <string name="map_markers_connector_before_stop">von</string>
                 <string name="map_markers_connector_before_destination">nach</string>
 
+        <!-- Bike rental stations map markers -->
+
+            <!-- Info pop-ups -->
+
+                <!-- Availability info -->
+                <!--<string name="map_markers_bike_rental_available_spaces">Free slots:</string>-->
+                <!--<string name="map_markers_bike_rental_available_bikes">Bikes:</string>-->
+
 
         <!-- Toast messages -->
 
@@ -76,7 +84,8 @@
 
                 <!-- Used alone -->
                 <string name="toast_metadata_request_successful">Verkehrsverbindungen heruntergeladen</string>
-                <string name="toast_server_checker_successful">OK: Region is working</string>
+                <!--<string name="toast_server_checker_successful">OK: Region is working</string>-->
+                <!--<string name="toast_bike_rental_load_request_successful">Bike rental stations downloaded</string>-->
 
                 <!-- Used together: toast_server_selector_detected + "server name" + toast_server_selector_server_change_info -->
                 <string name="toast_server_selector_detected">Daten gefunden.</string>
@@ -90,6 +99,9 @@
 
                     <!-- Obtaining server list -->
                     <string name="toast_server_selector_refresh_server_list_error">Liste der Regionen konnte nicht geladen werden.</string>
+
+                    <!-- Obtaining bike rental list -->
+                    <!--<string name="toast_bike_rental_load_request_error">Couldn\'t get bike rental stations</string>-->
 
                     <!-- Contacting server -->
                     <string name="toast_no_server_selected_error">Keine Region bzw. kein Regionalserver ausgewählt</string>

@@ -58,6 +58,8 @@ public class Server {
 
     private boolean boundsSet = false;
 
+    private Boolean offersBikeRental;
+
     public boolean areBoundsSet() {
         return boundsSet;
     }
@@ -90,10 +92,12 @@ public class Server {
         setLanguage(s.getLanguage());
         setContactName(s.getContactName());
         setContactEmail(s.getContactEmail());
+        setOffersBikeRental(s.getOffersBikeRental());
     }
 
     public Server(Long d, String region, String baseURL, String bounds,
-            String language, String contactName, String contactEmail, String center, String zoom)
+            String language, String contactName, String contactEmail, String center, String zoom,
+            String offersBikeRental)
             throws ServerListParsingException {
         super();
         setDate(d);
@@ -105,10 +109,12 @@ public class Server {
         setLanguage(language);
         setContactName(contactName);
         setContactEmail(contactEmail);
+        setBikeRental(offersBikeRental);
     }
 
     public Server(String region, String baseURL, String bounds,
-            String language, String contactName, String contactEmail, String center, String zoom)
+            String language, String contactName, String contactEmail, String center, String zoom,
+            String offersBikeRental)
             throws ServerListParsingException {
         super();
         setRegion(region);
@@ -119,6 +125,7 @@ public class Server {
         setLanguage(language);
         setContactName(contactName);
         setContactEmail(contactEmail);
+        setBikeRental(offersBikeRental);
     }
 
     /*
@@ -137,6 +144,7 @@ public class Server {
                 .getString(R.string.server_checker_info_custom_server_unknown_name);
         this.contactEmail = applicationContext.getResources()
                 .getString(R.string.server_checker_info_custom_server_unknown_email);
+        this.offersBikeRental = false;
     }
 
     public String getRegion() {
@@ -387,6 +395,23 @@ public class Server {
 
     public void setInitialZoom(float initialZoom) {
         this.initialZoom = initialZoom;
+    }
+
+    public Boolean getOffersBikeRental() {
+        return offersBikeRental;
+    }
+
+    public void setOffersBikeRental(Boolean offersBikeRental) {
+        this.offersBikeRental = offersBikeRental;
+    }
+
+    public void setBikeRental(String bikeRental) {
+        if (bikeRental.contains("yes")){
+            this.offersBikeRental = true;
+        }
+        else{
+            this.offersBikeRental = false;
+        }
     }
 
 }

@@ -36,6 +36,8 @@ public class OTPApp extends Application {
 
     public static final String METADATA_LOCATION = "/metadata";
 
+    public static final String BIKE_RENTAL_LOCATION = "/bike_rental";
+
     public static final String URL_ENCODING = "UTF-8";
 
     public static final String REFRESH_SERVER_RETURN_KEY = "RefreshServer";

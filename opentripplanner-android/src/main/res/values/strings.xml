@@ -63,6 +63,14 @@
                 <string name="map_markers_connector_before_stop">from</string>
                 <string name="map_markers_connector_before_destination">to</string>
 
+        <!-- Bike rental stations map markers -->
+
+            <!-- Info pop-ups -->
+
+                <!-- Availability info -->
+                <string name="map_markers_bike_rental_available_spaces">Free slots:</string>
+                <string name="map_markers_bike_rental_available_bikes">Bikes:</string>
+
 
         <!-- Toast messages -->
 
@@ -76,6 +84,7 @@
                 <!-- Used alone -->
                 <string name="toast_metadata_request_successful">Transit service downloaded</string>
                 <string name="toast_server_checker_successful">OK: Region is working</string>
+                <string name="toast_bike_rental_load_request_successful">Bike rental stations downloaded</string>
 
                 <!-- Used together: toast_server_selector_detected + "server name" + toast_server_selector_server_change_info -->
                 <string name="toast_server_selector_detected">Found</string>
@@ -89,6 +98,9 @@
 
                     <!-- Obtaining server list -->
                     <string name="toast_server_selector_refresh_server_list_error">Couldn\'t get region list</string>
+
+                    <!-- Obtaining bike rental list -->
+                    <string name="toast_bike_rental_load_request_error">Couldn\'t get bike rental stations</string>
 
                     <!-- Contacting server -->
                     <string name="toast_no_server_selected_error">No region selected</string>
@@ -144,6 +156,7 @@
                     <string name="server_checker_info_contact">Contact:</string>
                     <string name="server_checker_info_url">URL:</string>
                     <string name="server_checker_info_bounds">Bounds:</string>
+                    <string name="server_checker_info_bike_rental">Bike rental service:</string>
                     <string name="server_checker_info_reachable">Online:</string>
 
                     <!-- Fallback contents -->
@@ -153,6 +166,7 @@
                     <string name="server_checker_info_custom_server_unknown_language">Unknown</string>
                     <string name="server_checker_info_custom_server_unknown_name">Unknown </string>
                     <string name="server_checker_info_custom_server_unknown_email">unknown email</string>
+                    <string name="server_checker_info_custom_server_unknown_bike_rental">Unknown</string>
 
                 <!-- Server selector dialog -->
 

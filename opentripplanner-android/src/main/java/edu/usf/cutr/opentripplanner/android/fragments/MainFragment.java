@@ -41,6 +41,7 @@ import com.google.android.gms.maps.model.TileOverlayOptions;
 
 import org.opentripplanner.api.ws.GraphMetadata;
 import org.opentripplanner.api.ws.Request;
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -108,7 +109,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -134,6 +134,7 @@ import edu.usf.cutr.opentripplanner.android.MyActivity;
 import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.R;
 import edu.usf.cutr.opentripplanner.android.SettingsActivity;
+import edu.usf.cutr.opentripplanner.android.listeners.BikeRentalLoadCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.DateCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.MetadataRequestCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.OTPGeocodingListener;
@@ -145,6 +146,7 @@ import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
 import edu.usf.cutr.opentripplanner.android.model.OptimizeSpinnerItem;
 import edu.usf.cutr.opentripplanner.android.model.Server;
 import edu.usf.cutr.opentripplanner.android.sqlite.ServersDataSource;
+import edu.usf.cutr.opentripplanner.android.tasks.BikeRentalLoad;
 import edu.usf.cutr.opentripplanner.android.tasks.MetadataRequest;
 import edu.usf.cutr.opentripplanner.android.tasks.OTPGeocoding;
 import edu.usf.cutr.opentripplanner.android.tasks.ServerChecker;
@@ -169,8 +171,8 @@ import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_CUSTOM_
 public class MainFragment extends Fragment implements
         ServerSelectorCompleteListener,
         TripRequestCompleteListener, MetadataRequestCompleteListener,
-        OTPGeocodingListener, DateCompleteListener, OnRangeSeekBarChangeListener<Double>,
-        GooglePlayServicesClient.OnConnectionFailedListener,
+        BikeRentalLoadCompleteListener, OTPGeocodingListener, DateCompleteListener,
+        OnRangeSeekBarChangeListener<Double>, GooglePlayServicesClient.OnConnectionFailedListener,
         GooglePlayServicesClient.ConnectionCallbacks,
         GoogleMap.OnCameraChangeListener {
 
@@ -291,6 +293,8 @@ public class MainFragment extends Fragment implements
     private ArrayList<Marker> mModeMarkers;
 
     private List<Polyline> mRoute;
+
+    private ArrayList<Marker> mBikeRentalStationsMarkers;
 
     private Date mTripDate;
 
@@ -2316,7 +2320,8 @@ public class MainFragment extends Fragment implements
 
             MetadataRequest metaRequest = new MetadataRequest(weakContext, mApplicationContext,
                     this);
-            metaRequest.execute(mPrefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));            Log.v(OTPApp.TAG, "Now using custom OTP server: " + mPrefs
+            metaRequest.execute(mPrefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
+            Log.v(OTPApp.TAG, "Now using custom OTP server: " + mPrefs
                     .getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
         } else if ((serverId = mPrefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)) != 0){
             ServersDataSource dataSource = ServersDataSource.getInstance(mApplicationContext);
@@ -2327,6 +2332,14 @@ public class MainFragment extends Fragment implements
 
             setSelectedServer(server, updateUI);
             addBoundariesRectangle(server);
+
+            WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
+
+            if (server.getOffersBikeRental()){
+                BikeRentalLoad bikeRentalLoad = new BikeRentalLoad(weakContext, mApplicationContext,
+                        this);
+                bikeRentalLoad.execute(server.getBaseURL());
+            }
 
             if (updateUI){
                 LatLng mCurrentLatLng = getLastLocation();
@@ -3450,6 +3463,42 @@ public class MainFragment extends Fragment implements
         mBikeTriangleMaxValue = maxValue;
         String bikeParam = minValue.toString() + maxValue.toString();
         Log.v(OTPApp.TAG, bikeParam);
+    }
+
+    @Override
+    public void onBikeRentalStationListLoad(List<BikeRentalStation> bikeRentalStationList) {
+
+        mBikeRentalStationsMarkers = new ArrayList<Marker>(bikeRentalStationList.size());
+
+        MarkerOptions bikeRentalStationMarkerOption = new MarkerOptions();
+
+        float scaleFactor = getResources().getFraction(R.fraction.scaleFactor, 1, 1);
+
+        Drawable drawable = getResources().getDrawable(R.drawable.parking_bicycle);
+        if (drawable != null) {
+            BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable.getCurrent();
+            Bitmap bitmap = bitmapDrawable.getBitmap();
+            Bitmap bitmapHalfSize = Bitmap.createScaledBitmap(bitmap,
+                    (int) (bitmap.getWidth() / scaleFactor),
+                    (int) (bitmap.getHeight() / scaleFactor), false);
+            bikeRentalStationMarkerOption.icon(
+                    BitmapDescriptorFactory.fromBitmap(bitmapHalfSize));
+        } else {
+            Log.e(OTPApp.TAG, "Error obtaining drawable to add bike rental icons to the map");
+        }
+
+        for (BikeRentalStation bikeRentalStation : bikeRentalStationList){
+            bikeRentalStationMarkerOption.position(new LatLng(bikeRentalStation.y,
+                    bikeRentalStation.x));
+            bikeRentalStationMarkerOption.title(bikeRentalStation.name);
+            bikeRentalStationMarkerOption.snippet(getResources()
+                    .getString(R.string.map_markers_bike_rental_available_bikes) + " " +
+                    bikeRentalStation.bikesAvailable + " " + getResources()
+                    .getString(R.string.map_markers_bike_rental_available_spaces) + " " +
+                    bikeRentalStation.spacesAvailable);
+            Marker bikeRentalStationMarker = mMap.addMarker(bikeRentalStationMarkerOption);
+            mBikeRentalStationsMarkers.add(bikeRentalStationMarker);
+        }
     }
 
 }

@@ -54,7 +54,8 @@ public class ServersDataSource {
             OtpSQLiteHelper.COLUMN_CONTACT_NAME,
             OtpSQLiteHelper.COLUMN_CONTACT_EMAIL,
             OtpSQLiteHelper.COLUMN_CENTER,
-            OtpSQLiteHelper.COLUMN_ZOOM};
+            OtpSQLiteHelper.COLUMN_ZOOM,
+            OtpSQLiteHelper.COLUMN_OFFERS_BIKE_RENTAL};
 
     private ServersDataSource(Context context) {
         dbHelper = OtpSQLiteHelper.getInstance(context);
@@ -80,7 +81,8 @@ public class ServersDataSource {
 
         if ((s.getRegion() != null) && (s.getBaseURL() != null) && (s.getBounds() != null)
                 && (s.getCenter() != null) && (s.getZoom() != null) && (s.getLanguage() != null)
-                && (s.getContactName() != null) && (s.getContactEmail() != null)) {
+                && (s.getContactName() != null) && (s.getContactEmail() != null)
+                && (s.getOffersBikeRental() != null)) {
             if (s.getDate() != null) {
                 values.put(OtpSQLiteHelper.COLUMN_DATE, s.getDate());
                 Log.d(OTPApp.TAG,
@@ -94,6 +96,7 @@ public class ServersDataSource {
             values.put(OtpSQLiteHelper.COLUMN_LANGUAGE, s.getLanguage());
             values.put(OtpSQLiteHelper.COLUMN_CONTACT_NAME, s.getContactName());
             values.put(OtpSQLiteHelper.COLUMN_CONTACT_EMAIL, s.getContactEmail());
+            values.put(OtpSQLiteHelper.COLUMN_OFFERS_BIKE_RENTAL, s.getOffersBikeRental());
 
             long insertId = database.insert(OtpSQLiteHelper.TABLE_SERVERS, null,
                     values);
@@ -197,6 +200,7 @@ public class ServersDataSource {
         server.setContactEmail(cursor.getString(7));
         server.setCenter(cursor.getString(8));
         server.setZoom(cursor.getString(9));
+        server.setOffersBikeRental(cursor.getInt(10)>0);
 
         Log.d(OTPApp.TAG,
                 "Retrieved '" + server.getRegion() + "' server date from SQLLite - " + addedOn);
