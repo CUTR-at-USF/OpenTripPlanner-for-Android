@@ -105,9 +105,13 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -141,7 +145,6 @@ import edu.usf.cutr.opentripplanner.android.maps.CustomUrlTileProvider;
 import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
 import edu.usf.cutr.opentripplanner.android.model.OptimizeSpinnerItem;
 import edu.usf.cutr.opentripplanner.android.model.Server;
-import edu.usf.cutr.opentripplanner.android.model.TraverseModeSpinnerItem;
 import edu.usf.cutr.opentripplanner.android.sqlite.ServersDataSource;
 import edu.usf.cutr.opentripplanner.android.tasks.BikeRentalLoad;
 import edu.usf.cutr.opentripplanner.android.tasks.MetadataRequest;
@@ -206,7 +209,17 @@ public class MainFragment extends Fragment implements
 
     private ListView mDdlOptimization;
 
-    private ListView mDdlTravelMode;
+    private RadioGroup mDdlTravelModeNonTransit;
+
+    private CheckBox mBtnModeBus;
+
+    private CheckBox mBtnModeTrain;
+
+    private CheckBox mBtnModeRentedBike;
+
+    private RadioButton mBtnModeWalk;
+
+    private RadioButton mBtnModeBike;
 
     private double mBikeTriangleMinValue = OTPApp.BIKE_PARAMETERS_QUICK_DEFAULT_VALUE;
 
@@ -408,7 +421,14 @@ public class MainFragment extends Fragment implements
             mBtnPlanTrip = (ImageButton) mainView.findViewById(R.id.btnPlanTrip);
             mDdlOptimization = (ListView) mainView
                     .findViewById(R.id.spinOptimization);
-            mDdlTravelMode = (ListView) mainView.findViewById(R.id.spinTravelMode);
+
+            mDdlTravelModeNonTransit = (RadioGroup) mainView.findViewById(R.id.layoutModeNonTransit);
+
+            mBtnModeWalk = (RadioButton) mainView.findViewById(R.id.btnModeWalk);
+            mBtnModeBike = (RadioButton) mainView.findViewById(R.id.btnModeBike);
+            mBtnModeBus = (CheckBox) mainView.findViewById(R.id.btnModeBus);
+            mBtnModeTrain = (CheckBox) mainView.findViewById(R.id.btnModeTrain);
+            mBtnModeRentedBike = (CheckBox) mainView.findViewById(R.id.btnModeRentedBike);
 
             mBikeTriangleParameters = new RangeSeekBar<Double>(OTPApp.BIKE_PARAMETERS_MIN_VALUE,
                     OTPApp.BIKE_PARAMETERS_MAX_VALUE, this.getActivity().getApplicationContext(),
@@ -483,8 +503,6 @@ public class MainFragment extends Fragment implements
             prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true);
             prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false);
             prefsEditor.commit();
-            mBikeTriangleParameters.setSelectedMinValue(OTPApp.BIKE_PARAMETERS_QUICK_DEFAULT_VALUE);
-            mBikeTriangleParameters.setSelectedMaxValue(OTPApp.BIKE_PARAMETERS_FLAT_DEFAULT_VALUE);
         }
 
         if (!mMapFailed) {
@@ -507,29 +525,6 @@ public class MainFragment extends Fragment implements
                                 OptimizeType.TRANSFERS)});
         mDdlOptimization.setAdapter(optimizationAdapter);
 
-        ArrayAdapter<TraverseModeSpinnerItem> traverseModeAdapter
-                = new ArrayAdapter<TraverseModeSpinnerItem>(
-                getActivity(), android.R.layout.simple_list_item_single_choice,
-                new TraverseModeSpinnerItem[]{
-                        new TraverseModeSpinnerItem(getResources().getString(R.string.left_panel_mode_transit),
-                                new TraverseModeSet(TraverseMode.TRANSIT,
-                                        TraverseMode.WALK)),
-                        new TraverseModeSpinnerItem(getResources().getString(R.string.left_panel_mode_bus),
-                                new TraverseModeSet(TraverseMode.BUSISH,
-                                        TraverseMode.WALK)),
-                        new TraverseModeSpinnerItem(getResources().getString(R.string.left_panel_mode_train),
-                                new TraverseModeSet(TraverseMode.TRAINISH,
-                                        TraverseMode.WALK)),
-                        new TraverseModeSpinnerItem(getResources().getString(R.string.left_panel_mode_walk),
-                                new TraverseModeSet(TraverseMode.WALK)),
-                        new TraverseModeSpinnerItem(getResources().getString(R.string.left_panel_mode_bicycle),
-                                new TraverseModeSet(TraverseMode.BICYCLE)),
-                        new TraverseModeSpinnerItem(
-                                getResources().getString(R.string.left_panel_mode_transit_bicycle),
-                                new TraverseModeSet(TraverseMode.TRANSIT,
-                                        TraverseMode.BICYCLE))});
-        mDdlTravelMode.setAdapter(traverseModeAdapter);
-
         Server selectedServer = mOTPApp.getSelectedServer();
         if (selectedServer != null) {
             if (!mMapFailed) {
@@ -542,8 +537,8 @@ public class MainFragment extends Fragment implements
 
         if (savedInstanceState == null) {
             mDdlOptimization.setItemChecked(0, true);
-            mDdlTravelMode.setItemChecked(0, true);
-            showBikeParameters(false);
+//            mDdlTravelMode.setItemChecked(0, true);
+            restorePanelUI();
             mArriveBy = false;
             setTextBoxLocation(getResources().getString(R.string.text_box_my_location), true);
         }
@@ -1126,38 +1121,60 @@ public class MainFragment extends Fragment implements
                                 "User selected new range values: MIN=" + minValue + ", MAX="
                                         + maxValue);
                     }
+             });
 
-                });
 
-        mDdlTravelMode.setOnItemClickListener(new OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view,
-                    int position, long id) {
-                TraverseModeSpinnerItem traverseModeSpinnerItem
-                        = (TraverseModeSpinnerItem) mDdlTravelMode.getItemAtPosition(position);
-                if (traverseModeSpinnerItem != null) {
-                    if (traverseModeSpinnerItem.getTraverseModeSet()
-                            .contains(TraverseMode.BICYCLE)) {
-                        setBikeOptimizationAdapter(true);
-                        showBikeParameters(true);
-                    } else {
-                        setBikeOptimizationAdapter(false);
-                        showBikeParameters(false);
-                    }
+        mBtnModeWalk.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                setBikeOptimizationAdapter(!isChecked);
+                showBikeParameters(!isChecked);
+                mBtnModeRentedBike.setEnabled(isChecked);
+                updateModes(getSelectedTraverseModeSet(), mBtnPlanTrip);
+            }
+        });
 
-                    mBtnPlanTrip.setImageBitmap(BitmapFactory.decodeResource(getResources(),
-                            DirectionsGenerator
-                                    .getModeIcon(traverseModeSpinnerItem.getTraverseModeSet())));
-                }
-                Log.e(OTPApp.TAG,
-                        "Not possible to change travel mode because traverse mode is unknown"
-                                + "for selected transport medium");
+        mBtnModeBike.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                setBikeOptimizationAdapter(isChecked);
+                showBikeParameters(isChecked);
+                mBtnModeRentedBike.setEnabled(!isChecked);
+                updateModes(getSelectedTraverseModeSet(), mBtnPlanTrip);
+            }
+        });
+
+        mBtnModeRentedBike.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                setBikeOptimizationAdapter(isChecked);
+                showBikeParameters(isChecked);
+                mBtnModeBike.setEnabled(!isChecked);
+
+                updateModes(getSelectedTraverseModeSet(), mBtnPlanTrip);
+            }
+        });
+
+        mBtnModeBus.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                updateModes(getSelectedTraverseModeSet(), mBtnPlanTrip);
+            }
+        });
+
+        mBtnModeTrain.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                updateModes(getSelectedTraverseModeSet(), mBtnPlanTrip);
             }
         });
 
         mDdlOptimization.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                     int position, long id) {
-
+                SharedPreferences.Editor editor = mPrefs.edit();
+                editor.putInt(OTPApp.PREFERENCE_KEY_LAST_OPTIMIZATION, position);
+                editor.commit();
                 OptimizeSpinnerItem optimizeSpinnerItem = (OptimizeSpinnerItem) mDdlOptimization
                         .getItemAtPosition(position);
                 if (optimizeSpinnerItem != null) {
@@ -1171,6 +1188,105 @@ public class MainFragment extends Fragment implements
         });
 
         mBikeTriangleParameters.setOnRangeSeekBarChangeListener(this);
+    }
+
+    private void restorePanelUI(){
+        restoreOptimization();
+        restoreBikeParameters();
+        restoreTraverseModes();
+    }
+
+    private void restoreOptimization(){
+        int previousOptimization;
+        if ((previousOptimization =
+                mPrefs.getInt(mOTPApp.PREFERENCE_KEY_LAST_OPTIMIZATION, -1)) != -1){
+                mDdlOptimization.setSelection(previousOptimization);
+        }
+        else{
+            mDdlOptimization.setSelection(0);
+        }
+    }
+
+    private void restoreBikeParameters(){
+        double previousMinValue, previousMaxValue;
+        if ((previousMinValue = mPrefs.getFloat(OTPApp.PREFERENCE_KEY_LAST_BIKE_TRIANGLE_MIN_VALUE, -1)) != -1){
+            mBikeTriangleParameters.setSelectedMinValue(previousMinValue);
+        }
+        else {
+            mBikeTriangleParameters.setSelectedMinValue(OTPApp.BIKE_PARAMETERS_QUICK_DEFAULT_VALUE);
+        }
+        if ((previousMaxValue = mPrefs.getFloat(OTPApp.PREFERENCE_KEY_LAST_BIKE_TRIANGLE_MAX_VALUE, -1)) != -1){
+            mBikeTriangleParameters.setSelectedMaxValue(previousMaxValue);
+        }
+        else{
+            mBikeTriangleParameters.setSelectedMaxValue(OTPApp.BIKE_PARAMETERS_FLAT_DEFAULT_VALUE);
+        }
+
+    }
+
+    private void restoreTraverseModes(){
+        String lastTraverseModeSet;
+        if ((lastTraverseModeSet =
+                mPrefs.getString(OTPApp.PREFERENCE_KEY_LAST_TRAVERSE_MODE_SET, "")).equals("")){
+            mBtnModeWalk.setChecked(true);
+            mBtnModeBus.setChecked(true);
+            mBtnModeTrain.setChecked(true);
+            showBikeParameters(false);
+        }
+        else {
+            TraverseModeSet traverseModeSet = new TraverseModeSet(lastTraverseModeSet);
+            if (traverseModeSet != null) {
+                mBtnModeWalk.setChecked(traverseModeSet.getWalk());
+                mBtnModeBus.setChecked(traverseModeSet.getBus());
+                mBtnModeTrain.setChecked(traverseModeSet.getRail());
+                if (traverseModeSet.getWalk() && traverseModeSet.getBicycle()) {
+                    mBtnModeRentedBike.setEnabled(true);
+                    mBtnModeRentedBike.setChecked(true);
+                    mBtnModeBike.setEnabled(false);
+                    setBikeOptimizationAdapter(true);
+                    showBikeParameters(true);
+                } else if (!traverseModeSet.getWalk() && traverseModeSet.getBicycle()) {
+                    mBtnModeBike.setEnabled(true);
+                    mBtnModeBike.setChecked(true);
+                    mBtnModeRentedBike.setEnabled(false);
+                    setBikeOptimizationAdapter(true);
+                    showBikeParameters(true);
+                } else {
+                    mBtnModeBike.setEnabled(true);
+                    mBtnModeRentedBike.setEnabled(true);
+                    setBikeOptimizationAdapter(false);
+                    showBikeParameters(false);
+                }
+            } else {
+                Log.e(OTPApp.TAG, "Traverse mode set is null, UI not updated");
+            }
+        }
+    }
+
+    private TraverseModeSet getSelectedTraverseModeSet(){
+        TraverseModeSet selectedTraverseModeSet = new TraverseModeSet();
+        selectedTraverseModeSet.setWalk(mBtnModeWalk.isChecked()
+                || mBtnModeRentedBike.isChecked());
+        selectedTraverseModeSet.setBicycle(mBtnModeBike.isChecked()
+                || mBtnModeRentedBike.isChecked());
+        selectedTraverseModeSet.setBus(mBtnModeBus.isChecked());
+        selectedTraverseModeSet.setRail(mBtnModeTrain.isChecked());
+
+        return selectedTraverseModeSet;
+    }
+
+    private void updateModes(TraverseModeSet modeSet, ImageButton btnPlanTrip){
+        SharedPreferences.Editor editor = mPrefs.edit();
+        String modesString = modeSet.getAsStr();
+        editor.putString(OTPApp.PREFERENCE_KEY_LAST_TRAVERSE_MODE_SET, modesString);
+        editor.commit();
+        updatePlanTripButton(modeSet, btnPlanTrip);
+    }
+
+    private void updatePlanTripButton(TraverseModeSet modeSet, ImageButton btnPlanTrip){
+        btnPlanTrip.setImageBitmap(BitmapFactory.decodeResource(getResources(),
+                DirectionsGenerator
+                        .getModeIcon(modeSet)));
     }
 
     /**
@@ -1298,34 +1414,34 @@ public class MainFragment extends Fragment implements
                 mSavedLastLocationCheckedForServer = savedInstanceState
                         .getParcelable(OTPApp.BUNDLE_KEY_SAVED_LAST_LOCATION_CHECKED_FOR_SERVER);
 
-                showBikeParameters(false);
+                restorePanelUI();
 
-                mDdlTravelMode.setItemChecked(
-                        savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE), true);
-                TraverseModeSpinnerItem traverseModeSpinnerItem
-                        = (TraverseModeSpinnerItem) mDdlTravelMode
-                        .getItemAtPosition(mDdlTravelMode.getCheckedItemPosition());
-                if (traverseModeSpinnerItem != null) {
-                    // This should always be the case because if it's stored it was already checked
-                    if (traverseModeSpinnerItem.getTraverseModeSet()
-                            .contains(TraverseMode.BICYCLE)) {
-                        setBikeOptimizationAdapter(true);
-                        mDdlOptimization.setItemChecked(
-                                savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION),
-                                true);
-                        OptimizeSpinnerItem optimizeSpinnerItem
-                                = (OptimizeSpinnerItem) mDdlOptimization
-                                .getItemAtPosition(mDdlOptimization.getCheckedItemPosition());
-                        if (optimizeSpinnerItem != null) {
-                            if (optimizeSpinnerItem.getOptimizeType()
-                                    .equals(OptimizeType.TRIANGLE)) {
-                                showBikeParameters(true);
-                            }
-                        }
-                    }
-                }
-                mDdlTravelMode.setItemChecked(
-                        savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE), true);
+//                mDdlTravelMode.setItemChecked(
+//                        savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE), true);
+//                TraverseModeSpinnerItem traverseModeSpinnerItem
+//                        = (TraverseModeSpinnerItem) mDdlTravelMode
+//                        .getItemAtPosition(mDdlTravelMode.getCheckedItemPosition());
+//                if (traverseModeSpinnerItem != null) {
+//                    // This should always be the case because if it's stored it was already checked
+//                    if (traverseModeSpinnerItem.getTraverseModeSet()
+//                            .contains(TraverseMode.BICYCLE)) {
+//                        setBikeOptimizationAdapter(true);
+//                        mDdlOptimization.setItemChecked(
+//                                savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION),
+//                                true);
+//                        OptimizeSpinnerItem optimizeSpinnerItem
+//                                = (OptimizeSpinnerItem) mDdlOptimization
+//                                .getItemAtPosition(mDdlOptimization.getCheckedItemPosition());
+//                        if (optimizeSpinnerItem != null) {
+//                            if (optimizeSpinnerItem.getOptimizeType()
+//                                    .equals(OptimizeType.TRIANGLE)) {
+//                                showBikeParameters(true);
+//                            }
+//                        }
+//                    }
+//                }
+//                mDdlTravelMode.setItemChecked(
+//                        savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE), true);
 
                 OTPBundle otpBundle = (OTPBundle) savedInstanceState
                         .getSerializable(OTPApp.BUNDLE_KEY_OTP_BUNDLE);
@@ -1353,13 +1469,6 @@ public class MainFragment extends Fragment implements
                     mResultTripEndLocation = savedInstanceState
                             .getString(OTPApp.BUNDLE_KEY_RESULT_TRIP_END_LOCATION);
                 }
-
-                mBikeTriangleMinValue = savedInstanceState
-                        .getDouble(OTPApp.BUNDLE_KEY_SEEKBAR_MIN_VALUE);
-                mBikeTriangleMaxValue = savedInstanceState
-                        .getDouble(OTPApp.BUNDLE_KEY_SEEKBAR_MAX_VALUE);
-                mBikeTriangleParameters.setSelectedMinValue(mBikeTriangleMinValue);
-                mBikeTriangleParameters.setSelectedMaxValue(mBikeTriangleMaxValue);
 
                 mIsStartLocationChangedByUser = false;
                 mIsEndLocationChangedByUser = false;
@@ -1547,22 +1656,10 @@ public class MainFragment extends Fragment implements
                             + "likely results will be incorrect");
         }
 
-        TraverseModeSpinnerItem traverseModeSpinnerItem = (TraverseModeSpinnerItem) mDdlTravelMode
-                .getItemAtPosition(mDdlTravelMode.getCheckedItemPosition());
-        if (traverseModeSpinnerItem == null) {
-            traverseModeSpinnerItem = (TraverseModeSpinnerItem) mDdlTravelMode.getItemAtPosition(0);
-        }
-
-        if (traverseModeSpinnerItem != null) {
-            request.setModes(traverseModeSpinnerItem.getTraverseModeSet());
-        } else {
-            Log.e(OTPApp.TAG,
-                    "Traverse mode not found, not possible to add it to the request so, most"
-                            + "likely results will be incorrect");
-        }
+        request.setModes(getSelectedTraverseModeSet());
 
         Integer defaultMaxWalkInt = mApplicationContext.getResources()
-                .getInteger(R.integer.max_walking_distance);
+                 .getInteger(R.integer.max_walking_distance);
 
         try {
             Double maxWalk = Double
@@ -2155,10 +2252,8 @@ public class MainFragment extends Fragment implements
             }
             bundle.putString(OTPApp.BUNDLE_KEY_TB_END_LOCATION,
                     mTbEndLocation.getText().toString());
-            bundle.putInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION,
-                    mDdlOptimization.getCheckedItemPosition());
-            bundle.putInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE,
-                    mDdlTravelMode.getCheckedItemPosition());
+//            bundle.putInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE,
+//                    mDdlTravelMode.getCheckedItemPosition());
 
             bundle.putParcelable(OTPApp.BUNDLE_KEY_SAVED_LAST_LOCATION, mSavedLastLocation);
             bundle.putParcelable(OTPApp.BUNDLE_KEY_SAVED_LAST_LOCATION_CHECKED_FOR_SERVER,
@@ -2172,9 +2267,6 @@ public class MainFragment extends Fragment implements
                 bundle.putString(OTPApp.BUNDLE_KEY_RESULT_TRIP_END_LOCATION,
                         mResultTripEndLocation);
             }
-
-            bundle.putDouble(OTPApp.BUNDLE_KEY_SEEKBAR_MIN_VALUE, mBikeTriangleMinValue);
-            bundle.putDouble(OTPApp.BUNDLE_KEY_SEEKBAR_MAX_VALUE, mBikeTriangleMaxValue);
 
             bundle.putSerializable(OTPApp.BUNDLE_KEY_TRIP_DATE, mTripDate);
             bundle.putBoolean(OTPApp.BUNDLE_KEY_ARRIVE_BY, mArriveBy);
@@ -2707,11 +2799,8 @@ public class MainFragment extends Fragment implements
                 if (drawable != null) {
                     BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable.getCurrent();
                     Bitmap bitmap = bitmapDrawable.getBitmap();
-                    Bitmap bitmapHalfSize = Bitmap.createScaledBitmap(bitmap,
-                            (int) (bitmap.getWidth() / scaleFactor),
-                            (int) (bitmap.getHeight() / scaleFactor), false);
                     modeMarkerOption.icon(
-                            BitmapDescriptorFactory.fromBitmap(bitmapHalfSize));
+                            BitmapDescriptorFactory.fromBitmap(bitmap));
                 } else {
                     Log.e(OTPApp.TAG, "Error obtaining drawable to add mode icons to the map");
                 }
@@ -3438,6 +3527,11 @@ public class MainFragment extends Fragment implements
     @Override
     public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar,
             Double minValue, Double maxValue) {
+        SharedPreferences.Editor editor = mPrefs.edit();
+        editor.putFloat(OTPApp.PREFERENCE_KEY_LAST_BIKE_TRIANGLE_MIN_VALUE, minValue.floatValue());
+        editor.putFloat(OTPApp.PREFERENCE_KEY_LAST_BIKE_TRIANGLE_MAX_VALUE, maxValue.floatValue());
+        editor.commit();
+
         mBikeTriangleMinValue = minValue;
         mBikeTriangleMaxValue = maxValue;
         String bikeParam = minValue.toString() + maxValue.toString();
@@ -3457,11 +3551,8 @@ public class MainFragment extends Fragment implements
         if (drawable != null) {
             BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable.getCurrent();
             Bitmap bitmap = bitmapDrawable.getBitmap();
-            Bitmap bitmapHalfSize = Bitmap.createScaledBitmap(bitmap,
-                    (int) (bitmap.getWidth() / scaleFactor),
-                    (int) (bitmap.getHeight() / scaleFactor), false);
             bikeRentalStationMarkerOption.icon(
-                    BitmapDescriptorFactory.fromBitmap(bitmapHalfSize));
+                    BitmapDescriptorFactory.fromBitmap(bitmap));
         } else {
             Log.e(OTPApp.TAG, "Error obtaining drawable to add bike rental icons to the map");
         }
@@ -3472,7 +3563,7 @@ public class MainFragment extends Fragment implements
             bikeRentalStationMarkerOption.title(bikeRentalStation.name);
             bikeRentalStationMarkerOption.snippet(getResources()
                     .getString(R.string.map_markers_bike_rental_available_bikes) + " " +
-                    bikeRentalStation.bikesAvailable + " " + getResources()
+                    bikeRentalStation.bikesAvailable + " | " + getResources()
                     .getString(R.string.map_markers_bike_rental_available_spaces) + " " +
                     bikeRentalStation.spacesAvailable);
             Marker bikeRentalStationMarker = mMap.addMarker(bikeRentalStationMarkerOption);

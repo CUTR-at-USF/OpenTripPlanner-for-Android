@@ -165,36 +165,36 @@
             android:clickable="true"
             android:background="@android:color/background_light">
 
-        <LinearLayout
+            <LinearLayout
                 android:id="@+id/layoutOptimization"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_margin="4dp">
 
-            <TextView
-                    android:id="@+id/headerSpinOptimization"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="15sp"
-                    android:text="@string/left_panel_header_optimization">
-            </TextView>
+                <TextView
+                        android:id="@+id/headerSpinOptimization"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="15sp"
+                        android:text="@string/left_panel_header_optimization">
+                </TextView>
 
-            <ListView
-                    android:id="@+id/spinOptimization"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:choiceMode="singleChoice"
-                    android:divider="@android:color/darker_gray"
-                    android:dividerHeight="1dp"
-                    android:headerDividersEnabled="true"
-                    android:footerDividersEnabled="true"
-                    android:fadeScrollbars="false">
-            </ListView>
+                <ListView
+                        android:id="@+id/spinOptimization"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:choiceMode="singleChoice"
+                        android:divider="@android:color/darker_gray"
+                        android:dividerHeight="1dp"
+                        android:headerDividersEnabled="true"
+                        android:footerDividersEnabled="true"
+                        android:fadeScrollbars="false">
+                </ListView>
 
-        </LinearLayout>
+            </LinearLayout>
 
-        <LinearLayout
+            <LinearLayout
                 android:id="@+id/layoutMode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -203,27 +203,76 @@
                 android:layout_above="@+id/layoutBike"
                 android:layout_margin="4dp">
 
-            <TextView
+                <TextView
                     android:id="@+id/headerSpinTravelmode"
                     android:textSize="15sp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/left_panel_header_travel_mode">
-            </TextView>
+                    android:padding="4dp">
+                </TextView>
 
-            <ListView
-                    android:id="@+id/spinTravelMode"
+                <RadioGroup
+                    android:id="@+id/layoutModeNonTransit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:choiceMode="singleChoice"
-                    android:divider="@android:color/darker_gray"
-                    android:dividerHeight="1dp"
-                    android:headerDividersEnabled="true"
-                    android:footerDividersEnabled="true"
-                    android:fadeScrollbars="false">
-            </ListView>
+                    android:orientation="horizontal"
+                    android:padding="4dp">
 
-        </LinearLayout>
+                    <RadioButton
+                        android:id="@+id/btnModeWalk"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:drawableBottom="@drawable/mode_walk"/>
+
+                    <RadioButton
+                        android:id="@+id/btnModeBike"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:drawableBottom="@drawable/mode_bike"/>
+
+                </RadioGroup>
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@android:drawable/ic_input_add"
+                    android:layout_gravity="center"
+                    android:padding="4dp"/>
+
+                <LinearLayout
+                    android:id="@+id/layoutModeTransitFirstLine"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="4dp">
+
+                    <CheckBox
+                        android:id="@+id/btnModeBus"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:drawableBottom="@drawable/mode_bus"/>
+
+                    <CheckBox
+                        android:id="@+id/btnModeTrain"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:drawableBottom="@drawable/mode_train"/>
+
+                    <CheckBox
+                        android:id="@+id/btnModeRentedBike"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:drawableBottom="@drawable/mode_bike_rental"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
 
         <ScrollView
                 android:id="@+id/layoutBike"

@@ -102,10 +102,6 @@ public class OTPApp extends Application {
 
     public static final String BUNDLE_KEY_TB_END_LOCATION = "tbEndLocation";
 
-    public static final String BUNDLE_KEY_DDL_OPTIMIZATION = "ddlOptimization";
-
-    public static final String BUNDLE_KEY_DDL_TRAVEL_MODE = "ddlTravelMode";
-
     public static final String BUNDLE_KEY_OTP_BUNDLE = "OTP bundle";
 
     public static final String BUNDLE_KEY_APP_STARTS = "app starts";
@@ -130,11 +126,6 @@ public class OTPApp extends Application {
 
     public static final String BUNDLE_KEY_SAVED_LAST_LOCATION_CHECKED_FOR_SERVER
             = "saved last location checked for server";
-
-
-    public static final String BUNDLE_KEY_SEEKBAR_MIN_VALUE = "seekbar min value";
-
-    public static final String BUNDLE_KEY_SEEKBAR_MAX_VALUE = "seekbar max value";
 
     public static final String BUNDLE_KEY_TRIP_DATE = "trip date";
 
@@ -187,6 +178,13 @@ public class OTPApp extends Application {
 
     public static final String PREFERENCE_KEY_USE_DEVICE_TIMEZONE = "use_device_timezone";
 
+    public static final String PREFERENCE_KEY_LAST_TRAVERSE_MODE_SET = "last_traverse_mode_set";
+
+    public static final String PREFERENCE_KEY_LAST_BIKE_TRIANGLE_MIN_VALUE = "last_bike_triangle_min_value";
+
+    public static final String PREFERENCE_KEY_LAST_BIKE_TRIANGLE_MAX_VALUE = "last_bike_triangle_max_value";
+
+    public static final String PREFERENCE_KEY_LAST_OPTIMIZATION = "last_optimization";
 
     private static Server selectedServer;
 
