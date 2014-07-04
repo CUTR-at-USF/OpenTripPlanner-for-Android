@@ -69,8 +69,8 @@
             <!-- Info pop-ups -->
 
                 <!-- Availability info -->
-                <string name="map_markers_bike_rental_available_spaces">Puestos libres:</string>
-                <string name="map_markers_bike_rental_available_bikes">Bicis disponibles:</string>
+                <string name="map_markers_bike_rental_available_spaces">Huecos:</string>
+                <string name="map_markers_bike_rental_available_bikes"> Bicis:</string>
 
 
         <!-- Toast messages -->

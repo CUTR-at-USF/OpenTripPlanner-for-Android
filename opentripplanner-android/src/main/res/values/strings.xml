@@ -68,7 +68,7 @@
             <!-- Info pop-ups -->
 
                 <!-- Availability info -->
-                <string name="map_markers_bike_rental_available_spaces">Free slots:</string>
+                <string name="map_markers_bike_rental_available_spaces">Slots:</string>
                 <string name="map_markers_bike_rental_available_bikes">Bikes:</string>
 
 
