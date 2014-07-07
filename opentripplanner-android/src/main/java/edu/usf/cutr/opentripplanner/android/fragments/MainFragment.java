@@ -1183,12 +1183,21 @@ public class MainFragment extends Fragment implements
         mBikeTriangleParameters.setOnRangeSeekBarChangeListener(this);
     }
 
+    /**
+     * Wrapper to call the functions to recover trip options (traverse mode, optimization type and
+     * bike parameters) to last state, before closing the app, if there isn't data functions set
+     * options to default value. If it's needed UI update is also processed.
+     */
     private void restorePanelUI(){
         restoreTraverseModes();
         restoreBikeParameters();
         restoreOptimization();
     }
 
+    /**
+     * Recovers trip optimization value to last state, before closing the app, if there isn't data
+     * sets default value.
+     */
     private void restoreOptimization(){
         int previousOptimization;
         if ((previousOptimization =
@@ -1203,6 +1212,10 @@ public class MainFragment extends Fragment implements
         }
     }
 
+    /**
+     * Recovers bike parameters to last state, before closing the app, if there isn't data sets
+     * default value.
+     */
     private void restoreBikeParameters(){
         double previousMinValue, previousMaxValue;
         if ((previousMinValue = mPrefs.getFloat(OTPApp.PREFERENCE_KEY_LAST_BIKE_TRIANGLE_MIN_VALUE, -1)) != -1){
@@ -1220,6 +1233,10 @@ public class MainFragment extends Fragment implements
 
     }
 
+    /**
+     * Recovers trip traverse mode to last state, before closing the app, if there isn't data
+     * sets default value. It also updates UI according to the new modes.
+     */
     private void restoreTraverseModes(){
         String lastTraverseModeSet;
         if ((lastTraverseModeSet =
@@ -1721,12 +1738,16 @@ public class MainFragment extends Fragment implements
     }
 
     /**
-     * Changes optimization spinner values to show values compatibles with
-     * bikes or with transit.
+     * Changes optimization spinner values to show ones compatible with
+     * bikes or with transit. If updateOptimizationValue is true values of the spinner are also
+     * modified to adapt to bike.
      * <p>
      * Replaces fewest transfers with safer trip options.
      *
      * @param enable when true spinner is set to bike values
+     * @param updateOptimizationValue when true optimization spinner values are modified to select
+     *                                by default "custom trip" by bike and restore previous value
+     *                                when bike mode is abandoned
      */
     private void setBikeOptimizationAdapter(boolean enable, boolean updateOptimizationValue) {
         ArrayAdapter<OptimizeSpinnerItem> optimizationAdapter;
@@ -1912,10 +1933,13 @@ public class MainFragment extends Fragment implements
     /**
      * Registers the server in the OTPApp class.
      * <p>
-     * UI is restored to avoid presence of all server data, removing all
+     * UI may be restored to avoid presence of all server data, removing all
      * objects from the map and restarting text boxes to default contents.
      * <p>
      * OTPApp can be requested calling to getActivity by other fragments.
+     *
+     * @param s new server to be set
+     * @param restartUI if true UI will be restarted to adapt to new server
      */
     private void setSelectedServer(Server s, boolean restartUI) {
         if (restartUI) {
@@ -2367,6 +2391,12 @@ public class MainFragment extends Fragment implements
     }
 
 
+    /**
+     * Updates server to the new one set in preferences and also makes some UI changes (camera
+     * movements) if specified.
+     *
+     * @param updateUI also updateUI, not useful if changes should occur on background
+     */
     public void updateSelectedServer(boolean updateUI) {
         long serverId;
         Server server;
