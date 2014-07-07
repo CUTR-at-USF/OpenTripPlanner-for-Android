@@ -160,8 +160,6 @@ import edu.usf.cutr.opentripplanner.android.util.RangeSeekBar;
 import edu.usf.cutr.opentripplanner.android.util.RangeSeekBar.OnRangeSeekBarChangeListener;
 import edu.usf.cutr.opentripplanner.android.util.RightDrawableOnTouchListener;
 
-import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS;
-
 /**
  * Main UI screen of the mOTPApp, showing the map.
  *
@@ -208,8 +206,6 @@ public class MainFragment extends Fragment implements
     private ViewGroup mNavigationDrawerLeftPane;
 
     private ListView mDdlOptimization;
-
-    private RadioGroup mDdlTravelModeNonTransit;
 
     private CheckBox mBtnModeBus;
 
@@ -295,6 +291,8 @@ public class MainFragment extends Fragment implements
     private List<Polyline> mRoute;
 
     private ArrayList<Marker> mBikeRentalStationsMarkers;
+
+    private int mOptimizationValueToRestoreWhenNoBike;
 
     private Date mTripDate;
 
@@ -422,8 +420,6 @@ public class MainFragment extends Fragment implements
             mDdlOptimization = (ListView) mainView
                     .findViewById(R.id.spinOptimization);
 
-            mDdlTravelModeNonTransit = (RadioGroup) mainView.findViewById(R.id.layoutModeNonTransit);
-
             mBtnModeWalk = (RadioButton) mainView.findViewById(R.id.btnModeWalk);
             mBtnModeBike = (RadioButton) mainView.findViewById(R.id.btnModeBike);
             mBtnModeBus = (CheckBox) mainView.findViewById(R.id.btnModeBus);
@@ -536,8 +532,6 @@ public class MainFragment extends Fragment implements
         restoreState(savedInstanceState);
 
         if (savedInstanceState == null) {
-            mDdlOptimization.setItemChecked(0, true);
-//            mDdlTravelMode.setItemChecked(0, true);
             restorePanelUI();
             mArriveBy = false;
             setTextBoxLocation(getResources().getString(R.string.text_box_my_location), true);
@@ -1127,9 +1121,6 @@ public class MainFragment extends Fragment implements
         mBtnModeWalk.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                setBikeOptimizationAdapter(!isChecked);
-                showBikeParameters(!isChecked);
-                mBtnModeRentedBike.setEnabled(isChecked);
                 updateModes(getSelectedTraverseModeSet(), mBtnPlanTrip);
             }
         });
@@ -1137,7 +1128,7 @@ public class MainFragment extends Fragment implements
         mBtnModeBike.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                setBikeOptimizationAdapter(isChecked);
+                setBikeOptimizationAdapter(isChecked, true);
                 showBikeParameters(isChecked);
                 mBtnModeRentedBike.setEnabled(!isChecked);
                 updateModes(getSelectedTraverseModeSet(), mBtnPlanTrip);
@@ -1147,10 +1138,9 @@ public class MainFragment extends Fragment implements
         mBtnModeRentedBike.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                setBikeOptimizationAdapter(isChecked);
+                setBikeOptimizationAdapter(isChecked, true);
                 showBikeParameters(isChecked);
                 mBtnModeBike.setEnabled(!isChecked);
-
                 updateModes(getSelectedTraverseModeSet(), mBtnPlanTrip);
             }
         });
@@ -1172,6 +1162,9 @@ public class MainFragment extends Fragment implements
         mDdlOptimization.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                     int position, long id) {
+                if (getSelectedTraverseModeSet().getBicycle()) {
+                    mOptimizationValueToRestoreWhenNoBike = position;
+                }
                 SharedPreferences.Editor editor = mPrefs.edit();
                 editor.putInt(OTPApp.PREFERENCE_KEY_LAST_OPTIMIZATION, position);
                 editor.commit();
@@ -1191,19 +1184,22 @@ public class MainFragment extends Fragment implements
     }
 
     private void restorePanelUI(){
-        restoreOptimization();
-        restoreBikeParameters();
         restoreTraverseModes();
+        restoreBikeParameters();
+        restoreOptimization();
     }
 
     private void restoreOptimization(){
         int previousOptimization;
         if ((previousOptimization =
                 mPrefs.getInt(mOTPApp.PREFERENCE_KEY_LAST_OPTIMIZATION, -1)) != -1){
-                mDdlOptimization.setSelection(previousOptimization);
+            mDdlOptimization.setItemChecked(previousOptimization, true);
         }
         else{
-            mDdlOptimization.setSelection(0);
+            SharedPreferences.Editor editor = mPrefs.edit();
+            editor.putInt(OTPApp.PREFERENCE_KEY_LAST_OPTIMIZATION, 0);
+            editor.commit();
+            mDdlOptimization.setItemChecked(0, true);
         }
     }
 
@@ -1232,6 +1228,7 @@ public class MainFragment extends Fragment implements
             mBtnModeBus.setChecked(true);
             mBtnModeTrain.setChecked(true);
             showBikeParameters(false);
+            setBikeOptimizationAdapter(false, false);
         }
         else {
             TraverseModeSet traverseModeSet = new TraverseModeSet(lastTraverseModeSet);
@@ -1243,19 +1240,19 @@ public class MainFragment extends Fragment implements
                     mBtnModeRentedBike.setEnabled(true);
                     mBtnModeRentedBike.setChecked(true);
                     mBtnModeBike.setEnabled(false);
-                    setBikeOptimizationAdapter(true);
-                    showBikeParameters(true);
                 } else if (!traverseModeSet.getWalk() && traverseModeSet.getBicycle()) {
                     mBtnModeBike.setEnabled(true);
                     mBtnModeBike.setChecked(true);
                     mBtnModeRentedBike.setEnabled(false);
-                    setBikeOptimizationAdapter(true);
-                    showBikeParameters(true);
                 } else {
                     mBtnModeBike.setEnabled(true);
                     mBtnModeRentedBike.setEnabled(true);
-                    setBikeOptimizationAdapter(false);
+                    setBikeOptimizationAdapter(false, false);
                     showBikeParameters(false);
+                }
+                if (traverseModeSet.getBicycle()){
+                    setBikeOptimizationAdapter(true, false);
+                    showBikeParameters(mPrefs.getInt(OTPApp.PREFERENCE_KEY_LAST_OPTIMIZATION, -1) == 2);
                 }
             } else {
                 Log.e(OTPApp.TAG, "Traverse mode set is null, UI not updated");
@@ -1415,33 +1412,6 @@ public class MainFragment extends Fragment implements
                         .getParcelable(OTPApp.BUNDLE_KEY_SAVED_LAST_LOCATION_CHECKED_FOR_SERVER);
 
                 restorePanelUI();
-
-//                mDdlTravelMode.setItemChecked(
-//                        savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE), true);
-//                TraverseModeSpinnerItem traverseModeSpinnerItem
-//                        = (TraverseModeSpinnerItem) mDdlTravelMode
-//                        .getItemAtPosition(mDdlTravelMode.getCheckedItemPosition());
-//                if (traverseModeSpinnerItem != null) {
-//                    // This should always be the case because if it's stored it was already checked
-//                    if (traverseModeSpinnerItem.getTraverseModeSet()
-//                            .contains(TraverseMode.BICYCLE)) {
-//                        setBikeOptimizationAdapter(true);
-//                        mDdlOptimization.setItemChecked(
-//                                savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_OPTIMIZATION),
-//                                true);
-//                        OptimizeSpinnerItem optimizeSpinnerItem
-//                                = (OptimizeSpinnerItem) mDdlOptimization
-//                                .getItemAtPosition(mDdlOptimization.getCheckedItemPosition());
-//                        if (optimizeSpinnerItem != null) {
-//                            if (optimizeSpinnerItem.getOptimizeType()
-//                                    .equals(OptimizeType.TRIANGLE)) {
-//                                showBikeParameters(true);
-//                            }
-//                        }
-//                    }
-//                }
-//                mDdlTravelMode.setItemChecked(
-//                        savedInstanceState.getInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE), true);
 
                 OTPBundle otpBundle = (OTPBundle) savedInstanceState
                         .getSerializable(OTPApp.BUNDLE_KEY_OTP_BUNDLE);
@@ -1758,8 +1728,15 @@ public class MainFragment extends Fragment implements
      *
      * @param enable when true spinner is set to bike values
      */
-    private void setBikeOptimizationAdapter(boolean enable) {
+    private void setBikeOptimizationAdapter(boolean enable, boolean updateOptimizationValue) {
         ArrayAdapter<OptimizeSpinnerItem> optimizationAdapter;
+        int newOptimizationValue;
+
+        if (updateOptimizationValue){
+            if (enable){
+                mOptimizationValueToRestoreWhenNoBike = mDdlOptimization.getCheckedItemPosition();
+            }
+        }
 
         if (enable) {
             optimizationAdapter = new ArrayAdapter<OptimizeSpinnerItem>(
@@ -1776,7 +1753,6 @@ public class MainFragment extends Fragment implements
                                     getResources().getString(R.string.left_panel_optimization_bike_triangle),
                                     OptimizeType.TRIANGLE)});
             mDdlOptimization.setAdapter(optimizationAdapter);
-            mDdlOptimization.setItemChecked(2, true);
         } else {
             optimizationAdapter = new ArrayAdapter<OptimizeSpinnerItem>(
                     getActivity(),
@@ -1792,7 +1768,26 @@ public class MainFragment extends Fragment implements
                                     .getString(R.string.left_panel_optimization_fewest_transfers),
                                     OptimizeType.TRANSFERS)});
             mDdlOptimization.setAdapter(optimizationAdapter);
-            mDdlOptimization.setItemChecked(0, true);
+        }
+        if (updateOptimizationValue){
+            if (enable){
+                newOptimizationValue = 2;
+            }
+            else{
+                if (mOptimizationValueToRestoreWhenNoBike != -1){
+                    newOptimizationValue = mOptimizationValueToRestoreWhenNoBike;
+                }
+                else if (mPrefs.getInt(OTPApp.PREFERENCE_KEY_LAST_OPTIMIZATION, -1) != -1){
+                    newOptimizationValue = mPrefs.getInt(OTPApp.PREFERENCE_KEY_LAST_OPTIMIZATION, -1);
+                }
+                else{
+                    newOptimizationValue = 0;
+                }
+            }
+            mDdlOptimization.setItemChecked(newOptimizationValue, true);
+            SharedPreferences.Editor editor = mPrefs.edit();
+            editor.putInt(OTPApp.PREFERENCE_KEY_LAST_OPTIMIZATION, newOptimizationValue);
+            editor.commit();
         }
     }
 
@@ -2252,8 +2247,6 @@ public class MainFragment extends Fragment implements
             }
             bundle.putString(OTPApp.BUNDLE_KEY_TB_END_LOCATION,
                     mTbEndLocation.getText().toString());
-//            bundle.putInt(OTPApp.BUNDLE_KEY_DDL_TRAVEL_MODE,
-//                    mDdlTravelMode.getCheckedItemPosition());
 
             bundle.putParcelable(OTPApp.BUNDLE_KEY_SAVED_LAST_LOCATION, mSavedLastLocation);
             bundle.putParcelable(OTPApp.BUNDLE_KEY_SAVED_LAST_LOCATION_CHECKED_FOR_SERVER,
@@ -3227,7 +3220,7 @@ public class MainFragment extends Fragment implements
 
             SharedPreferences.Editor prefsEditor = PreferenceManager
                     .getDefaultSharedPreferences(mApplicationContext).edit();
-            prefsEditor.putString(PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS, bounds);
+            prefsEditor.putString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS, bounds);
             prefsEditor.commit();
 
             Log.v(OTPApp.TAG, "LowerLeft: " + Double.toString(lowerLeftLatitude) + "," + Double
@@ -3544,8 +3537,6 @@ public class MainFragment extends Fragment implements
         mBikeRentalStationsMarkers = new ArrayList<Marker>(bikeRentalStationList.size());
 
         MarkerOptions bikeRentalStationMarkerOption = new MarkerOptions();
-
-        float scaleFactor = getResources().getFraction(R.fraction.scaleFactor, 1, 1);
 
         Drawable drawable = getResources().getDrawable(R.drawable.parking_bicycle);
         if (drawable != null) {
