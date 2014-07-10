@@ -202,6 +202,7 @@
                 android:layout_below="@id/layoutOptimization"
                 android:layout_above="@+id/layoutBike"
                 android:layout_margin="4dp">
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/headerSpinTravelmode"
