@@ -406,12 +406,7 @@ public class Server {
     }
 
     public void setBikeRental(String bikeRental) {
-        if (bikeRental.contains("yes")){
-            this.offersBikeRental = true;
-        }
-        else{
-            this.offersBikeRental = false;
-        }
+        this.offersBikeRental = Boolean.parseBoolean(bikeRental);
     }
 
 }

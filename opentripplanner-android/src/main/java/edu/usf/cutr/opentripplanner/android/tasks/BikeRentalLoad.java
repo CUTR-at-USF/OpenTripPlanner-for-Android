@@ -44,8 +44,6 @@ import edu.usf.cutr.opentripplanner.android.listeners.BikeRentalLoadCompleteList
 
 public class BikeRentalLoad extends AsyncTask<String, Integer, List<BikeRentalStation>> {
 
-    private ProgressDialog progressDialog;
-
     private WeakReference<Activity> activity;
 
     private Context context;
@@ -54,15 +52,13 @@ public class BikeRentalLoad extends AsyncTask<String, Integer, List<BikeRentalSt
 
     private static ObjectMapper mapper = null;
 
-    public BikeRentalLoad(WeakReference<Activity> activity, Context context,
+    private boolean firstLoad;
+
+    public BikeRentalLoad(Context context, boolean firstLoad,
                           BikeRentalLoadCompleteListener callback) {
-        this.activity = activity;
         this.context = context;
+        this.firstLoad = firstLoad;
         this.callback = callback;
-        Activity activityRetrieved = activity.get();
-        if (activityRetrieved != null) {
-            progressDialog = new ProgressDialog(activityRetrieved);
-        }
     }
 
     protected void onPreExecute() {
@@ -99,26 +95,21 @@ public class BikeRentalLoad extends AsyncTask<String, Integer, List<BikeRentalSt
     }
 
     protected void onPostExecute(List<BikeRentalStation> bikeRentalStationList) {
-        if (activity.get() != null) {
-            try {
-                if (progressDialog != null && progressDialog.isShowing()) {
-                    progressDialog.dismiss();
-                }
-            } catch (Exception e) {
-                Log.e(OTPApp.TAG, "Error in bike rental load stations Request PostExecute dismissing dialog: " + e);
-            }
-        }
-
         if (bikeRentalStationList != null) {
-            Toast.makeText(context,
-                    context.getResources().getString(R.string.toast_bike_rental_load_request_successful),
-                    Toast.LENGTH_SHORT).show();
-            callback.onBikeRentalStationListLoad(bikeRentalStationList);
+            if (firstLoad){
+                Toast.makeText(context,
+                        context.getResources().getString(R.string.toast_bike_rental_load_request_successful),
+                        Toast.LENGTH_SHORT).show();
+                callback.onBikeRentalStationListLoad(bikeRentalStationList);
+            }
+            else{
+                callback.onBikeRentalStationListUpdate(bikeRentalStationList);
+            }
         } else {
             Toast.makeText(context, context.getResources().getString(R.string.toast_bike_rental_load_request_error),
                     Toast.LENGTH_SHORT).show();
-
             Log.e(OTPApp.TAG, "No bike rental stations!");
+            callback.onBikeRentalStationListFail();
         }
     }
 }

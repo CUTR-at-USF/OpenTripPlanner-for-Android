@@ -18,6 +18,8 @@ package edu.usf.cutr.opentripplanner.android;
 
 import android.app.Application;
 
+import java.util.concurrent.TimeUnit;
+
 import edu.usf.cutr.opentripplanner.android.model.Server;
 
 /*
@@ -137,6 +139,8 @@ public class OTPApp extends Application {
 
     public static final String BUNDLE_KEY_SETTINGS_INTENT = "timepicker minutes";
 
+    public static final String BUNDLE_KEY__IS_ALARM_BIKE_RENTAL_ACTIVE = "is alarm bike rental active";
+
     public static final int COLOR_ROUTE_LINE = 0x7F0000FF;
 
     /**
@@ -209,6 +213,11 @@ public class OTPApp extends Application {
     public static final String FORMAT_OTP_SERVER_DATE_QUERY = "MM/dd/yy";
 
     public static final String FORMAT_OTP_SERVER_TIME_QUERY = "kk:mm";
+
+    public static final long DEFAULT_UPDATE_INTERVAL = TimeUnit.SECONDS.toMillis(40);
+
+    public static final String INTENT_UPDATE_BIKE_RENTAL_ACTION
+            = "edu.usf.cutr.opentripplanner.android.OpenTripPlanner.UPDATE_BIKE_RENTAL";
 
 
     /**
