@@ -1326,7 +1326,7 @@ public class MainFragment extends Fragment implements
 
     private void updateModes(TraverseModeSet modeSet, ImageButton btnPlanTrip){
         SharedPreferences.Editor editor = mPrefs.edit();
-        String modesString = modeSet.getAsStr();
+        String modesString = modeSet.toString();
         editor.putString(OTPApp.PREFERENCE_KEY_LAST_TRAVERSE_MODE_SET, modesString);
         editor.commit();
         updatePlanTripButton(modeSet, btnPlanTrip);
