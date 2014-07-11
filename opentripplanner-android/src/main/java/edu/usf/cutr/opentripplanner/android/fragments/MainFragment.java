@@ -214,6 +214,8 @@ public class MainFragment extends Fragment implements
 
     private CheckBox mBtnModeTrain;
 
+    private CheckBox mBtnModeFerry;
+
     private CheckBox mBtnModeRentedBike;
 
     private RadioButton mBtnModeWalk;
@@ -439,6 +441,7 @@ public class MainFragment extends Fragment implements
             mBtnModeBike = (RadioButton) mainView.findViewById(R.id.btnModeBike);
             mBtnModeBus = (CheckBox) mainView.findViewById(R.id.btnModeBus);
             mBtnModeTrain = (CheckBox) mainView.findViewById(R.id.btnModeTrain);
+            mBtnModeFerry = (CheckBox) mainView.findViewById(R.id.btnModeFerry);
             mBtnModeRentedBike = (CheckBox) mainView.findViewById(R.id.btnModeRentedBike);
 
             mBikeTriangleParameters = new RangeSeekBar<Double>(OTPApp.BIKE_PARAMETERS_MIN_VALUE,
@@ -1175,6 +1178,13 @@ public class MainFragment extends Fragment implements
         });
 
         mBtnModeTrain.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                updateModes(getSelectedTraverseModeSet(), mBtnPlanTrip);
+            }
+        });
+
+        mBtnModeFerry.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 updateModes(getSelectedTraverseModeSet(), mBtnPlanTrip);

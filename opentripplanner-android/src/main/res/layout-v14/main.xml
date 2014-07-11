@@ -266,6 +266,32 @@
 
                 </LinearLayout>
 
+                <LinearLayout
+                    android:id="@+id/layoutModeTransitSecondLine"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="4dp">
+
+                    <CheckBox
+                        android:id="@+id/btnModeFerry"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:drawableBottom="@drawable/mode_ferry"/>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                </LinearLayout>
+
             </LinearLayout>
 
         <ScrollView
