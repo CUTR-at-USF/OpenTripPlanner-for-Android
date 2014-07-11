@@ -246,7 +246,8 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
                         try {
                             Server s = new Server(currentTime, serverString[0], serverString[1],
                                     serverString[2], serverString[3], serverString[4],
-                                    serverString[5], serverString[6], serverString[7]);
+                                    serverString[5], serverString[6], serverString[7],
+                                    serverString[8]);
                             serverList.add(s);
                         } catch (ServerListParsingException e) {
                             Log.e(OTPApp.TAG,
