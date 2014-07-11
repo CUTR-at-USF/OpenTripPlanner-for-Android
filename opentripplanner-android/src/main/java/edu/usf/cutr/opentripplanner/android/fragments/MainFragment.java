@@ -1276,6 +1276,7 @@ public class MainFragment extends Fragment implements
             mBtnModeWalk.setChecked(true);
             mBtnModeBus.setChecked(true);
             mBtnModeTrain.setChecked(true);
+            mBtnModeFerry.setChecked(true);
             showBikeParameters(false);
             setBikeOptimizationAdapter(false, false);
         }
@@ -1285,6 +1286,7 @@ public class MainFragment extends Fragment implements
                 mBtnModeWalk.setChecked(traverseModeSet.getWalk());
                 mBtnModeBus.setChecked(traverseModeSet.getBus());
                 mBtnModeTrain.setChecked(traverseModeSet.getRail());
+                mBtnModeFerry.setChecked(traverseModeSet.getFerry());
                 if (traverseModeSet.getWalk() && traverseModeSet.getBicycle()) {
                     mBtnModeRentedBike.setEnabled(true);
                     mBtnModeRentedBike.setChecked(true);
@@ -1317,6 +1319,7 @@ public class MainFragment extends Fragment implements
                 || mBtnModeRentedBike.isChecked());
         selectedTraverseModeSet.setBus(mBtnModeBus.isChecked());
         selectedTraverseModeSet.setRail(mBtnModeTrain.isChecked());
+        selectedTraverseModeSet.setFerry(mBtnModeFerry.isChecked());
 
         return selectedTraverseModeSet;
     }
