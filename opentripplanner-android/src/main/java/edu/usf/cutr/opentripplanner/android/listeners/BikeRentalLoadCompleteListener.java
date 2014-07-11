@@ -24,4 +24,8 @@ public interface BikeRentalLoadCompleteListener {
 
     public void onBikeRentalStationListLoad(List<BikeRentalStation> bikeRentalStationCollection);
 
+    public void onBikeRentalStationListUpdate(List<BikeRentalStation> bikeRentalStationCollection);
+
+    public void onBikeRentalStationListFail();
+
 }
