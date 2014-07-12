@@ -41,12 +41,13 @@ import com.google.android.gms.maps.model.TileOverlayOptions;
 
 import org.opentripplanner.api.ws.GraphMetadata;
 import org.opentripplanner.api.ws.Request;
+import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.v092snapshot.api.model.Itinerary;
-import org.opentripplanner.v092snapshot.api.model.Leg;
+import org.opentripplanner.api.model.Itinerary;
+import org.opentripplanner.api.model.Leg;
 
 import android.animation.LayoutTransition;
 import android.annotation.TargetApi;
@@ -54,6 +55,7 @@ import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -81,6 +83,7 @@ import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.DrawerLayout.DrawerListener;
 import android.text.Editable;
@@ -129,7 +132,10 @@ import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -142,6 +148,7 @@ import edu.usf.cutr.opentripplanner.android.listeners.DateCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.MetadataRequestCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.OTPGeocodingListener;
 import edu.usf.cutr.opentripplanner.android.listeners.OtpFragment;
+import edu.usf.cutr.opentripplanner.android.listeners.RequestTimesForTripsCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.ServerSelectorCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.TripRequestCompleteListener;
 import edu.usf.cutr.opentripplanner.android.maps.CustomUrlTileProvider;
@@ -152,13 +159,16 @@ import edu.usf.cutr.opentripplanner.android.sqlite.ServersDataSource;
 import edu.usf.cutr.opentripplanner.android.tasks.BikeRentalLoad;
 import edu.usf.cutr.opentripplanner.android.tasks.MetadataRequest;
 import edu.usf.cutr.opentripplanner.android.tasks.OTPGeocoding;
+import edu.usf.cutr.opentripplanner.android.tasks.RequestTimesForTrips;
 import edu.usf.cutr.opentripplanner.android.tasks.ServerChecker;
 import edu.usf.cutr.opentripplanner.android.tasks.ServerSelector;
 import edu.usf.cutr.opentripplanner.android.tasks.TripRequest;
 import edu.usf.cutr.opentripplanner.android.util.ConversionUtils;
+import edu.usf.cutr.opentripplanner.android.util.CustomInfoWindowAdapter;
 import edu.usf.cutr.opentripplanner.android.util.DateTimeDialog;
 import edu.usf.cutr.opentripplanner.android.util.DirectionsGenerator;
 import edu.usf.cutr.opentripplanner.android.util.LocationUtil;
+import edu.usf.cutr.opentripplanner.android.util.TripInfo;
 import edu.usf.cutr.opentripplanner.android.util.RangeSeekBar;
 import edu.usf.cutr.opentripplanner.android.util.RangeSeekBar.OnRangeSeekBarChangeListener;
 import edu.usf.cutr.opentripplanner.android.util.RightDrawableOnTouchListener;
@@ -172,8 +182,9 @@ import edu.usf.cutr.opentripplanner.android.util.RightDrawableOnTouchListener;
 public class MainFragment extends Fragment implements
         ServerSelectorCompleteListener,
         TripRequestCompleteListener, MetadataRequestCompleteListener,
-        BikeRentalLoadCompleteListener, OTPGeocodingListener, DateCompleteListener,
-        OnRangeSeekBarChangeListener<Double>, GooglePlayServicesClient.OnConnectionFailedListener,
+        BikeRentalLoadCompleteListener, RequestTimesForTripsCompleteListener, OTPGeocodingListener,
+        DateCompleteListener, OnRangeSeekBarChangeListener<Double>,
+        GooglePlayServicesClient.OnConnectionFailedListener,
         GooglePlayServicesClient.ConnectionCallbacks,
         GoogleMap.OnCameraChangeListener {
 
@@ -291,7 +302,7 @@ public class MainFragment extends Fragment implements
     private boolean mRequestTripAfterEndGeocoding = false;
 
     private boolean mRequestTripAfterStartEndGeocoding = false;
-    private ArrayList<Marker> mModeMarkers;
+    private Map<Marker, TripInfo> mModeMarkers;
 
     private List<Polyline> mRoute;
 
@@ -313,15 +324,23 @@ public class MainFragment extends Fragment implements
 
     private AlarmManager mAlarmMgr;
 
-    PendingIntent mAlarmIntentBikeRental;
+    PendingIntent mAlarmIntentTripTimeUpdate;
 
-    boolean mIsAlarmBikeRentalActive;
+    boolean mIsAlarmTripTimeUpdateActive;
+
+    PendingIntent mAlarmIntentBikeRentalUpdate;
+
+    boolean mIsAlarmBikeRentalUpdateActive;
 
     AlarmReceiver mAlarmReceiver;
 
-    IntentFilter intentFilter;
+    IntentFilter mIntentFilter;
 
-    Intent bikeRentalIntent;
+    Intent mTripTimeUpdateIntent;
+
+    Intent mBikeRentalUpdateIntent;
+
+    CustomInfoWindowAdapter mCustomInfoWindowAdapter;
 
     @SuppressWarnings("deprecation")
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -502,11 +521,17 @@ public class MainFragment extends Fragment implements
 
         mApplicationContext = getActivity().getApplicationContext();
 
-        intentFilter = new IntentFilter(OTPApp.INTENT_UPDATE_BIKE_RENTAL_ACTION);
-        bikeRentalIntent = new Intent(OTPApp.INTENT_UPDATE_BIKE_RENTAL_ACTION);
-        mAlarmIntentBikeRental = PendingIntent.getBroadcast(mApplicationContext, 0, bikeRentalIntent, 0);
+        mIntentFilter = new IntentFilter(OTPApp.INTENT_UPDATE_BIKE_RENTAL_ACTION);
+        mIntentFilter.addAction(OTPApp.INTENT_UPDATE_TRIP_TIME_ACTION);
+        mIntentFilter.addAction(OTPApp.INTENT_NOTIFICATION_ACTION_OPEN_APP);
+        mIntentFilter.addAction(OTPApp.INTENT_NOTIFICATION_ACTION_DISMISS_UPDATES);
+        mBikeRentalUpdateIntent = new Intent(OTPApp.INTENT_UPDATE_BIKE_RENTAL_ACTION);
+        mAlarmIntentBikeRentalUpdate = PendingIntent.getBroadcast(mApplicationContext, 0, mBikeRentalUpdateIntent, 0);
+        mTripTimeUpdateIntent = new Intent(OTPApp.INTENT_UPDATE_TRIP_TIME_ACTION);
+        mAlarmIntentTripTimeUpdate = PendingIntent.getBroadcast(mApplicationContext, 0, mTripTimeUpdateIntent, 0);
         mAlarmMgr = (AlarmManager)mApplicationContext.getSystemService(Context.ALARM_SERVICE);
-        mIsAlarmBikeRentalActive = false;
+        mIsAlarmBikeRentalUpdateActive = false;
+        mIsAlarmTripTimeUpdateActive = false;
         mAlarmReceiver = new AlarmReceiver();
 
         mMap = retrieveMap(mMap);
@@ -544,7 +569,6 @@ public class MainFragment extends Fragment implements
                         new OptimizeSpinnerItem(
                                 getResources().getString(R.string.left_panel_optimization_fewest_transfers),
                                 OptimizeType.TRANSFERS)});
-        mDdlOptimization.setAdapter(optimizationAdapter);
 
         Server selectedServer = mOTPApp.getSelectedServer();
         if (selectedServer != null) {
@@ -554,6 +578,8 @@ public class MainFragment extends Fragment implements
             }
         }
 
+        mCustomInfoWindowAdapter = new CustomInfoWindowAdapter(getLayoutInflater(savedInstanceState), mApplicationContext);
+        
         restoreState(savedInstanceState);
 
         if (savedInstanceState == null) {
@@ -1495,7 +1521,7 @@ public class MainFragment extends Fragment implements
                 mIsStartLocationChangedByUser = false;
                 mIsEndLocationChangedByUser = false;
 
-                mIsAlarmBikeRentalActive = savedInstanceState
+                mIsAlarmBikeRentalUpdateActive = savedInstanceState
                         .getBoolean(OTPApp.BUNDLE_KEY__IS_ALARM_BIKE_RENTAL_ACTIVE, false);
             }
         }
@@ -1578,8 +1604,8 @@ public class MainFragment extends Fragment implements
             mRoute = null;
         }
         if (mModeMarkers != null) {
-            for (Marker m : mModeMarkers) {
-                m.remove();
+            for (Map.Entry<Marker, TripInfo> entry : mModeMarkers.entrySet()) {
+                entry.getKey().remove();
             }
             mModeMarkers = null;
         }
@@ -2000,8 +2026,8 @@ public class MainFragment extends Fragment implements
             mEndMarker.remove();
         }
         if (mModeMarkers != null) {
-            for (Marker m : mModeMarkers) {
-                m.remove();
+            for (Map.Entry<Marker, TripInfo> entry : mModeMarkers.entrySet()) {
+                entry.getKey().remove();
             }
         }
         if (mRoute != null) {
@@ -2326,7 +2352,7 @@ public class MainFragment extends Fragment implements
             bundle.putSerializable(OTPApp.BUNDLE_KEY_TRIP_DATE, mTripDate);
             bundle.putBoolean(OTPApp.BUNDLE_KEY_ARRIVE_BY, mArriveBy);
 
-            bundle.putBoolean(OTPApp.BUNDLE_KEY__IS_ALARM_BIKE_RENTAL_ACTIVE, mIsAlarmBikeRentalActive);
+            bundle.putBoolean(OTPApp.BUNDLE_KEY__IS_ALARM_BIKE_RENTAL_ACTIVE, mIsAlarmBikeRentalUpdateActive);
 
             if (!mFragmentListener.getCurrentItineraryList().isEmpty()) {
                 OTPBundle otpBundle = new OTPBundle();
@@ -2404,7 +2430,7 @@ public class MainFragment extends Fragment implements
     public void onResume() {
         super.onResume();
 
-        listenForBikeUpdates(mIsAlarmBikeRentalActive);
+        listenForBikeUpdates(mIsAlarmBikeRentalUpdateActive);
 
         Log.v(OTPApp.TAG, "MainFragment onResume");
     }
@@ -2838,12 +2864,12 @@ public class MainFragment extends Fragment implements
             mRoute.clear();
         }
         if (mModeMarkers != null) {
-            for (Marker modeMarker : mModeMarkers) {
-                modeMarker.remove();
+            for (Map.Entry<Marker, TripInfo> entry : mModeMarkers.entrySet()) {
+                entry.getKey().remove();
             }
         }
         mRoute = new ArrayList<Polyline>();
-        mModeMarkers = new ArrayList<Marker>();
+        mModeMarkers = new HashMap<Marker, TripInfo>();
         Marker firstTransitMarker = null;
 
         if (!itinerary.isEmpty()) {
@@ -2857,70 +2883,27 @@ public class MainFragment extends Fragment implements
                 List<LatLng> points = LocationUtil.decodePoly(leg.legGeometry
                         .getPoints());
 
-                MarkerOptions modeMarkerOption = new MarkerOptions().position(points.get(0));
+                MarkerOptions modeMarkerOption = generateModeMarkerOptions(leg, points.get(0),
+                        stepIndex);
 
                 float scaleFactor = getResources().getFraction(R.fraction.scaleFactor, 1, 1);
 
-                Drawable drawable = getResources().getDrawable(getPathIcon(leg.mode));
-                if (drawable != null) {
-                    BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable.getCurrent();
-                    Bitmap bitmap = bitmapDrawable.getBitmap();
-                    modeMarkerOption.icon(
-                            BitmapDescriptorFactory.fromBitmap(bitmap));
-                } else {
-                    Log.e(OTPApp.TAG, "Error obtaining drawable to add mode icons to the map");
-                }
-
-                TraverseMode traverseMode = TraverseMode.valueOf(leg.mode);
-
-                if (traverseMode.isTransit()) {
-                    modeMarkerOption.title(stepIndex + ". " + ConversionUtils
-                            .getRouteShortNameSafe(leg.getRouteShortName(), leg.getRouteLongName(),
-                                    mApplicationContext)
-                            + " " + getResources().getString(R.string.map_markers_connector_before_stop) + " "
-                            + DirectionsGenerator.getLocalizedStreetName(leg.getFrom().name,
-                            mApplicationContext.getResources()));
-                    String modeMarkerSnippet = ConversionUtils
-                            .getTimeWithContext(mApplicationContext, leg.getAgencyTimeZoneOffset(),
-                                    Long.parseLong(leg.getStartTime()), false);
-                    if (leg.getHeadsign() != null) {
-                        modeMarkerSnippet += " " + getResources()
-                                .getString(R.string.step_by_step_non_transit_to) + " " + leg.getHeadsign();
-                    }
-                    modeMarkerOption.snippet(modeMarkerSnippet);
-                } else {
-                    if (traverseMode.equals(TraverseMode.WALK)) {
-                        modeMarkerOption.title(stepIndex + ". " + getResources()
-                                .getString(R.string.map_markers_mode_walk_action)
-                                + " " + getResources().getString(R.string.map_markers_connector_before_destination)
-                                + " " + DirectionsGenerator.getLocalizedStreetName(leg.getTo().name,
-                                mApplicationContext.getResources()));
-                    } else if (traverseMode.equals(TraverseMode.BICYCLE)) {
-                        modeMarkerOption.title(stepIndex + ". " + getResources()
-                                .getString(R.string.map_markers_mode_bicycle_action)
-                                + " " + getResources().getString(R.string.map_markers_connector_before_destination)
-                                + " " + DirectionsGenerator.getLocalizedStreetName(leg.getTo().name,
-                                mApplicationContext.getResources()));
-                    }
-                    modeMarkerOption.snippet(ConversionUtils
-                            .getFormattedDurationTextNoSeconds(leg.duration / 1000,
-                                    mApplicationContext) + " " + "-" + " "
-                            + ConversionUtils
-                            .getFormattedDistance(leg.getDistance(), mApplicationContext));
-                }
 
                 Marker modeMarker = mMap.addMarker(modeMarkerOption);
-                mModeMarkers.add(modeMarker);
+                boolean realtime = false;
+                if (TraverseMode.valueOf(leg.mode).isTransit()){
+                    realtime = leg.realtime;
+                }
+                TripInfo tripInfo = new TripInfo(realtime, leg.tripId,
+                        generateModeMarkerSnippet(leg), leg.departureDelay);
+                mModeMarkers.put(modeMarker, tripInfo);
 
-                if (traverseMode.isTransit()) {
+                if (TraverseMode.valueOf(leg.mode).isTransit()) {
                     //because on transit two step-by-step indications are generated (get on / get off)
                     stepIndex++;
 
                     if (firstTransitMarker == null) {
                         firstTransitMarker = modeMarker;
-                        if (animateCamera == 1){
-                            firstTransitMarker.showInfoWindow();
-                        }
                     }
                 }
                 PolylineOptions options = new PolylineOptions().addAll(points)
@@ -2932,11 +2915,104 @@ public class MainFragment extends Fragment implements
                     boundsCreator.include(point);
                 }
             }
+            mCustomInfoWindowAdapter.setMarkers(mModeMarkers);
+            mMap.setInfoWindowAdapter(mCustomInfoWindowAdapter);
+            if (animateCamera == 1){
+                if (firstTransitMarker != null){
+                    firstTransitMarker.showInfoWindow();
+                }
+            }
             if (animateCamera > 0) {
                 LatLngBounds routeBounds = boundsCreator.build();
                 showRouteOnMapAnimateCamera(routeBounds, firstTransitMarker, animateCamera);
             }
         }
+    }
+
+    private MarkerOptions generateModeMarkerOptions(Leg leg, LatLng location, int stepIndex){
+        MarkerOptions modeMarkerOption = new MarkerOptions().position(location);
+        Drawable drawable = getResources().getDrawable(getPathIcon(leg.mode));
+        if (drawable != null) {
+            BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable.getCurrent();
+            Bitmap bitmap = bitmapDrawable.getBitmap();
+            modeMarkerOption.icon(
+                    BitmapDescriptorFactory.fromBitmap(bitmap));
+        } else {
+            Log.e(OTPApp.TAG, "Error obtaining drawable to add mode icons to the map");
+        }
+
+        modeMarkerOption.title(generateModeMarkerTitle(leg, stepIndex));
+
+        return modeMarkerOption;
+    }
+
+    private String generateModeMarkerTitle(Leg leg, int stepIndex){
+        TraverseMode traverseMode = TraverseMode.valueOf(leg.mode);
+        String title = "";
+
+        if (traverseMode.isTransit()) {
+            title = stepIndex + ". " + ConversionUtils
+                    .getRouteShortNameSafe(leg.routeShortName, leg.routeLongName,
+                            mApplicationContext)
+                    + " " + getResources().getString(R.string.map_markers_connector_before_stop) + " "
+                    + DirectionsGenerator.getLocalizedStreetName(leg.from.name,
+                    mApplicationContext.getResources());
+        }
+        else{
+            if (traverseMode.equals(TraverseMode.WALK)) {
+                title = stepIndex + ". " + getResources()
+                        .getString(R.string.map_markers_mode_walk_action)
+                        + " " + getResources().getString(R.string.map_markers_connector_before_destination)
+                        + " " + DirectionsGenerator.getLocalizedStreetName(leg.to.name,
+                        mApplicationContext.getResources());
+            } else if (traverseMode.equals(TraverseMode.BICYCLE)) {
+                title = stepIndex + ". " + getResources()
+                        .getString(R.string.map_markers_mode_bicycle_action)
+                        + " " + getResources().getString(R.string.map_markers_connector_before_destination)
+                        + " " + DirectionsGenerator.getLocalizedStreetName(leg.to.name,
+                        mApplicationContext.getResources());
+            }
+        }
+        return title;
+    }
+
+    private CharSequence generateModeMarkerSnippet(Leg leg) {
+        CharSequence snippet;
+        long legDuration;
+        TraverseMode traverseMode = TraverseMode.valueOf(leg.mode);
+
+        if (mPrefs.getInt(OTPApp.PREFERENCE_KEY_API_VERSION, OTPApp.API_VERSION_V1)
+                == OTPApp.API_VERSION_V1){
+            legDuration = leg.duration;
+        } else{
+            legDuration = leg.duration / 1000;
+        }
+        if (traverseMode.isTransit()) {
+            CharSequence spannableSnippet = ConversionUtils
+                    .getTimeWithContext(mApplicationContext, leg.agencyTimeZoneOffset,
+                            Long.parseLong(leg.startTime), false);
+            if (leg.realtime){
+                int color = ConversionUtils.getDelayColor(leg.departureDelay, mApplicationContext);
+                spannableSnippet = ConversionUtils
+                        .getTimeWithContext(mApplicationContext, leg.agencyTimeZoneOffset,
+                                Long.parseLong(leg.startTime), false, color);
+            }
+            if (leg.headsign != null) {
+                snippet = TextUtils.concat(spannableSnippet, " ",
+                        getResources().getString(R.string.step_by_step_non_transit_to),
+                        " ", leg.headsign);
+            }
+            else{
+                snippet = spannableSnippet;
+            }
+        } else {
+            snippet = ConversionUtils
+                    .getFormattedDurationTextNoSeconds(legDuration, false,
+                            mApplicationContext) + " " + "-" + " "
+                    + ConversionUtils
+                    .getFormattedDistance(leg.distance, mApplicationContext);
+        }
+        return  snippet;
     }
 
     /**
@@ -3141,24 +3217,32 @@ public class MainFragment extends Fragment implements
 
     private void fillItinerariesSpinner(List<Itinerary> itineraryList) {
         String[] itinerarySummaryList = new String[itineraryList.size()];
+        long tripDuration;
 
         for (int i = 0; i < itinerarySummaryList.length; i++) {
             boolean isTransitIsTagSet = false;
             Itinerary it = itineraryList.get(i);
+            if (mPrefs.getInt(OTPApp.PREFERENCE_KEY_API_VERSION, OTPApp.API_VERSION_V1)
+                    == OTPApp.API_VERSION_V1){
+                tripDuration = it.duration;
+            }
+            else{
+                tripDuration = it.duration / 1000;
+            }
             for (Leg leg : it.legs) {
                 TraverseMode traverseMode = TraverseMode.valueOf(leg.mode);
                 if (traverseMode.isTransit()) {
                     itinerarySummaryList[i] = ConversionUtils
-                            .getTimeWithContext(mApplicationContext, leg.getAgencyTimeZoneOffset(),
-                                    Long.parseLong(leg.getStartTime()), false);
+                            .getTimeWithContext(mApplicationContext, leg.agencyTimeZoneOffset,
+                                    Long.parseLong(leg.startTime), false).toString();
                     itinerarySummaryList[i] += ". " + ConversionUtils
-                            .getRouteShortNameSafe(leg.getRouteShortName(),leg.getRouteLongName(),
+                            .getRouteShortNameSafe(leg.routeShortName,leg.routeLongName,
                                     mApplicationContext);
                     itinerarySummaryList[i] += " - " + ConversionUtils
-                            .getFormattedDurationTextNoSeconds(it.duration / 1000,
+                            .getFormattedDurationTextNoSeconds(tripDuration, false,
                                     mApplicationContext);
-                    if (leg.getHeadsign() != null) {
-                        itinerarySummaryList[i] += " - " + leg.getHeadsign();
+                    if (leg.headsign!= null) {
+                        itinerarySummaryList[i] += " - " + leg.headsign;
                     }
                     isTransitIsTagSet = true;
                     break;
@@ -3170,7 +3254,7 @@ public class MainFragment extends Fragment implements
                 itinerarySummaryList[i] +=
                         ConversionUtils.getFormattedDistance(it.walkDistance, mApplicationContext)
                                 + " " + "-" + " " + ConversionUtils
-                                .getFormattedDurationTextNoSeconds(it.duration / 1000,
+                                .getFormattedDurationTextNoSeconds(tripDuration, false,
                                         mApplicationContext);
             }
 
@@ -3669,13 +3753,16 @@ public class MainFragment extends Fragment implements
                                     .getString(R.string.map_markers_bike_rental_available_spaces) + " " +
                                     bikeRentalStation.spacesAvailable);
                         }
+                        if (bikeRentalStationMarker.isInfoWindowShown()){
+                            bikeRentalStationMarker.showInfoWindow();
+                        }
                     }
                 }
             }
             else{
                 Toast.makeText(mApplicationContext, mApplicationContext.getResources().getString(R.string.toast_bike_rental_load_request_error),
                         Toast.LENGTH_SHORT).show();
-                mAlarmMgr.cancel(mAlarmIntentBikeRental);
+                listenForBikeUpdates(false);
             }
         }
     }
@@ -3687,27 +3774,278 @@ public class MainFragment extends Fragment implements
 
     public void listenForBikeUpdates(boolean enable){
         if (enable){
-            mApplicationContext.registerReceiver(new AlarmReceiver(), intentFilter);
-            mAlarmMgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, OTPApp.DEFAULT_UPDATE_INTERVAL,
-                    OTPApp.DEFAULT_UPDATE_INTERVAL, mAlarmIntentBikeRental);
+            mApplicationContext.registerReceiver(new AlarmReceiver(), mIntentFilter);
+            mAlarmMgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME,
+                    OTPApp.DEFAULT_UPDATE_INTERVAL_BIKE_RENTAL,
+                    OTPApp.DEFAULT_UPDATE_INTERVAL_BIKE_RENTAL, mAlarmIntentBikeRentalUpdate);
         }
         else{
             if (!mApplicationContext.getPackageManager()
-                    .queryBroadcastReceivers(bikeRentalIntent, bikeRentalIntent.getFlags())
+                    .queryBroadcastReceivers(mBikeRentalUpdateIntent, mBikeRentalUpdateIntent.getFlags())
                     .isEmpty()){
                 mApplicationContext.unregisterReceiver(mAlarmReceiver);
+                if (!mIsAlarmTripTimeUpdateActive){
+                    mApplicationContext.unregisterReceiver(mAlarmReceiver);
+                }
             }
-            mAlarmMgr.cancel(mAlarmIntentBikeRental);
+            mAlarmMgr.cancel(mAlarmIntentBikeRentalUpdate);
         }
+    }
+
+    public void listenForTripTimeUpdates(boolean enable, long timeToStartUpdates){
+        if (enable){
+            Calendar calTimeToStartUpdates = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+            calTimeToStartUpdates.setTime(new Date(timeToStartUpdates));
+            calTimeToStartUpdates.add(Calendar.HOUR_OF_DAY, -1);
+            long timeToStartUpdatesProcessed = calTimeToStartUpdates.getTimeInMillis();
+            if (timeToStartUpdatesProcessed < (System.currentTimeMillis() - 1000)){
+                timeToStartUpdatesProcessed = System.currentTimeMillis() + 1000;
+            }
+            mApplicationContext.registerReceiver(new AlarmReceiver(), mIntentFilter);
+            mAlarmMgr.setInexactRepeating(AlarmManager.RTC, timeToStartUpdatesProcessed,
+                    OTPApp.DEFAULT_UPDATE_INTERVAL_TRIP_TIME, mAlarmIntentTripTimeUpdate);
+        }
+        else{
+            if (!mApplicationContext.getPackageManager()
+                    .queryBroadcastReceivers(mTripTimeUpdateIntent, mTripTimeUpdateIntent.getFlags())
+                    .isEmpty()){
+                if (!mIsAlarmBikeRentalUpdateActive){
+                    mApplicationContext.unregisterReceiver(mAlarmReceiver);
+                }
+            }
+            mAlarmMgr.cancel(mAlarmIntentTripTimeUpdate);
+        }
+    }
+
+    @Override
+    public void onUpdateTripTimesComplete(HashMap<String, List<TripTimeShort>> timesUpdatesForTrips) {
+        if (getActivity() != null){
+            List<Itinerary> itineraries;
+            if ((itineraries = getFragmentListener().getCurrentItineraryList()) != null){
+                if ((timesUpdatesForTrips != null) && !timesUpdatesForTrips.isEmpty()){
+                    long lastLegTime = 0;
+                    Leg lastLeg = itineraries.get(0).legs.get(0);
+                    for (Itinerary itinerary : itineraries){
+                        for (Leg leg : itinerary.legs){
+                            long legEndTimeLong = Long.parseLong(leg.startTime);
+                            if (legEndTimeLong > lastLegTime){
+                                lastLegTime = legEndTimeLong;
+                                lastLeg = leg;
+                            }
+                            List<TripTimeShort> tripsTimesUpdates;
+                            if ((tripsTimesUpdates
+                                    = timesUpdatesForTrips.get(leg.agencyId + "_" + leg.tripId))
+                                    != null){
+                                TripTimeShort firstStopUpdate = null;
+                                TripTimeShort lastStopUpdate = null;
+                                for (TripTimeShort tripTimeUdapteForStop : tripsTimesUpdates){
+                                    if (tripTimeUdapteForStop.stopId.equals(leg.from.stopCode)){
+                                        firstStopUpdate = tripTimeUdapteForStop;
+                                    }
+                                    if (tripTimeUdapteForStop.stopId.equals(leg.to.stopCode)){
+                                        lastStopUpdate = tripTimeUdapteForStop;
+                                    }
+                                }
+                                if ((firstStopUpdate != null) && (lastStopUpdate != null)){
+                                    int legsUpdated = updateLeg(leg, firstStopUpdate, lastStopUpdate);
+                                    if (legsUpdated != 0){
+                                        for (Map.Entry<Marker, TripInfo> entry : mModeMarkers.entrySet()) {
+                                            if (leg.tripId.equals(entry.getValue().getTripId())){
+                                                entry.getValue().setSnippet(generateModeMarkerSnippet(leg));
+                                                entry.getValue().setDelayInSeconds(leg.departureDelay);
+                                                if (entry.getKey().isInfoWindowShown()){
+                                                    entry.getKey().showInfoWindow();
+                                                }
+                                            }
+                                        }
+                                        showNotification(leg, legsUpdated);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (isTripOver(lastLeg)){
+                        listenForTripTimeUpdates(false, 0);
+                    }
+                } else{
+                    Toast.makeText(mApplicationContext,
+                            getResources()
+                                .getString(R.string.toast_realtime_updates_fail),
+                                Toast.LENGTH_SHORT).show();
+                    listenForTripTimeUpdates(false, 0);
+                }
+            }
+        }
+    }
+
+    private boolean isTripOver(Leg leg){
+        Calendar calTimeToStopUpdates = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+        calTimeToStopUpdates.setTime(new Date(Long.parseLong(leg.endTime)));
+        calTimeToStopUpdates.add(Calendar.MILLISECOND, leg.agencyTimeZoneOffset);
+
+        Calendar actualTime = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+        actualTime.setTime(new Date(System.currentTimeMillis()));
+        actualTime.add(Calendar.MILLISECOND, leg.agencyTimeZoneOffset);
+
+        return actualTime.getTimeInMillis() > calTimeToStopUpdates.getTimeInMillis();
+    }
+
+    /**
+     * Updates leg fields with departure and arrival new trip times.
+     *
+     * @param leg the leg to update
+     * @param departureTripTimesUpdate departure new trip times
+     * @param arrivalTripTimesUpdate arrival new trip times
+     * @return 0 if none are updated, 1 if departure is updated, 2 if arrival is updated, 3 if both
+     * are updated
+     */
+    private int updateLeg(Leg leg, TripTimeShort departureTripTimesUpdate,
+                              TripTimeShort arrivalTripTimesUpdate){
+        int updatedLegs = 0;
+        if (leg.departureDelay != departureTripTimesUpdate.departureDelay){
+            Long scheduledStartTime = Long.parseLong(leg.startTime) - leg.departureDelay;
+            leg.departureDelay = departureTripTimesUpdate.departureDelay;
+            leg.startTime = ((Long)(scheduledStartTime + (Integer)leg.departureDelay)).toString();
+            updatedLegs = 1;
+        }
+        if (leg.arrivalDelay != arrivalTripTimesUpdate.arrivalDelay){
+            Long scheduledEndTime = Long.parseLong(leg.endTime) - leg.arrivalDelay;
+            leg.arrivalDelay = arrivalTripTimesUpdate.arrivalDelay;
+            leg.endTime = ((Long)(scheduledEndTime + (Integer)leg.arrivalDelay)).toString();
+            if (updatedLegs == 1){
+                updatedLegs = 3;
+            }
+            else{
+                updatedLegs = 2;
+            }
+        }
+        return updatedLegs;
+    }
+
+    private void showNotification(Leg leg, int legsUpdated){
+        Integer delay;
+        if (legsUpdated == 1){
+            delay = leg.departureDelay;
+        }
+        else if (legsUpdated == 2){
+            delay = leg.arrivalDelay;
+        }
+        else if (legsUpdated == 3){
+            delay = leg.departureDelay;
+            showNotification(leg, 2);
+        }
+        else{
+            return;
+        }
+        String delayText = ConversionUtils.getFormattedDurationTextNoSeconds(delay, true, mApplicationContext);
+        if (delay > 0) {
+            delayText += " "
+                    + getResources()
+                    .getString(R.string.map_markers_warning_live_upates_late_arrival);
+        }
+        else {
+            delayText += " "
+                    + getResources()
+                    .getString(R.string.map_markers_warning_live_upates_early_arrival);
+        }
+
+        Intent notificationIntentOpenApp = new Intent(OTPApp.INTENT_NOTIFICATION_ACTION_OPEN_APP);
+        notificationIntentOpenApp.putExtra(OTPApp.BUNDLE_KEY_INTENT_TRIP_ID, leg.tripId);
+        PendingIntent notificationOpenAppPendingIntent = PendingIntent
+                .getBroadcast(mApplicationContext,
+                        0,
+                        notificationIntentOpenApp,
+                        PendingIntent.FLAG_CANCEL_CURRENT);
+
+        Intent notificationIntentDismissUpdates = new Intent(OTPApp.INTENT_NOTIFICATION_ACTION_DISMISS_UPDATES);
+        PendingIntent notificationPendingIntentDismissUpdates = PendingIntent
+                .getBroadcast(mApplicationContext,
+                        0,
+                        notificationIntentDismissUpdates,
+                        PendingIntent.FLAG_CANCEL_CURRENT);
+
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(mApplicationContext)
+                        .setSmallIcon(R.drawable.notification_opentripplanner)
+                        .setContentTitle(ConversionUtils.getRouteShortNameSafe(leg.routeShortName,
+                                leg.routeLongName, mApplicationContext))
+                        .setContentText(delayText)
+                        .setLargeIcon(BitmapFactory
+                                .decodeResource(getActivity()
+                                                .getResources(),
+                                        DirectionsGenerator
+                                                .getNotificationIcon(new TraverseModeSet(leg.mode))))
+                        .setPriority(NotificationCompat.PRIORITY_MAX)
+                        .setContentIntent(notificationOpenAppPendingIntent)
+                        .addAction(R.drawable.ic_action_cancel,
+                                getResources()
+                                        .getString(R.string.notification_disable_updates_button),
+                                notificationPendingIntentDismissUpdates);
+        NotificationManager notificationManager =
+                (NotificationManager) mApplicationContext.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.notify(OTPApp.NOTIFICATION_ID, mBuilder.build());
+    }
+
+    public void openModeMarker(String tripId){
+        if (mModeMarkers != null && tripId != null){
+            for (Map.Entry<Marker, TripInfo> entry : mModeMarkers.entrySet()) {
+                if (tripId.equals(entry.getValue().getTripId())){
+                    entry.getKey().showInfoWindow();
+                    break;
+                }
+            }
+        }
+    }
+
+
+    @Override
+    public void onUpdateTripTimesFail() {
+        listenForTripTimeUpdates(false, 0);
     }
 
     public class AlarmReceiver extends BroadcastReceiver{
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            NotificationManager notificationManager;
             if (intent.getAction().equals(OTPApp.INTENT_UPDATE_BIKE_RENTAL_ACTION)){
                 BikeRentalLoad bikeRentalLoad = new BikeRentalLoad(mApplicationContext, false, MainFragment.this);
                 bikeRentalLoad.execute(mOTPApp.getSelectedServer().getBaseURL());
+            }
+            else if (intent.getAction().equals(OTPApp.INTENT_UPDATE_TRIP_TIME_ACTION)){
+                RequestTimesForTrips requestTimesForTrips =
+                        new RequestTimesForTrips(mApplicationContext, MainFragment.this);
+                List<String> legsToUpdate = new ArrayList<String>();
+                for (Itinerary itinerary : getFragmentListener().getCurrentItineraryList()){
+                    for (Leg leg : itinerary.legs){
+                        if (leg.realtime && (TraverseMode.valueOf(leg.mode)).isTransit()){
+                            legsToUpdate.add(leg.agencyId + "_" + leg.tripId);
+                        }
+                    }
+                }
+                legsToUpdate.add(0, mOTPApp.getSelectedServer().getBaseURL());
+                String[] legsToUpdateArray = legsToUpdate.toArray(new String[legsToUpdate.size()]);
+                requestTimesForTrips.execute(legsToUpdateArray);
+            }
+            else if (intent.getAction().equals(OTPApp.INTENT_NOTIFICATION_ACTION_OPEN_APP)){
+                notificationManager =
+                (NotificationManager) mApplicationContext.getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.cancel(OTPApp.NOTIFICATION_ID);
+                Intent activityIntent = new Intent(mApplicationContext, MyActivity.class);
+                activityIntent.setAction(OTPApp.INTENT_NOTIFICATION_RESUME_APP_WITH_TRIP_ID);
+                activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                activityIntent.putExtra(OTPApp.BUNDLE_KEY_INTENT_TRIP_ID, intent.getStringExtra(OTPApp.BUNDLE_KEY_INTENT_TRIP_ID));
+                mApplicationContext.startActivity(activityIntent);
+            }
+            else if (intent.getAction().equals(OTPApp.INTENT_NOTIFICATION_ACTION_DISMISS_UPDATES)){
+                notificationManager =
+                        (NotificationManager) mApplicationContext.getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.cancel(OTPApp.NOTIFICATION_ID);
+                Toast.makeText(mApplicationContext,
+                        getResources().getString(R.string.notification_disable_updates_info),
+                        Toast.LENGTH_SHORT).show();
+                listenForTripTimeUpdates(false, 0);
             }
         }
     }

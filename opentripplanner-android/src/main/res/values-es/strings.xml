@@ -64,7 +64,13 @@
                 <string name="map_markers_connector_before_stop">de</string>
                 <string name="map_markers_connector_before_destination">a</string>
 
-        <!-- Bike rental stations map markers -->
+                <!-- Real time -->
+                <string name="map_markers_warning_live_udpates">Información en tiempo real</string>
+                <string name="map_markers_warning_live_upates_on_time">En hora</string>
+                <string name="map_markers_warning_live_upates_early_arrival">de adelanto</string>
+                <string name="map_markers_warning_live_upates_late_arrival">de retraso</string>
+
+    <!-- Bike rental stations map markers -->
 
             <!-- Info pop-ups -->
 
@@ -108,11 +114,17 @@
                     <string name="toast_server_checker_error_unreachable">No se ha podido contactar con la región:</string>
                     <string name="toast_server_checker_info_error">Atención: No se ha podido obtener información de la región!</string>
 
+                        <!-- Contacting user's region server -->
+                        <string name="toast_server_checker_error_unreachable_detected_server">Tu región no está funcionando. Por favor intentalo de nuevo más tarde.</string>
+
                     <!-- Editing custom server URL -->
                     <string name="toast_server_checker_error_bad_url">"URL incorrecta para región personalizada"</string>
 
                     <!-- Obtaining user location: to select server, to display user location address in text box, ... -->
                     <string name="toast_tripplanner_current_location_error">No se ha podido obtener la ubicación actual</string>
+
+                    <!-- Obtaining real time updates -->
+                    <string name="toast_realtime_updates_fail">No se dispone de actualizaciones en tiempo real, los tiempos pueden estar desfasados</string>
 
 
         <!-- Dialogs -->
@@ -316,6 +328,11 @@
                 <string name="settings_menu_use_intelligent_markers_title">Marcadores inteligentes</string>
                 <string name="settings_menu_use_intelligent_markers_description">Mover los marcadores a la dirección o punto de interés más cercanos</string>
 
+            <!-- Live updates -->
+            <string name="settings_menu_live_updates_category_title">Actualizaciones en tiempo real</string>
+            <string name="settings_menu_live_updates">Actualización de itinerarios a tiempo real</string>
+            <string name="settings_menu_live_updates_description">Notificarme cuando cambien las horas del viaje</string>
+
 
     <!-- Step-by-step screen -->
 
@@ -343,6 +360,9 @@
 
                 <!-- Transit description start -->
                 <string name="step_by_step_transit_connector_stop_name">En</string>
+
+                <!-- Real time -->
+                <string name="step_by_step_transit_warning_live_udpates">Información en tiempo real</string>
 
             <!-- Non-transit -->
 
@@ -408,6 +428,16 @@
 
 
     <!-- App wide  -->
+
+        <!-- Notifications specific -->
+
+            <!-- Disable updates -->
+
+                <!-- Button -->
+                <string name="notification_disable_updates_button">Cancelar actualizaciones para este viaje</string>
+
+                <!-- Toast -->
+                <string name="notification_disable_updates_info">Actualizaciones canceladas</string>
 
         <!-- Used in util functions to display consistently time and distance all around the app  -->
 

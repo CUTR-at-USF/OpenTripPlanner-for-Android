@@ -20,9 +20,16 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.opentripplanner.api.resource.ServerInfo;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -44,9 +51,15 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
 
     private ServerCheckerCompleteListener callback = null;
 
-    private boolean showMessage;
+    private boolean showMessage = false;
 
     private boolean isWorking = false;
+
+    private static ObjectMapper mapper = null;
+
+    private boolean isCustomServer = false;
+
+    private boolean isAutoDetected = false;
 
     /**
      * Constructs a new ServerChecker
@@ -65,11 +78,12 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
      * Constructs a new ServerChecker
      */
     public ServerChecker(WeakReference<Activity> activity, Context context,
-            ServerCheckerCompleteListener callback, boolean showMessage) {
+            ServerCheckerCompleteListener callback, boolean isCustomServer, boolean isAutoDetected) {
         this.activity = activity;
         this.context = context;
-        this.showMessage = showMessage;
         this.callback = callback;
+        this.isCustomServer = isCustomServer;
+        this.isAutoDetected = isAutoDetected;
         Activity activityRetrieved = activity.get();
         if (activityRetrieved != null) {
             progressDialog = new ProgressDialog(activityRetrieved);
@@ -94,6 +108,7 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
     @Override
     protected String doInBackground(Server... params) {
         Server server = params[0];
+        ServerInfo serverInfo;
 
         if (server == null) {
             Log.w(OTPApp.TAG,
@@ -125,27 +140,62 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
             message += "\n" + context.getResources()
                             .getString(R.string.server_checker_info_reachable) + " ";
 
+            if (mapper == null) {
+                mapper = new ObjectMapper();
+            }
+
             int status = 0;
             HttpURLConnection urlConnection = null;
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+            SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(
+                    context).edit();
 
             try {
-                URL url = new URL(server.getBaseURL() + "/plan");
+                URL url = new URL(server.getBaseURL() + OTPApp.SERVER_INFO_LOCATION_NEW);
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setConnectTimeout(OTPApp.HTTP_CONNECTION_TIMEOUT);
                 urlConnection.setReadTimeout(OTPApp.HTTP_SOCKET_TIMEOUT);
                 urlConnection.connect();
                 status = urlConnection.getResponseCode();
-            } catch (IOException e) {
-                Log.e(OTPApp.TAG, "Unable to reach server: " + e.getMessage());
-                message = context.getResources().getString(R.string.toast_server_checker_error_unreachable)
-                        + " "
-                        + e.getMessage();
-                return message;
+                serverInfo = mapper.readValue(urlConnection.getInputStream(), ServerInfo.class);
+                prefsEditor.putString(OTPApp.PREFERENCE_KEY_FOLDER_STRUCTURE_PREFIX, OTPApp.FOLDER_STRUCTURE_PREFIX_NEW);
+            } catch (IOException e1) {
+                Log.e(OTPApp.TAG, "Server not working with API V1, trying again this time with" +
+                        " old version: "
+                        + e1.getMessage());
+                try {
+                    URL url = new URL(server.getBaseURL() + OTPApp.SERVER_INFO_LOCATION_OLD);
+                    urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setConnectTimeout(OTPApp.HTTP_CONNECTION_TIMEOUT);
+                    urlConnection.setReadTimeout(OTPApp.HTTP_SOCKET_TIMEOUT);
+                    urlConnection.connect();
+                    status = urlConnection.getResponseCode();
+                    serverInfo = mapper.readValue(urlConnection.getInputStream(), ServerInfo.class);
+                    prefsEditor.putString(OTPApp.PREFERENCE_KEY_FOLDER_STRUCTURE_PREFIX, OTPApp.FOLDER_STRUCTURE_PREFIX_OLD);
+                } catch (IOException e2) {
+                    Log.e(OTPApp.TAG, "Unable to reach server: " + e2.getMessage());
+                    message = context.getResources().getString(R.string.toast_server_checker_error_unreachable)
+                            + " "
+                            + e2.getMessage();
+                    return message;
+                } finally {
+                    if (urlConnection != null) {
+                        urlConnection.disconnect();
+                    }
+                }
             } finally {
                 if (urlConnection != null) {
                     urlConnection.disconnect();
                 }
             }
+
+            if (serverInfo != null){
+                prefsEditor.putInt(OTPApp.PREFERENCE_KEY_API_VERSION,
+                        serverInfo.serverVersion.major);
+                prefsEditor.commit();
+            }
+
 
             if (status == HttpURLConnection.HTTP_OK) {
                 message += context.getResources().getString(android.R.string.yes);
@@ -189,21 +239,24 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
                         null);
                 dialog.create().show();
             }
-        } else {
-            if (isWorking) {
-                Toast.makeText(context,
-                        context.getResources().getString(R.string.toast_server_checker_successful),
-                        Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(context,
-                        context.getResources().getString(R.string.settings_menu_custom_server_url_description_error_unreachable),
-                        Toast.LENGTH_SHORT).show();
+        } else{
+            if (isCustomServer) {
+                if (isWorking) {
+                    Toast.makeText(context,
+                            context.getResources().getString(R.string.toast_server_checker_successful),
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(context,
+                            context.getResources().getString(R.string.settings_menu_custom_server_url_description_error_unreachable),
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+            if (callback != null) {
+                callback.onServerCheckerComplete(result, isCustomServer, isAutoDetected, isWorking);
             }
         }
 
-        if (callback != null) {
-            callback.onServerCheckerComplete(result, isWorking);
-        }
+
     }
 
 }

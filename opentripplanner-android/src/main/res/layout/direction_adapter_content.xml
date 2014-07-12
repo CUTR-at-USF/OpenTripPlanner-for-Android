@@ -18,7 +18,7 @@
             android:layout_marginLeft="10dip"
             android:layout_toRightOf="@+id/iconLine"
             android:textColor="@android:color/black"
-            android:textSize="24sp"/>
+            android:textSize="22sp"/>
 
     <Button
             android:id="@+id/buttonLine"

@@ -27,7 +27,9 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 import android.util.Log;
 import android.webkit.URLUtil;
 import android.widget.Toast;
@@ -63,6 +65,12 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 
     private CheckBoxPreference selectedCustomServer;
 
+    private CheckBoxPreference liveUpdates;
+
+    private PreferenceCategory liveUpdatesCategory;
+
+    private PreferenceScreen preferenceScreen;
+
     private ListPreference geocoderProvider;
 
     private EditTextPreference maxWalkingDistance;
@@ -92,6 +100,12 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
                 OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL);
         selectedCustomServer = (CheckBoxPreference) findPreference(
                 OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER);
+        liveUpdates = (CheckBoxPreference) findPreference(
+                OTPApp.PREFERENCE_KEY_LIVE_UPDATES);
+        liveUpdatesCategory = (PreferenceCategory) findPreference(
+                OTPApp.PREFERENCE_KEY_LIVE_UPDATES_CATEGORY);
+        preferenceScreen = (PreferenceScreen) findPreference(
+                OTPApp.PREFERENCE_KEY_PREFERENCE_SCREEN);
         maxWalkingDistance = (EditTextPreference) findPreference(
                 OTPApp.PREFERENCE_KEY_MAX_WALKING_DISTANCE);
 
@@ -252,7 +266,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
                             SettingsActivity.this);
                     ServerChecker serverChecker = new ServerChecker(weakContext,
                             SettingsActivity.this.getApplicationContext(), SettingsActivity.this,
-                            false);
+                            true, false);
                     serverChecker.execute(
                             new Server(value, SettingsActivity.this.getApplicationContext()));
                     return true;
@@ -312,6 +326,25 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
                 return true;
             }
         });
+
+        if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_REALTIME_AVAILABLE, false)){
+            liveUpdates.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    Boolean value = (Boolean) newValue;
+                    if (!value) {
+                        returnIntent.putExtra(OTPApp.LIVE_UPDATES_DISABLED_RETURN_KEY, true);
+                        setResult(RESULT_OK, returnIntent);
+                    }
+                    return true;
+                }
+            });
+        }
+        else{
+            liveUpdatesCategory.removePreference(liveUpdates);
+            preferenceScreen.removePreference(liveUpdatesCategory);
+        }
 
         providerFeedbackButton = (Preference) findPreference(
                 OTPApp.PREFERENCE_KEY_OTP_PROVIDER_FEEDBACK);
@@ -380,7 +413,8 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 
 
     @Override
-    public void onServerCheckerComplete(String result, boolean isWorking) {
+    public void onServerCheckerComplete(String result, boolean isCustomServer,
+                                        boolean isAutodetected, boolean isWorking) {
         SharedPreferences.Editor prefsEditor = PreferenceManager
                 .getDefaultSharedPreferences(getApplicationContext()).edit();
         if (isWorking) {

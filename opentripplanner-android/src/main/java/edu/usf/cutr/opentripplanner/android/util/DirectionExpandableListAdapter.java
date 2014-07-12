@@ -18,6 +18,8 @@ package edu.usf.cutr.opentripplanner.android.util;
 
 import android.app.Activity;
 import android.content.Context;
+import android.text.SpannableString;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -82,8 +84,6 @@ public class DirectionExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild,
             View convertView, ViewGroup parent) {
-//        TextView textView = getGenericView();
-//        textView.setText(getGroup(groupPosition).toString());
 
         View row = convertView;
         DirectionHolder holder = null;
@@ -103,7 +103,7 @@ public class DirectionExpandableListAdapter extends BaseExpandableListAdapter {
 
         Direction dir = data[groupPosition];
         Direction subDirection = (Direction) getChild(groupPosition, childPosition);
-        String text = subDirection == null ? "null here" : subDirection.getDirectionText();
+        CharSequence text = subDirection == null ? "null here" : subDirection.getDirectionText();
         holder.txtDirection.setText(text);
         holder.imgIcon.setImageResource(subDirection.getIcon());
 
@@ -130,8 +130,6 @@ public class DirectionExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView,
             ViewGroup parent) {
-//        TextView textView = getGenericView();
-//        textView.setText(getGroup(groupPosition).toString());
 
         View row = convertView;
         DirectionHolder holder = null;
@@ -142,6 +140,7 @@ public class DirectionExpandableListAdapter extends BaseExpandableListAdapter {
 
             holder = new DirectionHolder();
             holder.imgIcon = (ImageView) row.findViewById(R.id.imgIcon);
+            holder.noIconText = (TextView) row.findViewById(R.id.noIconText);
             holder.txtDirection = (TextView) row.findViewById(R.id.directionText);
 
             row.setTag(holder);
@@ -150,8 +149,35 @@ public class DirectionExpandableListAdapter extends BaseExpandableListAdapter {
         }
 
         Direction dir = data[groupPosition];
-        holder.txtDirection.setText(dir.getDirectionIndex() + ". " + dir.getDirectionText());
-        holder.imgIcon.setImageResource(dir.getIcon());
+
+        if (!dir.isTransit()){
+            holder.txtDirection.setText(dir.getDirectionIndex() + ". " + dir.getDirectionText());
+            holder.imgIcon.setVisibility(View.VISIBLE);
+            holder.imgIcon.setImageResource(dir.getIcon());
+        }
+        else {
+            CharSequence textBeforeTime = dir.getDirectionIndex() + ". " +  dir.getService();
+            CharSequence text;
+            CharSequence time = dir.getOldTime();
+            text = new SpannableString(textBeforeTime);
+            if (dir.isRealTimeInfo()){
+                if (dir.getNewTime() != null){
+                    time = dir.getNewTime();
+                }
+            }
+            text = TextUtils.concat(text, " ", time, "\n", dir.getPlace());
+
+            holder.txtDirection.setText(text);
+            if (dir.getIcon() == -1){
+                holder.imgIcon.setVisibility(View.INVISIBLE);
+                holder.noIconText.setVisibility(View.VISIBLE);
+            }
+            else{
+                holder.imgIcon.setVisibility(View.VISIBLE);
+                holder.imgIcon.setImageResource(dir.getIcon());
+                holder.noIconText.setVisibility(View.INVISIBLE);
+            }
+        }
 
         return row;
 
@@ -171,6 +197,8 @@ public class DirectionExpandableListAdapter extends BaseExpandableListAdapter {
     static class DirectionHolder {
 
         ImageView imgIcon;
+
+        TextView noIconText;
 
         TextView txtDirection;
     }

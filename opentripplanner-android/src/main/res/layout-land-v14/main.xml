@@ -170,7 +170,7 @@
                         android:id="@+id/headerSpinOptimization"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="15sp"
+                        android:textSize="14sp"
                         android:text="@string/left_panel_header_optimization">
                 </TextView>
 
@@ -200,7 +200,7 @@
 
                 <TextView
                     android:id="@+id/headerSpinTravelmode"
-                    android:textSize="15sp"
+                    android:textSize="14sp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/left_panel_header_travel_mode">
@@ -310,7 +310,7 @@
 
                 <TextView
                         android:id="@+id/headerBikeParameters"
-                        android:textSize="15sp"
+                        android:textSize="14sp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/left_panel_header_bike_options">
@@ -327,7 +327,7 @@
 
                     <TextView
                             android:id="@+id/bikeParametersQuickTag"
-                            android:textSize="15sp"
+                            android:textSize="14sp"
                             android:textColor="@layout/color_bike_headers_red"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -338,7 +338,7 @@
 
                     <TextView
                             android:id="@+id/bikeParametersFlatTag"
-                            android:textSize="15sp"
+                            android:textSize="14sp"
                             android:textColor="@layout/color_bike_headers_green"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -349,7 +349,7 @@
 
                     <TextView
                             android:id="@+id/bikeParametersFriendlyTag"
-                            android:textSize="15sp"
+                            android:textSize="14sp"
                             android:textColor="@layout/color_bike_headers_blue"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"

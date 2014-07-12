@@ -20,9 +20,11 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -66,7 +68,10 @@ public class BikeRentalLoad extends AsyncTask<String, Integer, List<BikeRentalSt
     }
 
     protected List<BikeRentalStation> doInBackground(String... reqs) {
-        String u = reqs[0] + OTPApp.BIKE_RENTAL_LOCATION;
+        String prefix = PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(OTPApp.PREFERENCE_KEY_FOLDER_STRUCTURE_PREFIX
+                        , OTPApp.FOLDER_STRUCTURE_PREFIX_NEW);
+        String u = reqs[0] + prefix + OTPApp.BIKE_RENTAL_LOCATION;
         Log.d(OTPApp.TAG, "URL: " + u);
 
         HttpURLConnection urlConnection = null;
@@ -77,6 +82,7 @@ public class BikeRentalLoad extends AsyncTask<String, Integer, List<BikeRentalSt
             if (mapper == null) {
                 mapper = new ObjectMapper();
             }
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestProperty("Accept", "application/json");
             urlConnection.setConnectTimeout(OTPApp.HTTP_CONNECTION_TIMEOUT);

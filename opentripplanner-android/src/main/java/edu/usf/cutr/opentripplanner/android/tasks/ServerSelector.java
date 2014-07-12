@@ -24,7 +24,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.text.Editable;
@@ -242,7 +241,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
                             break;
                         }
                     }
-                    if (allFieldsNotNull && (serverString.length >= 8)) {
+                    if (allFieldsNotNull && (serverString.length >= 9)) {
                         try {
                             Server s = new Server(currentTime, serverString[0], serverString[1],
                                     serverString[2], serverString[3], serverString[4],
@@ -344,31 +343,9 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
 
         if (selectedServer != null) {
             //We've already auto-selected a server
-            SharedPreferences prefs = PreferenceManager
-                    .getDefaultSharedPreferences(context);
-            long serverId = prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0);
-            Server s = null;
-            boolean serverIsChanged = true;
-            if (serverId != 0) {
-                dataSource.open();
-                s = dataSource.getServer(prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0));
-                dataSource.close();
-            }
-            if (s != null) {
-                serverIsChanged = !(s.getRegion().equals(selectedServer.getRegion()));
-            }
-            if (showDialog || serverIsChanged) {
-                Toast.makeText(context,
-                        context.getResources().getString(R.string.toast_server_selector_detected) + " "
-                                + selectedServer.getRegion() + ". " + context.getResources()
-                                .getString(R.string.toast_server_selector_server_change_info),
-                        Toast.LENGTH_SHORT).show();
-            }
-            Editor e = prefs.edit();
-            e.putLong(PREFERENCE_KEY_SELECTED_SERVER, selectedServer.getId());
-            e.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false);
-            e.commit();
-            callback.onServerSelectorComplete(selectedServer);
+            ServerChecker serverChecker = new ServerChecker(activity,
+                    context, ServerSelector.this, false, true);
+            serverChecker.execute(selectedServer);
         } else if (knownServers != null && !knownServers.isEmpty()) {
             Log.d(OTPApp.TAG,
                     "No server automatically selected.  User will need to choose the OTP server.");
@@ -435,9 +412,8 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
                                                                         value);
 
                                                         ServerChecker serverChecker
-                                                                = new ServerChecker(
-                                                                activity, context,
-                                                                ServerSelector.this,
+                                                                = new ServerChecker(activity,
+                                                                context, ServerSelector.this, true,
                                                                 false);
                                                         serverChecker.execute(
                                                                 new Server(value, context));
@@ -462,15 +438,9 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
                                 //If this server region matches what the user picked, then set the server as the selected server
                                 if (server.getRegion().equals(items[item])) {
                                     selectedServer = server;
-                                    SharedPreferences prefs = PreferenceManager
-                                            .getDefaultSharedPreferences(
-                                                    context);
-                                    Editor e = prefs.edit();
-                                    e.putLong(PREFERENCE_KEY_SELECTED_SERVER,
-                                            selectedServer.getId());
-                                    e.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false);
-                                    e.commit();
-                                    callback.onServerSelectorComplete(selectedServer);
+                                    ServerChecker serverChecker = new ServerChecker(activity,
+                                            context, ServerSelector.this, false, false);
+                                    serverChecker.execute(selectedServer);
                                     break;
                                 }
                             }
@@ -489,28 +459,67 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
     }
 
     @Override
-    public void onServerCheckerComplete(String result, boolean isWorking) {
+    public void onServerCheckerComplete(String result, boolean isCustomServer,
+            boolean isAutoDetected, boolean isWorking) {
         SharedPreferences prefs = PreferenceManager
                 .getDefaultSharedPreferences(context);
         SharedPreferences.Editor prefsEditor = prefs.edit();
-        if (isWorking) {
-            prefsEditor.putBoolean(PREFERENCE_KEY_AUTO_DETECT_SERVER, false);
-            prefsEditor.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, true);
-            prefsEditor.putBoolean(PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, true);
-            prefsEditor.commit();
-            if (selectedCustomServer) {
-                String baseURL = prefs.getString(PREFERENCE_KEY_CUSTOM_SERVER_URL, "");
-                selectedServer = new Server(baseURL, context);
+        if (isCustomServer){
+            if (isWorking) {
+                prefsEditor.putBoolean(PREFERENCE_KEY_AUTO_DETECT_SERVER, false);
+                prefsEditor.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, true);
+                prefsEditor.putBoolean(PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, true);
+                prefsEditor.commit();
+                if (selectedCustomServer) {
+                    String baseURL = prefs.getString(PREFERENCE_KEY_CUSTOM_SERVER_URL, "");
+                    selectedServer = new Server(baseURL, context);
+                    callback.onServerSelectorComplete(selectedServer);
+                }
+            } else {
+                prefsEditor.putBoolean(PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, false);
+                prefsEditor.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false);
+                prefsEditor.commit();
+                Toast.makeText(context,
+                        context.getResources().getString(R.string.toast_server_checker_error_bad_url),
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+        else{
+            if (isWorking){
+                if (isAutoDetected){
+                    long serverId = prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0);
+                    Server s = null;
+                    boolean serverIsChanged = true;
+                    if (serverId != 0) {
+                        dataSource.open();
+                        s = dataSource.getServer(prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0));
+                        dataSource.close();
+                    }
+                    if (s != null) {
+                        serverIsChanged = !(s.getRegion().equals(selectedServer.getRegion()));
+                    }
+                    if (showDialog || serverIsChanged) {
+                        Toast.makeText(context,
+                                context.getResources()
+                                        .getString(R.string.toast_server_selector_detected) + " "
+                                        + selectedServer.getRegion() + ". " + context.getResources()
+                                        .getString(R.string.toast_server_selector_server_change_info),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+                prefsEditor.putLong(PREFERENCE_KEY_SELECTED_SERVER,
+                        selectedServer.getId());
+                prefsEditor.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false);
+                prefsEditor.commit();
                 callback.onServerSelectorComplete(selectedServer);
             }
-        } else {
-            prefsEditor.putBoolean(PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, false);
-            prefsEditor.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false);
-            Toast.makeText(context,
-                    context.getResources().getString(R.string.toast_server_checker_error_bad_url),
-                    Toast.LENGTH_SHORT).show();
+            else{
+                Toast.makeText(context,
+                        context.getResources()
+                                .getString(R.string.
+                                        toast_server_checker_error_unreachable_detected_server),
+                        Toast.LENGTH_SHORT).show();
+            }
         }
-
-        prefsEditor.commit();
     }
 }
