@@ -16,8 +16,6 @@
 
 package edu.usf.cutr.opentripplanner.android.tasks;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -32,6 +30,8 @@ import android.util.Log;
 import android.webkit.URLUtil;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.google.android.gms.maps.model.LatLng;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -242,7 +242,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
                             break;
                         }
                     }
-                    if (allFieldsNotNull && (serverString.length >= 8)) {
+                    if (allFieldsNotNull && (serverString.length >= 9)) {
                         try {
                             Server s = new Server(currentTime, serverString[0], serverString[1],
                                     serverString[2], serverString[3], serverString[4],
