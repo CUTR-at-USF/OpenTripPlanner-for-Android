@@ -3622,7 +3622,8 @@ public class MainFragment extends Fragment implements
 
                     mAppStarts = false;
                 }
-            } else if (mOTPApp.getSelectedServer() == null || mNewAppVersion) {
+            } else if (mOTPApp.getSelectedServer() == null || mNewAppVersion
+                    || mNeedToUpdateServersList) {
                 runAutoDetectServerNoLocation(true);
             }
         }
