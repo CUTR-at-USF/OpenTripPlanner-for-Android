@@ -336,6 +336,12 @@
     <string name="settings_menu_live_updates">Actualización de itinerarios a tempo real</string>
     <string name="settings_menu_live_updates_description">Notificarme cando cambien as horas da viaxe</string>
 
+            <!-- About -->
+            <string name="settings_menu_about_category">Acerca de</string>
+            <string name="settings_menu_about">OpenTripPlanner para Android</string>
+            <string name="settings_menu_feedback">Enviar comentario</string>
+            <string name="settings_menu_about_description">Licenza e agradecementos</string>
+
 
     <!-- Step-by-step screen -->
 
@@ -428,6 +434,55 @@
 
                         <!-- After the ordinal -->
                         <string name="step_by_step_non_transit_roundabout_exit">saída</string>
+
+    <!-- About screen -->
+
+        <!-- App desctiption -->
+
+            <!-- App name -->
+            <string name="about_screen_app_full_name">OpenTripPlanner para Android</string>
+
+            <!-- App description -->
+            <string name="about_screen_app_description">Unha app para Android de planeamento de rutas multi-modal e navegación usando calquera servidor OpenTripPlanner.
+Para máis detalles ver a <a href="https://github.com/CUTR-at-USF/OpenTripPlanner-for-Android/wiki">páxina do proxecto en GitHub</a>.
+</string>
+
+        <!-- Headers -->
+
+            <!-- Acknowledgements -->
+            <string name="about_screen_header_acknowledgements">Agradecementos</string>
+
+            <!-- License -->
+            <string name="about_screen_header_license">Licencia</string>
+
+        <!-- Acknowledgements -->
+        <string name="about_screen_acknowledgements">"Gustaríanos agradecer ás seguintes persoas por teren contribuído ao proxecto:\n
+Marcy Gordon\n
+Khoa Tran\n
+Sean Barbeau (sjbarbeau@gmail.com)\n
+Vreixo Gonzalez\n
+Grazas a <a href="http://thenounproject.com">thenounproject.com</a> polos iconos de modo
+            de transporte usados nos botóns e a
+<a href="http://mapicons.nicolasmollet.com">Nicollas Mollet \"Maps Icons Collection\"</a>
+polos iconos do mapa.\n Gracias ao programa Google Summer of Code por financiar o desenvolvimento
+            durante o verán de 2013!
+Esta aplicación usa \"Google Play Services Maps API V2\", pulsa abaixo para ver a licenza."</string>
+
+        <!-- Play services license -->
+        <string name="about_screen_button_play_services_license">Licenza de Play Services</string>
+
+        <!-- License -->
+        <string name="about_screen_license_apache">"Copyright (C) 2010-2014 University of South Florida
+e colaboradores individuais.\n
+Todos os dereitos reservados.\n
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+in compliance with the License. You may obtain
+<a href="http://www.apache.org/licenses/LICENSE-2.0">here</a> a copy of the license.\n
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied."</string>
+
+
 
 
     <!-- App wide  -->

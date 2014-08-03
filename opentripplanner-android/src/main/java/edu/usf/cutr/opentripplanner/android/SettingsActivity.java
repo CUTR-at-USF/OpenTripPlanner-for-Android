@@ -65,6 +65,8 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 
     private Preference serverRefreshButton;
 
+    private Preference aboutButton;
+
     private CheckBoxPreference selectedCustomServer;
 
     private CheckBoxPreference liveUpdates;
@@ -112,6 +114,8 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
                 OTPApp.PREFERENCE_KEY_MAX_WALKING_DISTANCE);
         wheelAccessible = (CheckBoxPreference) findPreference(
                 OTPApp.PREFERENCE_KEY_WHEEL_ACCESSIBLE);
+        aboutButton = findPreference(
+                OTPApp.PREFERENCE_KEY_ABOUT);
 
         String[] entriesArray = getResources().getStringArray(R.array.map_tiles_servers_names);
         ArrayList<String> entries = new ArrayList<String>(Arrays.asList(entriesArray));
@@ -364,6 +368,16 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
             liveUpdatesCategory.removePreference(liveUpdates);
             preferenceScreen.removePreference(liveUpdatesCategory);
         }
+
+        aboutButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Log.v(OTPApp.TAG, "About button clicked");
+                Intent intent = new Intent(SettingsActivity.this, AboutActivity.class);
+                startActivity(intent);
+                return true;
+            }
+        });
 
         providerFeedbackButton = (Preference) findPreference(
                 OTPApp.PREFERENCE_KEY_OTP_PROVIDER_FEEDBACK);
