@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pre-dex-items>
+
+    <item
+        dex="/home/foucelhas/git/OpenTripPlanner-for-Android/opentripplanner-android/build/intermediates/pre-dexed/debug/jackson-core-2.4.1-6e0398aafc9860b644756434555f92b041f2f87f.jar"
+        jar="/home/foucelhas/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.4.1/b130bcfb5a9c410c3cbd2e0adec9437e69a39e2c/jackson-core-2.4.1.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="b130bcfb5a9c410c3cbd2e0adec9437e69a39e2c"/>
+    <item
+        dex="/home/foucelhas/git/OpenTripPlanner-for-Android/opentripplanner-android/build/intermediates/pre-dexed/debug/opentripplanner-pojos-1.0.0-SNAPSHOT-0ea1591416ac117020fecc8a3cf9e8d69bcb930e.jar"
+        jar="/home/foucelhas/.gradle/caches/modules-2/files-2.1/edu.usf.cutr.opentripplanner.android/opentripplanner-pojos/1.0.0-SNAPSHOT/c48e64e98ad7c1adc6c93b2d97422901f88f2e9b/opentripplanner-pojos-1.0.0-SNAPSHOT.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="c48e64e98ad7c1adc6c93b2d97422901f88f2e9b"/>
+    <item
+        dex="/home/foucelhas/git/OpenTripPlanner-for-Android/opentripplanner-android/build/intermediates/pre-dexed/debug/support-v4-19.1.0-95a363f7fadad141ffe290eb5375030e031abdb4.jar"
+        jar="/opt/android-sdk/extras/android/m2repository/com/android/support/support-v4/19.1.0/support-v4-19.1.0.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="85f201b380937e61a9dce6ca90ccf6872abbfb67"/>
+    <item
+        dex="/home/foucelhas/git/OpenTripPlanner-for-Android/opentripplanner-android/build/intermediates/pre-dexed/debug/classes-572c88590ef76749819daa10c177c363157067f6.jar"
+        jar="/home/foucelhas/git/OpenTripPlanner-for-Android/opentripplanner-android/build/intermediates/exploded-aar/com.google.android.gms/play-services/3.2.65/classes.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="23023656ba91dc12e963cf7d5682db5d2aba6262"/>
+    <item
+        dex="/home/foucelhas/git/OpenTripPlanner-for-Android/opentripplanner-android/build/intermediates/pre-dexed/debug/jackson-databind-2.4.1.1-c4da4350ec92e9d0d9ff9d4bc49acfe7d1402771.jar"
+        jar="/home/foucelhas/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.4.1.1/c14345441fad67b33200e67ad59bdb26c245f541/jackson-databind-2.4.1.1.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="c14345441fad67b33200e67ad59bdb26c245f541"/>
+    <item
+        dex="/home/foucelhas/git/OpenTripPlanner-for-Android/opentripplanner-android/build/intermediates/pre-dexed/debug/opencsv-2.3-ee980e6d4190aa158c5fe784d10ea024b73f018e.jar"
+        jar="/home/foucelhas/.gradle/caches/modules-2/files-2.1/net.sf.opencsv/opencsv/2.3/c23708cdb9e80a144db433e23344a788a1fd6599/opencsv-2.3.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="c23708cdb9e80a144db433e23344a788a1fd6599"/>
+    <item
+        dex="/home/foucelhas/git/OpenTripPlanner-for-Android/opentripplanner-android/build/intermediates/pre-dexed/debug/jackson-annotations-2.4.1-c3c9a41aeda524e01f2c2361be9404917e9d7fca.jar"
+        jar="/home/foucelhas/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-annotations/2.4.1/55605135bd7b836612e0bba7037c9669f6ccf89f/jackson-annotations-2.4.1.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="55605135bd7b836612e0bba7037c9669f6ccf89f"/>
+
+</pre-dex-items>
