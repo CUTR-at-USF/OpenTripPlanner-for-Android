@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 
-import org.opentripplanner.v092snapshot.api.ws.Response;
+import org.opentripplanner.api.ws.Response;
 
 import android.content.Context;
 import android.util.Log;

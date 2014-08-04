@@ -19,8 +19,8 @@ package edu.usf.cutr.opentripplanner.android.tasks;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.api.ws.Message;
 import org.opentripplanner.api.ws.Request;
-import org.opentripplanner.v092snapshot.api.model.Itinerary;
-import org.opentripplanner.v092snapshot.api.ws.Response;
+import org.opentripplanner.api.model.Itinerary;
+import org.opentripplanner.api.ws.Response;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -29,6 +29,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -243,15 +244,16 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
             }
         }
 
-        String res = "/plan";
-
         if (selectedServer == null) {
             Toast.makeText(context,
                     context.getResources().getString(R.string.toast_no_server_selected_error),
                     Toast.LENGTH_SHORT).show();
             return null;
         }
-        String u = selectedServer.getBaseURL() + res + params;
+        String prefix = PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(OTPApp.PREFERENCE_KEY_FOLDER_STRUCTURE_PREFIX
+                        , OTPApp.FOLDER_STRUCTURE_PREFIX_NEW);
+        String u = selectedServer.getBaseURL() + prefix + OTPApp.PLAN_LOCATION + params;
 
         Log.d(OTPApp.TAG, "URL: " + u);
 

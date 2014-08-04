@@ -17,10 +17,15 @@
 package edu.usf.cutr.opentripplanner.android.util;
 
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.v092snapshot.api.model.Itinerary;
-import org.opentripplanner.v092snapshot.api.model.Leg;
+import org.opentripplanner.api.model.Itinerary;
+import org.opentripplanner.api.model.Leg;
 
 import android.content.Context;
+import android.preference.PreferenceManager;
+import android.text.SpannableString;
+import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StrikethroughSpan;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -42,7 +47,8 @@ import edu.usf.cutr.opentripplanner.android.R;
 
 public class ConversionUtils {
 
-    public static double getDuration(String startTimeText, String endTimeText) {
+    public static double getDuration(String startTimeText, String endTimeText,
+                                     Context applicationContext) {
         double duration = 0;
         DateFormat formatter;
         Date startTime = null, endTime = null;
@@ -58,7 +64,14 @@ public class ConversionUtils {
 
         duration = 0;
         if (startTime != null && endTime != null) {
-            duration = (endTime.getTime() - startTime.getTime()) / 1000;
+            if (PreferenceManager.getDefaultSharedPreferences(applicationContext)
+                    .getInt(OTPApp.PREFERENCE_KEY_API_VERSION, OTPApp.API_VERSION_V1)
+                    == OTPApp.API_VERSION_V1){
+                duration = (endTime.getTime() - startTime.getTime());
+            }
+            else{
+                duration = (endTime.getTime() - startTime.getTime()) / 1000;
+            }
         }
         return duration;
     }
@@ -113,25 +126,32 @@ public class ConversionUtils {
      * @param sec
      * @return
      */
-    public static String getFormattedDurationTextNoSeconds(long sec, Context applicationContext) {
+    public static String getFormattedDurationTextNoSeconds(long sec, boolean longFormat, Context applicationContext) {
         String text = "";
         long h = sec / 3600;
         if (h >= 24) {
             return null;
         }
         long m = (sec % 3600) / 60;
+        String longMinutes = applicationContext.getResources()
+                .getString(R.string.time_long_minutes);
+        String shortMinutes = applicationContext.getResources()
+                .getString(R.string.time_short_minutes);
+        if (longFormat){
+            longMinutes = applicationContext.getResources()
+                    .getString(R.string.time_full_minutes);
+        }
+        String shortHours = applicationContext.getResources()
+                .getString(R.string.time_short_hours);
         if (h > 0) {
-            text += Long.toString(h) + applicationContext.getResources()
-                    .getString(R.string.time_short_hours);
-            text += " " + Long.toString(m) + applicationContext.getResources()
-                    .getString(R.string.time_short_minutes);
+            text += Long.toString(h) + shortHours;
+            text += " " + Long.toString(m) + shortMinutes;
         } else {
             if (m == 0) {
-                text += Long.toString(m) + " " + applicationContext.getResources()
-                        .getString(R.string.time_long_minutes);
-            } else {
-                text += Long.toString(m) + " " + applicationContext.getResources()
-                        .getString(R.string.time_long_minutes);
+                text += "< 1 " + longMinutes;
+            }
+            else{
+                text += Long.toString(m) + " " + longMinutes;
             }
         }
         return text;
@@ -151,8 +171,8 @@ public class ConversionUtils {
                             && !containsTransitLegs) {
                         containsTransitLegs = true;
                     }
-                    if (leg.getAgencyTimeZoneOffset() != 0) {
-                        agencyTimeZoneOffset = leg.getAgencyTimeZoneOffset();
+                    if (agencyTimeZoneOffset != 0) {
+                        agencyTimeZoneOffset = leg.agencyTimeZoneOffset;
                         //If agencyTimeZoneOffset is different from 0, route contains transit legs
                         containsTransitLegs = true;
                         break;
@@ -162,7 +182,7 @@ public class ConversionUtils {
 
             if (useDeviceTimezone || !containsTransitLegs) {
                 agencyTimeZoneOffset = TimeZone.getDefault()
-                        .getOffset(itinerariesFixed.get(0).startTime.getTimeInMillis());
+                        .getOffset(Long.parseLong(itinerariesFixed.get(0).startTime));
             }
 
             if (agencyTimeZoneOffset != 0) {
@@ -179,8 +199,13 @@ public class ConversionUtils {
         }
     }
 
-    public static String getTimeWithContext(Context applicationContext, int offsetGMT, long time,
-            boolean inLine) {
+    public static CharSequence getTimeWithContext (Context applicationContext, int offsetGMT, long time,
+                        boolean inLine){
+        return getTimeWithContext(applicationContext, offsetGMT, time, inLine, -1);
+    }
+
+    public static CharSequence getTimeWithContext(Context applicationContext, int offsetGMT, long time,
+            boolean inLine, int color) {
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         DateFormat timeFormat = android.text.format.DateFormat.getTimeFormat(applicationContext);
         DateFormat dateFormat = android.text.format.DateFormat.getDateFormat(applicationContext);
@@ -199,39 +224,125 @@ public class ConversionUtils {
 
         cal.add(Calendar.MILLISECOND, offsetGMT);
 
+        SpannableString spannableTime = new SpannableString(timeFormat.format(cal.getTime()));
+        if (color != -1){
+            spannableTime.setSpan(new ForegroundColorSpan(color), 0,
+                    spannableTime.length(), 0);
+        }
+
         if (inLine) {
             if (ConversionUtils.isToday(cal)) {
-                return (" " + applicationContext.getResources()
-                        .getString(R.string.time_connector_before_time)
-                        + " " + timeFormat.format(cal.getTime()) + " " + noDeviceTimezoneNote);
+                return TextUtils.concat(" ",
+                        applicationContext
+                            .getResources()
+                            .getString(R.string.time_connector_before_time), " ", spannableTime,
+                        " ", noDeviceTimezoneNote);
             } else if (ConversionUtils.isTomorrow(cal)) {
-                return (" " + applicationContext.getResources()
-                        .getString(R.string.time_connector_next_day) + " "
-                        + applicationContext.getResources()
-                        .getString(R.string.time_connector_before_time) + " "
-                        + timeFormat.format(cal.getTime()) + " " + noDeviceTimezoneNote);
+                return TextUtils.concat(" ",
+                        applicationContext
+                            .getResources()
+                            .getString(R.string.time_connector_next_day), " ",
+                        applicationContext.getResources()
+                            .getString(R.string.time_connector_before_time), " ", spannableTime,
+                        " ", noDeviceTimezoneNote);
             } else {
-                return (" " + applicationContext.getResources()
-                        .getString(R.string.time_connector_before_date) + " " + dateFormat
-                        .format(cal.getTime()) + " " + applicationContext.getResources()
-                        .getString(R.string.time_connector_before_time) + " " + timeFormat
-                        .format(cal.getTime())
-                        + " " + noDeviceTimezoneNote);
+                return TextUtils.concat(" ", applicationContext
+                        .getResources()
+                        .getString(R.string.time_connector_before_date), " ",
+                        dateFormat.format(cal.getTime()), " ",
+                        applicationContext.getResources()
+                            .getString(R.string.time_connector_before_time), " ", spannableTime,
+                        " ", noDeviceTimezoneNote);
             }
         } else {
             if (ConversionUtils.isToday(cal)) {
-                return (timeFormat.format(cal.getTime()) + " " + noDeviceTimezoneNote);
+                return TextUtils.concat(spannableTime, " ", noDeviceTimezoneNote);
             } else if (ConversionUtils.isTomorrow(cal)) {
-                return (" " + timeFormat.format(cal.getTime()) + ", "
-                        + applicationContext.getResources()
-                        .getString(R.string.time_connector_next_day) + " "
-                        + noDeviceTimezoneNote);
+                return TextUtils.concat(" ", spannableTime, ", ",
+                        applicationContext
+                            .getResources()
+                            .getString(R.string.time_connector_next_day), " ",
+                        noDeviceTimezoneNote);
             } else {
-                return (timeFormat.format(cal.getTime()) + ", " + dateFormat.format(cal.getTime())
-                        + " " + noDeviceTimezoneNote);
+                return TextUtils.concat(spannableTime, ", ", dateFormat.format(cal.getTime()), " ",
+                        noDeviceTimezoneNote);
             }
         }
 
+    }
+
+    public static CharSequence getTimeUpdated(Context applicationContext, int offsetGMT, long oldTime,
+                                        long newTime) {
+        Calendar calOldTime = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+        Calendar calNewTime = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+        DateFormat timeFormat = android.text.format.DateFormat.getTimeFormat(applicationContext);
+        DateFormat dateFormat = android.text.format.DateFormat.getDateFormat(applicationContext);
+        timeFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        CharSequence timeUpdatedString;
+        CharSequence beforeDateString = "", beforeTimeString = "", newDateString = "", timezone = "";
+        SpannableString oldTimeString,oldDateString, newTimeString;
+        calOldTime.setTimeInMillis(oldTime);
+        calNewTime.setTimeInMillis(newTime);
+
+        String noDeviceTimezoneNote = "";
+        if (offsetGMT != TimeZone.getDefault().getOffset(oldTime)) {
+            noDeviceTimezoneNote = "GMT";
+            if (offsetGMT != 0) {
+                noDeviceTimezoneNote += offsetGMT / 3600000;
+            }
+        }
+
+        calOldTime.add(Calendar.MILLISECOND, offsetGMT);
+        calNewTime.add(Calendar.MILLISECOND, offsetGMT);
+
+        if (ConversionUtils.isTomorrow(calNewTime)) {
+            oldDateString = new SpannableString(applicationContext.getResources()
+                    .getString(R.string.time_connector_next_day) + " ");
+        } else {
+            beforeDateString = applicationContext.getResources()
+                    .getString(R.string.time_connector_before_date) + " ";
+            oldDateString = new SpannableString(dateFormat.format(calNewTime.getTime()) + " ");
+        }
+
+        if (calNewTime.get(Calendar.DAY_OF_MONTH) != calOldTime.get(Calendar.DAY_OF_MONTH)) {
+            beforeDateString = applicationContext.getResources()
+                    .getString(R.string.time_connector_before_date) + " ";
+            newDateString = dateFormat.format(calNewTime.getTime()) + " ";
+            oldDateString.setSpan(new StrikethroughSpan(), 0, oldDateString.length() - 1, 0);
+        }
+
+        beforeTimeString = applicationContext.getResources()
+                .getString(R.string.time_connector_before_time) + " ";
+        timezone = noDeviceTimezoneNote;
+
+        int color = getDelayColor(calNewTime.getTimeInMillis() - calOldTime.getTimeInMillis(),
+                applicationContext);
+        newTimeString = new SpannableString(timeFormat.format(calNewTime.getTime()) + " ");
+        newTimeString.setSpan(new ForegroundColorSpan(color), 0, newTimeString.length(), 0);
+        if (calOldTime.get(Calendar.HOUR_OF_DAY) != calNewTime.get(Calendar.HOUR_OF_DAY)
+                || calOldTime.get(Calendar.MINUTE) != calNewTime.get(Calendar.MINUTE)) {
+            oldTimeString = new SpannableString(timeFormat.format(calOldTime.getTime()) + " ");
+            oldTimeString.setSpan(new StrikethroughSpan(), 0, oldTimeString.length() - 1, 0);
+        }
+        else{
+            oldTimeString = new SpannableString(" ");
+        }
+        timeUpdatedString = TextUtils.concat(beforeDateString, newDateString, oldDateString,
+                beforeTimeString, oldTimeString, newTimeString, timezone);
+        return timeUpdatedString;
+    }
+
+    public static int getDelayColor(long delay, Context applicationContext){
+        if (delay == 0){
+            return applicationContext.getResources().getColor(R.color.sysDarkGreen);
+        }
+        else if (delay > 0){
+            return applicationContext.getResources().getColor(R.color.sysDarkBlue);
+        }
+        else{
+            return applicationContext.getResources().getColor(R.color.sysDarkRed);
+        }
     }
 
     public static boolean isToday(Calendar cal) {

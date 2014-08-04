@@ -17,11 +17,12 @@
 package edu.usf.cutr.opentripplanner.android.fragments;
 
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.v092snapshot.api.model.Itinerary;
-import org.opentripplanner.v092snapshot.api.model.Leg;
+import org.opentripplanner.api.model.Itinerary;
+import org.opentripplanner.api.model.Leg;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -153,8 +154,8 @@ public class DirectionListFragment extends ExpandableListFragment {
                 TraverseMode traverseMode = TraverseMode.valueOf(leg.mode);
                 if (traverseMode.isTransit()) {
                     itinerarySummaryList[i] = ConversionUtils
-                            .getRouteShortNameSafe(leg.getRouteShortName(),
-                                    leg.getRouteLongName(),
+                            .getRouteShortNameSafe(leg.routeShortName,
+                                    leg.routeLongName,
                                     getActivity().getApplicationContext()) + ". ";
                     isTransitIsTagSet = true;
                     break;
@@ -168,12 +169,22 @@ public class DirectionListFragment extends ExpandableListFragment {
 
         for (int i = 0; i < itinerarySummaryList.length; i++) {
             Itinerary it = itineraryList.get(i);
+            long tripDuration;
+            if (PreferenceManager.getDefaultSharedPreferences(
+                    getActivity().getApplicationContext())
+                    .getInt(OTPApp.PREFERENCE_KEY_API_VERSION, OTPApp.API_VERSION_V1)
+                    == OTPApp.API_VERSION_V1){
+                tripDuration = it.duration;
+            }
+            else{
+                tripDuration = it.duration / 1000;
+            }
             itinerarySummaryList[i] += getString(R.string.step_by_step_total_duration) + " " + ConversionUtils
-                    .getFormattedDurationTextNoSeconds(it.duration / 1000,
+                    .getFormattedDurationTextNoSeconds(tripDuration, false,
                             getActivity().getApplicationContext());
             if (isTransitIsTagSet) {
                 itinerarySummaryList[i] += "   " + getString(R.string.step_by_step_walking_duration) + " "
-                        + ConversionUtils.getFormattedDurationTextNoSeconds(it.walkTime,
+                        + ConversionUtils.getFormattedDurationTextNoSeconds(it.walkTime, false,
                         getActivity().getApplicationContext());
             }
         }
@@ -274,9 +285,9 @@ public class DirectionListFragment extends ExpandableListFragment {
         if (!actualItinerary.legs.isEmpty()) {
             Leg firstLeg = actualItinerary.legs.get(0);
             Leg lastLeg = actualItinerary.legs.get((actualItinerary.legs.size() - 1));
-            int agencyTimeZoneOffset = firstLeg.getAgencyTimeZoneOffset();
-            long startTimeInSeconds = Long.parseLong(firstLeg.getStartTime());
-            long endTimeInSeconds = Long.parseLong(lastLeg.getEndTime());
+            int agencyTimeZoneOffset = firstLeg.agencyTimeZoneOffset;
+            long startTimeInSeconds = Long.parseLong(firstLeg.startTime);
+            long endTimeInSeconds = Long.parseLong(lastLeg.endTime);
 
             departureTimeHeader.setText(ConversionUtils
                     .getTimeWithContext(getActivity().getApplicationContext(), agencyTimeZoneOffset,

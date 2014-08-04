@@ -16,6 +16,7 @@
 
 package edu.usf.cutr.opentripplanner.android.tasks;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.opentripplanner.api.ws.GraphMetadata;
@@ -24,6 +25,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -76,7 +78,10 @@ public class MetadataRequest extends AsyncTask<String, Integer, GraphMetadata> {
     }
 
     protected GraphMetadata doInBackground(String... reqs) {
-        String u = reqs[0] + OTPApp.METADATA_LOCATION;
+        String prefix = PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(OTPApp.PREFERENCE_KEY_FOLDER_STRUCTURE_PREFIX
+                        , OTPApp.FOLDER_STRUCTURE_PREFIX_NEW);
+        String u = reqs[0] + prefix + OTPApp.METADATA_LOCATION;
         Log.d(OTPApp.TAG, "URL: " + u);
 
         HttpURLConnection urlConnection = null;
@@ -87,6 +92,7 @@ public class MetadataRequest extends AsyncTask<String, Integer, GraphMetadata> {
             if (mapper == null) {
                 mapper = new ObjectMapper();
             }
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestProperty("Accept", "application/json");
             urlConnection.setConnectTimeout(OTPApp.HTTP_CONNECTION_TIMEOUT);

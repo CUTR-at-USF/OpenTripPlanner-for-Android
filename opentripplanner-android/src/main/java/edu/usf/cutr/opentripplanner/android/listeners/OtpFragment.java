@@ -18,8 +18,8 @@ package edu.usf.cutr.opentripplanner.android.listeners;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import org.opentripplanner.v092snapshot.api.model.Itinerary;
-import org.opentripplanner.v092snapshot.api.model.Leg;
+import org.opentripplanner.api.model.Itinerary;
+import org.opentripplanner.api.model.Leg;
 
 import android.support.v4.app.Fragment;
 

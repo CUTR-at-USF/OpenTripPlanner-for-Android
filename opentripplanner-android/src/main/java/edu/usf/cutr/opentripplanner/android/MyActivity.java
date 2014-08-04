@@ -18,8 +18,8 @@ package edu.usf.cutr.opentripplanner.android;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import org.opentripplanner.v092snapshot.api.model.Itinerary;
-import org.opentripplanner.v092snapshot.api.model.Leg;
+import org.opentripplanner.api.model.Itinerary;
+import org.opentripplanner.api.model.Leg;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -97,6 +97,13 @@ public class MyActivity extends FragmentActivity implements OtpFragment {
     }
 
     @Override
+    protected void onNewIntent (Intent intent){
+        if (intent.getAction() == OTPApp.INTENT_NOTIFICATION_RESUME_APP_WITH_TRIP_ID){
+            mainFragment.openModeMarker(intent.getStringExtra(OTPApp.BUNDLE_KEY_INTENT_TRIP_ID));
+        }
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case OTPApp.SETTINGS_REQUEST_CODE:
@@ -108,6 +115,8 @@ public class MyActivity extends FragmentActivity implements OtpFragment {
                                     false);
                     boolean changedTileProvider = data
                             .getBooleanExtra(OTPApp.CHANGED_MAP_TILE_PROVIDER_RETURN_KEY, false);
+                    boolean liveUpdatesDisabled = data
+                            .getBooleanExtra(OTPApp.LIVE_UPDATES_DISABLED_RETURN_KEY, false);
 
                     //				Toast.makeText(this, "Should server list refresh? " + shouldRefresh, Toast.LENGTH_LONG).show();
                     if (shouldRefresh) {
@@ -119,6 +128,9 @@ public class MyActivity extends FragmentActivity implements OtpFragment {
                     }
                     if (changedTileProvider) {
                         mainFragment.updateOverlay(null);
+                    }
+                    if (liveUpdatesDisabled) {
+                        mainFragment.listenForTripTimeUpdates(false, 0);
                     }
                     break;
                 }
@@ -165,6 +177,31 @@ public class MyActivity extends FragmentActivity implements OtpFragment {
     public void onItinerariesLoaded(List<Itinerary> itineraries) {
         currentItineraryList.clear();
         currentItineraryList.addAll(itineraries);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_LIVE_UPDATES,true)){
+            boolean realtimeLegsOnItineraries = false;
+            long soonerRealTimeDeparture = Long.MAX_VALUE;
+            for (Itinerary itinerary : itineraries){
+                for (Leg leg : itinerary.legs){
+                    if (leg.realtime){
+                        long legRealtimeDeparture = Long.parseLong(leg.startTime);
+                        if (legRealtimeDeparture < soonerRealTimeDeparture){
+                            soonerRealTimeDeparture = legRealtimeDeparture;
+                        }
+                        realtimeLegsOnItineraries = true;
+                    }
+                }
+                if (realtimeLegsOnItineraries){
+                    break;
+                }
+            }
+            if (realtimeLegsOnItineraries){
+                SharedPreferences.Editor prefsEditor = prefs.edit();
+                prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_REALTIME_AVAILABLE, true);
+                prefsEditor.commit();
+                mainFragment.listenForTripTimeUpdates(true, soonerRealTimeDeparture);
+            }
+        }
     }
 
     @Override

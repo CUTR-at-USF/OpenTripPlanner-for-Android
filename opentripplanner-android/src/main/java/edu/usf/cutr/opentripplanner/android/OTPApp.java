@@ -40,6 +40,24 @@ public class OTPApp extends Application {
 
     public static final String BIKE_RENTAL_LOCATION = "/bike_rental";
 
+    public static final String TRIP_TIMES_UPDATES_LOCATION_BEFORE_ID = "/index/trips/";
+
+    public static final String TRIP_TIMES_UPDATES_LOCATION_AFTER_ID = "/stoptimes";
+
+    public static final String PLAN_LOCATION = "/plan";
+
+    public static final String SERVER_INFO_LOCATION_OLD = "/serverinfo";
+
+    public static final String SERVER_INFO_LOCATION_NEW = "";
+
+    public static final int API_VERSION_V1 = 1;
+
+    public static final int API_VERSION_PRE_V1 = 0;
+
+    public static final String FOLDER_STRUCTURE_PREFIX_NEW = "/routers/default";
+
+    public static final String FOLDER_STRUCTURE_PREFIX_OLD = "";
+
     public static final String URL_ENCODING = "UTF-8";
 
     public static final String REFRESH_SERVER_RETURN_KEY = "RefreshServer";
@@ -48,6 +66,8 @@ public class OTPApp extends Application {
             = "ChangedSelectedCustomServer";
 
     public static final String CHANGED_MAP_TILE_PROVIDER_RETURN_KEY = "ChangedMapTileProvider";
+
+    public static final String LIVE_UPDATES_DISABLED_RETURN_KEY = "RefreshServer";
 
     public static final String TAG_FRAGMENT_MAIN_FRAGMENT = "mainFragment";
 
@@ -141,6 +161,8 @@ public class OTPApp extends Application {
 
     public static final String BUNDLE_KEY__IS_ALARM_BIKE_RENTAL_ACTIVE = "is alarm bike rental active";
 
+    public static final String BUNDLE_KEY_INTENT_TRIP_ID = "intent trip id";
+
     public static final int COLOR_ROUTE_LINE = 0x7F0000FF;
 
     /**
@@ -190,6 +212,20 @@ public class OTPApp extends Application {
 
     public static final String PREFERENCE_KEY_LAST_OPTIMIZATION = "last_optimization";
 
+    public static final String PREFERENCE_KEY_API_VERSION = "last_api_version";
+
+    public static final String PREFERENCE_KEY_FOLDER_STRUCTURE_PREFIX = "folder_structure_prefix";
+
+    public static final String PREFERENCE_KEY_LIVE_UPDATES = "live_updates";
+
+    public static final String PREFERENCE_KEY_LIVE_UPDATES_CATEGORY = "live_updates_category";
+
+    public static final String PREFERENCE_KEY_REALTIME_AVAILABLE = "real_time_available";
+
+    public static final String PREFERENCE_KEY_PREFERENCE_SCREEN = "preferences_screen";
+
+    public static final String PREFERENCE_KEY_APP_VERSION = "app_version";
+
     private static Server selectedServer;
 
     public static final String TAG = "OTP";
@@ -214,11 +250,26 @@ public class OTPApp extends Application {
 
     public static final String FORMAT_OTP_SERVER_TIME_QUERY = "kk:mm";
 
-    public static final long DEFAULT_UPDATE_INTERVAL = TimeUnit.SECONDS.toMillis(40);
+    public static final long DEFAULT_UPDATE_INTERVAL_BIKE_RENTAL = TimeUnit.SECONDS.toMillis(40);
+
+    public static final long DEFAULT_UPDATE_INTERVAL_TRIP_TIME = TimeUnit.SECONDS.toMillis(60);
 
     public static final String INTENT_UPDATE_BIKE_RENTAL_ACTION
             = "edu.usf.cutr.opentripplanner.android.OpenTripPlanner.UPDATE_BIKE_RENTAL";
 
+    public static final String INTENT_UPDATE_TRIP_TIME_ACTION
+            = "edu.usf.cutr.opentripplanner.android.OpenTripPlanner.UPDATE_TRIP_TIME";
+
+    public static final String INTENT_NOTIFICATION_ACTION_OPEN_APP
+            = "edu.usf.cutr.opentripplanner.android.OpenTripPlanner.NOTIFICATION_OPEN_APP";
+
+    public static final String INTENT_NOTIFICATION_ACTION_DISMISS_UPDATES
+            = "edu.usf.cutr.opentripplanner.android.OpenTripPlanner.NOTIFICATION_DISMISS_UPDATES";
+
+    public static final String INTENT_NOTIFICATION_RESUME_APP_WITH_TRIP_ID
+            = "edu.usf.cutr.opentripplanner.android.OpenTripPlanner.NOTIFICATION_RESUME";
+
+    public static final int NOTIFICATION_ID = 0;
 
     /**
      * Sets the currently selected OTP server

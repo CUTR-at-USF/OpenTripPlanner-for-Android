@@ -16,7 +16,7 @@
 
 package edu.usf.cutr.opentripplanner.android.listeners;
 
-import org.opentripplanner.v092snapshot.api.model.Itinerary;
+import org.opentripplanner.api.model.Itinerary;
 
 import java.util.List;
 

@@ -55,7 +55,7 @@ public class OtpSQLiteHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "OTPServers.db";
 
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     private static OtpSQLiteHelper mInstance = null;
 

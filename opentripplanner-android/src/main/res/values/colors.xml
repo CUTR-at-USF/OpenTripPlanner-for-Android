@@ -2,13 +2,16 @@
 <resources>
     <color name="sysBlack">#FF000000</color>
     <color name="sysBlue">#FF0000FF</color>
+    <color name="sysDarkBlue">#FF0000D0</color>
     <color name="sysCyan">#FF00FFFF</color>
     <color name="sysDkGray">#FF444444</color>
     <color name="sysGray">#FF888888</color>
     <color name="sysGreen">#FF00FF00</color>
+    <color name="sysDarkGreen">#FF00D000</color>
     <color name="sysLtGray">#FFCCCCCC</color>
     <color name="sysMagenta">#FFFF00FF</color>
     <color name="sysRed">#FFFF0000</color>
+    <color name="sysDarkRed">#FFD00000</color>
     <color name="sysTransparent">#00000000</color>
     <color name="sysWhite">#FFFFFFFF</color>
     <color name="sysYellow">#FFFFFF00</color>

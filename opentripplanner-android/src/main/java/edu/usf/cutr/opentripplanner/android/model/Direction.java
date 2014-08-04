@@ -28,20 +28,41 @@ public class Direction {
 
     private int directionIndex;
 
-    private String directionText;
+    private CharSequence directionText;
+
+    private CharSequence service;
+
+    private CharSequence place;
+
+    private CharSequence oldTime;
+
+    private CharSequence newTime = null;
+
+    private boolean isTransit = false;
 
     private ArrayList<Direction> subDirections = null;
 
-    private double distanceTraveled;
+    private boolean realTimeInfo = false;
 
     public Direction() {
         super();
     }
 
-    public Direction(int icon, String directionText) {
+    public Direction(int icon, CharSequence service, CharSequence place, CharSequence oldTime,
+                     CharSequence newTime, boolean isTransit) {
         super();
         this.setIcon(icon);
-        this.setDirectionText(directionText);
+        this.service = service;
+        this.place = place;
+        this.oldTime = oldTime;
+        this.newTime = newTime;
+        this.isTransit = isTransit;
+    }
+
+    public Direction(int icon, CharSequence directionText) {
+        super();
+        this.setIcon(icon);
+        this.directionText = directionText;
     }
 
     /**
@@ -58,33 +79,12 @@ public class Direction {
         this.icon = icon;
     }
 
-    /**
-     * @return the directionText
-     */
-    public String getDirectionText() {
-        return directionText;
+    public CharSequence getService() {
+        return service;
     }
 
-    /**
-     * @param directionText the directionText to set
-     */
-    public void setDirectionText(String directionText) {
-        this.directionText = directionText;
-    }
-
-
-    /**
-     * @return the distanceTraveled
-     */
-    public double getDistanceTraveled() {
-        return distanceTraveled;
-    }
-
-    /**
-     * @param distanceTraveled the distanceTraveled to set
-     */
-    public void setDistanceTraveled(double distanceTraveled) {
-        this.distanceTraveled = distanceTraveled;
+    public void setService(CharSequence service) {
+        this.service = service;
     }
 
     /**
@@ -109,4 +109,52 @@ public class Direction {
         this.directionIndex = directionIndex;
     }
 
+    public CharSequence getOldTime() {
+        return oldTime;
+    }
+
+    public void setOldTime(CharSequence oldTime) {
+        this.oldTime = oldTime;
+    }
+
+    public CharSequence getNewTime() {
+        return newTime;
+    }
+
+    public void setNewTime(CharSequence newTime) {
+        this.newTime = newTime;
+    }
+
+    public CharSequence getPlace() {
+        return place;
+    }
+
+    public void setPlace(CharSequence place) {
+        this.place = place;
+    }
+
+    public boolean isTransit() {
+        return isTransit;
+    }
+
+    public void setTransit(boolean isTransit) {
+        this.isTransit = isTransit;
+    }
+
+    public boolean isRealTimeInfo() {
+
+        return realTimeInfo;
+    }
+
+    public void setRealTimeInfo(boolean realTimeInfo) {
+        this.realTimeInfo = realTimeInfo;
+    }
+
+    public CharSequence getDirectionText() {
+        return directionText;
+    }
+
+    public void setDirectionText(CharSequence directionText) {
+        this.directionText = directionText;
+    }
 }

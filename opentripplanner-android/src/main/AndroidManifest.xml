@@ -54,7 +54,7 @@
 
     <application
             android:name=".OTPApp"
-            android:icon="@drawable/ic_launcher_opentripplanner"
+            android:icon="@drawable/ic_launcher"
             android:label="@string/app_name"
             android:allowBackup="true">
         <activity
@@ -65,7 +65,6 @@
                 android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
