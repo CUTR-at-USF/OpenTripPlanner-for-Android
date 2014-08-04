@@ -65,6 +65,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -3544,6 +3546,19 @@ public class MainFragment extends Fragment implements
     public void onConnected(Bundle connectionHint) {
         Location mCurrentLocation = mLocationClient.getLastLocation();
         boolean autodetectServerTriggered = false;
+        boolean newVersion = false;
+        try {
+            PackageInfo packageInfo = getActivity().getPackageManager()
+                    .getPackageInfo(getActivity().getPackageName(), 0);
+            int newVersionCode = packageInfo.versionCode;
+            int oldVersionCode = mPrefs.getInt(OTPApp.PREFERENCE_KEY_APP_VERSION, newVersionCode);
+            SharedPreferences.Editor editor = mPrefs.edit();
+            editor.putInt(OTPApp.PREFERENCE_KEY_APP_VERSION, newVersionCode);
+            editor.commit();
+            newVersion = newVersionCode != oldVersionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
 
         if ((!mMapFailed)) {
             if (mCurrentLocation != null) {
@@ -3562,7 +3577,7 @@ public class MainFragment extends Fragment implements
                 Location.distanceBetween(savedLatitude, savedLongitude, mCurrentLatLng.latitude,
                         mCurrentLatLng.longitude, distance);
 
-                if (!checkServersAreUpdated()) {
+                if (!checkServersAreUpdated() || newVersion) {
                     runAutoDetectServer(mCurrentLatLng, false);
                 } else {
                     if (mNeedToRunAutoDetect) {
@@ -3611,7 +3626,7 @@ public class MainFragment extends Fragment implements
 
                     mAppStarts = false;
                 }
-            } else if (mOTPApp.getSelectedServer() == null) {
+            } else if (mOTPApp.getSelectedServer() == null || newVersion) {
                 runAutoDetectServerNoLocation(true);
             }
         }
