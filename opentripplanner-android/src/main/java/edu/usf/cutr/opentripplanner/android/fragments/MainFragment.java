@@ -502,7 +502,7 @@ public class MainFragment extends Fragment implements
 
             mItinerarySelectionSpinner = (Spinner) mainView.findViewById(R.id.itinerarySelection);
 
-            Log.v(OTPApp.TAG, "finish onStart()");
+            Log.d(OTPApp.TAG, "finish onStart()");
 
             if (Build.VERSION.SDK_INT > 11) {
                 LayoutTransition l = new LayoutTransition();
@@ -520,7 +520,7 @@ public class MainFragment extends Fragment implements
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        Log.v(OTPApp.TAG, "onActivityCreated");
+        Log.d(OTPApp.TAG, "onActivityCreated");
         super.onActivityCreated(savedInstanceState);
 
         mApplicationContext = getActivity().getApplicationContext();
@@ -2438,7 +2438,7 @@ public class MainFragment extends Fragment implements
 
         listenForBikeUpdates(mIsAlarmBikeRentalUpdateActive);
 
-        Log.v(OTPApp.TAG, "MainFragment onResume");
+        Log.d(OTPApp.TAG, "MainFragment onResume");
     }
 
     @Override
@@ -2490,7 +2490,7 @@ public class MainFragment extends Fragment implements
             MetadataRequest metaRequest = new MetadataRequest(weakContext, mApplicationContext,
                     this);
             metaRequest.execute(mPrefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
-            Log.v(OTPApp.TAG, "Now using custom OTP server: " + mPrefs
+            Log.d(OTPApp.TAG, "Now using custom OTP server: " + mPrefs
                     .getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
         } else if ((serverId = mPrefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)) != 0){
             ServersDataSource dataSource = ServersDataSource.getInstance(mApplicationContext);
@@ -2517,9 +2517,9 @@ public class MainFragment extends Fragment implements
                 }
             }
 
-            Log.v(OTPApp.TAG, "Now using OTP server: " + server.getRegion());
+            Log.d(OTPApp.TAG, "Now using OTP server: " + server.getRegion());
         } else {
-            Log.v(OTPApp.TAG, "Server not selected yet, should be first start or app update");
+            Log.d(OTPApp.TAG, "Server not selected yet, should be first start or app update");
             return;
         }
         if (server.getOffersBikeRental()){
@@ -2860,7 +2860,7 @@ public class MainFragment extends Fragment implements
      *                                                  any, otherwise to route.
      */
     public void showRouteOnMap(List<Leg> itinerary, int animateCamera) {
-        Log.v(OTPApp.TAG,
+        Log.d(OTPApp.TAG,
                 "(TripRequest) legs size = "
                         + Integer.toString(itinerary.size()));
         if (mRoute != null) {
@@ -3328,7 +3328,7 @@ public class MainFragment extends Fragment implements
                     Address address = addressesReturn.get(i);
                     addressesText[i] = getStringAddress(address, true);
 
-                    Log.v(OTPApp.TAG, addressesText[i].toString());
+                    Log.d(OTPApp.TAG, addressesText[i].toString());
                 }
 
                 final ArrayList<Address> addressesTemp = addressesReturn;
@@ -3337,7 +3337,7 @@ public class MainFragment extends Fragment implements
                             public void onClick(DialogInterface dialog, int item) {
                                 Address address = addressesTemp.get(item);
                                 moveMarker(isStartTextbox, address);
-                                Log.v(OTPApp.TAG, "Chosen: " + addressesText[item]);
+                                Log.d(OTPApp.TAG, "Chosen: " + addressesText[item]);
                                 MainFragment.this.requestTripAfterGeocoding();
                             }
                         });
@@ -3400,9 +3400,9 @@ public class MainFragment extends Fragment implements
             prefsEditor.putString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS, bounds);
             prefsEditor.commit();
 
-            Log.v(OTPApp.TAG, "LowerLeft: " + Double.toString(lowerLeftLatitude) + "," + Double
+            Log.d(OTPApp.TAG, "LowerLeft: " + Double.toString(lowerLeftLatitude) + "," + Double
                     .toString(lowerLeftLongitude));
-            Log.v(OTPApp.TAG, "UpperRight" + Double.toString(upperRightLatitude) + "," + Double
+            Log.d(OTPApp.TAG, "UpperRight" + Double.toString(upperRightLatitude) + "," + Double
                     .toString(upperRightLongitude));
 
             addBoundariesRectangle(selectedServer);
@@ -3696,7 +3696,7 @@ public class MainFragment extends Fragment implements
         this.mTripDate = tripDate;
         this.mArriveBy = arriveBy;
         String tripTime = tripDate.toString() + arriveBy;
-        Log.v(OTPApp.TAG, tripTime);
+        Log.d(OTPApp.TAG, tripTime);
     }
 
     @Override
@@ -3710,7 +3710,7 @@ public class MainFragment extends Fragment implements
         mBikeTriangleMinValue = minValue;
         mBikeTriangleMaxValue = maxValue;
         String bikeParam = minValue.toString() + maxValue.toString();
-        Log.v(OTPApp.TAG, bikeParam);
+        Log.d(OTPApp.TAG, bikeParam);
     }
 
     @Override

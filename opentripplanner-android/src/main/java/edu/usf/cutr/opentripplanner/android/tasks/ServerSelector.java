@@ -139,14 +139,14 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
         // If not forced to refresh list
         if (!mustRefreshList) {
             // Check if servers are stored in SQLite?
-            Log.v(OTPApp.TAG, "Attempt retrieving servers from sqlite");
+            Log.d(OTPApp.TAG, "Attempt retrieving servers from sqlite");
             serverList = getServersFromSQLite();
         }
 
         // If forced to refresh list OR
         // If severs are not stored, download list from the Google Spreadsheet and Insert to database
         if (serverList == null || serverList.isEmpty() || mustRefreshList) {
-            Log.v(OTPApp.TAG,
+            Log.d(OTPApp.TAG,
                     "No data from sqlite. Attempt retrieving servers from google spreadsheet");
             serverList = downloadServerList(
                     context.getResources().getString(R.string.servers_spreadsheet_url));
@@ -184,7 +184,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
             shown += s.getRegion() + s.getDate().toString() + "\n";
             servers.add(new Server(s));
         }
-        Log.v(OTPApp.TAG, shown);
+        Log.d(OTPApp.TAG, shown);
         dataSource.close();
 
         dataSource.open();
@@ -445,7 +445,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
                                 }
                             }
                         }
-                        Log.v(OTPApp.TAG, "Chosen: " + items[item]);
+                        Log.d(OTPApp.TAG, "Chosen: " + items[item]);
                     }
                 });
                 builder.show();
