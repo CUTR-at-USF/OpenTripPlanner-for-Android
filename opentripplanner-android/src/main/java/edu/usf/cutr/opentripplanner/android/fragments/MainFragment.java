@@ -16,39 +16,6 @@
 
 package edu.usf.cutr.opentripplanner.android.fragments;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.location.LocationClient;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.UiSettings;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.maps.model.TileOverlay;
-import com.google.android.gms.maps.model.TileOverlayOptions;
-
-import org.opentripplanner.api.ws.GraphMetadata;
-import org.opentripplanner.api.ws.Request;
-import org.opentripplanner.index.model.TripTimeShort;
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.core.OptimizeType;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.api.model.Itinerary;
-import org.opentripplanner.api.model.Leg;
-
 import android.animation.LayoutTransition;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -126,6 +93,39 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.model.TileOverlay;
+import com.google.android.gms.maps.model.TileOverlayOptions;
+
+import org.opentripplanner.api.model.Itinerary;
+import org.opentripplanner.api.model.Leg;
+import org.opentripplanner.api.ws.GraphMetadata;
+import org.opentripplanner.api.ws.Request;
+import org.opentripplanner.index.model.TripTimeShort;
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
+
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.net.URLEncoder;
@@ -170,10 +170,10 @@ import edu.usf.cutr.opentripplanner.android.util.CustomInfoWindowAdapter;
 import edu.usf.cutr.opentripplanner.android.util.DateTimeDialog;
 import edu.usf.cutr.opentripplanner.android.util.DirectionsGenerator;
 import edu.usf.cutr.opentripplanner.android.util.LocationUtil;
-import edu.usf.cutr.opentripplanner.android.util.TripInfo;
 import edu.usf.cutr.opentripplanner.android.util.RangeSeekBar;
 import edu.usf.cutr.opentripplanner.android.util.RangeSeekBar.OnRangeSeekBarChangeListener;
 import edu.usf.cutr.opentripplanner.android.util.RightDrawableOnTouchListener;
+import edu.usf.cutr.opentripplanner.android.util.TripInfo;
 
 /**
  * Main UI screen of the mOTPApp, showing the map.
@@ -343,6 +343,8 @@ public class MainFragment extends Fragment implements
     Intent mBikeRentalUpdateIntent;
 
     CustomInfoWindowAdapter mCustomInfoWindowAdapter;
+
+    boolean mNewAppVersion = false;
 
     @SuppressWarnings("deprecation")
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -552,6 +554,8 @@ public class MainFragment extends Fragment implements
             prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false);
             prefsEditor.commit();
         }
+
+        checkAppVersion();
 
         if (!mMapFailed) {
             updateSelectedServer(false);
@@ -2515,7 +2519,7 @@ public class MainFragment extends Fragment implements
 
             Log.v(OTPApp.TAG, "Now using OTP server: " + server.getRegion());
         } else {
-            Log.v(OTPApp.TAG, "Server not selected yet, should be first start");
+            Log.v(OTPApp.TAG, "Server not selected yet, should be first start or app update");
             return;
         }
         if (server.getOffersBikeRental()){
@@ -3542,23 +3546,15 @@ public class MainFragment extends Fragment implements
         }
     }
 
+    /**
+     * Called by Google Play Services when this app is connected
+     *
+     * @param connectionHint
+     */
     @Override
     public void onConnected(Bundle connectionHint) {
         Location mCurrentLocation = mLocationClient.getLastLocation();
         boolean autodetectServerTriggered = false;
-        boolean newVersion = false;
-        try {
-            PackageInfo packageInfo = getActivity().getPackageManager()
-                    .getPackageInfo(getActivity().getPackageName(), 0);
-            int newVersionCode = packageInfo.versionCode;
-            int oldVersionCode = mPrefs.getInt(OTPApp.PREFERENCE_KEY_APP_VERSION, newVersionCode);
-            SharedPreferences.Editor editor = mPrefs.edit();
-            editor.putInt(OTPApp.PREFERENCE_KEY_APP_VERSION, newVersionCode);
-            editor.commit();
-            newVersion = newVersionCode != oldVersionCode;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
 
         if ((!mMapFailed)) {
             if (mCurrentLocation != null) {
@@ -3577,7 +3573,7 @@ public class MainFragment extends Fragment implements
                 Location.distanceBetween(savedLatitude, savedLongitude, mCurrentLatLng.latitude,
                         mCurrentLatLng.longitude, distance);
 
-                if (!checkServersAreUpdated() || newVersion) {
+                if (!checkServersAreUpdated() || mNewAppVersion) {
                     runAutoDetectServer(mCurrentLatLng, false);
                 } else {
                     if (mNeedToRunAutoDetect) {
@@ -3626,7 +3622,7 @@ public class MainFragment extends Fragment implements
 
                     mAppStarts = false;
                 }
-            } else if (mOTPApp.getSelectedServer() == null || newVersion) {
+            } else if (mOTPApp.getSelectedServer() == null || mNewAppVersion) {
                 runAutoDetectServerNoLocation(true);
             }
         }
@@ -4000,6 +3996,42 @@ public class MainFragment extends Fragment implements
                 (NotificationManager) mApplicationContext.getSystemService(Context.NOTIFICATION_SERVICE);
 
         notificationManager.notify(OTPApp.NOTIFICATION_ID, mBuilder.build());
+    }
+
+    /**
+     * Checks to see if this version of OTP Android is higher than the last executed version,
+     * and perform any cleanup necessary.
+     */
+    private void checkAppVersion() {
+        try {
+            PackageInfo packageInfo = getActivity().getPackageManager()
+                    .getPackageInfo(getActivity().getPackageName(), 0);
+            int newVersionCode = packageInfo.versionCode;
+            int oldVersionCode = mPrefs.getInt(OTPApp.PREFERENCE_KEY_APP_VERSION, newVersionCode);
+            SharedPreferences.Editor editor = mPrefs.edit();
+            editor.putInt(OTPApp.PREFERENCE_KEY_APP_VERSION, newVersionCode);
+            editor.commit();
+            mNewAppVersion = newVersionCode != oldVersionCode;
+
+            /**
+             * Special handling for introduction of PREFERENCE_KEY_APP_VERSION - see #309
+             * Otherwise, mNewVersion will be false the first time we execute version_code 13
+             * when installed as an update to version_code 12.
+             */
+            boolean executedVersion13 = mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_EXECUTED_VERSION_CODE_13, false);
+
+            if (mNewAppVersion || !executedVersion13) {
+                Log.d(OTPApp.TAG, "Updating from app version " + oldVersionCode + " to " +
+                        newVersionCode);
+                // Erase selected server, so server selection is run after an app update (#309)
+                editor.putLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0);
+                // We've executed version_code 13 or higher once, so set the preference
+                editor.putBoolean(OTPApp.PREFERENCE_KEY_EXECUTED_VERSION_CODE_13, true);
+                editor.commit();
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     public void openModeMarker(String tripId){

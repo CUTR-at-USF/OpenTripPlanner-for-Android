@@ -226,6 +226,8 @@ public class OTPApp extends Application {
 
     public static final String PREFERENCE_KEY_APP_VERSION = "app_version";
 
+    public static final String PREFERENCE_KEY_EXECUTED_VERSION_CODE_13 = "executed_version_13";
+
     private static Server selectedServer;
 
     public static final String TAG = "OTP";
