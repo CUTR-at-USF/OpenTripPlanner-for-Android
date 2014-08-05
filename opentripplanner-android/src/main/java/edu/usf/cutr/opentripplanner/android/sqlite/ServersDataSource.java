@@ -120,7 +120,6 @@ public class ServersDataSource {
     }
 
     public Server getServer(Long id) {
-        Log.v(OTPApp.TAG, "Found server with id: " + id);
         Server newServer = null;
 
         Cursor cursor = database.query(OtpSQLiteHelper.TABLE_SERVERS, allColumns,
@@ -129,6 +128,12 @@ public class ServersDataSource {
             newServer = cursorToServer(cursor);
         }
         cursor.close();
+
+        if (newServer != null) {
+            Log.v(OTPApp.TAG, "Found server with id: " + id);
+        } else {
+            Log.v(OTPApp.TAG, "Server with id " + id + " does not exist in database");
+        }
 
         return newServer;
     }
