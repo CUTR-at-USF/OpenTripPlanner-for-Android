@@ -120,7 +120,7 @@ public class ServersDataSource {
     }
 
     public Server getServer(Long id) {
-        Log.v(OTPApp.TAG, "Server deleted with id: " + id);
+        Log.v(OTPApp.TAG, "Found server with id: " + id);
         Server newServer = null;
 
         Cursor cursor = database.query(OtpSQLiteHelper.TABLE_SERVERS, allColumns,
