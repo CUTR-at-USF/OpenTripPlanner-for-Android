@@ -2519,7 +2519,7 @@ public class MainFragment extends Fragment implements
 
             Log.v(OTPApp.TAG, "Now using OTP server: " + server.getRegion());
         } else {
-            Log.v(OTPApp.TAG, "Server not selected yet, should be first start");
+            Log.v(OTPApp.TAG, "Server not selected yet, should be first start or app update");
             return;
         }
         if (server.getOffersBikeRental()){
@@ -4013,11 +4013,20 @@ public class MainFragment extends Fragment implements
             editor.commit();
             mNewAppVersion = newVersionCode != oldVersionCode;
 
-            if (mNewAppVersion) {
+            /**
+             * Special handling for introduction of PREFERENCE_KEY_APP_VERSION - see #309
+             * Otherwise, mNewVersion will be false the first time we execute version_code 13
+             * when installed as an update to version_code 12.
+             */
+            boolean executedVersion13 = mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_EXECUTED_VERSION_CODE_13, false);
+
+            if (mNewAppVersion || !executedVersion13) {
                 Log.d(OTPApp.TAG, "Updating from app version " + oldVersionCode + " to " +
                         newVersionCode);
                 // Erase selected server, so server selection is run after an app update (#309)
                 editor.putLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0);
+                // We've executed version_code 13 or higher once, so set the preference
+                editor.putBoolean(OTPApp.PREFERENCE_KEY_EXECUTED_VERSION_CODE_13, true);
                 editor.commit();
             }
         } catch (PackageManager.NameNotFoundException e) {

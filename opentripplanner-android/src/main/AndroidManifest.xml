@@ -16,10 +16,10 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="edu.usf.cutr.opentripplanner.android"
-          android:versionCode="12"
-          android:versionName="2.0.5">
+    android:versionCode="13"
+    android:versionName="2.1.0">
 
-    <uses-sdk
+<uses-sdk
             android:minSdkVersion="8"
             android:targetSdkVersion="13"/>
 
