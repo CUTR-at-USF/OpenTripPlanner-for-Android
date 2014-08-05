@@ -16,11 +16,6 @@
 
 package edu.usf.cutr.opentripplanner.android;
 
-import com.google.android.gms.maps.model.LatLng;
-
-import org.opentripplanner.api.model.Itinerary;
-import org.opentripplanner.api.model.Leg;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -33,6 +28,11 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+
+import com.google.android.gms.maps.model.LatLng;
+
+import org.opentripplanner.api.model.Itinerary;
+import org.opentripplanner.api.model.Leg;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -136,7 +136,7 @@ public class MyActivity extends FragmentActivity implements OtpFragment {
                 }
             case OTPApp.CHOOSE_CONTACT_REQUEST_CODE:
                 if (resultCode == RESULT_OK) {
-                    Log.v(OTPApp.TAG, "CHOOSE CONTACT RESULT OK");
+                    Log.d(OTPApp.TAG, "CHOOSE CONTACT RESULT OK");
 
                     Uri contactData = data.getData();
                     Cursor c = managedQuery(contactData, null, null, null, null);

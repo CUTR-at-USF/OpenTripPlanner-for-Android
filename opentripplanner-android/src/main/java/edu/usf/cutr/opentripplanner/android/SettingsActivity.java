@@ -298,7 +298,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
                     autoDetectServer.setEnabled(true);
                 }
 
-                Log.v(OTPApp.TAG, "Custom server Button clicked");
+                Log.d(OTPApp.TAG, "Custom server Button clicked");
 
                 returnIntent.putExtra(OTPApp.CHANGED_SELECTED_CUSTOM_SERVER_RETURN_KEY, true);
                 setResult(RESULT_OK, returnIntent);
@@ -327,7 +327,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
             }
         });
 
-        if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_REALTIME_AVAILABLE, false)){
+        if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_REALTIME_AVAILABLE, false)) {
             liveUpdates.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 
                 @Override
@@ -340,8 +340,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
                     return true;
                 }
             });
-        }
-        else{
+        } else {
             liveUpdatesCategory.removePreference(liveUpdates);
             preferenceScreen.removePreference(liveUpdatesCategory);
         }
@@ -352,7 +351,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
                 .setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                     @Override
                     public boolean onPreferenceClick(Preference arg0) {
-                        Log.v(OTPApp.TAG, "Provider Feedback Button clicked");
+                        Log.d(OTPApp.TAG, "Provider Feedback Button clicked");
                         String recipient = getString(R.string.feedback_email_android_developer);
 
                         String uriText = "mailto:" + recipient;
@@ -399,7 +398,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
                 .setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                     @Override
                     public boolean onPreferenceClick(Preference arg0) {
-                        Log.v(OTPApp.TAG, "Server Refresh Button clicked");
+                        Log.d(OTPApp.TAG, "Server Refresh Button clicked");
 
                         returnIntent.putExtra(OTPApp.REFRESH_SERVER_RETURN_KEY, true);
                         setResult(RESULT_OK, returnIntent);

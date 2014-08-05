@@ -114,7 +114,7 @@ public class ServersDataSource {
 
     public void deleteServer(Server server) {
         long id = server.getId();
-        Log.v(OTPApp.TAG, "Server deleted with id: " + id);
+        Log.d(OTPApp.TAG, "Server deleted with id: " + id);
         database.delete(OtpSQLiteHelper.TABLE_SERVERS, OtpSQLiteHelper.COLUMN_ID
                 + " = " + id, null);
     }
@@ -130,9 +130,9 @@ public class ServersDataSource {
         cursor.close();
 
         if (newServer != null) {
-            Log.v(OTPApp.TAG, "Found server with id: " + id);
+            Log.d(OTPApp.TAG, "Found server with id: " + id);
         } else {
-            Log.v(OTPApp.TAG, "Server with id " + id + " does not exist in database");
+            Log.d(OTPApp.TAG, "Server with id " + id + " does not exist in database");
         }
 
         return newServer;

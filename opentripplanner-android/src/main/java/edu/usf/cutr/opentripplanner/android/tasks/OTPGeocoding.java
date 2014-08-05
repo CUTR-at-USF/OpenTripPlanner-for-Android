@@ -16,8 +16,6 @@
 
 package edu.usf.cutr.opentripplanner.android.tasks;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -29,6 +27,8 @@ import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
+import com.google.android.gms.maps.model.LatLng;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -74,8 +74,8 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
     private Server selectedServer;
 
     public OTPGeocoding(WeakReference<Activity> activity, Context context, boolean isStartTextbox,
-            boolean geocodingForMarker, Server selectedServer, String placesService,
-            OTPGeocodingListener callback) {
+                        boolean geocodingForMarker, Server selectedServer, String placesService,
+                        OTPGeocodingListener callback) {
         this.context = context;
         this.activity = activity;
         this.isStartTextbox = isStartTextbox;
@@ -221,12 +221,13 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
             if (selectedServer != null) {
                 params.put(GooglePlaces.PARAM_LOCATION,
                         Double.toString(selectedServer.getGeometricalCenterLatitude()) + ","
-                                + Double.toString(selectedServer.getGeometricalCenterLongitude()));
+                                + Double.toString(selectedServer.getGeometricalCenterLongitude())
+                );
                 params.put(GooglePlaces.PARAM_RADIUS, Double.toString(selectedServer.getRadius()));
             }
             p = new GooglePlaces(getKeyFromResource());
 
-            Log.v(OTPApp.TAG, "Using Google Places!");
+            Log.d(OTPApp.TAG, "Using Google Places!");
         } else {
             params.put(Nominatim.PARAM_NAME, name);
             if (selectedServer != null) {
@@ -242,7 +243,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 
             p = new Nominatim();
 
-            Log.v(OTPApp.TAG, "Using Nominatim!");
+            Log.d(OTPApp.TAG, "Using Nominatim!");
         }
 
         ArrayList<POI> pois = new ArrayList<POI>();
@@ -251,7 +252,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
         List<Address> addresses = new ArrayList<Address>();
 
         for (POI poi : pois) {
-            Log.v(OTPApp.TAG, poi.getName() + " " + poi.getLatitude() + "," + poi.getLongitude());
+            Log.d(OTPApp.TAG, poi.getName() + " " + poi.getLatitude() + "," + poi.getLongitude());
             Address address = new Address(context.getResources().getConfiguration().locale);
             address.setLatitude(poi.getLatitude());
             address.setLongitude(poi.getLongitude());
@@ -284,7 +285,8 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                 }
-                            });
+                            }
+                    );
 
             AlertDialog alert = geocoderAlert.create();
             alert.show();

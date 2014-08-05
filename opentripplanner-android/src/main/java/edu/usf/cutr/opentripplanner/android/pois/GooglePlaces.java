@@ -16,11 +16,11 @@
 
 package edu.usf.cutr.opentripplanner.android.pois;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -102,7 +102,7 @@ public class GooglePlaces implements Places {
         request += "&sensor=false";
         request += "&key=" + getApiKey();
 
-        Log.v(OTPApp.TAG, request);
+        Log.d(OTPApp.TAG, request);
 
         HttpURLConnection urlConnection = null;
 
@@ -134,7 +134,7 @@ public class GooglePlaces implements Places {
                 urlConnection.disconnect();
             }
         }
-        Log.v(OTPApp.TAG, builder.toString());
+        Log.d(OTPApp.TAG, builder.toString());
 
         JSONObject json = null;
         try {
