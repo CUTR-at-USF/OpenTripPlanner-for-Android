@@ -39,13 +39,13 @@
         </fragment>
 
         <ImageButton
-                android:id="@+id/btnPlanTrip"
-                android:layout_height="match_parent"
+                android:id="@+id/btnSwapOriginDestination"
+                android:layout_height="55dp"
                 android:layout_width="55dp"
                 android:layout_alignTop="@+id/tbStartLocation"
-                android:layout_alignBottom="@+id/tbEndLocation"
+                android:layout_alignBottom="@id/tbStartLocation"
                 android:layout_alignParentRight="true"
-                android:src="@drawable/mode_transit"
+                android:src="@drawable/ic_action_import_export"
                 android:background="@drawable/button_layout">
         </ImageButton>
 
@@ -53,7 +53,8 @@
                 android:id="@+id/btnDateDialog"
                 android:layout_height="55dp"
                 android:layout_width="55dp"
-                android:layout_below="@+id/btnPlanTrip"
+                android:layout_alignTop="@+id/tbEndLocation"
+                android:layout_alignBottom="@id/tbEndLocation"
                 android:layout_alignParentRight="true"
                 android:src="@drawable/device_access_time"
                 android:background="@drawable/button_layout">
@@ -67,7 +68,7 @@
                 android:layout_margin="4dp"
                 android:singleLine="true"
                 android:drawableRight="@android:drawable/ic_input_get"
-                android:layout_toLeftOf="@id/btnPlanTrip"
+                android:layout_toLeftOf="@id/btnSwapOriginDestination"
                 android:background="@android:drawable/editbox_background">
         </EditText>
 
@@ -81,7 +82,7 @@
                 android:selectAllOnFocus="true"
                 android:singleLine="true"
                 android:drawableRight="@android:drawable/ic_input_get"
-                android:layout_toLeftOf="@id/btnPlanTrip"
+                android:layout_toLeftOf="@id/btnSwapOriginDestination"
                 android:background="@android:drawable/editbox_background">
         </EditText>
 
