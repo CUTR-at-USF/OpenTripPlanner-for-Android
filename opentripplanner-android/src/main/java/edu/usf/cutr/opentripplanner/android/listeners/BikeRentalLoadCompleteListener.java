@@ -16,15 +16,15 @@
 
 package edu.usf.cutr.opentripplanner.android.listeners;
 
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.bike_rental.BikeRentalStationList;
 
 import java.util.List;
 
 public interface BikeRentalLoadCompleteListener {
 
-    public void onBikeRentalStationListLoad(List<BikeRentalStation> bikeRentalStationCollection);
+    public void onBikeRentalStationListLoad(BikeRentalStationList bikeRentalStationCollection);
 
-    public void onBikeRentalStationListUpdate(List<BikeRentalStation> bikeRentalStationCollection);
+    public void onBikeRentalStationListUpdate(BikeRentalStationList bikeRentalStationCollection);
 
     public void onBikeRentalStationListFail();
 
