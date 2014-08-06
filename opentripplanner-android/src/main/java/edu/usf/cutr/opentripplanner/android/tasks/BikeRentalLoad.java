@@ -17,7 +17,6 @@
 package edu.usf.cutr.opentripplanner.android.tasks;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
@@ -28,7 +27,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.bike_rental.BikeRentalStationList;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -44,7 +43,7 @@ import edu.usf.cutr.opentripplanner.android.listeners.BikeRentalLoadCompleteList
  * @author Vreixo González
  */
 
-public class BikeRentalLoad extends AsyncTask<String, Integer, List<BikeRentalStation>> {
+public class BikeRentalLoad extends AsyncTask<String, Integer, BikeRentalStationList> {
 
     private WeakReference<Activity> activity;
 
@@ -67,7 +66,7 @@ public class BikeRentalLoad extends AsyncTask<String, Integer, List<BikeRentalSt
         // Do nothing
     }
 
-    protected List<BikeRentalStation> doInBackground(String... reqs) {
+    protected BikeRentalStationList doInBackground(String... reqs) {
         String prefix = PreferenceManager.getDefaultSharedPreferences(context)
                 .getString(OTPApp.PREFERENCE_KEY_FOLDER_STRUCTURE_PREFIX
                         , OTPApp.FOLDER_STRUCTURE_PREFIX_NEW);
@@ -75,7 +74,7 @@ public class BikeRentalLoad extends AsyncTask<String, Integer, List<BikeRentalSt
         Log.d(OTPApp.TAG, "URL: " + u);
 
         HttpURLConnection urlConnection = null;
-        List<BikeRentalStation> bikeRentalStationList = null;
+        BikeRentalStationList bikeRentalStationList = null;
 
         try {
             URL url = new URL(u);
@@ -87,8 +86,7 @@ public class BikeRentalLoad extends AsyncTask<String, Integer, List<BikeRentalSt
             urlConnection.setRequestProperty("Accept", "application/json");
             urlConnection.setConnectTimeout(OTPApp.HTTP_CONNECTION_TIMEOUT);
             urlConnection.setReadTimeout(OTPApp.HTTP_SOCKET_TIMEOUT);
-            JavaType bikeRentalStationListType = mapper.getTypeFactory().constructCollectionType(List.class, BikeRentalStation.class);
-            bikeRentalStationList = mapper.readValue(urlConnection.getInputStream(), bikeRentalStationListType);
+            bikeRentalStationList = mapper.readValue(urlConnection.getInputStream(), BikeRentalStationList.class);
         } catch (IOException e) {
             Log.e(OTPApp.TAG, "Error fetching JSON or XML: " + e);
             e.printStackTrace();
@@ -100,7 +98,7 @@ public class BikeRentalLoad extends AsyncTask<String, Integer, List<BikeRentalSt
         return bikeRentalStationList;
     }
 
-    protected void onPostExecute(List<BikeRentalStation> bikeRentalStationList) {
+    protected void onPostExecute(BikeRentalStationList bikeRentalStationList) {
         if (bikeRentalStationList != null) {
             if (firstLoad){
                 Toast.makeText(context,

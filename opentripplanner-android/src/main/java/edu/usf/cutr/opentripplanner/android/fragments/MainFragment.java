@@ -122,6 +122,7 @@ import org.opentripplanner.api.ws.GraphMetadata;
 import org.opentripplanner.api.ws.Request;
 import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.bike_rental.BikeRentalStationList;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -3714,35 +3715,38 @@ public class MainFragment extends Fragment implements
     }
 
     @Override
-    public void onBikeRentalStationListLoad(List<BikeRentalStation> bikeRentalStationList) {
-        if ((bikeRentalStationList != null) && !bikeRentalStationList.isEmpty()){
-            mBikeRentalStationsMarkers = new ArrayList<Marker>(bikeRentalStationList.size());
+    public void onBikeRentalStationListLoad(BikeRentalStationList bikeRentalStationList) {
+        if (bikeRentalStationList != null){
+            List<BikeRentalStation> listOfBikeRentalStations = bikeRentalStationList.stations;
+            if ((listOfBikeRentalStations != null) && !listOfBikeRentalStations.isEmpty()){
+                mBikeRentalStationsMarkers = new ArrayList<Marker>(listOfBikeRentalStations.size());
 
-            MarkerOptions bikeRentalStationMarkerOption = new MarkerOptions();
+                MarkerOptions bikeRentalStationMarkerOption = new MarkerOptions();
 
-            Drawable drawable = getResources().getDrawable(R.drawable.parking_bicycle);
-            if (drawable != null) {
-                BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable.getCurrent();
-                Bitmap bitmap = bitmapDrawable.getBitmap();
-                bikeRentalStationMarkerOption.icon(
-                        BitmapDescriptorFactory.fromBitmap(bitmap));
-            } else {
-                Log.e(OTPApp.TAG, "Error obtaining drawable to add bike rental icons to the map");
+                Drawable drawable = getResources().getDrawable(R.drawable.parking_bicycle);
+                if (drawable != null) {
+                    BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable.getCurrent();
+                    Bitmap bitmap = bitmapDrawable.getBitmap();
+                    bikeRentalStationMarkerOption.icon(
+                            BitmapDescriptorFactory.fromBitmap(bitmap));
+                } else {
+                    Log.e(OTPApp.TAG, "Error obtaining drawable to add bike rental icons to the map");
+                }
+
+                for (BikeRentalStation bikeRentalStation : listOfBikeRentalStations){
+                    bikeRentalStationMarkerOption.position(new LatLng(bikeRentalStation.y,
+                            bikeRentalStation.x));
+                    bikeRentalStationMarkerOption.title(bikeRentalStation.name);
+                    bikeRentalStationMarkerOption.snippet(getResources()
+                            .getString(R.string.map_markers_bike_rental_available_bikes) + " " +
+                            bikeRentalStation.bikesAvailable + " | " + getResources()
+                            .getString(R.string.map_markers_bike_rental_available_spaces) + " " +
+                            bikeRentalStation.spacesAvailable);
+                    Marker bikeRentalStationMarker = mMap.addMarker(bikeRentalStationMarkerOption);
+                    mBikeRentalStationsMarkers.add(bikeRentalStationMarker);
+                }
+                listenForBikeUpdates(true);
             }
-
-            for (BikeRentalStation bikeRentalStation : bikeRentalStationList){
-                bikeRentalStationMarkerOption.position(new LatLng(bikeRentalStation.y,
-                        bikeRentalStation.x));
-                bikeRentalStationMarkerOption.title(bikeRentalStation.name);
-                bikeRentalStationMarkerOption.snippet(getResources()
-                        .getString(R.string.map_markers_bike_rental_available_bikes) + " " +
-                        bikeRentalStation.bikesAvailable + " | " + getResources()
-                        .getString(R.string.map_markers_bike_rental_available_spaces) + " " +
-                        bikeRentalStation.spacesAvailable);
-                Marker bikeRentalStationMarker = mMap.addMarker(bikeRentalStationMarkerOption);
-                mBikeRentalStationsMarkers.add(bikeRentalStationMarker);
-            }
-            listenForBikeUpdates(true);
         }
         else{
             Toast.makeText(mApplicationContext, mApplicationContext.getResources().getString(R.string.toast_bike_rental_load_request_error),
@@ -3751,21 +3755,24 @@ public class MainFragment extends Fragment implements
     }
 
     @Override
-    public void onBikeRentalStationListUpdate(List<BikeRentalStation> bikeRentalStationList) {
+    public void onBikeRentalStationListUpdate(BikeRentalStationList bikeRentalStationList) {
         if (getActivity() != null){
-            if ((bikeRentalStationList != null) && !bikeRentalStationList.isEmpty()
-                    && (mBikeRentalStationsMarkers != null) && !mBikeRentalStationsMarkers.isEmpty()){
-                for (BikeRentalStation bikeRentalStation : bikeRentalStationList){
-                    for (Marker bikeRentalStationMarker : mBikeRentalStationsMarkers){
-                        if (bikeRentalStationMarker.getTitle().equals(bikeRentalStation.name)){
-                            bikeRentalStationMarker.setSnippet(getResources()
-                                    .getString(R.string.map_markers_bike_rental_available_bikes) + " " +
-                                    bikeRentalStation.bikesAvailable + " | " + getResources()
-                                    .getString(R.string.map_markers_bike_rental_available_spaces) + " " +
-                                    bikeRentalStation.spacesAvailable);
-                        }
-                        if (bikeRentalStationMarker.isInfoWindowShown()){
-                            bikeRentalStationMarker.showInfoWindow();
+            if (bikeRentalStationList != null) {
+                List<BikeRentalStation> listOfBikeRentalStations = bikeRentalStationList.stations;
+                if ((listOfBikeRentalStations != null) && !listOfBikeRentalStations.isEmpty()
+                        && (mBikeRentalStationsMarkers != null) && !mBikeRentalStationsMarkers.isEmpty()) {
+                    for (BikeRentalStation bikeRentalStation : listOfBikeRentalStations) {
+                        for (Marker bikeRentalStationMarker : mBikeRentalStationsMarkers) {
+                            if (bikeRentalStationMarker.getTitle().equals(bikeRentalStation.name)) {
+                                bikeRentalStationMarker.setSnippet(getResources()
+                                        .getString(R.string.map_markers_bike_rental_available_bikes) + " " +
+                                        bikeRentalStation.bikesAvailable + " | " + getResources()
+                                        .getString(R.string.map_markers_bike_rental_available_spaces) + " " +
+                                        bikeRentalStation.spacesAvailable);
+                            }
+                            if (bikeRentalStationMarker.isInfoWindowShown()) {
+                                bikeRentalStationMarker.showInfoWindow();
+                            }
                         }
                     }
                 }
