@@ -156,6 +156,7 @@ public class MyActivity extends FragmentActivity implements OtpFragment {
                         }
                         prefsEditor.commit();
                         mainFragment.processAddress(isButtonStartLocation, address, false);
+                        mainFragment.processRequestTrip();
                     }
 
                     break;
