@@ -449,7 +449,7 @@ public class DirectionsGenerator {
 
                 Place stop = stopsInBetween.get(i);
                 AgencyAndId agencyAndIdStop = stop.stopId;
-                String subDirectionText = Integer.toString(i) + ". " + stop.name + " (" +
+                String subDirectionText = Integer.toString(i + 1) + ". " + stop.name + " (" +
                         agencyAndIdStop.getAgencyId() + " " +
                         agencyAndIdStop.getId() + ")";
 
