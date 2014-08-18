@@ -60,7 +60,7 @@
                 android:background="@drawable/button_layout">
         </ImageButton>
 
-        <EditText
+        <AutoCompleteTextView
                 android:id="@id/tbStartLocation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -70,9 +70,9 @@
                 android:drawableRight="@android:drawable/ic_input_get"
                 android:layout_toLeftOf="@id/btnSwapOriginDestination"
                 android:background="@android:drawable/editbox_background">
-        </EditText>
+        </AutoCompleteTextView>
 
-        <EditText
+        <AutoCompleteTextView
                 android:id="@id/tbEndLocation"
                 android:layout_width="match_parent"
                 android:layout_below="@+id/tbStartLocation"
@@ -84,7 +84,7 @@
                 android:drawableRight="@android:drawable/ic_input_get"
                 android:layout_toLeftOf="@id/btnSwapOriginDestination"
                 android:background="@android:drawable/editbox_background">
-        </EditText>
+        </AutoCompleteTextView>
 
 
         <ImageButton

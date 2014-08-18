@@ -18,12 +18,33 @@ package edu.usf.cutr.opentripplanner.android.util;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
+import android.preference.PreferenceManager;
+import android.util.Log;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
+import edu.usf.cutr.opentripplanner.android.OTPApp;
+import edu.usf.cutr.opentripplanner.android.R;
 import edu.usf.cutr.opentripplanner.android.model.Server;
+import edu.usf.cutr.opentripplanner.android.pois.GooglePlaces;
+import edu.usf.cutr.opentripplanner.android.pois.Nominatim;
+import edu.usf.cutr.opentripplanner.android.pois.POI;
+import edu.usf.cutr.opentripplanner.android.pois.Places;
+import edu.usf.cutr.opentripplanner.android.util.CustomAddress;
 
 /**
  * Various utilities related to location data
@@ -124,5 +145,237 @@ public class LocationUtil {
         }
 
         return true;
+    }
+
+
+    public static ArrayList<CustomAddress> processGeocoding(Context context, Server selectedServer, String... reqs) {
+        ArrayList<CustomAddress> addressesReturn = new ArrayList<CustomAddress>();
+
+        String address = reqs[0];
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        if (address == null || address.equalsIgnoreCase("")) {
+            return null;
+        }
+
+        if (address.equalsIgnoreCase(context.getString(R.string.text_box_my_location))) {
+            String currentLat = reqs[1];
+            String currentLng = reqs[2];
+            LatLng latLng = new LatLng(Double.parseDouble(currentLat),
+                    Double.parseDouble(currentLng));
+
+            CustomAddress addressReturn = new CustomAddress(context.getResources().getConfiguration().locale);
+            addressReturn.setLatitude(latLng.latitude);
+            addressReturn.setLongitude(latLng.longitude);
+            addressReturn.setAddressLine(addressReturn.getMaxAddressLineIndex() + 1,
+                    context.getString(R.string.text_box_my_location));
+
+            addressesReturn.add(addressReturn);
+
+            return addressesReturn;
+        }
+
+        List<CustomAddress> addresses = new ArrayList<CustomAddress>();
+
+        if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_USE_ANDROID_GEOCODER, true)) {
+            Geocoder gc = new Geocoder(context);
+            try {
+                List<Address> androidTypeAddresses;
+                if (selectedServer != null) {
+                    androidTypeAddresses = gc.getFromLocationName(address,
+                            context.getResources().getInteger(R.integer.geocoder_max_results),
+                            selectedServer.getLowerLeftLatitude(),
+                            selectedServer.getLowerLeftLongitude(),
+                            selectedServer.getUpperRightLatitude(),
+                            selectedServer.getUpperRightLongitude());
+                } else {
+                    androidTypeAddresses = gc.getFromLocationName(address,
+                            context.getResources().getInteger(R.integer.geocoder_max_results));
+                }
+                for (Address androidTypeAddress : androidTypeAddresses){
+                    addresses.add(new CustomAddress(androidTypeAddress));
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        addresses = filterAddressesBBox(selectedServer, addresses);
+
+        if ((addresses == null) || addresses.isEmpty()) {
+            addresses = searchPlaces(context, selectedServer, address);
+
+            for (CustomAddress addressRetrieved : addresses) {
+                String str = addressRetrieved.getAddressLine(0);
+                List<String> addressLines = Arrays.asList(str.split(", "));
+                for (int j = 0; j < addressLines.size(); j++) {
+                    addressRetrieved.setAddressLine(j, addressLines.get(j));
+                }
+            }
+        }
+
+        addresses = filterAddressesBBox(selectedServer, addresses);
+
+        addressesReturn.addAll(addresses);
+
+        return addressesReturn;
+    }
+
+    /**
+     * Filters the addresses obtained in geocoding process, removing the
+     * results outside server limits.
+     *
+     * @param addresses list of addresses to filter
+     * @return a new list filtered
+     */
+    private static List<CustomAddress> filterAddressesBBox(Server selectedServer, List<CustomAddress> addresses) {
+        if (!(addresses == null || addresses.isEmpty())) {
+            CopyOnWriteArrayList<CustomAddress> addressesFiltered = new CopyOnWriteArrayList<CustomAddress>(addresses);
+
+            for (CustomAddress address : addressesFiltered) {
+                if (!LocationUtil.checkPointInBoundingBox(
+                        new LatLng(address.getLatitude(), address.getLongitude()), selectedServer,
+                        OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)) {
+                    addressesFiltered.remove(address);
+                }
+            }
+
+            return addressesFiltered;
+        }
+        return addresses;
+    }
+
+    /**
+     * Try to grab the developer key from an unversioned resource file, if it exists
+     *
+     * @return the developer key from an unversioned resource file, or empty string if it doesn't
+     * exist
+     */
+    private static String getKeyFromResource(Context context) {
+        String strKey = "";
+
+        try {
+            InputStream in = context.getResources().openRawResource(R.raw.googleplaceskey);
+            BufferedReader r = new BufferedReader(new InputStreamReader(in));
+            StringBuilder total = new StringBuilder();
+
+            while ((strKey = r.readLine()) != null) {
+                total.append(strKey);
+            }
+
+            strKey = total.toString();
+            strKey = strKey.trim(); //Remove any whitespace
+        } catch (Resources.NotFoundException e) {
+            Log.w(OTPApp.TAG, "Warning - didn't find the google places key file:" + e);
+        } catch (IOException e) {
+            Log.w(OTPApp.TAG, "Error reading the developer key file:" + e);
+        }
+
+        return strKey;
+    }
+
+    private static List<CustomAddress> searchPlaces(Context context, Server selectedServer, String name) {
+        HashMap<String, String> params = new HashMap<String, String>();
+        Places p;
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(
+                context);
+        String placesService = mPrefs.getString(
+                OTPApp.PREFERENCE_KEY_GEOCODER_PROVIDER,
+                context.getResources().getString(R.string.geocoder_nominatim));
+
+        if (placesService
+                .equals(context.getResources().getString(R.string.geocoder_google_places))) {
+            params.put(GooglePlaces.PARAM_NAME, name);
+            if (selectedServer != null) {
+                params.put(GooglePlaces.PARAM_LOCATION,
+                        Double.toString(selectedServer.getGeometricalCenterLatitude()) + ","
+                                + Double.toString(selectedServer.getGeometricalCenterLongitude())
+                );
+                params.put(GooglePlaces.PARAM_RADIUS, Double.toString(selectedServer.getRadius()));
+            }
+            p = new GooglePlaces(getKeyFromResource(context));
+
+            Log.d(OTPApp.TAG, "Using Google Places!");
+        } else {
+            params.put(Nominatim.PARAM_NAME, name);
+            if (selectedServer != null) {
+                params.put(Nominatim.PARAM_LEFT,
+                        Double.toString(selectedServer.getLowerLeftLongitude()));
+                params.put(Nominatim.PARAM_TOP,
+                        Double.toString(selectedServer.getLowerLeftLatitude()));
+                params.put(Nominatim.PARAM_RIGHT,
+                        Double.toString(selectedServer.getUpperRightLongitude()));
+                params.put(Nominatim.PARAM_BOTTOM,
+                        Double.toString(selectedServer.getUpperRightLatitude()));
+            }
+
+            p = new Nominatim();
+
+            Log.d(OTPApp.TAG, "Using Nominatim!");
+        }
+
+        ArrayList<POI> pois = new ArrayList<POI>();
+        pois.addAll(p.getPlaces(params));
+
+        List<CustomAddress> addresses = new ArrayList<CustomAddress>();
+
+        for (POI poi : pois) {
+            Log.d(OTPApp.TAG, poi.getName() + " " + poi.getLatitude() + "," + poi.getLongitude());
+            CustomAddress address = new CustomAddress(context.getResources().getConfiguration().locale);
+            address.setLatitude(poi.getLatitude());
+            address.setLongitude(poi.getLongitude());
+            String addressLine;
+
+            if (poi.getAddress() != null) {
+                if (!poi.getAddress().contains(poi.getName())) {
+                    addressLine = (poi.getName() + ", " + poi.getAddress());
+                } else {
+                    addressLine = poi.getAddress();
+                }
+            } else {
+                addressLine = poi.getName();
+            }
+            address.setAddressLine(address.getMaxAddressLineIndex() + 1, addressLine);
+            addresses.add(address);
+        }
+
+        return addresses;
+    }
+
+    public static String getStringAddress(CustomAddress address, boolean multiline) {
+        if (address.getMaxAddressLineIndex() >= 0) {
+
+            String result = address.getAddressLine(0);
+
+            if (multiline) {
+                for (int i = 1; i <= address.getMaxAddressLineIndex(); i++) {
+                    if (i == 1) {
+                        result += "\n";
+                        if (address.getAddressLine(i) != null) {
+                            result += address.getAddressLine(i);
+                        }
+                    } else if (i == 2) {
+                        result += "\n";
+                        if (address.getAddressLine(i) != null) {
+                            result += address.getAddressLine(i);
+                        }
+                    } else {
+                        if (address.getAddressLine(i) != null) {
+                            result += ", " + address.getAddressLine(i);
+                        }
+                    }
+                }
+            } else {
+                for (int i = 1; i <= address.getMaxAddressLineIndex(); i++) {
+                    if (address.getAddressLine(i) != null) {
+                        result += ", " + address.getAddressLine(i);
+                    }
+                }
+            }
+
+            return result;
+        } else {
+            return null;
+        }
     }
 }
