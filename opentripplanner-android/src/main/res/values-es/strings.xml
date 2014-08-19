@@ -46,6 +46,9 @@
                 <string name="text_box_dialog_location_type_contact">Dirección de un contacto</string>
                 <string name="text_box_dialog_location_type_map_point">Punto en el mapa</string>
 
+            <!-- Virtual keyboard "done" button label -->
+            <string name="text_box_virtual_keyboard_done_label">IR!</string>
+
         <!-- Start/End markers -->
         <string name="map_markers_start_marker_title">Salida</string>
         <string name="map_markers_start_marker_description">Pulsa para arrastrar…</string>
@@ -101,7 +104,7 @@
 
                     <!-- Triggering planning trip task -->
                     <string name="toast_tripplanner_need_to_place_markers_before_planning">"Primero tienes que introducir un origen y un destino"</string>
-                    <string name="toast_tripplanner_origin_destination_are_mylocation">"No se puede planear el viaje, el origen y el destino son iguales"</string>
+                    <string name="toast_tripplanner_origin_destination_are_equal">"No se puede planear el viaje, el origen y el destino son iguales"</string>
 
                     <!-- Obtaining server list -->
                     <string name="toast_server_selector_refresh_server_list_error">No ha sido posible obtener la lista de regiones</string>

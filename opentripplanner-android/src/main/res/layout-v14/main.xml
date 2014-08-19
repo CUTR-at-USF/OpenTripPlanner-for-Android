@@ -71,7 +71,7 @@
         </AutoCompleteTextView>
 
         <AutoCompleteTextView
-                android:id="@id/tbEndLocation"
+                android:id="@+id/tbEndLocation"
                 android:layout_width="match_parent"
                 android:layout_below="@+id/tbStartLocation"
                 android:layout_height="wrap_content"

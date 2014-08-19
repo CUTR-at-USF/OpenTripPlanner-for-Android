@@ -342,40 +342,5 @@ public class LocationUtil {
         return addresses;
     }
 
-    public static String getStringAddress(CustomAddress address, boolean multiline) {
-        if (address.getMaxAddressLineIndex() >= 0) {
 
-            String result = address.getAddressLine(0);
-
-            if (multiline) {
-                for (int i = 1; i <= address.getMaxAddressLineIndex(); i++) {
-                    if (i == 1) {
-                        result += "\n";
-                        if (address.getAddressLine(i) != null) {
-                            result += address.getAddressLine(i);
-                        }
-                    } else if (i == 2) {
-                        result += "\n";
-                        if (address.getAddressLine(i) != null) {
-                            result += address.getAddressLine(i);
-                        }
-                    } else {
-                        if (address.getAddressLine(i) != null) {
-                            result += ", " + address.getAddressLine(i);
-                        }
-                    }
-                }
-            } else {
-                for (int i = 1; i <= address.getMaxAddressLineIndex(); i++) {
-                    if (address.getAddressLine(i) != null) {
-                        result += ", " + address.getAddressLine(i);
-                    }
-                }
-            }
-
-            return result;
-        } else {
-            return null;
-        }
-    }
 }

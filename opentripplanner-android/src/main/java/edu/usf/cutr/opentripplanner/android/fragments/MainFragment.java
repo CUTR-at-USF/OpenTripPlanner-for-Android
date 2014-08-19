@@ -501,6 +501,7 @@ public class MainFragment extends Fragment implements
 
             mTbStartLocation.setImeOptions(EditorInfo.IME_ACTION_NEXT);
             mTbEndLocation.setImeOptions(EditorInfo.IME_ACTION_DONE);
+            mTbEndLocation.setImeActionLabel(getResources().getString(R.string.text_box_virtual_keyboard_done_label), EditorInfo.IME_ACTION_DONE);
             mTbEndLocation.requestFocus();
 
             mItinerarySelectionSpinner = (Spinner) mainView.findViewById(R.id.itinerarySelection);
@@ -847,12 +848,12 @@ public class MainFragment extends Fragment implements
         mDrawerLayout.setDrawerListener(dl);
 
 
-        startLocationPlacesAutoCompleteAdapter = new PlacesAutoCompleteAdapter(mApplicationContext, R.layout.autocomplete_list_item,
+        startLocationPlacesAutoCompleteAdapter = new PlacesAutoCompleteAdapter(getActivity(), android.R.layout.simple_spinner_dropdown_item,
                 mOTPApp.getSelectedServer());
         mTbStartLocation.setAdapter(startLocationPlacesAutoCompleteAdapter);
         mTbStartLocation.setThreshold(3);
 
-        endLocationPlacesAutoCompleteAdapter = new PlacesAutoCompleteAdapter(mApplicationContext, R.layout.autocomplete_list_item,
+        endLocationPlacesAutoCompleteAdapter = new PlacesAutoCompleteAdapter(getActivity(), android.R.layout.simple_spinner_dropdown_item,
                 mOTPApp.getSelectedServer());
         mTbStartLocation.setAdapter(startLocationPlacesAutoCompleteAdapter);
 
@@ -1695,7 +1696,7 @@ public class MainFragment extends Fragment implements
 
         if (isOriginMyLocation && isDestinationMyLocation) {
             Toast.makeText(MainFragment.this.mApplicationContext, mApplicationContext.getResources()
-                    .getString(R.string.toast_tripplanner_origin_destination_are_mylocation), Toast.LENGTH_SHORT)
+                    .getString(R.string.toast_tripplanner_origin_destination_are_equal), Toast.LENGTH_SHORT)
                     .show();
             return;
         } else if (isOriginMyLocation || isDestinationMyLocation) {
@@ -1745,6 +1746,12 @@ public class MainFragment extends Fragment implements
                         .getPosition().longitude;
                 endLocationString = mEndMarker.getPosition().latitude + "," + mEndMarker
                         .getPosition().longitude;
+                if (startLocationString.equals(endLocationString)){
+                    Toast.makeText(MainFragment.this.mApplicationContext, mApplicationContext.getResources()
+                            .getString(R.string.toast_tripplanner_origin_destination_are_equal), Toast.LENGTH_SHORT)
+                            .show();
+                    return;
+                }
             }
         }
 
@@ -2713,7 +2720,7 @@ public class MainFragment extends Fragment implements
         }
         LatLng latlng = new LatLng(address.getLatitude(), address.getLongitude());
         setMarkerPosition(isStartMarker, latlng);
-        setTextBoxLocation(LocationUtil.getStringAddress(address, false), isStartMarker);
+        setTextBoxLocation(address.toString(), isStartMarker);
         zoomToGeocodingResult(isStartMarker, address);
     }
 
@@ -2748,10 +2755,10 @@ public class MainFragment extends Fragment implements
         if (results[0] < OTPApp.MARKER_GEOCODING_MAX_ERROR) {
             LatLng newLatlng = new LatLng(addressLat, addressLon);
             setMarkerPosition(isStartMarker, newLatlng);
-            setTextBoxLocation(LocationUtil.getStringAddress(address, false), isStartMarker);
+            setTextBoxLocation(address.toString(), isStartMarker);
         } else {
             setTextBoxLocation(getResources().getString(R.string.text_box_close_to_marker) + " "
-                    + LocationUtil.getStringAddress(address, false), isStartMarker);
+                    + address.toString(), isStartMarker);
         }
 
     }
@@ -3344,7 +3351,7 @@ public class MainFragment extends Fragment implements
                         .size()];
                 for (int i = 0; i < addressesReturn.size(); i++) {
                     CustomAddress address = addressesReturn.get(i);
-                    addressesText[i] = LocationUtil.getStringAddress(address, true);
+                    addressesText[i] = address.getStringAddress(true);
 
                     Log.d(OTPApp.TAG, addressesText[i].toString());
                 }

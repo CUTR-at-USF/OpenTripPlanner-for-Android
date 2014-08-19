@@ -46,6 +46,9 @@
                 <string name="text_box_dialog_location_type_contact">Indirizzo da rubrica</string>
                 <string name="text_box_dialog_location_type_map_point">Punto sulla mappa</string>
 
+            <!-- Virtual keyboard "done" button label -->
+            <!--<string name="text_box_virtual_keyboard_done_label">GO!</string>-->
+
         <!-- Start/End markers -->
         <string name="map_markers_start_marker_title">Salita</string>
     <string name="map_markers_start_marker_description">Tenere premuto per trascinare&#8230;</string>
@@ -101,7 +104,7 @@
 
                     <!-- Triggering planning trip task -->
                     <string name="toast_tripplanner_need_to_place_markers_before_planning">"Impostare partenza e arrivo"</string>
-                    <string name="toast_tripplanner_origin_destination_are_mylocation">"Impossibile trovare percorso: origine e destinazione coincidono"</string>
+                    <string name="toast_tripplanner_origin_destination_are_equal">"Impossibile trovare percorso: origine e destinazione coincidono"</string>
 
                     <!-- Obtaining server list -->
                     <!--<string name="toast_server_selector_refresh_server_list_error">Couldn\'t get region list</string>-->

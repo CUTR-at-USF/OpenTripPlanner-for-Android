@@ -4,11 +4,14 @@ import android.location.Address;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
+import edu.usf.cutr.opentripplanner.android.OTPApp;
 
 /**
  * Created by foucelhas on 18/08/14.
@@ -44,11 +47,74 @@ public class CustomAddress extends Address {
     @Override
     public String toString(){
         StringBuilder sb = new StringBuilder();
-        sb.append(getFeatureName());
-        sb.append(getAdminArea());
-        sb.append(getSubAdminArea());
-        sb.append(getLocality());
-        sb.append(getThoroughfare());
+        if (getFeatureName() != null){
+            sb.append(getFeatureName());
+        }
+        if (getThoroughfare() != null && !getThoroughfare().equals(getFeatureName())){
+            sb.append(", " + getThoroughfare());
+        }
+        if (getSubThoroughfare() != null && !getSubThoroughfare().equals(getFeatureName())){
+            sb.append(", " + getSubThoroughfare());
+        }
+        if (getAdminArea() != null && !getAdminArea().equals(getFeatureName())){
+            sb.append(", " + getAdminArea());
+        }
+        if (getSubAdminArea() != null && !getSubAdminArea().equals(getFeatureName())){
+            sb.append(", " + getSubAdminArea());
+        }
+        if (getLocality() != null && !getLocality().equals(getFeatureName())){
+            sb.append(", " + getLocality());
+        }
+        if (TextUtils.isEmpty(sb.toString())){
+            int maxLines = (OTPApp.ADDRESS_MAX_LINES_TO_SHOW > getMaxAddressLineIndex())
+                    ? getMaxAddressLineIndex() : OTPApp.ADDRESS_MAX_LINES_TO_SHOW;
+            sb.append(getAddressLine(0));
+            for (int i = 1; i < maxLines; i++) {
+                if (getAddressLine(i) != null) {
+                    sb.append(", " + getAddressLine(i));
+                }
+            }
+        }
         return sb.toString();
+    }
+
+    public String getStringAddress(boolean multiline) {
+        int maxLines = (OTPApp.ADDRESS_MAX_LINES_TO_SHOW > getMaxAddressLineIndex())
+                ? getMaxAddressLineIndex() : OTPApp.ADDRESS_MAX_LINES_TO_SHOW;
+
+        if (maxLines >= 0) {
+
+            String result = getAddressLine(0);
+            this.getAdminArea();
+            if (multiline) {
+                for (int i = 1; i < maxLines; i++) {
+                    if (i == 1) {
+                        result += "\n";
+                        if (getAddressLine(i) != null) {
+                            result += getAddressLine(i);
+                        }
+                    } else if (i == 2) {
+                        result += "\n";
+                        if (getAddressLine(i) != null) {
+                            result += getAddressLine(i);
+                        }
+                    } else {
+                        if (getAddressLine(i) != null) {
+                            result += ", " + getAddressLine(i);
+                        }
+                    }
+                }
+            } else {
+                for (int i = 1; i < maxLines; i++) {
+                    if (getAddressLine(i) != null) {
+                        result += ", " + getAddressLine(i);
+                    }
+                }
+            }
+
+            return result;
+        } else {
+            return null;
+        }
     }
 }

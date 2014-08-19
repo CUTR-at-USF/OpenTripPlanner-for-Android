@@ -42,8 +42,6 @@
                 android:id="@+id/btnSwapOriginDestination"
                 android:layout_height="45dp"
                 android:layout_width="45dp"
-                android:layout_alignTop="@+id/tbStartLocation"
-                android:layout_alignBottom="@id/tbStartLocation"
                 android:layout_alignParentRight="true"
                 android:src="@drawable/ic_action_import_export"
                 android:background="@drawable/button_layout">
@@ -53,27 +51,27 @@
                 android:id="@+id/btnDateDialog"
                 android:layout_height="45dp"
                 android:layout_width="45dp"
-                android:layout_alignTop="@+id/tbEndLocation"
-                android:layout_alignBottom="@id/tbEndLocation"
                 android:layout_alignParentRight="true"
+                android:layout_below="@+id/btnSwapOriginDestination"
                 android:src="@drawable/device_access_time"
                 android:background="@drawable/button_layout">
         </ImageButton>
 
-        <EditText
+        <AutoCompleteTextView
                 android:id="@id/tbStartLocation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:selectAllOnFocus="true"
                 android:layout_margin="4dp"
                 android:singleLine="true"
+                android:hint="@string/text_box_start_location_hint"
                 android:drawableRight="@android:drawable/ic_input_get"
                 android:layout_toLeftOf="@id/btnSwapOriginDestination"
                 android:background="@android:drawable/editbox_background">
-        </EditText>
+        </AutoCompleteTextView>
 
-        <EditText
-                android:id="@id/tbEndLocation"
+        <AutoCompleteTextView
+                android:id="@+id/tbEndLocation"
                 android:layout_width="match_parent"
                 android:layout_below="@+id/tbStartLocation"
                 android:layout_height="wrap_content"
@@ -84,7 +82,7 @@
                 android:drawableRight="@android:drawable/ic_input_get"
                 android:layout_toLeftOf="@id/btnSwapOriginDestination"
                 android:background="@android:drawable/editbox_background">
-        </EditText>
+        </AutoCompleteTextView>
 
 
         <ImageButton
