@@ -117,6 +117,8 @@ public class MyActivity extends FragmentActivity implements OtpFragment {
                             .getBooleanExtra(OTPApp.CHANGED_MAP_TILE_PROVIDER_RETURN_KEY, false);
                     boolean liveUpdatesDisabled = data
                             .getBooleanExtra(OTPApp.LIVE_UPDATES_DISABLED_RETURN_KEY, false);
+                    boolean changedParametersMustRequestTrip = data
+                            .getBooleanExtra(OTPApp.CHANGED_PARAMETERS_MUST_REQUEST_TRIP_RETURN_KEY, false);
 
                     //				Toast.makeText(this, "Should server list refresh? " + shouldRefresh, Toast.LENGTH_LONG).show();
                     if (shouldRefresh) {
@@ -131,6 +133,9 @@ public class MyActivity extends FragmentActivity implements OtpFragment {
                     }
                     if (liveUpdatesDisabled) {
                         mainFragment.listenForTripTimeUpdates(false, 0);
+                    }
+                    if (changedParametersMustRequestTrip) {
+                        mainFragment.processRequestTrip();
                     }
                     break;
                 }

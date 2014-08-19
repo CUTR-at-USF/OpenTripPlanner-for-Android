@@ -66,6 +66,7 @@
                 android:layout_height="wrap_content"
                 android:selectAllOnFocus="true"
                 android:layout_margin="4dp"
+                android:hint="@string/text_box_start_location_hint"
                 android:singleLine="true"
                 android:drawableRight="@android:drawable/ic_input_get"
                 android:layout_toLeftOf="@id/btnSwapOriginDestination"

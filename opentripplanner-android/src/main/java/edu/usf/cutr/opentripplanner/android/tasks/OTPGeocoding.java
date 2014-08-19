@@ -37,7 +37,7 @@ import edu.usf.cutr.opentripplanner.android.util.CustomAddress;
  * @author Khoa Tran
  */
 
-public class OTPGeocoding extends AsyncTask<String, Integer, ArrayList<CustomAddress>> {
+public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 
     private WeakReference<Activity> activity;
 
@@ -68,8 +68,10 @@ public class OTPGeocoding extends AsyncTask<String, Integer, ArrayList<CustomAdd
         // Do nothing
     }
 
-    protected ArrayList<CustomAddress> doInBackground(String... reqs) {
-        return LocationUtil.processGeocoding(context, selectedServer, reqs);
+    protected Long doInBackground(String... reqs) {
+        long count = reqs.length;
+        addressesReturn = LocationUtil.processGeocoding(context, selectedServer, reqs);
+        return count;
     }
 
     protected void onCancelled(Long result) {

@@ -64,6 +64,7 @@
                 android:selectAllOnFocus="true"
                 android:layout_margin="4dp"
                 android:singleLine="true"
+                android:hint="@string/text_box_start_location_hint"
                 android:drawableRight="@android:drawable/ic_input_get"
                 android:layout_toLeftOf="@id/btnSwapOriginDestination"
                 android:background="@android:drawable/editbox_background">
