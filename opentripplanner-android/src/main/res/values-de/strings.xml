@@ -46,6 +46,9 @@
                 <string name="text_box_dialog_location_type_contact">Adresse</string>
                 <string name="text_box_dialog_location_type_map_point">Ort in der Karte</string>
 
+            <!-- Virtual keyboard "done" button label -->
+            <!--<string name="text_box_virtual_keyboard_done_label">GO!</string>-->
+
         <!-- Start/End markers -->
         <string name="map_markers_start_marker_title">Start</string>
         <string name="map_markers_start_marker_description">Gedrückt halten zum Verschieben…</string>
@@ -101,7 +104,7 @@
 
                     <!-- Triggering planning trip task -->
                     <string name="toast_tripplanner_need_to_place_markers_before_planning">"Start- und Zielort werden benötigt"</string>
-                    <string name="toast_tripplanner_origin_destination_are_mylocation">Verbindungssuche nicht möglich: Start- und Zielort sind identisch."</string>
+                    <string name="toast_tripplanner_origin_destination_are_equal">Verbindungssuche nicht möglich: Start- und Zielort sind identisch."</string>
 
                     <!-- Obtaining server list -->
                     <string name="toast_server_selector_refresh_server_list_error">Liste der Regionen konnte nicht geladen werden.</string>

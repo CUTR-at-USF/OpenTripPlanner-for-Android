@@ -61,6 +61,8 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 
     private Preference providerFeedbackButton;
 
+    private CheckBoxPreference wheelAccessible;
+
     private Preference serverRefreshButton;
 
     private CheckBoxPreference selectedCustomServer;
@@ -108,6 +110,8 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
                 OTPApp.PREFERENCE_KEY_PREFERENCE_SCREEN);
         maxWalkingDistance = (EditTextPreference) findPreference(
                 OTPApp.PREFERENCE_KEY_MAX_WALKING_DISTANCE);
+        wheelAccessible = (CheckBoxPreference) findPreference(
+                OTPApp.PREFERENCE_KEY_WHEEL_ACCESSIBLE);
 
         String[] entriesArray = getResources().getStringArray(R.array.map_tiles_servers_names);
         ArrayList<String> entries = new ArrayList<String>(Arrays.asList(entriesArray));
@@ -235,6 +239,22 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
 
                 maxWalkingDistance.setSummary(
                         value + " " + getResources().getString(R.string.settings_menu_maximum_walk_description));
+
+                returnIntent.putExtra(OTPApp.CHANGED_PARAMETERS_MUST_REQUEST_TRIP_RETURN_KEY, true);
+                setResult(RESULT_OK, returnIntent);
+
+                return true;
+            }
+
+        });
+
+        wheelAccessible.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+
+                returnIntent.putExtra(OTPApp.CHANGED_PARAMETERS_MUST_REQUEST_TRIP_RETURN_KEY, true);
+                setResult(RESULT_OK, returnIntent);
 
                 return true;
             }

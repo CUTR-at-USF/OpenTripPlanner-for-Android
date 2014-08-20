@@ -69,6 +69,8 @@ public class OTPApp extends Application {
 
     public static final String LIVE_UPDATES_DISABLED_RETURN_KEY = "RefreshServer";
 
+    public static final String CHANGED_PARAMETERS_MUST_REQUEST_TRIP_RETURN_KEY = "ChangedParameters";
+
     public static final String TAG_FRAGMENT_MAIN_FRAGMENT = "mainFragment";
 
     public static final String TAG_FRAGMENT_DATE_TIME_DIALOG = "dateTimeDialog";
@@ -104,6 +106,8 @@ public class OTPApp extends Application {
     public static final int CHECK_BOUNDS_ACCEPTABLE_ERROR = 1000;
 
     public static final float COORDINATES_IMPORTANT_DIFFERENCE = 2000f;
+
+    public static final int ADDRESS_MAX_LINES_TO_SHOW = 5;
 
     //in meters
     public static final int MARKER_GEOCODING_MAX_ERROR = 100;

@@ -46,6 +46,9 @@
                 <string name="text_box_dialog_location_type_contact">Adresse d\'un contact</string>
                 <string name="text_box_dialog_location_type_map_point">Point sur la carte</string>
 
+            <!-- Virtual keyboard "done" button label -->
+            <!--<string name="text_box_virtual_keyboard_done_label">GO!</string>-->
+
         <!-- Start/End markers -->
         <string name="map_markers_start_marker_title">Départ</string>
         <string name="map_markers_start_marker_description">Appuyer pour faire glisser…</string>
@@ -101,7 +104,7 @@
 
                     <!-- Triggering planning trip task -->
                     <string name="toast_tripplanner_need_to_place_markers_before_planning">Veuillez d\'abord saisir un lieu de départ et de destination</string>
-                    <string name="toast_tripplanner_origin_destination_are_mylocation">Impossible de calculer un itinéraire: le départ et la destination sont identiques</string>
+                    <string name="toast_tripplanner_origin_destination_are_equal">Impossible de calculer un itinéraire: le départ et la destination sont identiques</string>
 
                     <!-- Obtaining server list -->
                     <string name="toast_server_selector_refresh_server_list_error">Impossible d\'obtenir la liste des régions</string>
