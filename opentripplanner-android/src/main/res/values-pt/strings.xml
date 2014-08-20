@@ -335,6 +335,12 @@
             <!--<string name="settings_menu_live_updates">Itinerary Updates</string>-->
             <!--<string name="settings_menu_live_updates_description">Notify me when trip times change</string>-->
 
+            <!-- About -->
+            <!--<string name="settings_menu_about_category">About</string>-->
+            <!--<string name="settings_menu_about">About OpenTripPlanner for Android</string>-->
+            <!--<string name="settings_menu_feedback">Send Feedback</string>-->
+            <!--<string name="settings_menu_about_description">License and acknowledgements</string>-->
+
 
     <!-- Step-by-step screen -->
 
@@ -427,6 +433,55 @@
 
                         <!-- After the ordinal -->
                         <string name="step_by_step_non_transit_roundabout_exit">saída</string>
+
+    <!-- About screen -->
+
+        <!-- App desctiption -->
+
+            <!-- App name -->
+            <!--<string name="about_screen_app_full_name">OpenTripPlanner for Android</string>-->
+
+            <!-- App description -->
+            <!--<string name="about_screen_app_description">An Android app for multi-modal trip planning and navigation using any OpenTripPlanner server.-->
+<!--See more details at <a href="https://github.com/CUTR-at-USF/OpenTripPlanner-for-Android/wiki">GitHub project page</a>.-->
+<!--</string>-->
+
+        <!-- Headers -->
+
+            <!-- Acknowledgements -->
+            <!--<string name="about_screen_header_acknowledgements">Acknowledgements</string>-->
+
+            <!-- License -->
+            <!--<string name="about_screen_header_license">License</string>-->
+
+        <!-- Acknowledgements -->
+        <!--<string name="about_screen_acknowledgements">"We'd like to thank the following people for contributing to the project:\n-->
+<!--Marcy Gordon\n-->
+<!--Khoa Tran\n-->
+<!--Sean Barbeau (sjbarbeau@gmail.com)\n-->
+<!--Vreixo Gonzalez\n-->
+<!--Thanks to <a href="http://thenounproject.com">thenounproject.com</a> for the mode icons used in-->
+<!--the buttons and-->
+<!--<a href="http://mapicons.nicolasmollet.com">Nicollas Mollet \"Maps Icons Collection\"</a>-->
+<!--for the map icons.\n Thanks to the Google Summer of Code program for funding development during the-->
+<!--summer of 2013!-->
+<!--This app uses \"Google Play Services Maps API V2\", press below to see license terms."</string>-->
+
+        <!-- Play services license -->
+        <!--<string name="about_screen_button_play_services_license">Play Services license</string>-->
+
+        <!-- License -->
+        <!--<string name="about_screen_license_apache">"Copyright (C) 2010-2014 University of South Florida-->
+<!--and individual contributors.\n-->
+<!--All rights reserved.\n-->
+<!--Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except-->
+<!--in compliance with the License. You may obtain-->
+<!--<a href="http://www.apache.org/licenses/LICENSE-2.0">here</a> a copy of the license.\n-->
+<!--Unless required by applicable law or agreed to in writing, software-->
+<!--distributed under the License is distributed on an "AS IS" BASIS,-->
+<!--WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied."</string>-->
+
+
 
 
     <!-- App wide  -->

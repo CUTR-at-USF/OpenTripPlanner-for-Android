@@ -1,0 +1,101 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="edu.usf.cutr.opentripplanner.android.AboutActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="24dp"
+        android:scrollbarStyle="outsideOverlay">
+
+        <RelativeLayout
+            android:id="@+id/layoutAbout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical">
+
+            <ImageView
+                android:id="@+id/appLogo"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="24dp"
+                android:src="@drawable/ic_launcher" />
+
+            <TextView
+                android:id="@+id/appName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/appLogo"
+                android:layout_alignBottom="@id/appLogo"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:text="@string/about_screen_app_full_name" />
+
+            <TextView
+                android:id="@+id/appDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/appLogo"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:text="@string/about_screen_app_description"
+                android:linksClickable="true" />
+
+            <TextView
+                android:id="@+id/acknowledgementsHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/appDescription"
+                android:text="@string/about_screen_header_acknowledgements"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/acknowledgements"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/acknowledgementsHeader"
+                android:text="@string/about_screen_acknowledgements"
+                android:textSize="14sp"
+                android:layout_marginBottom="8dp"
+                android:linksClickable="true" />
+
+            <Button
+                android:id="@+id/playServicesButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/acknowledgements"
+                android:layout_centerHorizontal="true"
+                android:text="@string/about_screen_button_play_services_license"
+                android:textSize="12sp"
+                android:layout_marginBottom="8dp"
+                android:linksClickable="true" />
+
+            <TextView
+                android:id="@+id/licenseHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/playServicesButton"
+                android:text="@string/about_screen_header_license"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+
+            <TextView
+                android:id="@+id/license"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/licenseHeader"
+                android:text="@string/about_screen_license_apache"
+                android:textSize="14sp"
+                android:linksClickable="true"/>
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+</FrameLayout>
