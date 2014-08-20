@@ -43,10 +43,11 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<CustomAddress> imple
                     // Retrieve the autocomplete results.
                         resultList = LocationUtil.processGeocoding(context, selectedServer,
                                 constraint.toString());
-
-                    // Assign the data to the FilterResults
-                    filterResults.values = resultList;
-                    filterResults.count = resultList.size();
+                    if (resultList != null){
+                        // Assign the data to the FilterResults
+                        filterResults.values = resultList;
+                        filterResults.count = resultList.size();
+                    }
                 }
                 return filterResults;
             }
