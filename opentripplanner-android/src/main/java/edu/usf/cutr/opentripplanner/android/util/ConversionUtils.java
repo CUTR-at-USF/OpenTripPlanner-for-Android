@@ -171,7 +171,7 @@ public class ConversionUtils {
                             && !containsTransitLegs) {
                         containsTransitLegs = true;
                     }
-                    if (agencyTimeZoneOffset != 0) {
+                    if (leg.agencyTimeZoneOffset != 0) {
                         agencyTimeZoneOffset = leg.agencyTimeZoneOffset;
                         //If agencyTimeZoneOffset is different from 0, route contains transit legs
                         containsTransitLegs = true;
