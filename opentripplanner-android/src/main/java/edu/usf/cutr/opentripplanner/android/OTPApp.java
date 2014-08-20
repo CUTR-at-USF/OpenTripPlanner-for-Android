@@ -260,6 +260,8 @@ public class OTPApp extends Application {
 
     public static final String FORMAT_OTP_SERVER_TIME_QUERY = "kk:mm";
 
+    public static final String OTP_RENTAL_QUALIFIER = "_RENT";
+
     public static final long DEFAULT_UPDATE_INTERVAL_BIKE_RENTAL = TimeUnit.SECONDS.toMillis(40);
 
     public static final long DEFAULT_UPDATE_INTERVAL_TRIP_TIME = TimeUnit.SECONDS.toMillis(60);

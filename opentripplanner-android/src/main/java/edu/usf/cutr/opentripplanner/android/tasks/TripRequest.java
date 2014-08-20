@@ -21,6 +21,7 @@ import org.opentripplanner.api.ws.Message;
 import org.opentripplanner.api.ws.Request;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.ws.Response;
+import org.opentripplanner.routing.core.TraverseMode;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -242,6 +243,12 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
             } else {
                 params += "&" + itr.next();
             }
+        }
+
+        if (requestParams.getBikeRental()) {
+            String updatedString = params.replace(TraverseMode.BICYCLE.toString(),
+                    TraverseMode.BICYCLE.toString() + OTPApp.OTP_RENTAL_QUALIFIER);
+            params = updatedString;
         }
 
         if (selectedServer == null) {
