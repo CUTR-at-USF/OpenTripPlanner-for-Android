@@ -167,6 +167,14 @@ public class OTPApp extends Application {
 
     public static final String BUNDLE_KEY_INTENT_TRIP_ID = "intent trip id";
 
+    public static final String BUNDLE_KEY_PREVIOUS_OPTIMIZATION = "previous Optimization";
+
+    public static final String BUNDLE_KEY_PREVIOUS_MODES = "previous mode";
+
+    public static final String BUNDLE_KEY_PREVIOUS_BIKE_TRIANGLE_MIN_VALUE = "previous bike triangle min value";
+
+    public static final String BUNDLE_KEY_PREVIOUS_BIKE_TRIANGLE_MAX_VALUE = "previous bike triangle max value";
+
     public static final int COLOR_ROUTE_LINE = 0x7F0000FF;
 
     /**
