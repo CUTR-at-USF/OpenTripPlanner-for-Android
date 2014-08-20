@@ -166,6 +166,7 @@ import edu.usf.cutr.opentripplanner.android.tasks.RequestTimesForTrips;
 import edu.usf.cutr.opentripplanner.android.tasks.ServerChecker;
 import edu.usf.cutr.opentripplanner.android.tasks.ServerSelector;
 import edu.usf.cutr.opentripplanner.android.tasks.TripRequest;
+import edu.usf.cutr.opentripplanner.android.util.BikeRentalStationInfo;
 import edu.usf.cutr.opentripplanner.android.util.ConversionUtils;
 import edu.usf.cutr.opentripplanner.android.util.CustomInfoWindowAdapter;
 import edu.usf.cutr.opentripplanner.android.util.DateTimeDialog;
@@ -302,7 +303,7 @@ public class MainFragment extends Fragment implements
 
     private List<Polyline> mRoute;
 
-    private ArrayList<Marker> mBikeRentalStationsMarkers;
+    private Map<Marker, BikeRentalStationInfo> mBikeRentalStations;
 
     private int mOptimizationValueToRestoreWhenNoBike;
 
@@ -345,6 +346,14 @@ public class MainFragment extends Fragment implements
     PlacesAutoCompleteAdapter endLocationPlacesAutoCompleteAdapter;
 
     boolean changingTextBoxWithAutocomplete = false;
+
+    private OptimizeType previousOptimization;
+
+    private TraverseModeSet previousModes;
+
+    private double previousBikeTriangleMinValue;
+
+    private double previousBikeTriangleMaxValue;
 
 
     private OTPGeocoding mGeoCodingTask;
@@ -561,8 +570,10 @@ public class MainFragment extends Fragment implements
 
         checkAppVersion();
 
-        if (!mMapFailed) {
-            updateSelectedServer(false);
+        if (savedInstanceState == null) {
+            restorePanelUI();
+            mArriveBy = false;
+            setTextBoxLocation(getResources().getString(R.string.text_box_my_location), true);
         }
 
         ArrayAdapter<OptimizeSpinnerItem> optimizationAdapter
@@ -589,13 +600,11 @@ public class MainFragment extends Fragment implements
         }
 
         mCustomInfoWindowAdapter = new CustomInfoWindowAdapter(getLayoutInflater(savedInstanceState), mApplicationContext);
-        
+
         restoreState(savedInstanceState);
 
-        if (savedInstanceState == null) {
-            restorePanelUI();
-            mArriveBy = false;
-            setTextBoxLocation(getResources().getString(R.string.text_box_my_location), true);
+        if (!mMapFailed) {
+            updateSelectedServer(false);
         }
 
         if (!mMapFailed) {
@@ -632,9 +641,9 @@ public class MainFragment extends Fragment implements
                 imm.hideSoftInputFromWindow(mTbStartLocation.getWindowToken(), 0);
 
                 if (mTbStartLocation.hasFocus()) {
-                    setMarker(true, latlng, true);
+                    setMarker(true, latlng, true, true);
                 } else {
-                    setMarker(false, latlng, true);
+                    setMarker(false, latlng, true, true);
                 }
                 processRequestTrip();
             }
@@ -695,7 +704,7 @@ public class MainFragment extends Fragment implements
                         } else {
                             mIsStartLocationGeocodingCompleted = true;
                             removeFocus(true);
-                            setMarker(true, markerLatlng, false);
+                            setMarker(true, markerLatlng, false, true);
                         }
                         mStartMarkerPosition = markerLatlng;
                         processRequestTrip();
@@ -707,7 +716,7 @@ public class MainFragment extends Fragment implements
                         } else {
                             mIsEndLocationGeocodingCompleted = true;
                             removeFocus(false);
-                            setMarker(false, markerLatlng, false);
+                            setMarker(false, markerLatlng, false, true);
                         }
                         mEndMarkerPosition = markerLatlng;
                         processRequestTrip();
@@ -755,9 +764,9 @@ public class MainFragment extends Fragment implements
                 builder.setItems(items, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int item) {
                         if (item == 0) {
-                            setMarker(true, latLngFinal, true);
+                            setMarker(true, latLngFinal, true, true);
                         } else {
-                            setMarker(false, latLngFinal, true);
+                            setMarker(false, latLngFinal, true, true);
                         }
                         processRequestTrip();
                     }
@@ -780,12 +789,17 @@ public class MainFragment extends Fragment implements
         OnInfoWindowClickListener onInfoWindowClickListener = new OnInfoWindowClickListener() {
 
             @Override
-            public void onInfoWindowClick(Marker modeMarker) {
+            public void onInfoWindowClick(Marker marker) {
+                if (mBikeRentalStations.containsKey(marker)){
+                    BikeRentalStationInfo bikeRentalStationInfo = mBikeRentalStations.get(marker);
+                    setMarker(true, bikeRentalStationInfo.getLocation(), false, false);
+                    setTextBoxLocation(bikeRentalStationInfo.getName(), true);
+                }
                 saveOTPBundle();
                 OTPBundle otpBundle = getFragmentListener().getOTPBundle();
-                Matcher matcher = Pattern.compile("\\d+").matcher(modeMarker.getTitle());
+                Matcher matcher = Pattern.compile("\\d+").matcher(marker.getTitle());
                 if (matcher.find()) {
-                    String numberString = modeMarker.getTitle().substring(0, matcher.end());
+                    String numberString = marker.getTitle().substring(0, matcher.end());
                     //Step indexes shown to the user are in a scale starting by 1 but instructions steps internally start by 0
                     int currentStepIndex = Integer.parseInt(numberString) - 1;
                     otpBundle.setCurrentStepIndex(currentStepIndex);
@@ -801,14 +815,6 @@ public class MainFragment extends Fragment implements
 
 
         DrawerListener dl = new DrawerListener() {
-
-            private OptimizeType previousOptimization;
-
-            private TraverseModeSet previousModes;
-
-            private double previousBikeTriangleMinValue;
-
-            private double previousBikeTriangleMaxValue;
 
             @Override
             public void onDrawerStateChanged(int arg0) {
@@ -1329,6 +1335,14 @@ public class MainFragment extends Fragment implements
                 showBikeParameters(isChecked);
                 mBtnModeBike.setEnabled(!isChecked);
                 updateModes(getSelectedTraverseModeSet());
+                if (mOTPApp.getSelectedServer().getOffersBikeRental() && isChecked){
+                    BikeRentalLoad bikeRentalGetStations = new BikeRentalLoad(mApplicationContext, true,
+                            MainFragment.this);
+                    bikeRentalGetStations.execute(mOTPApp.getSelectedServer().getBaseURL());
+                }
+                if (mBikeRentalStations != null && !isChecked){
+                    removeBikeStations();
+                }
             }
         });
 
@@ -1608,6 +1622,15 @@ public class MainFragment extends Fragment implements
 
                 mIsAlarmBikeRentalUpdateActive = savedInstanceState
                         .getBoolean(OTPApp.BUNDLE_KEY__IS_ALARM_BIKE_RENTAL_ACTIVE, false);
+
+                previousOptimization = (OptimizeType) savedInstanceState
+                        .getSerializable(OTPApp.BUNDLE_KEY_PREVIOUS_OPTIMIZATION);
+                previousModes = (TraverseModeSet) savedInstanceState
+                        .getSerializable(OTPApp.BUNDLE_KEY_PREVIOUS_MODES);
+                previousBikeTriangleMinValue = savedInstanceState
+                        .getDouble(OTPApp.BUNDLE_KEY_PREVIOUS_BIKE_TRIANGLE_MIN_VALUE);
+                previousBikeTriangleMaxValue = savedInstanceState
+                        .getDouble(OTPApp.BUNDLE_KEY_PREVIOUS_BIKE_TRIANGLE_MAX_VALUE);
             }
         }
     }
@@ -1798,6 +1821,10 @@ public class MainFragment extends Fragment implements
         }
 
         request.setModes(getSelectedTraverseModeSet());
+
+        if (mBtnModeRentedBike.isChecked()){
+            request.setBikeRental(true);
+        }
 
         Integer defaultMaxWalkInt = mApplicationContext.getResources()
                  .getInteger(R.integer.max_walking_distance);
@@ -2120,6 +2147,11 @@ public class MainFragment extends Fragment implements
                 entry.getKey().remove();
             }
         }
+        if (mBikeRentalStations != null) {
+            for (Map.Entry<Marker, BikeRentalStationInfo> entry : mBikeRentalStations.entrySet()) {
+                entry.getKey().remove();
+            }
+        }
         if (mRoute != null) {
             for (Polyline p : mRoute) {
                 p.remove();
@@ -2135,6 +2167,7 @@ public class MainFragment extends Fragment implements
         mEndMarkerPosition = null;
         mRoute = null;
         mModeMarkers = null;
+        mBikeRentalStations = null;
         mBoundariesPolyline = null;
     }
 
@@ -2181,7 +2214,8 @@ public class MainFragment extends Fragment implements
      * and updates its text box.
      * <p>
      * If preference with key PREFERENCE_KEY_USE_INTELLIGENT_MARKERS is set
-     * geocoding will be triggered for text boxes.
+     * geocoding will be triggered for text boxes, except if the parameter geocoding is set to
+     * false.
      * <p>
      * If the marker does not fit in selected server bounds marker won't be set
      * and a warning will be shown.
@@ -2189,8 +2223,10 @@ public class MainFragment extends Fragment implements
      * @param isStartMarker when true start marker will be set
      * @param latlng        the location to move on
      * @param showMessage   whether show or not informative message on success
+     * @param geocode       when false, even with the preference set, geocoding won't be triggered.
      */
-    private void setMarker(boolean isStartMarker, LatLng latlng, boolean showMessage) {
+    private void setMarker(boolean isStartMarker, LatLng latlng, boolean showMessage,
+                           boolean geocode) {
         SharedPreferences.Editor prefsEditor = mPrefs.edit();
 
         if (((mOTPApp.getSelectedServer() != null) && LocationUtil
@@ -2221,7 +2257,7 @@ public class MainFragment extends Fragment implements
                 MainFragment.this.setLocationTb(latlng, true);
                 prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, false);
                 prefsEditor.commit();
-                if (mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true)) {
+                if (mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true) && geocode) {
                     mIsStartLocationGeocodingCompleted = false;
                     updateMarkerPosition(latlng, true);
                 } else {
@@ -2238,7 +2274,7 @@ public class MainFragment extends Fragment implements
                 MainFragment.this.setLocationTb(latlng, false);
                 prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false);
                 prefsEditor.commit();
-                if (mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true)) {
+                if (mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_USE_INTELLIGENT_MARKERS, true) && geocode) {
                     mIsEndLocationGeocodingCompleted = false;
                     updateMarkerPosition(latlng, false);
                 } else {
@@ -2449,6 +2485,11 @@ public class MainFragment extends Fragment implements
 
             bundle.putBoolean(OTPApp.BUNDLE_KEY__IS_ALARM_BIKE_RENTAL_ACTIVE, mIsAlarmBikeRentalUpdateActive);
 
+            bundle.putSerializable(OTPApp.BUNDLE_KEY_PREVIOUS_OPTIMIZATION, previousOptimization);
+            bundle.putSerializable(OTPApp.BUNDLE_KEY_PREVIOUS_MODES, previousModes);
+            bundle.putSerializable(OTPApp.BUNDLE_KEY_PREVIOUS_BIKE_TRIANGLE_MIN_VALUE, previousBikeTriangleMinValue);
+            bundle.putSerializable(OTPApp.BUNDLE_KEY_PREVIOUS_BIKE_TRIANGLE_MAX_VALUE, previousBikeTriangleMaxValue);
+
             if (!mFragmentListener.getCurrentItineraryList().isEmpty()) {
                 OTPBundle otpBundle = new OTPBundle();
                 otpBundle.setFromText(mResultTripStartLocation);
@@ -2591,7 +2632,7 @@ public class MainFragment extends Fragment implements
                 } else {
                     mMap.animateCamera(CameraUpdateFactory
                             .newLatLngZoom(getServerCenter(server), getServerInitialZoom(server)));
-                    setMarker(true, getServerCenter(server), false);
+                    setMarker(true, getServerCenter(server), false, true);
                 }
             }
 
@@ -2600,12 +2641,13 @@ public class MainFragment extends Fragment implements
             Log.d(OTPApp.TAG, "Server not selected yet, should be first start or app update");
             return;
         }
-        if (server.getOffersBikeRental()){
+        if (server.getOffersBikeRental() && mBtnModeRentedBike.isChecked()){
             BikeRentalLoad bikeRentalGetStations = new BikeRentalLoad(mApplicationContext, true,
                     this);
             bikeRentalGetStations.execute(server.getBaseURL());
         }
         else{
+            removeBikeStations();
             listenForBikeUpdates(false);
         }
     }
@@ -2930,36 +2972,38 @@ public class MainFragment extends Fragment implements
                 List<LatLng> points = LocationUtil.decodePoly(leg.legGeometry
                         .getPoints());
 
-                MarkerOptions modeMarkerOption = generateModeMarkerOptions(leg, points.get(0),
-                        stepIndex);
+                if (!points.isEmpty()) {
+                    MarkerOptions modeMarkerOption = generateModeMarkerOptions(leg, points.get(0),
+                            stepIndex);
 
-                float scaleFactor = getResources().getFraction(R.fraction.scaleFactor, 1, 1);
+                    float scaleFactor = getResources().getFraction(R.fraction.scaleFactor, 1, 1);
 
 
-                Marker modeMarker = mMap.addMarker(modeMarkerOption);
-                boolean realtime = false;
-                if (TraverseMode.valueOf(leg.mode).isTransit()){
-                    realtime = leg.realtime;
-                }
-                TripInfo tripInfo = new TripInfo(realtime, leg.tripId,
-                        generateModeMarkerSnippet(leg), leg.departureDelay);
-                mModeMarkers.put(modeMarker, tripInfo);
-
-                if (TraverseMode.valueOf(leg.mode).isTransit()) {
-                    //because on transit two step-by-step indications are generated (get on / get off)
-                    stepIndex++;
-
-                    if (firstTransitMarker == null) {
-                        firstTransitMarker = modeMarker;
+                    Marker modeMarker = mMap.addMarker(modeMarkerOption);
+                    boolean realtime = false;
+                    if (TraverseMode.valueOf(leg.mode).isTransit()) {
+                        realtime = leg.realtime;
                     }
-                }
-                PolylineOptions options = new PolylineOptions().addAll(points)
-                        .width(5 * scaleFactor)
-                        .color(OTPApp.COLOR_ROUTE_LINE);
-                Polyline routeLine = mMap.addPolyline(options);
-                mRoute.add(routeLine);
-                for (LatLng point : points) {
-                    boundsCreator.include(point);
+                    TripInfo tripInfo = new TripInfo(realtime, leg.tripId,
+                            generateModeMarkerSnippet(leg), leg.departureDelay);
+                    mModeMarkers.put(modeMarker, tripInfo);
+
+                    if (TraverseMode.valueOf(leg.mode).isTransit()) {
+                        //because on transit two step-by-step indications are generated (get on / get off)
+                        stepIndex++;
+
+                        if (firstTransitMarker == null) {
+                            firstTransitMarker = modeMarker;
+                        }
+                    }
+                    PolylineOptions options = new PolylineOptions().addAll(points)
+                            .width(5 * scaleFactor)
+                            .color(OTPApp.COLOR_ROUTE_LINE);
+                    Polyline routeLine = mMap.addPolyline(options);
+                    mRoute.add(routeLine);
+                    for (LatLng point : points) {
+                        boundsCreator.include(point);
+                    }
                 }
             }
             mCustomInfoWindowAdapter.setMarkers(mModeMarkers);
@@ -3436,7 +3480,7 @@ public class MainFragment extends Fragment implements
                 mMap.animateCamera(CameraUpdateFactory
                         .newLatLngZoom(getServerCenter(selectedServer),
                                 getServerInitialZoom(selectedServer)));
-                setMarker(true, getServerCenter(selectedServer), false);
+                setMarker(true, getServerCenter(selectedServer), false, true);
             }
         }
     }
@@ -3628,7 +3672,7 @@ public class MainFragment extends Fragment implements
                                     mMap.animateCamera(CameraUpdateFactory
                                             .newLatLngZoom(getServerCenter(selectedServer),
                                                     getServerInitialZoom(selectedServer)));
-                                    setMarker(true, getServerCenter(selectedServer), false);
+                                    setMarker(true, getServerCenter(selectedServer), false, true);
                                 }
                             } else {
                                 mMap.animateCamera(CameraUpdateFactory
@@ -3735,41 +3779,48 @@ public class MainFragment extends Fragment implements
 
     @Override
     public void onBikeRentalStationListLoad(BikeRentalStationList bikeRentalStationList) {
-        if (bikeRentalStationList != null){
-            List<BikeRentalStation> listOfBikeRentalStations = bikeRentalStationList.stations;
-            if ((listOfBikeRentalStations != null) && !listOfBikeRentalStations.isEmpty()){
-                mBikeRentalStationsMarkers = new ArrayList<Marker>(listOfBikeRentalStations.size());
+        removeBikeStations();
+        if (mBtnModeRentedBike.isChecked()){
+            if (bikeRentalStationList != null){
+                List<BikeRentalStation> listOfBikeRentalStations = bikeRentalStationList.stations;
+                if ((listOfBikeRentalStations != null) && !listOfBikeRentalStations.isEmpty()){
+                    mBikeRentalStations = new HashMap<Marker, BikeRentalStationInfo>(listOfBikeRentalStations.size());
 
-                MarkerOptions bikeRentalStationMarkerOption = new MarkerOptions();
+                    MarkerOptions bikeRentalStationMarkerOption = new MarkerOptions();
 
-                Drawable drawable = getResources().getDrawable(R.drawable.parking_bicycle);
-                if (drawable != null) {
-                    BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable.getCurrent();
-                    Bitmap bitmap = bitmapDrawable.getBitmap();
-                    bikeRentalStationMarkerOption.icon(
-                            BitmapDescriptorFactory.fromBitmap(bitmap));
-                } else {
-                    Log.e(OTPApp.TAG, "Error obtaining drawable to add bike rental icons to the map");
+                    Drawable drawable = getResources().getDrawable(R.drawable.parking_bicycle);
+                    if (drawable != null) {
+                        BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable.getCurrent();
+                        Bitmap bitmap = bitmapDrawable.getBitmap();
+                        bikeRentalStationMarkerOption.icon(
+                                BitmapDescriptorFactory.fromBitmap(bitmap));
+                    } else {
+                        Log.e(OTPApp.TAG, "Error obtaining drawable to add bike rental icons to the map");
+                    }
+
+                    for (BikeRentalStation bikeRentalStation : listOfBikeRentalStations){
+                        LatLng position = new LatLng(bikeRentalStation.y,
+                                bikeRentalStation.x);
+                        bikeRentalStationMarkerOption.position(position);
+                        bikeRentalStationMarkerOption.title(bikeRentalStation.name);
+                        bikeRentalStationMarkerOption.snippet(getResources()
+                                .getString(R.string.map_markers_bike_rental_available_bikes) + " " +
+                                bikeRentalStation.bikesAvailable + " | " + getResources()
+                                .getString(R.string.map_markers_bike_rental_available_spaces) + " " +
+                                bikeRentalStation.spacesAvailable);
+                        Marker bikeRentalStationMarker = mMap.addMarker(bikeRentalStationMarkerOption);
+                        BikeRentalStationInfo bikeRentalStationInfo = new BikeRentalStationInfo(position,
+                                bikeRentalStation.name);
+
+                        mBikeRentalStations.put(bikeRentalStationMarker, bikeRentalStationInfo);
+                    }
+                    listenForBikeUpdates(true);
                 }
-
-                for (BikeRentalStation bikeRentalStation : listOfBikeRentalStations){
-                    bikeRentalStationMarkerOption.position(new LatLng(bikeRentalStation.y,
-                            bikeRentalStation.x));
-                    bikeRentalStationMarkerOption.title(bikeRentalStation.name);
-                    bikeRentalStationMarkerOption.snippet(getResources()
-                            .getString(R.string.map_markers_bike_rental_available_bikes) + " " +
-                            bikeRentalStation.bikesAvailable + " | " + getResources()
-                            .getString(R.string.map_markers_bike_rental_available_spaces) + " " +
-                            bikeRentalStation.spacesAvailable);
-                    Marker bikeRentalStationMarker = mMap.addMarker(bikeRentalStationMarkerOption);
-                    mBikeRentalStationsMarkers.add(bikeRentalStationMarker);
-                }
-                listenForBikeUpdates(true);
             }
-        }
-        else{
-            Toast.makeText(mApplicationContext, mApplicationContext.getResources().getString(R.string.toast_bike_rental_load_request_error),
-                    Toast.LENGTH_SHORT).show();
+            else{
+                Toast.makeText(mApplicationContext, mApplicationContext.getResources().getString(R.string.toast_bike_rental_load_request_error),
+                        Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -3779,18 +3830,18 @@ public class MainFragment extends Fragment implements
             if (bikeRentalStationList != null) {
                 List<BikeRentalStation> listOfBikeRentalStations = bikeRentalStationList.stations;
                 if ((listOfBikeRentalStations != null) && !listOfBikeRentalStations.isEmpty()
-                        && (mBikeRentalStationsMarkers != null) && !mBikeRentalStationsMarkers.isEmpty()) {
+                        && (mBikeRentalStations != null) && !mBikeRentalStations.isEmpty()) {
                     for (BikeRentalStation bikeRentalStation : listOfBikeRentalStations) {
-                        for (Marker bikeRentalStationMarker : mBikeRentalStationsMarkers) {
-                            if (bikeRentalStationMarker.getTitle().equals(bikeRentalStation.name)) {
-                                bikeRentalStationMarker.setSnippet(getResources()
+                        for (Map.Entry<Marker, BikeRentalStationInfo> entry : mBikeRentalStations.entrySet()) {
+                            if (entry.getKey().getTitle().equals(bikeRentalStation.name)) {
+                                entry.getKey().setSnippet(getResources()
                                         .getString(R.string.map_markers_bike_rental_available_bikes) + " " +
                                         bikeRentalStation.bikesAvailable + " | " + getResources()
                                         .getString(R.string.map_markers_bike_rental_available_spaces) + " " +
                                         bikeRentalStation.spacesAvailable);
                             }
-                            if (bikeRentalStationMarker.isInfoWindowShown()) {
-                                bikeRentalStationMarker.showInfoWindow();
+                            if (entry.getKey().isInfoWindowShown()) {
+                                entry.getKey().showInfoWindow();
                             }
                         }
                     }
@@ -3800,6 +3851,7 @@ public class MainFragment extends Fragment implements
                 Toast.makeText(mApplicationContext, mApplicationContext.getResources().getString(R.string.toast_bike_rental_load_request_error),
                         Toast.LENGTH_SHORT).show();
                 listenForBikeUpdates(false);
+                removeBikeStations();
             }
         }
     }
@@ -3826,6 +3878,15 @@ public class MainFragment extends Fragment implements
                 }
             }
             mAlarmMgr.cancel(mAlarmIntentBikeRentalUpdate);
+        }
+    }
+
+    public void removeBikeStations(){
+        if (mBikeRentalStations != null) {
+            for (Map.Entry<Marker, BikeRentalStationInfo> entry : mBikeRentalStations.entrySet()) {
+                entry.getKey().remove();
+            }
+            mBikeRentalStations = null;
         }
     }
 

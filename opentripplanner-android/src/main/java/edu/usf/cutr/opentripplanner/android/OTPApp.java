@@ -167,6 +167,14 @@ public class OTPApp extends Application {
 
     public static final String BUNDLE_KEY_INTENT_TRIP_ID = "intent trip id";
 
+    public static final String BUNDLE_KEY_PREVIOUS_OPTIMIZATION = "previous Optimization";
+
+    public static final String BUNDLE_KEY_PREVIOUS_MODES = "previous mode";
+
+    public static final String BUNDLE_KEY_PREVIOUS_BIKE_TRIANGLE_MIN_VALUE = "previous bike triangle min value";
+
+    public static final String BUNDLE_KEY_PREVIOUS_BIKE_TRIANGLE_MAX_VALUE = "previous bike triangle max value";
+
     public static final int COLOR_ROUTE_LINE = 0x7F0000FF;
 
     /**
@@ -259,6 +267,8 @@ public class OTPApp extends Application {
     public static final String FORMAT_OTP_SERVER_DATE_QUERY = "MM/dd/yy";
 
     public static final String FORMAT_OTP_SERVER_TIME_QUERY = "kk:mm";
+
+    public static final String OTP_RENTAL_QUALIFIER = "_RENT";
 
     public static final long DEFAULT_UPDATE_INTERVAL_BIKE_RENTAL = TimeUnit.SECONDS.toMillis(40);
 
