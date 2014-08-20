@@ -90,10 +90,15 @@
             android:title="@string/settings_menu_live_updates"></CheckBoxPreference>
     </PreferenceCategory>
     <PreferenceCategory
-            android:title="@string/menu_button_feedback"
-            android:key="feedback_options">
+        android:title="@string/settings_menu_about_category"
+        android:key="about_category">
         <Preference
-                android:title="@string/feedback_email_android_developer"
+                android:title="@string/settings_menu_about"
+                android:summary="@string/settings_menu_about_description"
+                android:key="about"/>
+        <Preference
+                android:title="@string/settings_menu_feedback"
+                android:summary="@string/feedback_email_android_developer"
                 android:key="otp_provider_feedback"/>
     </PreferenceCategory>
 </PreferenceScreen> 

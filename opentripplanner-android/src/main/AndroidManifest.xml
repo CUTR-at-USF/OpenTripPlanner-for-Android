@@ -73,6 +73,16 @@
                 android:theme="@style/MyTheme"
                 android:windowSoftInputMode="stateHidden">
         </activity>
+        <activity
+            android:name=".AboutActivity"
+            android:theme="@style/MyTheme"
+            android:windowSoftInputMode="stateHidden">
+        </activity>
+        <activity
+            android:name=".AboutPlayServicesActivity"
+            android:theme="@style/MyTheme"
+            android:windowSoftInputMode="stateHidden">
+        </activity>
 
         <meta-data
                 android:name="com.google.android.maps.v2.API_KEY"
