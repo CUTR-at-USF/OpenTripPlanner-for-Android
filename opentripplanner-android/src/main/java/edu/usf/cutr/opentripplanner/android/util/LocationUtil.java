@@ -159,20 +159,23 @@ public class LocationUtil {
         }
 
         if (address.equalsIgnoreCase(context.getString(R.string.text_box_my_location))) {
-            String currentLat = reqs[1];
-            String currentLng = reqs[2];
-            LatLng latLng = new LatLng(Double.parseDouble(currentLat),
-                    Double.parseDouble(currentLng));
+            if (reqs.length >= 3){
+                String currentLat = reqs[1];
+                String currentLng = reqs[2];
+                LatLng latLng = new LatLng(Double.parseDouble(currentLat),
+                        Double.parseDouble(currentLng));
 
-            CustomAddress addressReturn = new CustomAddress(context.getResources().getConfiguration().locale);
-            addressReturn.setLatitude(latLng.latitude);
-            addressReturn.setLongitude(latLng.longitude);
-            addressReturn.setAddressLine(addressReturn.getMaxAddressLineIndex() + 1,
-                    context.getString(R.string.text_box_my_location));
+                CustomAddress addressReturn = new CustomAddress(context.getResources().getConfiguration().locale);
+                addressReturn.setLatitude(latLng.latitude);
+                addressReturn.setLongitude(latLng.longitude);
+                addressReturn.setAddressLine(addressReturn.getMaxAddressLineIndex() + 1,
+                        context.getString(R.string.text_box_my_location));
 
-            addressesReturn.add(addressReturn);
+                addressesReturn.add(addressReturn);
 
-            return addressesReturn;
+                return addressesReturn;
+            }
+            return null;
         }
 
         List<CustomAddress> addresses = new ArrayList<CustomAddress>();
