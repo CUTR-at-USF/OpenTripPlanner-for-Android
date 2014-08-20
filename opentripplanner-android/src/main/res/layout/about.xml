@@ -21,7 +21,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_margin="24dp"
-                android:src="@drawable/ic_launcher_opentripplanner" />
+                android:src="@drawable/ic_launcher" />
 
             <TextView
                 android:id="@+id/appName"
