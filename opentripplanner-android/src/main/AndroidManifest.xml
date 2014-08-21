@@ -15,15 +15,9 @@
   limitations under the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="edu.usf.cutr.opentripplanner.android"
-    android:versionCode="13"
-    android:versionName="2.1.0">
+    package="edu.usf.cutr.opentripplanner.android">
 
-<uses-sdk
-            android:minSdkVersion="8"
-            android:targetSdkVersion="13"/>
-
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <!-- To plan trip from/to contact address -->
@@ -78,6 +72,4 @@
                 android:name="com.google.android.maps.v2.API_KEY"
                 android:value="AIzaSyD5XadJhAK7jIKFz5TcT7t-gsWw_OTvlBI"/>
     </application>
-
-
 </manifest>

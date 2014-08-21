@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
  Copyright 2011 Marcy Gordon
  
  Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -15,7 +14,6 @@
  the License.
 -->
 <resources>
-    <string name="app_name">OpenTripPlanner</string>
     <string name="servers_spreadsheet_url"><![CDATA[https://spreadsheets.google.com/spreadsheet/pub?hl=en_US&hl=en_US&key=0AgWy8ujaGosCdDhxTC04cUZNeHo0eGFBQTBpU2dxN0E&single=true&gid=0&output=csv]]></string>
     <string name="map_tiles_default_server">"http://tiles.lyrk.org/lr/{z}/{x}/{y}?apikey=ea4f307439474ce99e29662232f80885"</string>
     <string-array name="map_tiles_servers_names">
