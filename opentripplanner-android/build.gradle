@@ -47,6 +47,18 @@ android {
         targetSdkVersion 13
     }
 
+    productFlavors {
+        vanilla {
+            applicationId = 'edu.usf.cutr.opentripplanner.android'
+            packageName 'edu.usf.cutr.opentripplanner.android'
+        }
+
+        mobullity {
+            applicationId = 'edu.usf.cutr.mobullity.android'
+            packageName 'edu.usf.cutr.mobullity.android'
+        }
+    }
+
     // http://stackoverflow.com/questions/20673625/gradle-0-7-0-duplicate-files-during-packaging-of-apk
     packagingOptions {
         exclude 'META-INF/LICENSE'

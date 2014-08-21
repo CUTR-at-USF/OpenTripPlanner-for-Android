@@ -73,6 +73,4 @@
                 android:name="com.google.android.maps.v2.API_KEY"
                 android:value="AIzaSyD5XadJhAK7jIKFz5TcT7t-gsWw_OTvlBI"/>
     </application>
-
-
 </manifest>
