@@ -3727,6 +3727,9 @@ public class MainFragment extends Fragment implements
         PolylineOptions boundariesPolylineOptions = new PolylineOptions()
                 .addAll(bounds)
                 .color(Color.GRAY);
+        if (mBoundariesPolyline != null){
+            mBoundariesPolyline.remove();
+        }
         mBoundariesPolyline = mMap.addPolyline(boundariesPolylineOptions);
     }
 
