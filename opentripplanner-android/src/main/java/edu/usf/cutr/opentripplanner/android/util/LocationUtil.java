@@ -154,7 +154,7 @@ public class LocationUtil {
         String address = reqs[0];
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        if (address == null || address.equalsIgnoreCase("")) {
+        if (address == null || address.equalsIgnoreCase("") || selectedServer == null) {
             return null;
         }
 
