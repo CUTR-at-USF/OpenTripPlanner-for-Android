@@ -790,7 +790,7 @@ public class MainFragment extends Fragment implements
 
             @Override
             public void onInfoWindowClick(Marker marker) {
-                if (mBikeRentalStations.containsKey(marker)){
+                if (mBikeRentalStations != null && mBikeRentalStations.containsKey(marker)){
                     BikeRentalStationInfo bikeRentalStationInfo = mBikeRentalStations.get(marker);
                     setMarker(true, bikeRentalStationInfo.getLocation(), false, false);
                     setTextBoxLocation(bikeRentalStationInfo.getName(), true);
