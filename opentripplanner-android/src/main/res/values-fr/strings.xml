@@ -151,7 +151,7 @@
 
                     <!-- Options -->
                     <string name="point_type_selector_start_marker_option">Position de départ</string>
-                    <string name="point_type_selector_end_marker_option">Position d'arrivée</string>
+                    <string name="point_type_selector_end_marker_option">Position d\'arrivée</string>
 
                 <!-- Geocoding results dialog -->
 
@@ -255,7 +255,7 @@
         <!-- Bike options -->
         <string name="left_panel_bike_options_quick">Rapide</string>
         <string name="left_panel_bike_options_flat">Plat</string>
-        <string name="left_panel_bike_options_bike_friendly">Sûr</string>
+        <string name="left_panel_bike_options_bike_friendly">Agréable en vélo</string>
 
 
     <!-- Menus -->
@@ -363,8 +363,8 @@
             <!-- Transit -->
 
                 <!-- Transit instruction start -->
-                <string name="step_by_step_transit_get_on">Embarquer</string>
-                <string name="step_by_step_transit_get_off">Débarquer</string>
+                <string name="step_by_step_transit_get_on">Monter</string>
+                <string name="step_by_step_transit_get_off">Descendre</string>
                 <string name="step_by_step_transit_stops_in_between">Arrêts jusqu\'à destination</string>
 
                 <!-- Transit description start -->
@@ -466,7 +466,7 @@ les boutons et à
 <a href="http://mapicons.nicolasmollet.com">la \"Maps Icons Collection\" de Nicolas Mollet</a>
 pour les icônes des cartes.\n Merci au programme Google Summer of Code pour le financement du développement pendant
 l\'été 2013 !
-Cette application utilise \"Google Play Services Maps API V2\", cliquez ci dessous pour voir les termes de la licence."</string>
+Cette application utilise \"Google Play Services Maps API V2\", cliquez ci-dessous pour voir les termes de la licence."</string>
 
         <!-- Play services license -->
         <string name="about_screen_button_play_services_license">Licence Services Google Play</string>
@@ -480,7 +480,7 @@ sous les termes de la licence. Vous pouvez obtenir
 <a href="http://www.apache.org/licenses/LICENSE-2.0">ici</a> une copie de la licence.\n
 Sauf si requis par la loi applicable ou approuvé par écrit, ce logiciel est
 distribué sous la Licence est diffusé sur une base "TEL QUEL",
-SANS AUCUNE GARANTIE OU CONDITION D\AUCUNE SORTE, explicite ou implicite."</string>
+SANS AUCUNE GARANTIE OU CONDITION D\'AUCUNE SORTE, explicite ou implicite."</string>
 
 
 
@@ -515,7 +515,7 @@ SANS AUCUNE GARANTIE OU CONDITION D\AUCUNE SORTE, explicite ou implicite."</stri
                 <!-- Connectors -->
                 <string name="time_connector_next_day">demain</string>
                 <string name="time_connector_before_time">à</string>
-                <string name="time_connector_before_date">Le</string>
+                <string name="time_connector_before_date">le</string>
 
             <!-- Distance -->
 
