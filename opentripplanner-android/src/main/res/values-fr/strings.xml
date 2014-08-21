@@ -68,18 +68,18 @@
                 <string name="map_markers_connector_before_destination">à</string>
 
                 <!-- Real time -->
-                <!--<string name="map_markers_warning_live_udpates">Mises à jour temps réel</string>-->
-                <!--<string name="map_markers_warning_live_upates_on_time">A l\'heure</string>-->
-                <!--<string name="map_markers_warning_live_upates_early_arrival">en avance</string>-->
-                <!--<string name="map_markers_warning_live_upates_late_arrival">en retard</string>-->
+                <string name="map_markers_warning_live_udpates">Mises à jour temps réel</string>
+                <string name="map_markers_warning_live_upates_on_time">A l\'heure</string>
+                <string name="map_markers_warning_live_upates_early_arrival">en avance</string>
+                <string name="map_markers_warning_live_upates_late_arrival">en retard</string>
 
         <!-- Bike rental stations map markers -->
 
             <!-- Info pop-ups -->
 
                 <!-- Availability info -->
-                <!--<string name="map_markers_bike_rental_available_spaces">Emplacements :</string>-->
-                <!--<string name="map_markers_bike_rental_available_bikes">Vélos :</string>-->
+                <string name="map_markers_bike_rental_available_spaces">Emplacements :</string>
+                <string name="map_markers_bike_rental_available_bikes">Vélos :</string>
 
 
         <!-- Toast messages -->
@@ -93,8 +93,8 @@
 
                 <!-- Used alone -->
                 <string name="toast_metadata_request_successful">Service de transport en commun téléchargé</string>
-                <!--<string name="toast_server_checker_successful">OK: La région fonctionne</string>-->
-                <!--<string name="toast_bike_rental_load_request_successful">Stations de Vélos Libre Service téléchargées</string>-->
+                <string name="toast_server_checker_successful">OK: La région fonctionne</string>
+                <string name="toast_bike_rental_load_request_successful">Stations de Vélos Libre Service téléchargées</string>
 
                 <!-- Used together: toast_server_selector_detected + "server name" + toast_server_selector_server_change_info -->
                 <string name="toast_server_selector_detected">Trouvé</string>
@@ -110,7 +110,7 @@
                     <string name="toast_server_selector_refresh_server_list_error">Impossible d\'obtenir la liste des régions</string>
 
                     <!-- Obtaining bike rental list -->
-                    <!--<string name="toast_bike_rental_load_request_error">Impossible d\'obtenir la liste des stations de VLS</string>-->
+                    <string name="toast_bike_rental_load_request_error">Impossible d\'obtenir la liste des stations de VLS</string>
 
                     <!-- Contacting server -->
                     <string name="toast_no_server_selected_error">Aucune région sélectionnée</string>
@@ -118,7 +118,7 @@
                     <string name="toast_server_checker_info_error">Attention: impossible d\'obtenir les informations sur la région</string>
 
                         <!-- Contacting user's region server -->
-                        <!--<string name="toast_server_checker_error_unreachable_detected_server">Le serveur de votre région ne fonctionne pas. Merci de réessayer plus tard.</string>-->
+                        <string name="toast_server_checker_error_unreachable_detected_server">Le serveur de votre région ne fonctionne pas. Merci de réessayer plus tard.</string>
 
                     <!-- Editing custom server URL -->
                     <string name="toast_server_checker_error_bad_url">URL invalide pour la région personnalisée</string>
@@ -127,7 +127,7 @@
                     <string name="toast_tripplanner_current_location_error">Impossible de trouver la position courante</string>
 
                     <!-- Obtaining real time updates -->
-                    <!--<string name="toast_realtime_updates_fail">Les mises à jour en temps réel ne sont pas disponibles pour ce voyage, les horaires sont théoriques</string>-->
+                    <string name="toast_realtime_updates_fail">Les mises à jour en temps réel ne sont pas disponibles pour ce voyage, les horaires sont théoriques</string>
 
 
         <!-- Dialogs -->
@@ -150,8 +150,8 @@
                     <string name="point_type_selector_title">Choisir la localisation</string>
 
                     <!-- Options -->
-                    <!--<string name="point_type_selector_start_marker_option">Position de départ</string>-->
-                    <!--<string name="point_type_selector_end_marker_option">Position d'arrivée</string>-->
+                    <string name="point_type_selector_start_marker_option">Position de départ</string>
+                    <string name="point_type_selector_end_marker_option">Position d\'arrivée</string>
 
                 <!-- Geocoding results dialog -->
 
@@ -255,7 +255,7 @@
         <!-- Bike options -->
         <string name="left_panel_bike_options_quick">Rapide</string>
         <string name="left_panel_bike_options_flat">Plat</string>
-        <string name="left_panel_bike_options_bike_friendly">Sûr</string>
+        <string name="left_panel_bike_options_bike_friendly">Agréable en vélo</string>
 
 
     <!-- Menus -->
@@ -291,7 +291,7 @@
 
             <!-- Location -->
             <string name="settings_menu_location_preference_category_title">Emplacement</string>
-            <!--<string name="settings_menu_auto_detect_server">Région automatique</string>-->
+            <string name="settings_menu_auto_detect_server">Détection de région automatique</string>
             <string name="settings_menu_auto_detect_server_description">Détermine automatiquement le serveur en fonction de votre position actuelle</string>
             <string name="settings_menu_refresh_server_list">Rafraîchir la liste des régions</string>
             <string name="settings_menu_use_device_timezone">Utiliser le fuseau horaire du périphérique</string>
@@ -363,15 +363,15 @@
             <!-- Transit -->
 
                 <!-- Transit instruction start -->
-                <string name="step_by_step_transit_get_on">Embarquer</string>
-                <string name="step_by_step_transit_get_off">Débarquer</string>
+                <string name="step_by_step_transit_get_on">Monter</string>
+                <string name="step_by_step_transit_get_off">Descendre</string>
                 <string name="step_by_step_transit_stops_in_between">Arrêts jusqu\'à destination</string>
 
                 <!-- Transit description start -->
                 <string name="step_by_step_transit_connector_stop_name">À</string>
 
                 <!-- Real time -->
-                <!--<string name="step_by_step_transit_warning_live_udpates">Mises à jour en temps réel</string>-->
+                <string name="step_by_step_transit_warning_live_udpates">Mises à jour en temps réel</string>
 
             <!-- Non-transit -->
 
@@ -388,14 +388,14 @@
                     <string name="step_by_step_non_transit_turn">Tourner</string>
                     <string name="step_by_step_non_transit_heading">vers</string>
                     <string name="step_by_step_non_transit_connector_street_name">sur</string>
-                    <!--<string name="step_by_step_non_transit_connector_street_name_roundabout">jusqu\'à</string>-->
+                    <string name="step_by_step_non_transit_connector_street_name_roundabout">jusqu\'à</string>
 
                     <!-- Relative directions -->
-                    <!--<string name="step_by_step_non_transit_dir_relative_circle_clockwise">Au round-point, prendre</string>-->
-                    <!--<string name="step_by_step_non_transit_dir_relative_circle_counterclockwise">Au rond-point prendre</string>-->
+                    <string name="step_by_step_non_transit_dir_relative_circle_clockwise">Au round-point, prendre</string>
+                    <string name="step_by_step_non_transit_dir_relative_circle_counterclockwise">Au rond-point prendre</string>
                     <string name="step_by_step_non_transit_dir_relative_continue">Continuer</string>
                     <string name="step_by_step_non_transit_dir_relative_depart">Partir</string>
-                    <!--<string name="step_by_step_non_transit_dir_relative_elevator">Prendre l\'ascenseur</string>-->
+                    <string name="step_by_step_non_transit_dir_relative_elevator">Prendre l\'ascenseur</string>
                     <string name="step_by_step_non_transit_dir_relative_hard_left">Tourner complètement à gauche</string>
                     <string name="step_by_step_non_transit_dir_relative_hard_right">Tourner complètement à droite</string>
                     <string name="step_by_step_non_transit_dir_relative_left">à gauche</string>
@@ -418,69 +418,69 @@
                     <!-- Roundabouts -->
 
                         <!-- Exit ordinals -->
-                        <!--<string name="step_by_step_non_transit_roundabout_ordinal_first">la première</string>-->
-                        <!--<string name="step_by_step_non_transit_roundabout_ordinal_second">la seconde</string>-->
-                        <!--<string name="step_by_step_non_transit_roundabout_ordinal_third">la troisième</string>-->
-                        <!--<string name="step_by_step_non_transit_roundabout_ordinal_fourth">la quatrième</string>-->
-                        <!--<string name="step_by_step_non_transit_roundabout_ordinal_fifth">la cinquième</string>-->
-                        <!--<string name="step_by_step_non_transit_roundabout_ordinal_sixth">la sixième</string>-->
-                        <!--<string name="step_by_step_non_transit_roundabout_ordinal_seventh">la septième</string>-->
-                        <!--<string name="step_by_step_non_transit_roundabout_ordinal_eighth">la huitième</string>-->
-                        <!--<string name="step_by_step_non_transit_roundabout_ordinal_ninth">la neuvième</string>-->
-                        <!--<string name="step_by_step_non_transit_roundabout_ordinal_tenth">la dixième</string>-->
+                        <string name="step_by_step_non_transit_roundabout_ordinal_first">la première</string>
+                        <string name="step_by_step_non_transit_roundabout_ordinal_second">la seconde</string>
+                        <string name="step_by_step_non_transit_roundabout_ordinal_third">la troisième</string>
+                        <string name="step_by_step_non_transit_roundabout_ordinal_fourth">la quatrième</string>
+                        <string name="step_by_step_non_transit_roundabout_ordinal_fifth">la cinquième</string>
+                        <string name="step_by_step_non_transit_roundabout_ordinal_sixth">la sixième</string>
+                        <string name="step_by_step_non_transit_roundabout_ordinal_seventh">la septième</string>
+                        <string name="step_by_step_non_transit_roundabout_ordinal_eighth">la huitième</string>
+                        <string name="step_by_step_non_transit_roundabout_ordinal_ninth">la neuvième</string>
+                        <string name="step_by_step_non_transit_roundabout_ordinal_tenth">la dixième</string>
 
                         <!-- To complement the step_by_step_non_transit_roundabout_number for a bigger ordinal -->
-                        <!--<string name="step_by_step_non_transit_roundabout_number">nombre</string>-->
+                        <string name="step_by_step_non_transit_roundabout_number">numéro</string>
 
                         <!-- After the ordinal -->
-                        <!--<string name="step_by_step_non_transit_roundabout_exit">sortie</string>-->
+                        <string name="step_by_step_non_transit_roundabout_exit">sortie</string>
 
     <!-- About screen -->
 
         <!-- App description -->
 
             <!-- App name -->
-            <!--<string name="about_screen_app_full_name">OpenTripPlanner pour Android</string>-->
+            <string name="about_screen_app_full_name">OpenTripPlanner pour Android</string>
 
             <!-- App description -->
-            <!--<string name="about_screen_app_description">Une application Android pour la recherche de trajets et la navigation multimodale utilisant n\importe quel serveur OpenTripPlanner.-->
-<!--Pour plus de détails rendez-vous sur <a href="https://github.com/CUTR-at-USF/OpenTripPlanner-for-Android/wiki">la page GitHub du projet</a>.-->
-<!--</string>-->
+            <string name="about_screen_app_description">Une application Android pour la recherche de trajets et la navigation multimodale utilisant n\importe quel serveur OpenTripPlanner.
+Pour plus de détails rendez-vous sur <a href="https://github.com/CUTR-at-USF/OpenTripPlanner-for-Android/wiki">la page GitHub du projet</a>.
+</string>
 
         <!-- Headers -->
 
             <!-- Acknowledgements -->
-            <!--<string name="about_screen_header_acknowledgements">Remerciements</string>-->
+            <string name="about_screen_header_acknowledgements">Remerciements</string>
 
             <!-- License -->
-            <!--<string name="about_screen_header_license">Licence</string>-->
+            <string name="about_screen_header_license">Licence</string>
 
         <!-- Acknowledgements -->
-        <!--<string name="about_screen_acknowledgements">"Nous souhaitons remercier les personnes suivantes pour leur contribution au projet :\n-->
-<!--Marcy Gordon\n-->
-<!--Khoa Tran\n-->
-<!--Sean Barbeau (sjbarbeau@gmail.com)\n-->
-<!--Vreixo Gonzalez\n-->
-<!--Merci à <a href="http://thenounproject.com">thenounproject.com</a> pour les icônes des modes utilisées sur-->
-<!--les boutons et à-->
-<!--<a href="http://mapicons.nicolasmollet.com">la \"Maps Icons Collection\" de Nicolas Mollet</a>-->
-<!--pour les icônes des cartes.\n Merci au programme Google Summer of Code pour le financement du développement pendant-->
-<!--l\'été 2013 !-->
-<!--Cette application utilise \"Google Play Services Maps API V2\", cliquez ci dessous pour voir les termes de la licence."</string>-->
+        <string name="about_screen_acknowledgements">"Nous souhaitons remercier les personnes suivantes pour leur contribution au projet :\n
+Marcy Gordon\n
+Khoa Tran\n
+Sean Barbeau (sjbarbeau@gmail.com)\n
+Vreixo Gonzalez\n
+Merci à <a href="http://thenounproject.com">thenounproject.com</a> pour les icônes des modes utilisées sur
+les boutons et à
+<a href="http://mapicons.nicolasmollet.com">la \"Maps Icons Collection\" de Nicolas Mollet</a>
+pour les icônes des cartes.\n Merci au programme Google Summer of Code pour le financement du développement pendant
+l\'été 2013 !
+Cette application utilise \"Google Play Services Maps API V2\", cliquez ci-dessous pour voir les termes de la licence."</string>
 
         <!-- Play services license -->
-        <!--<string name="about_screen_button_play_services_license">Licence Services Google Play</string>-->
+        <string name="about_screen_button_play_services_license">Licence Services Google Play</string>
 
         <!-- License -->
-        <!--<string name="about_screen_license_apache">"Copyright (C) 2010-2014 University of South Florida-->
-<!--et contributeurs individuels.\n-->
-<!--Tous droits réservés.\n-->
-<!--Sous licence Apache, Version 2.0 (la "Licence"); vous ne pouvez pas utiliser ce fichier excepté-->
-<!--sous les termes de la licence. Vous pouvez obtenir -->
-<!--<a href="http://www.apache.org/licenses/LICENSE-2.0">ici</a> une copie de la licence.\n-->
-<!--Sauf si requis par la loi applicable ou approuvé par écrit, ce logiciel est-->
-<!--distribué sous la Licence est diffusé sur une base "TEL QUEL",-->
-<!--SANS AUCUNE GARANTIE OU CONDITION D\AUCUNE SORTE, explicite ou implicite."</string>-->
+        <string name="about_screen_license_apache">"Copyright (C) 2010-2014 University of South Florida
+et contributeurs individuels.\n
+Tous droits réservés.\n
+Sous licence Apache, Version 2.0 (la "Licence"); vous ne pouvez pas utiliser ce fichier excepté
+sous les termes de la licence. Vous pouvez obtenir 
+<a href="http://www.apache.org/licenses/LICENSE-2.0">ici</a> une copie de la licence.\n
+Sauf si requis par la loi applicable ou approuvé par écrit, ce logiciel est
+distribué sous la Licence est diffusé sur une base "TEL QUEL",
+SANS AUCUNE GARANTIE OU CONDITION D\'AUCUNE SORTE, explicite ou implicite."</string>
 
 
 
@@ -492,10 +492,10 @@
             <!-- Disable updates -->
 
                 <!-- Button -->
-                <!--<string name="notification_disable_updates_button">Annuler les mises à jour pour ce voyage</string>-->
+                <string name="notification_disable_updates_button">Annuler les mises à jour pour ce voyage</string>
 
                 <!-- Toast -->
-                <!--<string name="notification_disable_updates_info">Mises à jour annulées</string>-->
+                <string name="notification_disable_updates_info">Mises à jour annulées</string>
 
         <!-- Used in util functions to display consistently time and distance all around the app  -->
 
@@ -515,7 +515,7 @@
                 <!-- Connectors -->
                 <string name="time_connector_next_day">demain</string>
                 <string name="time_connector_before_time">à</string>
-                <string name="time_connector_before_date">Le</string>
+                <string name="time_connector_before_date">le</string>
 
             <!-- Distance -->
 
