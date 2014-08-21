@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
  Copyright 2011 Marcy Gordon
  
  Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -15,7 +14,6 @@
  the License.
 -->
 <resources>
-    <string name="app_name">OpenTripPlanner</string>
     <string name="servers_spreadsheet_url"><![CDATA[https://spreadsheets.google.com/spreadsheet/pub?hl=en_US&hl=en_US&key=0AgWy8ujaGosCdDhxTC04cUZNeHo0eGFBQTBpU2dxN0E&single=true&gid=0&output=csv]]></string>
     <string name="map_tiles_default_server_high_res">"http://api.tiles.mapbox.com/v4/opentripplannerhigh.jcah6hla/{z}/{x}/{y}@2x.png256?access_token=pk.eyJ1Ijoib3BlbnRyaXBwbGFubmVyaGlnaCIsImEiOiIyT2xxdVRjIn0.1n9CkukOWpsIgExzdcWfJg"</string>
     <string name="map_tiles_default_server_low_res">"http://api.tiles.mapbox.com/v4/opentripplannerlow.jcagk4b3/{z}/{x}/{y}.png256?access_token=pk.eyJ1Ijoib3BlbnRyaXBwbGFubmVybG93IiwiYSI6ImRja1VOUjAifQ.1XBo8j8DGWj2EdIsxXGHdQ"</string>
