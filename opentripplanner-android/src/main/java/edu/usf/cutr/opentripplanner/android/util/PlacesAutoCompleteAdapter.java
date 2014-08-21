@@ -64,4 +64,12 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<CustomAddress> imple
         return filter;
     }
 
+    public Server getSelectedServer() {
+        return selectedServer;
+    }
+
+    public void setSelectedServer(Server selectedServer) {
+        this.selectedServer = selectedServer;
+    }
+
 }
