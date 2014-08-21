@@ -2641,14 +2641,21 @@ public class MainFragment extends Fragment implements
             Log.d(OTPApp.TAG, "Server not selected yet, should be first start or app update");
             return;
         }
-        if (server.getOffersBikeRental() && mBtnModeRentedBike.isChecked()){
-            BikeRentalLoad bikeRentalGetStations = new BikeRentalLoad(mApplicationContext, true,
-                    this);
-            bikeRentalGetStations.execute(server.getBaseURL());
-        }
-        else{
-            removeBikeStations();
-            listenForBikeUpdates(false);
+        if (server != null){
+            if (server.getOffersBikeRental() && mBtnModeRentedBike.isChecked()){
+                BikeRentalLoad bikeRentalGetStations = new BikeRentalLoad(mApplicationContext, true,
+                        this);
+                bikeRentalGetStations.execute(server.getBaseURL());
+            }
+            else{
+                removeBikeStations();
+                listenForBikeUpdates(false);
+            }
+            if (startLocationPlacesAutoCompleteAdapter != null
+                    && endLocationPlacesAutoCompleteAdapter != null){
+                startLocationPlacesAutoCompleteAdapter.setSelectedServer(server);
+                endLocationPlacesAutoCompleteAdapter.setSelectedServer(server);
+            }
         }
     }
 
