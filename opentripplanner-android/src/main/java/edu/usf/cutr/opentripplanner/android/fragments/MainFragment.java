@@ -1494,7 +1494,7 @@ public class MainFragment extends Fragment implements
         selectedTraverseModeSet.setBicycle(mBtnModeBike.isChecked()
                 || mBtnModeRentedBike.isChecked());
         selectedTraverseModeSet.setBus(mBtnModeBus.isChecked());
-        selectedTraverseModeSet.setRail(mBtnModeTrain.isChecked());
+        selectedTraverseModeSet.setTrainish(mBtnModeTrain.isChecked());
         selectedTraverseModeSet.setFerry(mBtnModeFerry.isChecked());
 
         return selectedTraverseModeSet;
