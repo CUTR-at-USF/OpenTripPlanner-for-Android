@@ -363,8 +363,8 @@
             <!-- Transit -->
 
                 <!-- Transit instruction start -->
-                <string name="step_by_step_transit_get_on">Monter</string>
-                <string name="step_by_step_transit_get_off">Descendre</string>
+                <string name="step_by_step_transit_get_on">Monter dans</string>
+                <string name="step_by_step_transit_get_off">Descendre du</string>
                 <string name="step_by_step_transit_stops_in_between">Arrêts jusqu\'à destination</string>
 
                 <!-- Transit description start -->
@@ -443,7 +443,7 @@
             <string name="about_screen_app_full_name">OpenTripPlanner pour Android</string>
 
             <!-- App description -->
-            <string name="about_screen_app_description">Une application Android pour la recherche de trajets et la navigation multimodale utilisant n\importe quel serveur OpenTripPlanner.
+            <string name="about_screen_app_description">Une application Android pour la recherche de trajets et la navigation multimodale utilisant n\'importe quel serveur OpenTripPlanner.
 Pour plus de détails rendez-vous sur <a href="https://github.com/CUTR-at-USF/OpenTripPlanner-for-Android/wiki">la page GitHub du projet</a>.
 </string>
 
