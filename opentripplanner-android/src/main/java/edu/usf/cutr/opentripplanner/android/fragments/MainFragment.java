@@ -2190,6 +2190,8 @@ public class MainFragment extends Fragment implements
         mIsStartLocationGeocodingCompleted = true;
         mIsEndLocationGeocodingCompleted = false;
 
+        mTbEndLocation.requestFocus();
+        
         setTextBoxLocation("", false);
     }
 
