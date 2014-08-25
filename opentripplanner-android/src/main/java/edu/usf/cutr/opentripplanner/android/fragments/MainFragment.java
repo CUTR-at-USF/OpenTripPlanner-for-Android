@@ -2185,6 +2185,8 @@ public class MainFragment extends Fragment implements
                 true);
         prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true);
         prefsEditor.commit();
+        mIsStartLocationGeocodingCompleted = true;
+        mIsEndLocationGeocodingCompleted = false;
 
         setTextBoxLocation("", false);
     }
