@@ -2169,6 +2169,8 @@ public class MainFragment extends Fragment implements
         mModeMarkers = null;
         mBikeRentalStations = null;
         mBoundariesPolyline = null;
+
+        toggleItinerarySelectionSpinner(false);
     }
 
     /**
@@ -2185,7 +2187,11 @@ public class MainFragment extends Fragment implements
                 true);
         prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, true);
         prefsEditor.commit();
+        mIsStartLocationGeocodingCompleted = true;
+        mIsEndLocationGeocodingCompleted = false;
 
+        mTbEndLocation.requestFocus();
+        
         setTextBoxLocation("", false);
     }
 
