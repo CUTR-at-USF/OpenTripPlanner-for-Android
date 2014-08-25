@@ -2169,6 +2169,8 @@ public class MainFragment extends Fragment implements
         mModeMarkers = null;
         mBikeRentalStations = null;
         mBoundariesPolyline = null;
+
+        toggleItinerarySelectionSpinner(false);
     }
 
     /**
