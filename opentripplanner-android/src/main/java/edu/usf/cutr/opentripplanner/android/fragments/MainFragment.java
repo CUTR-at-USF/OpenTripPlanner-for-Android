@@ -1822,8 +1822,11 @@ public class MainFragment extends Fragment implements
 
         request.setModes(getSelectedTraverseModeSet());
 
-        if (mBtnModeRentedBike.isChecked()){
-            request.setBikeRental(true);
+        Server selectedServer = mOTPApp.getSelectedServer();
+        if (selectedServer != null && selectedServer.getOffersBikeRental()){
+            if (mBtnModeRentedBike.isChecked()){
+                request.setBikeRental(true);
+            }
         }
 
         Integer defaultMaxWalkInt = mApplicationContext.getResources()
@@ -2648,6 +2651,13 @@ public class MainFragment extends Fragment implements
             return;
         }
         if (server != null){
+            if (server.getOffersBikeRental()){
+                mBtnModeRentedBike.setEnabled(true);
+            }
+            else{
+                mBtnModeRentedBike.setChecked(false);
+                mBtnModeRentedBike.setEnabled(false);
+            }
             if (server.getOffersBikeRental() && mBtnModeRentedBike.isChecked()){
                 BikeRentalLoad bikeRentalGetStations = new BikeRentalLoad(mApplicationContext, true,
                         this);
