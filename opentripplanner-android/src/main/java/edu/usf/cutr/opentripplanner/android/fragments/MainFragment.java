@@ -43,7 +43,6 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -2393,7 +2392,7 @@ public class MainFragment extends Fragment implements
         } else {
             mIsEndLocationChangedByUser = false;
         }
-        processAddress(isStartMarker, locationText, true);
+        processAddress(isStartMarker, locationText, newLatLng.latitude, newLatLng.longitude, true);
     }
 
     @Override
@@ -2522,7 +2521,23 @@ public class MainFragment extends Fragment implements
      * shown.
      */
     public void processAddress(final boolean isStartTextBox, String address,
-            boolean geocodingForMarker) {
+                               boolean geocodingForMarker) {
+        processAddress(isStartTextBox, address, null, null, geocodingForMarker);
+    }
+
+    /**
+     * Triggers geocoding for chosen text box with passed text, offering the possibility of pass
+     * original latitude and longitude requested to check reverse geocoding results when
+     * geocoding for marker.
+     * <p>
+     * If address contents are the String used to identify user's location
+     * ("MyLocation" for example) user location is passed to know the
+     * corresponding address.
+     * In this case user's location shouldn't be null, if it is a toast is
+     * shown.
+     */
+    public void processAddress(final boolean isStartTextBox, String address, Double originalLat,
+                               Double originalLon, boolean geocodingForMarker) {
         WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
 
         mGeoCodingTask = new OTPGeocoding(weakContext, mApplicationContext,
@@ -2550,11 +2565,11 @@ public class MainFragment extends Fragment implements
         } else {
             if (isStartTextBox){
                 mIsStartLocationGeocodingCompleted = false;
-                mGeoCodingTask.execute(address);
+                mGeoCodingTask.execute(address, originalLat.toString(), originalLon.toString());
             }
             else{
                 mIsEndLocationGeocodingCompleted = false;
-                mGeoCodingTask.execute(address);
+                mGeoCodingTask.execute(address, originalLat.toString(), originalLon.toString());
             }
         }
     }
@@ -2817,7 +2832,7 @@ public class MainFragment extends Fragment implements
         Location.distanceBetween(marker.getPosition().latitude, marker.getPosition().longitude,
                 addressLat, addressLon, results);
 
-        if (results[0] < OTPApp.MARKER_GEOCODING_MAX_ERROR) {
+        if (results[0] < OTPApp.GEOCODING_MAX_ERROR) {
             LatLng newLatlng = new LatLng(addressLat, addressLon);
             setMarkerPosition(isStartMarker, newLatlng);
             setTextBoxLocation(address.toString(), isStartMarker);

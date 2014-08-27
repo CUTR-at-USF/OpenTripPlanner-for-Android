@@ -110,7 +110,7 @@ public class OTPApp extends Application {
     public static final int ADDRESS_MAX_LINES_TO_SHOW = 5;
 
     //in meters
-    public static final int MARKER_GEOCODING_MAX_ERROR = 100;
+    public static final int GEOCODING_MAX_ERROR = 100;
 
     public static final int HTTP_CONNECTION_TIMEOUT = 15000;
 
