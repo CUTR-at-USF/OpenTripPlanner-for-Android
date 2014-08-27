@@ -70,7 +70,7 @@ public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
 
     protected Long doInBackground(String... reqs) {
         long count = reqs.length;
-        addressesReturn = LocationUtil.processGeocoding(context, selectedServer, reqs);
+        addressesReturn = LocationUtil.processGeocoding(context, selectedServer, geocodingForMarker, reqs);
         return count;
     }
 

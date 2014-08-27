@@ -147,27 +147,29 @@ public class LocationUtil {
         return true;
     }
 
+    public static ArrayList<CustomAddress> processGeocoding(Context context, Server selectedServer,
+                                                            String... reqs) {
+        return processGeocoding(context, selectedServer, false, reqs);
+    }
 
-    public static ArrayList<CustomAddress> processGeocoding(Context context, Server selectedServer, String... reqs) {
+    public static ArrayList<CustomAddress> processGeocoding(Context context, Server selectedServer, boolean geocodingForMarker, String... reqs) {
         ArrayList<CustomAddress> addressesReturn = new ArrayList<CustomAddress>();
 
         String address = reqs[0];
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        if (address == null || address.equalsIgnoreCase("") || selectedServer == null) {
+        if (address == null || address.equalsIgnoreCase("")) {
             return null;
         }
 
         if (address.equalsIgnoreCase(context.getString(R.string.text_box_my_location))) {
             if (reqs.length >= 3){
-                String currentLat = reqs[1];
-                String currentLng = reqs[2];
-                LatLng latLng = new LatLng(Double.parseDouble(currentLat),
-                        Double.parseDouble(currentLng));
+                double currentLat = Double.parseDouble(reqs[1]);
+                double currentLon = Double.parseDouble(reqs[2]);
 
                 CustomAddress addressReturn = new CustomAddress(context.getResources().getConfiguration().locale);
-                addressReturn.setLatitude(latLng.latitude);
-                addressReturn.setLongitude(latLng.longitude);
+                addressReturn.setLatitude(currentLat);
+                addressReturn.setLongitude(currentLon);
                 addressReturn.setAddressLine(addressReturn.getMaxAddressLineIndex() + 1,
                         context.getString(R.string.text_box_my_location));
 
@@ -205,8 +207,29 @@ public class LocationUtil {
 
         addresses = filterAddressesBBox(selectedServer, addresses);
 
-        if ((addresses == null) || addresses.isEmpty()) {
-            addresses = searchPlaces(context, selectedServer, address);
+        boolean resultsCloseEnough = true;
+
+        if (geocodingForMarker && reqs.length >= 3){
+            float results[] = new float[1];
+            resultsCloseEnough = false;
+            double originalLat = Double.parseDouble(reqs[1]);
+            double originalLon = Double.parseDouble(reqs[2]);
+
+            for (CustomAddress addressToCheck : addresses){
+                Location.distanceBetween(originalLat, originalLon,
+                        addressToCheck.getLatitude(), addressToCheck.getLongitude(), results);
+                if (results[0] < OTPApp.GEOCODING_MAX_ERROR) {
+                    resultsCloseEnough = true;
+                    break;
+                }
+            }
+        }
+
+        if ((addresses == null) || addresses.isEmpty() || !resultsCloseEnough) {
+            if (addresses == null){
+                addresses = new ArrayList<CustomAddress>();
+            }
+            addresses.addAll(searchPlaces(context, selectedServer, address));
 
             for (CustomAddress addressRetrieved : addresses) {
                 String str = addressRetrieved.getAddressLine(0);
@@ -219,7 +242,26 @@ public class LocationUtil {
 
         addresses = filterAddressesBBox(selectedServer, addresses);
 
-        addressesReturn.addAll(addresses);
+        if (geocodingForMarker && reqs.length >= 3 && addresses != null){
+            float results[] = new float[1];
+            double originalLat = Double.parseDouble(reqs[1]);
+            double originalLon = Double.parseDouble(reqs[2]);
+            float minDistanceToOriginalLatLon = Float.MAX_VALUE;
+            CustomAddress closestAddress = addresses.get(0);
+
+            for (CustomAddress addressToCheck : addresses){
+                Location.distanceBetween(originalLat, originalLon,
+                        addressToCheck.getLatitude(), addressToCheck.getLongitude(), results);
+                if (results[0] < minDistanceToOriginalLatLon){
+                    closestAddress = addressToCheck;
+                    minDistanceToOriginalLatLon = results[0];
+                }
+            }
+            addressesReturn.add(closestAddress);
+        }
+        else{
+            addressesReturn.addAll(addresses);
+        }
 
         return addressesReturn;
     }
@@ -232,7 +274,7 @@ public class LocationUtil {
      * @return a new list filtered
      */
     private static List<CustomAddress> filterAddressesBBox(Server selectedServer, List<CustomAddress> addresses) {
-        if (!(addresses == null || addresses.isEmpty())) {
+        if ((!(addresses == null || addresses.isEmpty())) && selectedServer != null) {
             CopyOnWriteArrayList<CustomAddress> addressesFiltered = new CopyOnWriteArrayList<CustomAddress>(addresses);
 
             for (CustomAddress address : addressesFiltered) {
