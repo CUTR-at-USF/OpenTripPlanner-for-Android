@@ -344,7 +344,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
         if (selectedServer != null) {
             //We've already auto-selected a server
             ServerChecker serverChecker = new ServerChecker(activity,
-                    context, ServerSelector.this, false, true);
+                    context, ServerSelector.this, false, false, true);
             serverChecker.execute(selectedServer);
         } else if (knownServers != null && !knownServers.isEmpty()) {
             Log.d(OTPApp.TAG,
@@ -414,7 +414,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
                                                         ServerChecker serverChecker
                                                                 = new ServerChecker(activity,
                                                                 context, ServerSelector.this, true,
-                                                                false);
+                                                                true, false);
                                                         serverChecker.execute(
                                                                 new Server(value, context));
                                                         prefsEditor.commit();
@@ -439,7 +439,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
                                 if (server.getRegion().equals(items[item])) {
                                     selectedServer = server;
                                     ServerChecker serverChecker = new ServerChecker(activity,
-                                            context, ServerSelector.this, false, false);
+                                            context, ServerSelector.this, false, false, false);
                                     serverChecker.execute(selectedServer);
                                     break;
                                 }

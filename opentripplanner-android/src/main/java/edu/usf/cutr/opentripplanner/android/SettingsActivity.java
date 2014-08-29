@@ -290,7 +290,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
                             SettingsActivity.this);
                     ServerChecker serverChecker = new ServerChecker(weakContext,
                             SettingsActivity.this.getApplicationContext(), SettingsActivity.this,
-                            true, false);
+                            true, true, false);
                     serverChecker.execute(
                             new Server(value, SettingsActivity.this.getApplicationContext()));
                     return true;

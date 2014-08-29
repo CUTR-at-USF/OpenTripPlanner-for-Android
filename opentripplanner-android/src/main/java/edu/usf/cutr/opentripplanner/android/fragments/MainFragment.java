@@ -151,6 +151,7 @@ import edu.usf.cutr.opentripplanner.android.listeners.MetadataRequestCompleteLis
 import edu.usf.cutr.opentripplanner.android.listeners.OTPGeocodingListener;
 import edu.usf.cutr.opentripplanner.android.listeners.OtpFragment;
 import edu.usf.cutr.opentripplanner.android.listeners.RequestTimesForTripsCompleteListener;
+import edu.usf.cutr.opentripplanner.android.listeners.ServerCheckerCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.ServerSelectorCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.TripRequestCompleteListener;
 import edu.usf.cutr.opentripplanner.android.maps.CustomUrlTileProvider;
@@ -188,7 +189,7 @@ public class MainFragment extends Fragment implements
         ServerSelectorCompleteListener,
         TripRequestCompleteListener, MetadataRequestCompleteListener,
         BikeRentalLoadCompleteListener, RequestTimesForTripsCompleteListener, OTPGeocodingListener,
-        DateCompleteListener, OnRangeSeekBarChangeListener<Double>,
+        DateCompleteListener, OnRangeSeekBarChangeListener<Double>, ServerCheckerCompleteListener,
         GooglePlayServicesClient.OnConnectionFailedListener,
         GooglePlayServicesClient.ConnectionCallbacks,
         GoogleMap.OnCameraChangeListener {
@@ -3712,7 +3713,7 @@ public class MainFragment extends Fragment implements
                                                     getServerInitialZoom(selectedServer)));
                                     setMarker(true, getServerCenter(selectedServer), false, true);
                                 }
-                            } else {
+                            } else if(selectedServer != null) {
                                 mMap.animateCamera(CameraUpdateFactory
                                         .newLatLngZoom(mCurrentLatLng,
                                                 getServerInitialZoom(selectedServer)));
@@ -4223,5 +4224,10 @@ public class MainFragment extends Fragment implements
                 listenForTripTimeUpdates(false, 0);
             }
         }
+    }
+
+    @Override
+    public void onServerCheckerComplete(String result, boolean isCustomServer, boolean isAutoDetected, boolean isWorking) {
+        updateSelectedServer(true);
     }
 }
