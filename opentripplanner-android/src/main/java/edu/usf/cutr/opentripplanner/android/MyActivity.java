@@ -16,6 +16,7 @@
 
 package edu.usf.cutr.opentripplanner.android;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -34,15 +35,20 @@ import com.google.android.gms.maps.model.LatLng;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.prefs.PreferenceChangeEvent;
 
 import edu.usf.cutr.opentripplanner.android.fragments.DirectionListFragment;
 import edu.usf.cutr.opentripplanner.android.fragments.MainFragment;
 import edu.usf.cutr.opentripplanner.android.listeners.DateCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.OtpFragment;
 import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
+import edu.usf.cutr.opentripplanner.android.model.Server;
+import edu.usf.cutr.opentripplanner.android.sqlite.ServersDataSource;
+import edu.usf.cutr.opentripplanner.android.tasks.ServerChecker;
 
 /**
  * Main Activity for the OTP for Android app
@@ -126,7 +132,24 @@ public class MyActivity extends FragmentActivity implements OtpFragment {
                         mainFragment.setNeedToUpdateServersList(true);
                     }
                     if (changedSelectedCustomServer) {
-                        mainFragment.updateSelectedServer(true);
+                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+                        WeakReference<Activity> weakContext = new WeakReference<Activity>(this);
+                        ServerChecker serverChecker = new ServerChecker(weakContext, this.getApplicationContext(),
+                                mainFragment, true, false, false);
+                        Server server;
+                        if (prefs.getBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)){
+                            server = new Server(prefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""),
+                                    this);
+                        }
+                        else{
+                            ServersDataSource dataSource = ServersDataSource.getInstance(this);
+                            dataSource.open();
+                            server = new Server(dataSource
+                                    .getServer(prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)));
+                            dataSource.close();
+                        }
+                        serverChecker.execute(server);
                     }
                     if (changedTileProvider) {
                         mainFragment.updateOverlay(null);

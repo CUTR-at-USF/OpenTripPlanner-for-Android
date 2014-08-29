@@ -50,6 +50,8 @@ public class OTPApp extends Application {
 
     public static final String SERVER_INFO_LOCATION_NEW = "";
 
+    public static final int API_VERSION_MINOR_011 = 11;
+
     public static final int API_VERSION_V1 = 1;
 
     public static final int API_VERSION_PRE_V1 = 0;

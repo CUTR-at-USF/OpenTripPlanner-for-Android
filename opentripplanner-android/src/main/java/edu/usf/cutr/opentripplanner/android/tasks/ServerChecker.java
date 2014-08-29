@@ -61,6 +61,8 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
 
     private boolean isAutoDetected = false;
 
+    private boolean showToast = false;
+
     /**
      * Constructs a new ServerChecker
      */
@@ -78,12 +80,14 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
      * Constructs a new ServerChecker
      */
     public ServerChecker(WeakReference<Activity> activity, Context context,
-            ServerCheckerCompleteListener callback, boolean isCustomServer, boolean isAutoDetected) {
+            ServerCheckerCompleteListener callback, boolean isCustomServer, boolean showToast,
+            boolean isAutoDetected) {
         this.activity = activity;
         this.context = context;
         this.callback = callback;
         this.isCustomServer = isCustomServer;
         this.isAutoDetected = isAutoDetected;
+        this.showToast = showToast;
         Activity activityRetrieved = activity.get();
         if (activityRetrieved != null) {
             progressDialog = new ProgressDialog(activityRetrieved);
@@ -191,8 +195,14 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
             }
 
             if (serverInfo != null){
+                int api_version = serverInfo.serverVersion.major;
+                if (serverInfo.serverVersion.major == 0){
+                    if (serverInfo.serverVersion.minor == OTPApp.API_VERSION_MINOR_011){
+                        api_version = OTPApp.API_VERSION_V1;
+                    }
+                }
                 prefsEditor.putInt(OTPApp.PREFERENCE_KEY_API_VERSION,
-                        serverInfo.serverVersion.major);
+                        api_version);
                 prefsEditor.commit();
             }
 
@@ -240,7 +250,7 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
                 dialog.create().show();
             }
         } else{
-            if (isCustomServer) {
+            if (isCustomServer && showToast) {
                 if (isWorking) {
                     Toast.makeText(context,
                             context.getResources().getString(R.string.toast_server_checker_successful),
@@ -255,8 +265,6 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
                 callback.onServerCheckerComplete(result, isCustomServer, isAutoDetected, isWorking);
             }
         }
-
-
     }
 
 }
