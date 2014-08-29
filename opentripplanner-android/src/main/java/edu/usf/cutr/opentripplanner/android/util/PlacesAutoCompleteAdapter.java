@@ -25,7 +25,12 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<CustomAddress> imple
 
     @Override
     public int getCount() {
-        return resultList.size();
+        if (resultList != null){
+            return resultList.size();
+        }
+        else{
+            return 0;
+        }
     }
 
     @Override
