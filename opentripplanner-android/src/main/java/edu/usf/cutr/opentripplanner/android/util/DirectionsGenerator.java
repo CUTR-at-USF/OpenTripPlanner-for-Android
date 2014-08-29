@@ -323,6 +323,8 @@ public class DirectionsGenerator {
                 return resources.getString(R.string.street_type_track);
             } else if (streetName.equals("sidewalk")) {
                 return resources.getString(R.string.street_type_sidewalk);
+            } else if (streetName.startsWith("osm:node:")) {
+                return resources.getString(R.string.street_type_sidewalk);
             } else if (streetName.equals("steps")) {
                 return resources.getString(R.string.street_type_steps);
             } else {
