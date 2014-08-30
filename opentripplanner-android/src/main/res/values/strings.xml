@@ -509,6 +509,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied."</strin
                 <string name="time_full_hours">hours</string>
                 <string name="time_full_minutes">minutes</string>
                 <string name="time_full_seconds">seconds</string>
+                <string name="time_full_hours_singular">hour</string>
+                <string name="time_full_minutes_singular">minute</string>
+                <string name="time_full_seconds_singular">second</string>
 
                 <!-- Connectors -->
                 <string name="time_connector_next_day">tomorrow</string>

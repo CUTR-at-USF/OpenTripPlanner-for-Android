@@ -511,8 +511,12 @@
                 <string name="time_full_hours">Stunden</string>
                 <string name="time_full_minutes">Minuten</string>
                 <string name="time_full_seconds">Sekunden</string>
+                <!--<string name="time_full_hours_singular">hour</string>-->
+                <!--<string name="time_full_minutes_singular">minute</string>-->
+                <!--<string name="time_full_seconds_singular">second</string>-->
 
-                <!-- Connectors -->
+
+    <!-- Connectors -->
                 <string name="time_connector_next_day">Morgen</string>
                 <string name="time_connector_before_time">um</string>
                 <string name="time_connector_before_date">am</string>

@@ -135,11 +135,15 @@ public class ConversionUtils {
         long m = (sec % 3600) / 60;
         String longMinutes = applicationContext.getResources()
                 .getString(R.string.time_long_minutes);
+        String longMinutesSingular = applicationContext.getResources()
+                .getString(R.string.time_long_minutes);
         String shortMinutes = applicationContext.getResources()
                 .getString(R.string.time_short_minutes);
         if (longFormat){
             longMinutes = applicationContext.getResources()
                     .getString(R.string.time_full_minutes);
+            longMinutesSingular = applicationContext.getResources()
+                    .getString(R.string.time_full_minutes_singular);
         }
         String shortHours = applicationContext.getResources()
                 .getString(R.string.time_short_hours);
@@ -149,6 +153,9 @@ public class ConversionUtils {
         } else {
             if (m == 0) {
                 text += "< 1 " + longMinutes;
+            }
+            else if (m == 1){
+                text += Long.toString(m) + " " + longMinutesSingular;
             }
             else{
                 text += Long.toString(m) + " " + longMinutes;

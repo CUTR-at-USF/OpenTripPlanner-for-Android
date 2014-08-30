@@ -511,8 +511,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied."</strin
                 <string name="time_full_hours">horas</string>
                 <string name="time_full_minutes">minutos</string>
                 <string name="time_full_seconds">segundos</string>
+                <string name="time_full_hours_singular">hora</string>
+                <string name="time_full_minutes_singular">minuto</string>
+                <string name="time_full_seconds_singular">segundo</string>
 
-                <!-- Connectors -->
+    <!-- Connectors -->
                 <string name="time_connector_next_day">mañana</string>
                 <string name="time_connector_before_time">a las</string>
                 <string name="time_connector_before_date">el</string>
