@@ -4192,7 +4192,7 @@ public class MainFragment extends Fragment implements
             else if (intent.getAction().equals(OTPApp.INTENT_UPDATE_TRIP_TIME_ACTION)){
                 RequestTimesForTrips requestTimesForTrips =
                         new RequestTimesForTrips(mApplicationContext, MainFragment.this);
-                List<String> legsToUpdate = new ArraList<String>();
+                List<String> legsToUpdate = new ArrayList<String>();
                 for (Itinerary itinerary : getFragmentListener().getCurrentItineraryList()){
                     for (Leg leg : itinerary.legs){
                         if (leg.realTime && (TraverseMode.valueOf(leg.mode)).isTransit()){
