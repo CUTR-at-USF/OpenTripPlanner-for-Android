@@ -17,24 +17,28 @@
 <resources>
     <string name="app_name">OpenTripPlanner</string>
     <string name="servers_spreadsheet_url"><![CDATA[https://spreadsheets.google.com/spreadsheet/pub?hl=en_US&hl=en_US&key=0AgWy8ujaGosCdDhxTC04cUZNeHo0eGFBQTBpU2dxN0E&single=true&gid=0&output=csv]]></string>
-    <string name="map_tiles_default_server">"http://tiles.lyrk.org/lr/{z}/{x}/{y}?apikey=ea4f307439474ce99e29662232f80885"</string>
+    <string name="map_tiles_default_server">"http://api.tiles.mapbox.com/v4/vreixo.hio8ce1a/{z}/{x}/{y}@2x.png256?access_token=pk.eyJ1IjoidnJlaXhvIiwiYSI6InprRm40ZEkifQ.sxr5MAZ_tx43HJHJDZBsfQ"</string>
     <string-array name="map_tiles_servers_names">
+        <item>Mapbox</item>
         <item>LyrkOSM</item>
         <item>MapQuestOSM</item>
         <item>Mapnik</item>
         <item>CycleMap</item>
     </string-array>
+    <string name="mapbox">Mapbox</string>
     <string name="lyrk">LyrkOSM</string>
     <string name="maquest">MapQuestOSM</string>
     <string name="mapnik">Mapnik</string>
     <string name="cyclemap">CycleMap</string>
     <string name="cloudmade">CloudmadeOSM</string>
     <string-array name="map_tiles_servers_urls">
+        <item>http://api.tiles.mapbox.com/v4/vreixo.hio8ce1a/{z}/{x}/{y}@2x.png256?access_token=pk.eyJ1IjoidnJlaXhvIiwiYSI6InprRm40ZEkifQ.sxr5MAZ_tx43HJHJDZBsfQ</item>
         <item>http://tiles.lyrk.org/lr/{z}/{x}/{y}?apikey=ea4f307439474ce99e29662232f80885</item>
         <item>"http://otile1.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png"</item>
         <item>"http://a.tile.openstreetmap.org/{z}/{x}/{y}.png"</item>
         <item>"http://a.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png"</item>
     </string-array>
+    <string name="tiles_mapbox">http://api.tiles.mapbox.com/v4/vreixo.hio8ce1a/{z}/{x}/{y}.{@2xpng256}?access_token=pk.eyJ1IjoidnJlaXhvIiwiYSI6InprRm40ZEkifQ.sxr5MAZ_tx43HJHJDZBsfQ</string>
     <string name="tiles_lyrk">http://tiles.lyrk.org/lr/{z}/{x}/{y}?apikey=ea4f307439474ce99e29662232f80885</string>
     <string name="tiles_maquest">"http://otile1.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png"</string>
     <string name="tiles_mapnik">"http://a.tile.openstreetmap.org/{z}/{x}/{y}.png"</string>
