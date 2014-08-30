@@ -69,7 +69,7 @@ public class OTPApp extends Application {
 
     public static final String CHANGED_MAP_TILE_PROVIDER_RETURN_KEY = "ChangedMapTileProvider";
 
-    public static final String LIVE_UPDATES_DISABLED_RETURN_KEY = "RefreshServer";
+    public static final String LIVE_UPDATES_DISABLED_RETURN_KEY = "LiveUpdatesDisabled";
 
     public static final String CHANGED_PARAMETERS_MUST_REQUEST_TRIP_RETURN_KEY = "ChangedParameters";
 
