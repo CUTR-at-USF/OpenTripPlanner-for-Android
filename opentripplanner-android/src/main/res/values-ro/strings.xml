@@ -511,6 +511,9 @@
                 <string name="time_full_hours">ore</string>
                 <string name="time_full_minutes">minute</string>
                 <string name="time_full_seconds">secunde</string>
+                <!--<string name="time_full_hours_singular">hour</string>-->
+                <!--<string name="time_full_minutes_singular">minute</string>-->
+                <!--<string name="time_full_seconds_singular">second</string>-->
 
                 <!-- Connectors -->
                 <string name="time_connector_next_day">mâine</string>

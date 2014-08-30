@@ -81,7 +81,8 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter{
                                 .getString(R.string.map_markers_warning_live_upates_late_arrival);
                 }
                 else {
-                    delayText += " " + delay + " "
+                    String positiveDelay = delay.replace("-","");
+                    delayText += " " + positiveDelay + " "
                             + context
                                 .getResources()
                                 .getString(R.string.map_markers_warning_live_upates_early_arrival);
