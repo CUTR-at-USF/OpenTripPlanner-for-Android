@@ -622,9 +622,7 @@ public class MainFragment extends Fragment implements
         uiSettings.setAllGesturesEnabled(true);
         uiSettings.setZoomControlsEnabled(false);
 
-        String overlayString = mPrefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE,
-                mApplicationContext.getResources().getString(R.string.map_tiles_default_server));
-        updateOverlay(overlayString);
+        updateOverlay(ConversionUtils.getOverlayString(mApplicationContext));
 
         addInterfaceListeners();
     }
@@ -1548,10 +1546,7 @@ public class MainFragment extends Fragment implements
                 }
 
                 if (!mapFailedBefore) {
-                    String overlayString = mPrefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE,
-                            mApplicationContext.getResources()
-                                    .getString(R.string.map_tiles_default_server));
-                    updateOverlay(overlayString);
+                    updateOverlay(ConversionUtils.getOverlayString(mApplicationContext));
                 }
 
                 setTextBoxLocation(
@@ -3535,9 +3530,8 @@ public class MainFragment extends Fragment implements
         int tile_height = OTPApp.CUSTOM_MAP_TILE_SMALL_HEIGHT;
 
         if (overlayString == null) {
-            overlayString = mPrefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE,
-                    mApplicationContext.getResources()
-                            .getString(R.string.map_tiles_default_server));
+            overlayString = ConversionUtils.getOverlayString(mApplicationContext);
+
         }
         if (mSelectedTileOverlay != null) {
             mSelectedTileOverlay.remove();

@@ -134,7 +134,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
         mapTileProvider
                 .setEntryValues(entriesValues.toArray(new CharSequence[entriesValues.size()]));
         if (mapTileProvider.getValue() == null) {
-            mapTileProvider.setValue(getResources().getString(R.string.map_tiles_default_server));
+            mapTileProvider.setValue(ConversionUtils.getOverlayString(this));
         }
 
         CharSequence geocoders[] = {getResources().getString(R.string.geocoder_nominatim),
@@ -178,7 +178,7 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
         });
 
         String actualMapTileProvider = prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE,
-                getResources().getString(R.string.tiles_mapnik));
+                getResources().getString(R.string.map_tiles_default_server_low_res));
 
         if (actualMapTileProvider.equals(getResources().getString(R.string.tiles_mapnik))) {
             mapTileProvider.setSummary(getResources().getString(R.string.mapnik));
@@ -190,6 +190,12 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
         } else if (actualMapTileProvider
                 .equals(getResources().getString(R.string.tiles_lyrk))) {
             mapTileProvider.setSummary(getResources().getString(R.string.lyrk));
+        } else if (actualMapTileProvider
+                .equals(getResources().getString(R.string.tiles_mapbox))) {
+            mapTileProvider.setSummary(getResources().getString(R.string.mapbox));
+        } else if (actualMapTileProvider
+                .equals(getResources().getString(R.string.tiles_mapbox_retina))) {
+            mapTileProvider.setSummary(getResources().getString(R.string.mapboxretina));
         } else if (actualMapTileProvider.equals(OTPApp.MAP_TILE_GOOGLE_NORMAL)) {
             mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_NORMAL);
         } else if (actualMapTileProvider.equals(OTPApp.MAP_TILE_GOOGLE_HYBRID)) {

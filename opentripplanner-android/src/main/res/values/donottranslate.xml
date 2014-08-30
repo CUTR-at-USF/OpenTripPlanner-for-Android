@@ -17,28 +17,32 @@
 <resources>
     <string name="app_name">OpenTripPlanner</string>
     <string name="servers_spreadsheet_url"><![CDATA[https://spreadsheets.google.com/spreadsheet/pub?hl=en_US&hl=en_US&key=0AgWy8ujaGosCdDhxTC04cUZNeHo0eGFBQTBpU2dxN0E&single=true&gid=0&output=csv]]></string>
-    <string name="map_tiles_default_server">"http://api.tiles.mapbox.com/v4/vreixo.hio8ce1a/{z}/{x}/{y}@2x.png256?access_token=pk.eyJ1IjoidnJlaXhvIiwiYSI6InprRm40ZEkifQ.sxr5MAZ_tx43HJHJDZBsfQ"</string>
+    <string name="map_tiles_default_server_high_res">"http://api.tiles.mapbox.com/v4/opentripplannerhigh.jcah6hla/{z}/{x}/{y}@2x.png256?access_token=pk.eyJ1Ijoib3BlbnRyaXBwbGFubmVyaGlnaCIsImEiOiIyT2xxdVRjIn0.1n9CkukOWpsIgExzdcWfJg"</string>
+    <string name="map_tiles_default_server_low_res">"http://api.tiles.mapbox.com/v4/opentripplannerlow.jcagk4b3/{z}/{x}/{y}.png256?access_token=pk.eyJ1Ijoib3BlbnRyaXBwbGFubmVybG93IiwiYSI6ImRja1VOUjAifQ.1XBo8j8DGWj2EdIsxXGHdQ"</string>
     <string-array name="map_tiles_servers_names">
         <item>Mapbox</item>
+        <item>Mapbox retina</item>
         <item>LyrkOSM</item>
         <item>MapQuestOSM</item>
         <item>Mapnik</item>
         <item>CycleMap</item>
     </string-array>
     <string name="mapbox">Mapbox</string>
+    <string name="mapboxretina">Mapbox retina</string>
     <string name="lyrk">LyrkOSM</string>
     <string name="maquest">MapQuestOSM</string>
     <string name="mapnik">Mapnik</string>
     <string name="cyclemap">CycleMap</string>
-    <string name="cloudmade">CloudmadeOSM</string>
     <string-array name="map_tiles_servers_urls">
-        <item>http://api.tiles.mapbox.com/v4/vreixo.hio8ce1a/{z}/{x}/{y}@2x.png256?access_token=pk.eyJ1IjoidnJlaXhvIiwiYSI6InprRm40ZEkifQ.sxr5MAZ_tx43HJHJDZBsfQ</item>
+        <item>http://api.tiles.mapbox.com/v4/opentripplannerlow.jcagk4b3/{z}/{x}/{y}.png256?access_token=pk.eyJ1Ijoib3BlbnRyaXBwbGFubmVybG93IiwiYSI6ImRja1VOUjAifQ.1XBo8j8DGWj2EdIsxXGHdQ</item>
+        <item>http://api.tiles.mapbox.com/v4/opentripplannerhigh.jcah6hla/{z}/{x}/{y}@2x.png256?access_token=pk.eyJ1Ijoib3BlbnRyaXBwbGFubmVyaGlnaCIsImEiOiIyT2xxdVRjIn0.1n9CkukOWpsIgExzdcWfJg</item>
         <item>http://tiles.lyrk.org/lr/{z}/{x}/{y}?apikey=ea4f307439474ce99e29662232f80885</item>
         <item>"http://otile1.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png"</item>
         <item>"http://a.tile.openstreetmap.org/{z}/{x}/{y}.png"</item>
         <item>"http://a.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png"</item>
     </string-array>
-    <string name="tiles_mapbox">http://api.tiles.mapbox.com/v4/vreixo.hio8ce1a/{z}/{x}/{y}.{@2xpng256}?access_token=pk.eyJ1IjoidnJlaXhvIiwiYSI6InprRm40ZEkifQ.sxr5MAZ_tx43HJHJDZBsfQ</string>
+    <string name="tiles_mapbox">http://api.tiles.mapbox.com/v4/opentripplannerlow.jcagk4b3/{z}/{x}/{y}.png256?access_token=pk.eyJ1Ijoib3BlbnRyaXBwbGFubmVybG93IiwiYSI6ImRja1VOUjAifQ.1XBo8j8DGWj2EdIsxXGHdQ</string>
+    <string name="tiles_mapbox_retina">http://api.tiles.mapbox.com/v4/opentripplannerhigh.jcah6hla/{z}/{x}/{y}@2x.png256?access_token=pk.eyJ1Ijoib3BlbnRyaXBwbGFubmVyaGlnaCIsImEiOiIyT2xxdVRjIn0.1n9CkukOWpsIgExzdcWfJg</string>
     <string name="tiles_lyrk">http://tiles.lyrk.org/lr/{z}/{x}/{y}?apikey=ea4f307439474ce99e29662232f80885</string>
     <string name="tiles_maquest">"http://otile1.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png"</string>
     <string name="tiles_mapnik">"http://a.tile.openstreetmap.org/{z}/{x}/{y}.png"</string>

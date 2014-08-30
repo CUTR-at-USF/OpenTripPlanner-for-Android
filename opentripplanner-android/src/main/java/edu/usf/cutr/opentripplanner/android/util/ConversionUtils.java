@@ -21,11 +21,13 @@ import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StrikethroughSpan;
+import android.util.DisplayMetrics;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -436,6 +438,15 @@ public class ConversionUtils {
         }
 
         return routeName;
+    }
+
+    public static String getOverlayString(Context context){
+        String defaultOverlay = context.getResources().getString(R.string.map_tiles_default_server_high_res);
+        if (context.getResources().getDisplayMetrics().densityDpi < DisplayMetrics.DENSITY_HIGH){
+            defaultOverlay = context.getResources().getString(R.string.map_tiles_default_server_low_res);
+        }
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, defaultOverlay);
     }
 
 }
