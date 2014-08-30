@@ -3021,7 +3021,7 @@ public class MainFragment extends Fragment implements
                     Marker modeMarker = mMap.addMarker(modeMarkerOption);
                     boolean realtime = false;
                     if (TraverseMode.valueOf(leg.mode).isTransit()) {
-                        realtime = leg.realtime;
+                        realtime = leg.realTime;
                     }
                     TripInfo tripInfo = new TripInfo(realtime, leg.tripId,
                             generateModeMarkerSnippet(leg), leg.departureDelay);
@@ -3121,7 +3121,7 @@ public class MainFragment extends Fragment implements
             CharSequence spannableSnippet = ConversionUtils
                     .getTimeWithContext(mApplicationContext, leg.agencyTimeZoneOffset,
                             Long.parseLong(leg.startTime), false);
-            if (leg.realtime){
+            if (leg.realTime){
                 int color = ConversionUtils.getDelayColor(leg.departureDelay, mApplicationContext);
                 spannableSnippet = ConversionUtils
                         .getTimeWithContext(mApplicationContext, leg.agencyTimeZoneOffset,
@@ -4192,10 +4192,10 @@ public class MainFragment extends Fragment implements
             else if (intent.getAction().equals(OTPApp.INTENT_UPDATE_TRIP_TIME_ACTION)){
                 RequestTimesForTrips requestTimesForTrips =
                         new RequestTimesForTrips(mApplicationContext, MainFragment.this);
-                List<String> legsToUpdate = new ArrayList<String>();
+                List<String> legsToUpdate = new ArraList<String>();
                 for (Itinerary itinerary : getFragmentListener().getCurrentItineraryList()){
                     for (Leg leg : itinerary.legs){
-                        if (leg.realtime && (TraverseMode.valueOf(leg.mode)).isTransit()){
+                        if (leg.realTime && (TraverseMode.valueOf(leg.mode)).isTransit()){
                             legsToUpdate.add(leg.agencyId + "_" + leg.tripId);
                         }
                     }

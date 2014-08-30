@@ -212,7 +212,7 @@ public class MyActivity extends FragmentActivity implements OtpFragment {
             long soonerRealTimeDeparture = Long.MAX_VALUE;
             for (Itinerary itinerary : itineraries){
                 for (Leg leg : itinerary.legs){
-                    if (leg.realtime){
+                    if (leg.realTime){
                         long legRealtimeDeparture = Long.parseLong(leg.startTime);
                         if (legRealtimeDeparture < soonerRealTimeDeparture){
                             soonerRealTimeDeparture = legRealtimeDeparture;
