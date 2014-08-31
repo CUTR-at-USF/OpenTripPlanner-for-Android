@@ -538,9 +538,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied."</strin
             <string name="street_type_road">road</string>
             <string name="street_type_ramp">ramp</string>
             <string name="street_type_link">link</string>
-            <string name="street_type_service_road">service_road</string>
+            <string name="street_type_service_road">service road</string>
             <string name="street_type_alley">alley</string>
-            <string name="street_type_parking_aisle">parking_aisle</string>
+            <string name="street_type_parking_aisle">parking aisle</string>
             <string name="street_type_byway">byway</string>
             <string name="street_type_track">track</string>
             <string name="street_type_sidewalk">sidewalk</string>
