@@ -370,8 +370,23 @@
                 <!-- Transit description start -->
                 <string name="step_by_step_transit_connector_stop_name">À</string>
 
+                <!-- Transit headsign connector -->
+                <!--<string name="step_by_step_transit_connector_headsign">to</string>-->
+
                 <!-- Real time -->
                 <string name="step_by_step_transit_warning_live_udpates">Mises à jour en temps réel</string>
+
+                <!-- Modes -->
+
+                    <!-- Modes -->
+                    <!--<string name="step_by_step_transit_mode_tram">tram</string>-->
+                    <!--<string name="step_by_step_transit_mode_subway">subway</string>-->
+                    <!--<string name="step_by_step_transit_mode_rail">rail</string>-->
+                    <!--<string name="step_by_step_transit_mode_bus">bus</string>-->
+                    <!--<string name="step_by_step_transit_mode_ferry">ferry</string>-->
+                    <!--<string name="step_by_step_transit_mode_cable_car">cable car</string>-->
+                    <!--<string name="step_by_step_transit_mode_gondola">gondola</string>-->
+                    <!--<string name="step_by_step_transit_mode_funicular">funicular</string>-->
 
             <!-- Non-transit -->
 
@@ -530,7 +545,7 @@ SANS AUCUNE GARANTIE OU CONDITION D\'AUCUNE SORTE, explicite ou implicite."</str
 
             <!-- Street type -->
             <string name="street_type_bike_path">piste cyclable</string>
-            <string name="street_type_open_area">place</string>
+            <string name="street_type_open_area">placeAndHeadsign</string>
             <string name="street_type_path">chemin</string>
             <string name="street_type_bridleway">chemin équestre</string>
             <string name="street_type_footpath">chemin piétonnier</string>
