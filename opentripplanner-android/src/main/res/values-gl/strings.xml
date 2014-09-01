@@ -391,8 +391,8 @@
                     <string name="step_by_step_non_transit_connector_street_name_roundabout">en dirección a</string>
 
                     <!-- Relative directions -->
-                    <!--<string name="step_by_step_non_transit_dir_relative_circle_clockwise">At the roundabout take the</string>-->
-                    <!--<string name="step_by_step_non_transit_dir_relative_circle_counterclockwise">At the roundabout take the</string>-->
+                    <string name="step_by_step_non_transit_dir_relative_circle_clockwise">Na rotonda toma a</string>
+                    <string name="step_by_step_non_transit_dir_relative_circle_counterclockwise">Na rotonda toma a</string>
                     <string name="step_by_step_non_transit_dir_relative_continue">Continúa</string>
                     <string name="step_by_step_non_transit_dir_relative_depart">Sae</string>
                     <string name="step_by_step_non_transit_dir_relative_elevator">Toma o elevador</string>
