@@ -131,9 +131,6 @@ public class ConversionUtils {
     public static String getFormattedDurationTextNoSeconds(long sec, boolean longFormat, Context applicationContext) {
         String text = "";
         long h = sec / 3600;
-        if (h >= 24) {
-            return null;
-        }
         long m = (sec % 3600) / 60;
         String longMinutes = applicationContext.getResources()
                 .getString(R.string.time_long_minutes);
