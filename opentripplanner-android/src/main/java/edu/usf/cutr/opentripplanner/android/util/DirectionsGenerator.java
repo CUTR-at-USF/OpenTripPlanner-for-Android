@@ -16,7 +16,6 @@
 
 package edu.usf.cutr.opentripplanner.android.util;
 
-import org.opentripplanner.api.model.AgencyAndId;
 import org.opentripplanner.api.model.RelativeDirection;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -29,6 +28,7 @@ import org.opentripplanner.api.model.WalkStep;
 import android.content.Context;
 import android.content.res.Resources;
 import android.text.SpannableString;
+import android.text.TextUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -152,10 +152,13 @@ public class DirectionsGenerator {
         mainDirectionText += toPlace.name == null ? ""
                 : " " + applicationContext.getResources().getString(R.string.step_by_step_non_transit_to) + " "
                         + getLocalizedStreetName(toPlace.name, applicationContext.getResources());
-        mainDirectionText += toPlace.stopId == null ? ""
-                : " (" + toPlace.stopId.getAgencyId() + " " + toPlace.stopId.getId() + ")";
+        String extraStopInformation = toPlace.stopCode;
+        if (!TextUtils.isEmpty(extraStopInformation)) {
+            mainDirectionText += " (" + extraStopInformation + ")";
+        }
         mainDirectionText += "\n[" + ConversionUtils
-                .getFormattedDistance(totalDistance, applicationContext)
+                .getFormattedDistance(leg.distance, applicationContext) + " - " +
+                ConversionUtils.getFormattedDurationTextNoSeconds(leg.duration, false, applicationContext)
                 + " ]";
         direction.setDirectionText(mainDirectionText);
 
@@ -390,6 +393,29 @@ public class DirectionsGenerator {
         return null;
     }
 
+    public static String getLocalizedMode(TraverseMode mode, Resources resources) {
+        if (mode != null) {
+            if (mode.equals(TraverseMode.TRAM)) {
+                return resources.getString(R.string.step_by_step_transit_mode_tram);
+            } else if (mode.equals(TraverseMode.SUBWAY)) {
+                return resources.getString(R.string.step_by_step_transit_mode_subway);
+            } else if (mode.equals(TraverseMode.RAIL)) {
+                return resources.getString(R.string.step_by_step_transit_mode_rail);
+            } else if (mode.equals(TraverseMode.BUS)) {
+                return resources.getString(R.string.step_by_step_transit_mode_bus);
+            } else if (mode.equals(TraverseMode.FERRY)) {
+                return resources.getString(R.string.step_by_step_transit_mode_ferry);
+            } else if (mode.equals(TraverseMode.CABLE_CAR)) {
+                return resources.getString(R.string.step_by_step_transit_mode_cable_car);
+            } else if (mode.equals(TraverseMode.GONDOLA)) {
+                return resources.getString(R.string.step_by_step_transit_mode_gondola);
+            } else if (mode.equals(TraverseMode.FUNICULAR)) {
+                return resources.getString(R.string.step_by_step_transit_mode_funicular);
+            }
+        }
+        return null;
+    }
+
     private ArrayList<Direction> generateTransitDirections(Leg leg) {
         ArrayList<Direction> directions = new ArrayList<Direction>(2);
 
@@ -404,34 +430,41 @@ public class DirectionsGenerator {
         direction.setRealTimeInfo(leg.realtime);
 
         //		set icon
-        TraverseMode mode = TraverseMode.valueOf(leg.mode);
+        String mode = getLocalizedMode(TraverseMode.valueOf(leg.mode),
+                applicationContext.getResources());
         int icon;
-        String route = leg.route;
+        String route;
         String agencyName = leg.agencyName;
         Place from = leg.from;
-        AgencyAndId agencyAndIdFrom = from.stopId;
         Place to = leg.to;
-        AgencyAndId agencyAndIdTo = to.stopId;
         Calendar newTime = Calendar.getInstance();
         Calendar oldTime = Calendar.getInstance();
 
-        // Get on HART BUS 6
-        String serviceName = agencyName;
-        if (serviceName == null) {
-            serviceName = "";
+        String shortName;
+        if (!TextUtils.isEmpty(leg.tripShortName)){
+            shortName = leg.tripShortName ;
         }
+        else{
+            shortName = leg.routeShortName ;
+        }
+
+        if (!leg.routeLongName.contains(shortName)){
+            route = shortName + " " + "(" + leg.routeLongName + ")";
+        }
+        else{
+            route = leg.routeLongName;
+        }
+
 
         direction.setTransit(true);
 
-        String action, place, agencyAndId, extra = "";
+        String action, placeAndHeadsign, extra = "";
 
         if (isOnDirection){
             action = applicationContext.getResources()
                     .getString(R.string.step_by_step_transit_get_on);
-            place = from.name;
-            agencyAndId = " ("
-                    + agencyAndIdFrom.getAgencyId() + " " + agencyAndIdFrom.getId() + ")";
-            icon = getModeIcon(new TraverseModeSet(mode));
+            placeAndHeadsign = from.name;
+            icon = getModeIcon(new TraverseModeSet(leg.mode));
             newTime.setTime(new Date(Long.parseLong(leg.startTime)));
             oldTime.setTime(new Date(newTime.getTimeInMillis()));
             oldTime.add(Calendar.SECOND, - leg.departureDelay);
@@ -450,11 +483,11 @@ public class DirectionsGenerator {
                 Direction subDirection = new Direction();
 
                 Place stop = stopsInBetween.get(i);
-                AgencyAndId agencyAndIdStop = stop.stopId;
-                String subDirectionText = Integer.toString(i + 1) + ". " + stop.name + " (" +
-                        agencyAndIdStop.getAgencyId() + " " +
-                        agencyAndIdStop.getId() + ")";
-
+                String extraStopInformation = stop.stopCode;
+                String subDirectionText = Integer.toString(i + 1) + ". " + stop.name;
+                if (!TextUtils.isEmpty(extraStopInformation)) {
+                    subDirectionText += " (" + extraStopInformation + ")";
+                }
                 subDirection.setDirectionText(subDirectionText);
                 subDirection.setIcon(icon);
 
@@ -464,13 +497,18 @@ public class DirectionsGenerator {
 
             extra = "\n"  + stopsInBetween.size() + " " + applicationContext.getResources()
                             .getString(R.string.step_by_step_transit_stops_in_between);
+
+            if (!TextUtils.isEmpty(leg.headsign)){
+                placeAndHeadsign += " "
+                        + applicationContext
+                        .getResources().getString(R.string.step_by_step_transit_connector_headsign)
+                        + " " + leg.headsign;
+            }
         }
         else{
             action = applicationContext.getResources()
                     .getString(R.string.step_by_step_transit_get_off);
-            place = to.name;
-            agencyAndId = " ("
-                    + agencyAndIdTo.getAgencyId() + " " + agencyAndIdTo.getId() + ")";
+            placeAndHeadsign = to.name;
             icon = -1;
             newTime.setTime(new Date(Long.parseLong(leg.endTime)));
             oldTime.setTime(new Date(newTime.getTimeInMillis()));
@@ -478,10 +516,11 @@ public class DirectionsGenerator {
         }
 
         direction.setIcon(icon);
-        direction.setPlace(applicationContext.getResources()
-                .getString(R.string.step_by_step_transit_connector_stop_name) + " " + place
-                + agencyAndId + extra);
-        direction.setService(action + " " + serviceName + " " + mode + " " + route);
+        direction.setPlaceAndHeadsign(applicationContext.getResources()
+                .getString(R.string.step_by_step_transit_connector_stop_name) + " "
+                + placeAndHeadsign + extra);
+        direction.setService(action + " " + mode + " " + route);
+        direction.setAgency(agencyName);
 
         SpannableString oldTimeString;
 
@@ -581,7 +620,6 @@ public class DirectionsGenerator {
      * @return the totalDistance
      */
     public double getTotalDistance() {
-        //	totalDistance = Double.valueOf(twoDForm.format(totalDistance));-->VREIXO
         return totalDistance;
     }
 

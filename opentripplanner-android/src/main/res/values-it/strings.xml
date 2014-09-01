@@ -370,8 +370,23 @@
                 <!-- Transit description start -->
                 <string name="step_by_step_transit_connector_stop_name">A</string>
 
+                <!-- Transit headsign connector -->
+                <!--<string name="step_by_step_transit_connector_headsign">to</string>-->
+
                 <!-- Real time -->
                 <!--<string name="step_by_step_transit_warning_live_udpates">Live updates</string>-->
+
+                <!-- Modes -->
+
+                    <!-- Modes -->
+                    <!--<string name="step_by_step_transit_mode_tram">tram</string>-->
+                    <!--<string name="step_by_step_transit_mode_subway">subway</string>-->
+                    <!--<string name="step_by_step_transit_mode_rail">rail</string>-->
+                    <!--<string name="step_by_step_transit_mode_bus">bus</string>-->
+                    <!--<string name="step_by_step_transit_mode_ferry">ferry</string>-->
+                    <!--<string name="step_by_step_transit_mode_cable_car">cable car</string>-->
+                    <!--<string name="step_by_step_transit_mode_gondola">gondola</string>-->
+                    <!--<string name="step_by_step_transit_mode_funicular">funicular</string>-->
 
             <!-- Non-transit -->
 

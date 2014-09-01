@@ -370,8 +370,23 @@
                 <!-- Transit description start -->
                 <string name="step_by_step_transit_connector_stop_name">En</string>
 
+                <!-- Transit headsign connector -->
+                <string name="step_by_step_transit_connector_headsign">hacia</string>
+
                 <!-- Real time -->
                 <string name="step_by_step_transit_warning_live_udpates">Información en tiempo real</string>
+
+                <!-- Modes -->
+
+                    <!-- Modes -->
+                    <string name="step_by_step_transit_mode_tram">tranvía</string>
+                    <string name="step_by_step_transit_mode_subway">metro</string>
+                    <string name="step_by_step_transit_mode_rail">tren</string>
+                    <string name="step_by_step_transit_mode_bus">autobús</string>
+                    <string name="step_by_step_transit_mode_ferry">ferry</string>
+                    <string name="step_by_step_transit_mode_cable_car">cable car</string>
+                    <string name="step_by_step_transit_mode_gondola">teleférico</string>
+                    <string name="step_by_step_transit_mode_funicular">funicular</string>
 
             <!-- Non-transit -->
 

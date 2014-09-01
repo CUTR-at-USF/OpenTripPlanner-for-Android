@@ -165,7 +165,11 @@ public class DirectionExpandableListAdapter extends BaseExpandableListAdapter {
                     time = dir.getNewTime();
                 }
             }
-            text = TextUtils.concat(text, " ", time, "\n", dir.getPlace());
+            text = TextUtils.concat(text, " ", time, "\n", dir.getPlaceAndHeadsign());
+
+            if (!TextUtils.isEmpty(dir.getAgency())){
+                text = TextUtils.concat(text, "\n", dir.getAgency());
+            }
 
             holder.txtDirection.setText(text);
             if (dir.getIcon() == -1){

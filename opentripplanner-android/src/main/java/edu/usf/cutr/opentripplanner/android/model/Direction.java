@@ -32,7 +32,9 @@ public class Direction {
 
     private CharSequence service;
 
-    private CharSequence place;
+    private CharSequence agency;
+
+    private CharSequence placeAndHeadsign;
 
     private CharSequence oldTime;
 
@@ -48,12 +50,12 @@ public class Direction {
         super();
     }
 
-    public Direction(int icon, CharSequence service, CharSequence place, CharSequence oldTime,
+    public Direction(int icon, CharSequence service, CharSequence placeAndHeadsign, CharSequence oldTime,
                      CharSequence newTime, boolean isTransit) {
         super();
         this.setIcon(icon);
         this.service = service;
-        this.place = place;
+        this.placeAndHeadsign = placeAndHeadsign;
         this.oldTime = oldTime;
         this.newTime = newTime;
         this.isTransit = isTransit;
@@ -125,12 +127,12 @@ public class Direction {
         this.newTime = newTime;
     }
 
-    public CharSequence getPlace() {
-        return place;
+    public CharSequence getPlaceAndHeadsign() {
+        return placeAndHeadsign;
     }
 
-    public void setPlace(CharSequence place) {
-        this.place = place;
+    public void setPlaceAndHeadsign(CharSequence placeAndHeadsign) {
+        this.placeAndHeadsign = placeAndHeadsign;
     }
 
     public boolean isTransit() {
@@ -156,5 +158,13 @@ public class Direction {
 
     public void setDirectionText(CharSequence directionText) {
         this.directionText = directionText;
+    }
+
+    public CharSequence getAgency() {
+        return agency;
+    }
+
+    public void setAgency(CharSequence agency) {
+        this.agency = agency;
     }
 }
