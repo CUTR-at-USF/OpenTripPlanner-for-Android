@@ -242,7 +242,7 @@ public class LocationUtil {
 
         addresses = filterAddressesBBox(selectedServer, addresses);
 
-        if (geocodingForMarker && reqs.length >= 3 && addresses != null){
+        if (geocodingForMarker && reqs.length >= 3 && addresses != null && !addresses.isEmpty()){
             float results[] = new float[1];
             double originalLat = Double.parseDouble(reqs[1]);
             double originalLon = Double.parseDouble(reqs[2]);
