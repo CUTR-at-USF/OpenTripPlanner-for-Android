@@ -4241,4 +4241,12 @@ public class MainFragment extends Fragment implements
     public void onServerCheckerComplete(String result, boolean isCustomServer, boolean isAutoDetected, boolean isWorking) {
         updateSelectedServer(true);
     }
+
+    public GraphMetadata getmCustomServerMetadata() {
+        return mCustomServerMetadata;
+    }
+
+    public void setmCustomServerMetadata(GraphMetadata mCustomServerMetadata) {
+        this.mCustomServerMetadata = mCustomServerMetadata;
+    }
 }

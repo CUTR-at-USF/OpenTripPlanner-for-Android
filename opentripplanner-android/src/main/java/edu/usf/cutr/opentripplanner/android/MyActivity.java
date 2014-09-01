@@ -149,6 +149,7 @@ public class MyActivity extends FragmentActivity implements OtpFragment {
                                     .getServer(prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)));
                             dataSource.close();
                         }
+                        mainFragment.setmCustomServerMetadata(null);
                         serverChecker.execute(server);
                     }
                     if (changedTileProvider) {
