@@ -124,7 +124,7 @@ public class MetadataRequest extends AsyncTask<String, Integer, GraphMetadata> {
             Toast.makeText(context,
                     context.getResources().getString(R.string.toast_metadata_request_successful),
                     Toast.LENGTH_SHORT).show();
-            callback.onMetadataRequestComplete(metadata);
+            callback.onMetadataRequestComplete(metadata, true);
         } else {
             Toast.makeText(context, context.getResources().getString(R.string.toast_server_checker_info_error),
                     Toast.LENGTH_SHORT).show();

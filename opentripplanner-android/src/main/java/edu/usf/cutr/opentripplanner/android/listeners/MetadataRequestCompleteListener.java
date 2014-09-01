@@ -20,6 +20,6 @@ import org.opentripplanner.api.ws.GraphMetadata;
 
 public interface MetadataRequestCompleteListener {
 
-    public void onMetadataRequestComplete(GraphMetadata metadata);
+    public void onMetadataRequestComplete(GraphMetadata metadata, boolean updateUI);
 
 }

@@ -355,6 +355,7 @@ public class MainFragment extends Fragment implements
 
     private double previousBikeTriangleMaxValue;
 
+    private GraphMetadata mCustomServerMetadata = null;
 
     private OTPGeocoding mGeoCodingTask;
 
@@ -1626,6 +1627,8 @@ public class MainFragment extends Fragment implements
                         .getDouble(OTPApp.BUNDLE_KEY_PREVIOUS_BIKE_TRIANGLE_MIN_VALUE);
                 previousBikeTriangleMaxValue = savedInstanceState
                         .getDouble(OTPApp.BUNDLE_KEY_PREVIOUS_BIKE_TRIANGLE_MAX_VALUE);
+                mCustomServerMetadata = (GraphMetadata) savedInstanceState
+                        .getSerializable(OTPApp.BUNDLE_KEY_CUSTOM_SERVER_METADATA);
             }
         }
     }
@@ -2503,6 +2506,7 @@ public class MainFragment extends Fragment implements
                 otpBundle.setCurrentItinerary(mFragmentListener.getCurrentItinerary());
                 bundle.putSerializable(OTPApp.BUNDLE_KEY_OTP_BUNDLE, otpBundle);
             }
+            bundle.putSerializable(OTPApp.BUNDLE_KEY_CUSTOM_SERVER_METADATA, mCustomServerMetadata);
         }
 
     }
@@ -2626,12 +2630,19 @@ public class MainFragment extends Fragment implements
             }
             WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
 
-            MetadataRequest metaRequest = new MetadataRequest(weakContext, mApplicationContext,
-                    this);
-            metaRequest.execute(mPrefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
+            if (mCustomServerMetadata == null){
+                MetadataRequest metaRequest = new MetadataRequest(weakContext, mApplicationContext,
+                        this);
+                metaRequest.execute(mPrefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
+            }
+            else{
+                onMetadataRequestComplete(mCustomServerMetadata, false);
+            }
+
             Log.d(OTPApp.TAG, "Now using custom OTP server: " + mPrefs
                     .getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
         } else if ((serverId = mPrefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)) != 0){
+            mCustomServerMetadata = null;
             ServersDataSource dataSource = ServersDataSource.getInstance(mApplicationContext);
             dataSource.open();
             server = new Server(dataSource
@@ -3476,45 +3487,51 @@ public class MainFragment extends Fragment implements
 
 
     @Override
-    public void onMetadataRequestComplete(GraphMetadata metadata) {
+    public void onMetadataRequestComplete(GraphMetadata metadata, boolean updateUI) {
         if (getActivity() != null) {
-            double lowerLeftLatitude = metadata.getLowerLeftLatitude();
-            double lowerLeftLongitude = metadata.getLowerLeftLongitude();
-            double upperRightLatitude = metadata.getUpperRightLatitude();
-            double upperRightLongitude = metadata.getUpperRightLongitude();
+            if (metadata != null){
+                mCustomServerMetadata = metadata;
 
-            Server selectedServer = mOTPApp.getSelectedServer();
+                double lowerLeftLatitude = metadata.getLowerLeftLatitude();
+                double lowerLeftLongitude = metadata.getLowerLeftLongitude();
+                double upperRightLatitude = metadata.getUpperRightLatitude();
+                double upperRightLongitude = metadata.getUpperRightLongitude();
 
-            String bounds = String.valueOf(lowerLeftLatitude) +
-                    "," + String.valueOf(lowerLeftLongitude) +
-                    "," + String.valueOf(upperRightLatitude) + "," + String
-                    .valueOf(upperRightLongitude);
-            selectedServer.setBounds(bounds);
+                Server selectedServer = mOTPApp.getSelectedServer();
 
-            SharedPreferences.Editor prefsEditor = PreferenceManager
-                    .getDefaultSharedPreferences(mApplicationContext).edit();
-            prefsEditor.putString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS, bounds);
-            prefsEditor.commit();
+                String bounds = String.valueOf(lowerLeftLatitude) +
+                        "," + String.valueOf(lowerLeftLongitude) +
+                        "," + String.valueOf(upperRightLatitude) + "," + String
+                        .valueOf(upperRightLongitude);
+                selectedServer.setBounds(bounds);
 
-            Log.d(OTPApp.TAG, "LowerLeft: " + Double.toString(lowerLeftLatitude) + "," + Double
-                    .toString(lowerLeftLongitude));
-            Log.d(OTPApp.TAG, "UpperRight" + Double.toString(upperRightLatitude) + "," + Double
-                    .toString(upperRightLongitude));
+                SharedPreferences.Editor prefsEditor = PreferenceManager
+                        .getDefaultSharedPreferences(mApplicationContext).edit();
+                prefsEditor.putString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS, bounds);
+                prefsEditor.commit();
 
-            addBoundariesRectangle(selectedServer);
+                Log.d(OTPApp.TAG, "LowerLeft: " + Double.toString(lowerLeftLatitude) + "," + Double
+                        .toString(lowerLeftLongitude));
+                Log.d(OTPApp.TAG, "UpperRight" + Double.toString(upperRightLatitude) + "," + Double
+                        .toString(upperRightLongitude));
 
-            LatLng mCurrentLatLng = getLastLocation();
+                addBoundariesRectangle(selectedServer);
 
-            if ((mCurrentLatLng != null) && (LocationUtil
-                    .checkPointInBoundingBox(mCurrentLatLng, selectedServer,
-                            OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))) {
-                mMap.animateCamera(CameraUpdateFactory
-                        .newLatLngZoom(mCurrentLatLng, getServerInitialZoom(selectedServer)));
-            } else {
-                mMap.animateCamera(CameraUpdateFactory
-                        .newLatLngZoom(getServerCenter(selectedServer),
-                                getServerInitialZoom(selectedServer)));
-                setMarker(true, getServerCenter(selectedServer), false, true);
+                LatLng mCurrentLatLng = getLastLocation();
+
+                if (updateUI){
+                    if ((mCurrentLatLng != null) && (LocationUtil
+                            .checkPointInBoundingBox(mCurrentLatLng, selectedServer,
+                                    OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))) {
+                        mMap.animateCamera(CameraUpdateFactory
+                                .newLatLngZoom(mCurrentLatLng, getServerInitialZoom(selectedServer)));
+                    } else {
+                        mMap.animateCamera(CameraUpdateFactory
+                                .newLatLngZoom(getServerCenter(selectedServer),
+                                        getServerInitialZoom(selectedServer)));
+                        setMarker(true, getServerCenter(selectedServer), false, true);
+                    }
+                }
             }
         }
     }
