@@ -2,6 +2,10 @@
 
 This guide details how to use issues and pull requests (for new code) to improve OpenTripPlanner for Android.
 
+## Individual Contributor License Agreement (ICLA)
+
+To ensure that the app source code remains fully open-source under a common license, we require that contributors sign [an electronic ICLA](https://docs.google.com/forms/d/1gYT1gLn8TPu-oMYCfWlixm1cG8BU4eCUcSsVDqp3j5o/viewform) before contributions can be merged.
+
 ## Code Style and Template
 
 We use the [Android Open-Source Project (AOSP)](http://source.android.com/source/code-style.html) Code Style Guidelines.
