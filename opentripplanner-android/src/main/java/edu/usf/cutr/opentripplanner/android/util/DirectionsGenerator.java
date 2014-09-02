@@ -427,7 +427,7 @@ public class DirectionsGenerator {
 
     public Direction generateTransitSubdirection(Leg leg, boolean isOnDirection){
         Direction direction = new Direction();
-        direction.setRealTimeInfo(leg.realtime);
+        direction.setRealTimeInfo(leg.realTime);
 
         //		set icon
         String mode = getLocalizedMode(TraverseMode.valueOf(leg.mode),
@@ -524,7 +524,7 @@ public class DirectionsGenerator {
 
         SpannableString oldTimeString;
 
-        if (leg.realtime) {
+        if (leg.realTime) {
             CharSequence newTimeString;
             newTimeString = ConversionUtils
                     .getTimeUpdated(applicationContext, leg.agencyTimeZoneOffset,
