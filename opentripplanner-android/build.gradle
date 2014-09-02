@@ -115,8 +115,7 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-annotations:2.4.1'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.4.1.1'
     // POJOs used for full data-binding via Jackson
-  //  compile 'edu.usf.cutr.opentripplanner.android:opentripplanner-pojos:1.0.0-SNAPSHOT'
+    compile 'edu.usf.cutr.opentripplanner.android:opentripplanner-pojos:1.0.0-SNAPSHOT'
     // OpenCSV, for parsing the OTP Server Directory Google Doc
     compile 'net.sf.opencsv:opencsv:2.3'
-    compile files('/home/foucelhas/git/OpenTripPlanner-for-Android/opentripplanner-pojos-1.0.0-SNAPSHOT.jar')
 }
