@@ -177,6 +177,8 @@ public class OTPApp extends Application {
 
     public static final String BUNDLE_KEY_PREVIOUS_BIKE_TRIANGLE_MAX_VALUE = "previous bike triangle max value";
 
+    public static final String BUNDLE_KEY_CUSTOM_SERVER_METADATA = "custom server metadata";
+
     public static final int COLOR_ROUTE_LINE = 0x7F0000FF;
 
     /**
