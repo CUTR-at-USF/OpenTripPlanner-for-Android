@@ -2563,13 +2563,22 @@ public class MainFragment extends Fragment implements
                         Toast.LENGTH_LONG).show();
             }
         } else {
+            String latString, lonString;
+            if (originalLat != null && originalLon != null){
+                latString = originalLat.toString();
+                lonString = originalLon.toString();
+            }
+            else {
+                latString = null;
+                lonString = null;
+            }
             if (isStartTextBox){
                 mIsStartLocationGeocodingCompleted = false;
-                mGeoCodingTask.execute(address, originalLat.toString(), originalLon.toString());
+                mGeoCodingTask.execute(address, latString, lonString);
             }
             else{
                 mIsEndLocationGeocodingCompleted = false;
-                mGeoCodingTask.execute(address, originalLat.toString(), originalLon.toString());
+                mGeoCodingTask.execute(address, latString, lonString);
             }
         }
     }
