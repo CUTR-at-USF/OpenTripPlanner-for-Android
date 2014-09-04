@@ -69,7 +69,7 @@
 
                 <!-- Real time -->
                 <string name="map_markers_warning_live_udpates">Mises à jour temps réel</string>
-                <string name="map_markers_warning_live_upates_on_time">A l\'heure</string>
+                <string name="map_markers_warning_live_upates_on_time">à l\'heure</string>
                 <string name="map_markers_warning_live_upates_early_arrival">en avance</string>
                 <string name="map_markers_warning_live_upates_late_arrival">en retard</string>
 
@@ -93,7 +93,7 @@
 
                 <!-- Used alone -->
                 <string name="toast_metadata_request_successful">Service de transport en commun téléchargé</string>
-                <string name="toast_server_checker_successful">OK: La région fonctionne</string>
+                <string name="toast_server_checker_successful">OK : La région fonctionne</string>
                 <string name="toast_bike_rental_load_request_successful">Stations de Vélos Libre Service téléchargées</string>
 
                 <!-- Used together: toast_server_selector_detected + "server name" + toast_server_selector_server_change_info -->
@@ -332,15 +332,15 @@
                 <string name="settings_menu_use_intelligent_markers_description">Déplacer les marqueurs sur l\'adresse ou le point d\'intérêt le plus proche</string>
 
             <!-- Live updates -->
-            <!--<string name="settings_menu_live_updates_category_title">Mises à jour en temps réel</string>-->
-            <!--<string name="settings_menu_live_updates">Mises à jour d\'itinéraire</string>-->
-            <!--<string name="settings_menu_live_updates_description">Notify me when trip times change</string>-->
+            <string name="settings_menu_live_updates_category_title">Mises à jour en temps réel</string>
+            <string name="settings_menu_live_updates">Mises à jour d\'itinéraire</string>
+            <string name="settings_menu_live_updates_description">Me prévenir quand mon voyage change</string>
 
             <!-- About -->
-            <!--<string name="settings_menu_about_category">A propos de</string>-->
-            <!--<string name="settings_menu_about">A propos d\'OpenTripPlanner pour Android</string>-->
-            <!--<string name="settings_menu_feedback">Envoyer des commentaires</string>-->
-            <!--<string name="settings_menu_about_description">Licence et remerciements</string>-->
+            <string name="settings_menu_about_category">A propos de</string>
+            <string name="settings_menu_about">A propos d\'OpenTripPlanner pour Android</string>
+            <string name="settings_menu_feedback">Envoyer des commentaires</string>
+            <string name="settings_menu_about_description">Licence et remerciements</string>
 
 
     <!-- Step-by-step screen -->
@@ -369,14 +369,14 @@
                 the destination stop under this text, so would be best to avoid expressions like
                  "stops to destination". For example in the trip Barcelona/Paris/London/New York,
                   stops in between are Paris and London, and not New York. See #394 for reference.-->
-                <!--<string name="step_by_step_transit_stops_in_between">stops in between</string>-->
-                <!--<string name="step_by_step_transit_stops_in_between_singular">stop in between</string>-->
+                <string name="step_by_step_transit_stops_in_between">arrêts avant l\'arrêt de destination</string>
+                <string name="step_by_step_transit_stops_in_between_singular">arrêt avant l\'arrêt de destination</string>
 
                 <!-- Transit description start -->
-                <string name="step_by_step_transit_connector_stop_name">À</string>
+                <string name="step_by_step_transit_connector_stop_name">à</string>
 
                 <!-- Transit headsign connector -->
-                <!--<string name="step_by_step_transit_connector_headsign">to</string>-->
+                <string name="step_by_step_transit_connector_headsign">direction</string>
 
                 <!-- Real time -->
                 <string name="step_by_step_transit_warning_live_udpates">Mises à jour en temps réel</string>
@@ -384,14 +384,14 @@
                 <!-- Modes -->
 
                     <!-- Modes -->
-                    <!--<string name="step_by_step_transit_mode_tram">tram</string>-->
-                    <!--<string name="step_by_step_transit_mode_subway">subway</string>-->
-                    <!--<string name="step_by_step_transit_mode_rail">rail</string>-->
-                    <!--<string name="step_by_step_transit_mode_bus">bus</string>-->
-                    <!--<string name="step_by_step_transit_mode_ferry">ferry</string>-->
-                    <!--<string name="step_by_step_transit_mode_cable_car">cable car</string>-->
-                    <!--<string name="step_by_step_transit_mode_gondola">gondola</string>-->
-                    <!--<string name="step_by_step_transit_mode_funicular">funicular</string>-->
+                    <string name="step_by_step_transit_mode_tram">tram</string>
+                    <string name="step_by_step_transit_mode_subway">métro</string>
+                    <string name="step_by_step_transit_mode_rail">train</string>
+                    <string name="step_by_step_transit_mode_bus">bus</string>
+                    <string name="step_by_step_transit_mode_ferry">ferry</string>
+                    <string name="step_by_step_transit_mode_cable_car">téléphérique</string>
+                    <string name="step_by_step_transit_mode_gondola">nacelle</string>
+                    <string name="step_by_step_transit_mode_funicular">funiculaire</string>
 
             <!-- Non-transit -->
 
@@ -531,9 +531,9 @@ SANS AUCUNE GARANTIE OU CONDITION D\'AUCUNE SORTE, explicite ou implicite."</str
                 <string name="time_full_hours">heures</string>
                 <string name="time_full_minutes">minutes</string>
                 <string name="time_full_seconds">secondes</string>
-                <!--<string name="time_full_hours_singular">hour</string>-->
-                <!--<string name="time_full_minutes_singular">minute</string>-->
-                <!--<string name="time_full_seconds_singular">second</string>-->
+                <string name="time_full_hours_singular">heure</string>
+                <string name="time_full_minutes_singular">minute</string>
+                <string name="time_full_seconds_singular">seconde</string>
 
                 <!-- Connectors -->
                 <string name="time_connector_next_day">demain</string>
@@ -550,7 +550,7 @@ SANS AUCUNE GARANTIE OU CONDITION D\'AUCUNE SORTE, explicite ou implicite."</str
 
             <!-- Street type -->
             <string name="street_type_bike_path">piste cyclable</string>
-            <string name="street_type_open_area">placeAndHeadsign</string>
+            <string name="street_type_open_area">place</string>
             <string name="street_type_path">chemin</string>
             <string name="street_type_bridleway">chemin équestre</string>
             <string name="street_type_footpath">chemin piétonnier</string>
