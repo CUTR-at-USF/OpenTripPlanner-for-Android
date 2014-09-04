@@ -284,13 +284,12 @@ public class LocationUtil {
      */
     private static List<CustomAddress> filterAddressesBBox(Server selectedServer, List<CustomAddress> addresses) {
         if ((!(addresses == null || addresses.isEmpty())) && selectedServer != null) {
-            CopyOnWriteArrayList<CustomAddress> addressesFiltered = new CopyOnWriteArrayList<CustomAddress>(addresses);
-
-            for (CustomAddress address : addressesFiltered) {
+            for (Iterator<CustomAddress> it=addresses.iterator(); it.hasNext();) {
+                CustomAddress address = it.next();
                 if (!LocationUtil.checkPointInBoundingBox(
                         new LatLng(address.getLatitude(), address.getLongitude()), selectedServer,
                         OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)) {
-                    addressesFiltered.remove(address);
+                    it.remove();
                 }
             }
         }
