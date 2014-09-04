@@ -223,6 +223,10 @@ public class SettingsActivity extends PreferenceActivity implements ServerChecke
                     mapTileProvider.setSummary(getResources().getString(R.string.cyclemap));
                 } else if (value.equals(getResources().getString(R.string.tiles_lyrk))) {
                     mapTileProvider.setSummary(getResources().getString(R.string.lyrk));
+                } else if (value.equals(getResources().getString(R.string.tiles_mapbox))) {
+                    mapTileProvider.setSummary(getResources().getString(R.string.mapbox));
+                } else if (value.equals(getResources().getString(R.string.tiles_mapbox_retina))) {
+                    mapTileProvider.setSummary(getResources().getString(R.string.mapboxretina));
                 } else if (value.equals(OTPApp.MAP_TILE_GOOGLE_NORMAL)) {
                     mapTileProvider.setSummary(OTPApp.MAP_TILE_GOOGLE_NORMAL);
                 } else if (value.equals(OTPApp.MAP_TILE_GOOGLE_HYBRID)) {
