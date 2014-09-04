@@ -36,6 +36,8 @@ public class Direction {
 
     private CharSequence placeAndHeadsign;
 
+    private CharSequence extra;
+
     private CharSequence oldTime;
 
     private CharSequence newTime = null;
@@ -166,5 +168,13 @@ public class Direction {
 
     public void setAgency(CharSequence agency) {
         this.agency = agency;
+    }
+
+    public CharSequence getExtra() {
+        return extra;
+    }
+
+    public void setExtra(CharSequence extra) {
+        this.extra = extra;
     }
 }

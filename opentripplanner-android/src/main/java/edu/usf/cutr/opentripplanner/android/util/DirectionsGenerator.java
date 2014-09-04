@@ -495,8 +495,15 @@ public class DirectionsGenerator {
             }
             direction.setSubDirections(subDirections);
 
-            extra = "\n"  + stopsInBetween.size() + " " + applicationContext.getResources()
-                            .getString(R.string.step_by_step_transit_stops_in_between);
+            if (stopsInBetween.size() > 0){
+                String connector = applicationContext.getResources()
+                        .getString(R.string.step_by_step_transit_stops_in_between);
+                if (stopsInBetween.size() == 1){
+                    connector = applicationContext.getResources()
+                            .getString(R.string.step_by_step_transit_stops_in_between_singular);
+                }
+                extra = stopsInBetween.size() + " " + connector;
+            }
 
             if (!TextUtils.isEmpty(leg.headsign)){
                 placeAndHeadsign += " "
@@ -518,9 +525,10 @@ public class DirectionsGenerator {
         direction.setIcon(icon);
         direction.setPlaceAndHeadsign(applicationContext.getResources()
                 .getString(R.string.step_by_step_transit_connector_stop_name) + " "
-                + placeAndHeadsign + extra);
+                + placeAndHeadsign);
         direction.setService(action + " " + mode + " " + route);
         direction.setAgency(agencyName);
+        direction.setExtra(extra);
 
         SpannableString oldTimeString;
 
