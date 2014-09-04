@@ -365,7 +365,12 @@
                 <!-- Transit instruction start -->
                 <string name="step_by_step_transit_get_on">Urcați în</string>
                 <string name="step_by_step_transit_get_off">Coborâți din</string>
-                <string name="step_by_step_transit_stops_in_between">Stații până la destinație</string>
+<!--                This is exactly the formula that should be used, because the app won't include
+                the destination stop under this text, so would be best to avoid expressions like
+                 "stops to destination". For example in the trip Barcelona/Paris/London/New York,
+                  stops in between are Paris and London, and not New York. See #394 for reference.-->
+                <!--<string name="step_by_step_transit_stops_in_between">stops in between</string>-->
+                <!--<string name="step_by_step_transit_stops_in_between_singular">stop in between</string>-->
 
                 <!-- Transit description start -->
                 <string name="step_by_step_transit_connector_stop_name">În</string>

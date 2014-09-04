@@ -18,8 +18,10 @@ package edu.usf.cutr.opentripplanner.android.util;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Typeface;
 import android.text.SpannableString;
 import android.text.TextUtils;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -169,6 +171,12 @@ public class DirectionExpandableListAdapter extends BaseExpandableListAdapter {
 
             if (!TextUtils.isEmpty(dir.getAgency())){
                 text = TextUtils.concat(text, "\n", dir.getAgency());
+            }
+            if (!TextUtils.isEmpty(dir.getExtra())){
+                SpannableString extraSpannableString = new SpannableString(dir.getExtra());
+                extraSpannableString.setSpan(new StyleSpan(Typeface.ITALIC), 0,
+                        extraSpannableString.length(), 0);
+                text = TextUtils.concat(text, "\n", extraSpannableString);
             }
 
             holder.txtDirection.setText(text);
