@@ -34,6 +34,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -197,17 +198,24 @@ public class LocationUtil {
             Geocoder gc = new Geocoder(context);
             try {
                 List<Address> androidTypeAddresses;
-                if (selectedServer != null) {
-                    //Temporary workaround while Google does not solve the problem with Android Geocoder, see issue #396
+                //TODO Temporary workaround while Google does not solve the problem with Android Geocoder, see issue #396
+                /*if (selectedServer != null) {
                     androidTypeAddresses = gc.getFromLocationName(address,
-                            context.getResources().getInteger(R.integer.geocoder_max_results)/*,
+                            context.getResources().getInteger(R.integer.geocoder_max_results),
                             selectedServer.getLowerLeftLatitude(),
                             selectedServer.getLowerLeftLongitude(),
                             selectedServer.getUpperRightLatitude(),
-                            selectedServer.getUpperRightLongitude()*/);
+                            selectedServer.getUpperRightLongitude());
                 } else {
                     androidTypeAddresses = gc.getFromLocationName(address,
                             context.getResources().getInteger(R.integer.geocoder_max_results));
+                }*/
+                if (geocodingForMarker){
+                    androidTypeAddresses = gc.getFromLocationName(address,
+                            context.getResources().getInteger(R.integer.geocoder_max_results));
+                }
+                else{
+                    androidTypeAddresses = new ArrayList<Address>();
                 }
                 for (Address androidTypeAddress : androidTypeAddresses){
                     addresses.add(new CustomAddress(androidTypeAddress));
@@ -283,17 +291,14 @@ public class LocationUtil {
      */
     private static List<CustomAddress> filterAddressesBBox(Server selectedServer, List<CustomAddress> addresses) {
         if ((!(addresses == null || addresses.isEmpty())) && selectedServer != null) {
-            CopyOnWriteArrayList<CustomAddress> addressesFiltered = new CopyOnWriteArrayList<CustomAddress>(addresses);
-
-            for (CustomAddress address : addressesFiltered) {
+            for (Iterator<CustomAddress> it=addresses.iterator(); it.hasNext();) {
+                CustomAddress address = it.next();
                 if (!LocationUtil.checkPointInBoundingBox(
                         new LatLng(address.getLatitude(), address.getLongitude()), selectedServer,
                         OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)) {
-                    addressesFiltered.remove(address);
+                    it.remove();
                 }
             }
-
-            return addressesFiltered;
         }
         return addresses;
     }
