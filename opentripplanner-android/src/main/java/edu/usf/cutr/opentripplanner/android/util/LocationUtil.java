@@ -162,14 +162,25 @@ public class LocationUtil {
             return null;
         }
 
-        if (address.equalsIgnoreCase(context.getString(R.string.text_box_my_location))) {
-            if (reqs.length >= 3){
-                double currentLat = Double.parseDouble(reqs[1]);
-                double currentLon = Double.parseDouble(reqs[2]);
+        double latitude = 0, longitude = 0;
+        boolean latLngSet = false;
 
+        try{
+            if (reqs.length >= 3) {
+                latitude = Double.parseDouble(reqs[1]);
+                longitude = Double.parseDouble(reqs[2]);
+                latLngSet = true;
+            }
+        }
+        catch(Exception e){
+            Log.d(OTPApp.TAG, "Geocoding without reference latitude/longitude");
+        }
+
+        if (address.equalsIgnoreCase(context.getString(R.string.text_box_my_location))) {
+            if (latLngSet){
                 CustomAddress addressReturn = new CustomAddress(context.getResources().getConfiguration().locale);
-                addressReturn.setLatitude(currentLat);
-                addressReturn.setLongitude(currentLon);
+                addressReturn.setLatitude(latitude);
+                addressReturn.setLongitude(longitude);
                 addressReturn.setAddressLine(addressReturn.getMaxAddressLineIndex() + 1,
                         context.getString(R.string.text_box_my_location));
 
@@ -209,14 +220,12 @@ public class LocationUtil {
 
         boolean resultsCloseEnough = true;
 
-        if (geocodingForMarker && reqs.length >= 3){
+        if (geocodingForMarker && latLngSet){
             float results[] = new float[1];
             resultsCloseEnough = false;
-            double originalLat = Double.parseDouble(reqs[1]);
-            double originalLon = Double.parseDouble(reqs[2]);
 
             for (CustomAddress addressToCheck : addresses){
-                Location.distanceBetween(originalLat, originalLon,
+                Location.distanceBetween(latitude, longitude,
                         addressToCheck.getLatitude(), addressToCheck.getLongitude(), results);
                 if (results[0] < OTPApp.GEOCODING_MAX_ERROR) {
                     resultsCloseEnough = true;
@@ -242,15 +251,13 @@ public class LocationUtil {
 
         addresses = filterAddressesBBox(selectedServer, addresses);
 
-        if (geocodingForMarker && reqs.length >= 3 && addresses != null && !addresses.isEmpty()){
+        if (geocodingForMarker && latLngSet && addresses != null && !addresses.isEmpty()){
             float results[] = new float[1];
-            double originalLat = Double.parseDouble(reqs[1]);
-            double originalLon = Double.parseDouble(reqs[2]);
             float minDistanceToOriginalLatLon = Float.MAX_VALUE;
             CustomAddress closestAddress = addresses.get(0);
 
             for (CustomAddress addressToCheck : addresses){
-                Location.distanceBetween(originalLat, originalLon,
+                Location.distanceBetween(latitude, longitude,
                         addressToCheck.getLatitude(), addressToCheck.getLongitude(), results);
                 if (results[0] < minDistanceToOriginalLatLon){
                     closestAddress = addressToCheck;
