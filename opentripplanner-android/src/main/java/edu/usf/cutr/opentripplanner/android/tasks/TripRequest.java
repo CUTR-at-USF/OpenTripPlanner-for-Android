@@ -28,6 +28,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
@@ -66,20 +67,23 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
 
     private Context context;
 
+    private Resources resources;
+
     private String currentRequestString = "";
 
     private Server selectedServer;
 
     private TripRequestCompleteListener callback;
 
-    public TripRequest(WeakReference<Activity> activity, Context context, Server selectedServer,
-            TripRequestCompleteListener callback) {
+    public TripRequest(WeakReference<Activity> activity, Context context, Resources resources,
+                       Server selectedServer, TripRequestCompleteListener callback) {
         this.activity = activity;
         this.context = context;
         this.selectedServer = selectedServer;
         this.callback = callback;
-        Activity activityRetrieved = activity.get();
-        if (activityRetrieved != null) {
+        this.resources = resources;
+        if (activity != null) {
+            Activity activityRetrieved = activity.get();
             progressDialog = new ProgressDialog(activityRetrieved);
         }
     }
@@ -91,15 +95,27 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
             Activity activityRetrieved = activity.get();
             if (activityRetrieved != null) {
                 progressDialog = ProgressDialog.show(activityRetrieved, "",
-                        context.getText(R.string.task_progress_tripplanner_progress), true);
+                        resources.getText(R.string.task_progress_tripplanner_progress), true);
             }
         }
     }
 
     protected Long doInBackground(Request... reqs) {
         long totalSize = 0;
-        for (Request req : reqs) {
-            response = requestPlan(req);
+        if (selectedServer == null) {
+            Toast.makeText(context,
+                    resources.getString(R.string.toast_no_server_selected_error),
+                    Toast.LENGTH_SHORT).show();
+            return null;
+        }
+        else{
+            String prefix = PreferenceManager.getDefaultSharedPreferences(context)
+                    .getString(OTPApp.PREFERENCE_KEY_FOLDER_STRUCTURE_PREFIX
+                            , OTPApp.FOLDER_STRUCTURE_PREFIX_NEW);
+            String baseURL = selectedServer.getBaseURL();
+            for (Request req : reqs) {
+                response = requestPlan(req, prefix, baseURL);
+            }
         }
         return totalSize;
     }
@@ -153,11 +169,11 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
             Activity activityRetrieved = activity.get();
             if (activityRetrieved != null) {
                 AlertDialog.Builder feedback = new AlertDialog.Builder(activityRetrieved);
-                feedback.setTitle(context.getResources()
+                feedback.setTitle(resources
                         .getString(R.string.tripplanner_error_dialog_title));
-                feedback.setNeutralButton(context.getResources().getString(android.R.string.ok),
+                feedback.setNeutralButton(resources.getString(android.R.string.ok),
                         null);
-                String msg = context.getResources()
+                String msg = resources
                         .getString(R.string.tripplanner_error_not_defined);
 
                 PlannerError error = response.getError();
@@ -182,53 +198,53 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
         }
     }
 
-    private String getErrorMessage(int errorCode) {
+    protected String getErrorMessage(int errorCode) {
         if (errorCode == Message.SYSTEM_ERROR.getId()) {
-            return (context.getResources().getString(R.string.tripplanner_error_system));
+            return (resources.getString(R.string.tripplanner_error_system));
         } else if (errorCode == Message.OUTSIDE_BOUNDS.getId()) {
-            return (context.getResources().getString(R.string.tripplanner_error_outside_bounds));
+            return (resources.getString(R.string.tripplanner_error_outside_bounds));
         } else if (errorCode == Message.PATH_NOT_FOUND.getId()) {
-            return (context.getResources().getString(R.string.tripplanner_error_path_not_found));
+            return (resources.getString(R.string.tripplanner_error_path_not_found));
         } else if (errorCode == Message.NO_TRANSIT_TIMES.getId()) {
-            return (context.getResources().getString(R.string.tripplanner_error_no_transit_times));
+            return (resources.getString(R.string.tripplanner_error_no_transit_times));
         } else if (errorCode == Message.REQUEST_TIMEOUT.getId()) {
-            return (context.getResources().getString(R.string.tripplanner_error_request_timeout));
+            return (resources.getString(R.string.tripplanner_error_request_timeout));
         } else if (errorCode == Message.BOGUS_PARAMETER.getId()) {
-            return (context.getResources().getString(R.string.tripplanner_error_bogus_parameter));
+            return (resources.getString(R.string.tripplanner_error_bogus_parameter));
         } else if (errorCode == Message.GEOCODE_FROM_NOT_FOUND.getId()) {
-            return (context.getResources()
+            return (resources
                     .getString(R.string.tripplanner_error_geocode_from_not_found));
         } else if (errorCode == Message.GEOCODE_TO_NOT_FOUND.getId()) {
-            return (context.getResources()
+            return (resources
                     .getString(R.string.tripplanner_error_geocode_to_not_found));
         } else if (errorCode == Message.GEOCODE_FROM_TO_NOT_FOUND.getId()) {
-            return (context.getResources()
+            return (resources
                     .getString(R.string.tripplanner_error_geocode_from_to_not_found));
         } else if (errorCode == Message.TOO_CLOSE.getId()) {
-            return (context.getResources().getString(R.string.tripplanner_error_too_close));
+            return (resources.getString(R.string.tripplanner_error_too_close));
         } else if (errorCode == Message.LOCATION_NOT_ACCESSIBLE.getId()) {
-            return (context.getResources()
+            return (resources
                     .getString(R.string.tripplanner_error_location_not_accessible));
         } else if (errorCode == Message.GEOCODE_FROM_AMBIGUOUS.getId()) {
-            return (context.getResources()
+            return (resources
                     .getString(R.string.tripplanner_error_geocode_from_ambiguous));
         } else if (errorCode == Message.GEOCODE_TO_AMBIGUOUS.getId()) {
-            return (context.getResources()
+            return (resources
                     .getString(R.string.tripplanner_error_geocode_to_ambiguous));
         } else if (errorCode == Message.GEOCODE_FROM_TO_AMBIGUOUS.getId()) {
-            return (context.getResources()
+            return (resources
                     .getString(R.string.tripplanner_error_geocode_from_to_ambiguous));
         } else if (errorCode == Message.UNDERSPECIFIED_TRIANGLE.getId()
                 || errorCode == Message.TRIANGLE_NOT_AFFINE.getId()
                 || errorCode == Message.TRIANGLE_OPTIMIZE_TYPE_NOT_SET.getId()
                 || errorCode == Message.TRIANGLE_VALUES_NOT_SET.getId()) {
-            return (context.getResources().getString(R.string.tripplanner_error_triangle));
+            return (resources.getString(R.string.tripplanner_error_triangle));
         } else {
             return null;
         }
     }
 
-    private Response requestPlan(Request requestParams) {
+    protected Response requestPlan(Request requestParams, String prefix, String baseURL) {
         HashMap<String, String> tmp = requestParams.getParameters();
 
         Collection c = tmp.entrySet();
@@ -251,16 +267,7 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
             params = updatedString;
         }
 
-        if (selectedServer == null) {
-            Toast.makeText(context,
-                    context.getResources().getString(R.string.toast_no_server_selected_error),
-                    Toast.LENGTH_SHORT).show();
-            return null;
-        }
-        String prefix = PreferenceManager.getDefaultSharedPreferences(context)
-                .getString(OTPApp.PREFERENCE_KEY_FOLDER_STRUCTURE_PREFIX
-                        , OTPApp.FOLDER_STRUCTURE_PREFIX_NEW);
-        String u = selectedServer.getBaseURL() + prefix + OTPApp.PLAN_LOCATION + params;
+        String u = baseURL + prefix + OTPApp.PLAN_LOCATION + params;
 
         Log.d(OTPApp.TAG, "URL: " + u);
 
