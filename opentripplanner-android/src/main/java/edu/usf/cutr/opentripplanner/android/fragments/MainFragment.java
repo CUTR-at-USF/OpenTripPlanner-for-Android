@@ -1861,7 +1861,7 @@ public class MainFragment extends Fragment implements
         WeakReference<Activity> weakContext = new WeakReference<Activity>(
                 MainFragment.this.getActivity());
 
-        new TripRequest(weakContext, MainFragment.this.mApplicationContext, mOTPApp
+        new TripRequest(weakContext, MainFragment.this.mApplicationContext, getResources(), mOTPApp
                 .getSelectedServer(), MainFragment.this)
                 .execute(request);
 
