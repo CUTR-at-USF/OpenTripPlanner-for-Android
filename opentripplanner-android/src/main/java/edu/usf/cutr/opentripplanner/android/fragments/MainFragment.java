@@ -3994,15 +3994,15 @@ public class MainFragment extends Fragment implements
                             }
                             List<TripTimeShort> tripsTimesUpdates;
                             if ((tripsTimesUpdates
-                                    = timesUpdatesForTrips.get(leg.agencyId + "_" + leg.tripId))
+                                    = timesUpdatesForTrips.get(leg.agencyId + ":" + leg.tripId))
                                     != null){
                                 TripTimeShort firstStopUpdate = null;
                                 TripTimeShort lastStopUpdate = null;
                                 for (TripTimeShort tripTimeUdapteForStop : tripsTimesUpdates){
-                                    if (tripTimeUdapteForStop.stopId.equals(leg.from.stopCode)){
+                                    if (tripTimeUdapteForStop.stopId.equals(leg.agencyId + ":" + leg.from.stopCode)){
                                         firstStopUpdate = tripTimeUdapteForStop;
                                     }
-                                    if (tripTimeUdapteForStop.stopId.equals(leg.to.stopCode)){
+                                    if (tripTimeUdapteForStop.stopId.equals(leg.agencyId + ":" + leg.to.stopCode)){
                                         lastStopUpdate = tripTimeUdapteForStop;
                                     }
                                 }
@@ -4083,6 +4083,9 @@ public class MainFragment extends Fragment implements
     }
 
     private void showNotification(Leg leg, int legsUpdated){
+        if (!getFragmentListener().getCurrentItinerary().contains(leg)){
+            return;
+        }
         Integer delay;
         if (legsUpdated == 1){
             delay = leg.departureDelay;
