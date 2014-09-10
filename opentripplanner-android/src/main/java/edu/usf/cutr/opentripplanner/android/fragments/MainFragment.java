@@ -4062,21 +4062,29 @@ public class MainFragment extends Fragment implements
     private int updateLeg(Leg leg, TripTimeShort departureTripTimesUpdate,
                               TripTimeShort arrivalTripTimesUpdate){
         int updatedLegs = 0;
+        long oldDepartureDelayInSeconds = (leg.departureDelay % 3600) / 60;
+        long oldArrivalDelayInSeconds = (leg.arrivalDelay % 3600) / 60;
+        long newDepartureDelayInSeconds = (departureTripTimesUpdate.departureDelay % 3600) / 60;
+        long newArrivalDelayInSeconds = (arrivalTripTimesUpdate.arrivalDelay % 3600) / 60;;
         if (leg.departureDelay != departureTripTimesUpdate.departureDelay){
             Long scheduledStartTime = Long.parseLong(leg.startTime) - leg.departureDelay;
             leg.departureDelay = departureTripTimesUpdate.departureDelay;
             leg.startTime = ((Long)(scheduledStartTime + (Integer)leg.departureDelay)).toString();
-            updatedLegs = 1;
+            if (oldDepartureDelayInSeconds != newDepartureDelayInSeconds){
+                updatedLegs = 1;
+            }
         }
         if (leg.arrivalDelay != arrivalTripTimesUpdate.arrivalDelay){
             Long scheduledEndTime = Long.parseLong(leg.endTime) - leg.arrivalDelay;
             leg.arrivalDelay = arrivalTripTimesUpdate.arrivalDelay;
             leg.endTime = ((Long)(scheduledEndTime + (Integer)leg.arrivalDelay)).toString();
-            if (updatedLegs == 1){
-                updatedLegs = 3;
-            }
-            else{
-                updatedLegs = 2;
+            if (oldArrivalDelayInSeconds != newArrivalDelayInSeconds){
+                if (updatedLegs == 1){
+                    updatedLegs = 3;
+                }
+                else{
+                    updatedLegs = 2;
+                }
             }
         }
         return updatedLegs;
@@ -4101,12 +4109,17 @@ public class MainFragment extends Fragment implements
             return;
         }
         String delayText = ConversionUtils.getFormattedDurationTextNoSeconds(delay, true, mApplicationContext);
+        if (delay == 0){
+            delayText = getResources()
+                    .getString(R.string.map_markers_warning_live_upates_on_time);
+        }
         if (delay > 0) {
             delayText += " "
                     + getResources()
                     .getString(R.string.map_markers_warning_live_upates_late_arrival);
         }
         else {
+            delayText = delayText.replace("-","");
             delayText += " "
                     + getResources()
                     .getString(R.string.map_markers_warning_live_upates_early_arrival);
