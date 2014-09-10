@@ -230,6 +230,10 @@ public class ConversionUtils {
 
         cal.add(Calendar.MILLISECOND, offsetGMT);
 
+        if (cal.get(Calendar.SECOND) >= 30){
+            cal.add(Calendar.MINUTE, 1);
+        }
+
         SpannableString spannableTime = new SpannableString(timeFormat.format(cal.getTime()));
         if (color != -1){
             spannableTime.setSpan(new ForegroundColorSpan(color), 0,
