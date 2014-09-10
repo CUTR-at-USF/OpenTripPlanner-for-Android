@@ -153,7 +153,7 @@ public class ConversionUtils {
             if (m == 0) {
                 text += "< 1 " + longMinutes;
             }
-            else if (m == 1){
+            else if (m == 1 || m == -1){
                 text += Long.toString(m) + " " + longMinutesSingular;
             }
             else{
