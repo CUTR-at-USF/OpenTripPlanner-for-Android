@@ -4216,7 +4216,7 @@ public class MainFragment extends Fragment implements
                 for (Itinerary itinerary : getFragmentListener().getCurrentItineraryList()){
                     for (Leg leg : itinerary.legs){
                         if (leg.realTime && (TraverseMode.valueOf(leg.mode)).isTransit()){
-                            legsToUpdate.add(leg.agencyId + "_" + leg.tripId);
+                            legsToUpdate.add(leg.agencyId + ":" + leg.tripId);
                         }
                     }
                 }
