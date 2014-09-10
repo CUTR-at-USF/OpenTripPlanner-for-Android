@@ -26,7 +26,9 @@ import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.WalkStep;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.preference.PreferenceManager;
 import android.text.SpannableString;
 import android.text.TextUtils;
 
@@ -35,6 +37,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.R;
 import edu.usf.cutr.opentripplanner.android.model.Direction;
 
@@ -153,12 +156,20 @@ public class DirectionsGenerator {
                 : " " + applicationContext.getResources().getString(R.string.step_by_step_non_transit_to) + " "
                         + getLocalizedStreetName(toPlace.name, applicationContext.getResources());
         String extraStopInformation = toPlace.stopCode;
+        long legDuration;
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext);
+        if (prefs.getInt(OTPApp.PREFERENCE_KEY_API_VERSION, OTPApp.API_VERSION_V1)
+                == OTPApp.API_VERSION_V1){
+            legDuration = leg.duration;
+        } else{
+            legDuration = leg.duration / 1000;
+        }
         if (!TextUtils.isEmpty(extraStopInformation)) {
             mainDirectionText += " (" + extraStopInformation + ")";
         }
         mainDirectionText += "\n[" + ConversionUtils
                 .getFormattedDistance(leg.distance, applicationContext) + " - " +
-                ConversionUtils.getFormattedDurationTextNoSeconds(leg.duration, false, applicationContext)
+                ConversionUtils.getFormattedDurationTextNoSeconds(legDuration, false, applicationContext)
                 + " ]";
         direction.setDirectionText(mainDirectionText);
 
