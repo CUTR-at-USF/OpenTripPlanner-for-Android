@@ -4062,23 +4062,31 @@ public class MainFragment extends Fragment implements
     private int updateLeg(Leg leg, TripTimeShort departureTripTimesUpdate,
                               TripTimeShort arrivalTripTimesUpdate){
         int updatedLegs = 0;
-        long oldDepartureDelayInSeconds = (leg.departureDelay % 3600) / 60;
-        long oldArrivalDelayInSeconds = (leg.arrivalDelay % 3600) / 60;
-        long newDepartureDelayInSeconds = (departureTripTimesUpdate.departureDelay % 3600) / 60;
-        long newArrivalDelayInSeconds = (arrivalTripTimesUpdate.arrivalDelay % 3600) / 60;;
         if (leg.departureDelay != departureTripTimesUpdate.departureDelay){
-            Long scheduledStartTime = Long.parseLong(leg.startTime) - leg.departureDelay;
+            CharSequence oldDepartureTime = ConversionUtils
+                    .getTimeWithContext(mApplicationContext, leg.agencyTimeZoneOffset,
+                            Long.parseLong(leg.startTime), false);
+            Long scheduledStartTime = Long.parseLong(leg.startTime) - leg.departureDelay * 1000;
             leg.departureDelay = departureTripTimesUpdate.departureDelay;
-            leg.startTime = ((Long)(scheduledStartTime + (Integer)leg.departureDelay)).toString();
-            if (oldDepartureDelayInSeconds != newDepartureDelayInSeconds){
+            leg.startTime = ((Long)(scheduledStartTime + leg.departureDelay * 1000)).toString();
+            CharSequence newDepartureTime = ConversionUtils
+                    .getTimeWithContext(mApplicationContext, leg.agencyTimeZoneOffset,
+                            Long.parseLong(leg.startTime), false);
+            if (!oldDepartureTime.equals(newDepartureTime)){
                 updatedLegs = 1;
             }
         }
         if (leg.arrivalDelay != arrivalTripTimesUpdate.arrivalDelay){
-            Long scheduledEndTime = Long.parseLong(leg.endTime) - leg.arrivalDelay;
+            CharSequence oldArrivalTime = ConversionUtils
+                    .getTimeWithContext(mApplicationContext, leg.agencyTimeZoneOffset,
+                            Long.parseLong(leg.endTime), false);
+            Long scheduledEndTime = Long.parseLong(leg.endTime) - leg.arrivalDelay * 1000;
             leg.arrivalDelay = arrivalTripTimesUpdate.arrivalDelay;
-            leg.endTime = ((Long)(scheduledEndTime + (Integer)leg.arrivalDelay)).toString();
-            if (oldArrivalDelayInSeconds != newArrivalDelayInSeconds){
+            leg.endTime = ((Long)(scheduledEndTime + leg.arrivalDelay * 1000)).toString();
+            CharSequence newArrivalTime = ConversionUtils
+                    .getTimeWithContext(mApplicationContext, leg.agencyTimeZoneOffset,
+                            Long.parseLong(leg.endTime), false);
+            if (!oldArrivalTime.equals(newArrivalTime)){
                 if (updatedLegs == 1){
                     updatedLegs = 3;
                 }
@@ -4113,7 +4121,7 @@ public class MainFragment extends Fragment implements
             delayText = getResources()
                     .getString(R.string.map_markers_warning_live_upates_on_time);
         }
-        if (delay > 0) {
+        else if (delay > 0) {
             delayText += " "
                     + getResources()
                     .getString(R.string.map_markers_warning_live_upates_late_arrival);
