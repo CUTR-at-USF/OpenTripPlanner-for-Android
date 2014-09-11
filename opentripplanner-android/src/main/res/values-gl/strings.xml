@@ -150,8 +150,8 @@
                     <string name="point_type_selector_title">Escolle a localización</string>
 
                     <!-- Options -->
-                    <string name="point_type_selector_start_marker_option">Start location</string>
-                    <string name="point_type_selector_end_marker_option">End location</string>
+                    <string name="point_type_selector_start_marker_option">Orixe</string>
+                    <string name="point_type_selector_end_marker_option">Destino</string>
 
                 <!-- Geocoding results dialog -->
 
@@ -516,6 +516,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied."</strin
 
                 <!-- Toast -->
                 <string name="notification_disable_updates_info">Actualizacións canceladas</string>
+
+            <!-- Text -->
+            <string name="notification_stop_name_conector">en</string>
+            <string name="notification_two_delays_connector">e</string>
+            <string name="notification_origin">orixe</string>
+            <string name="notification_destination">destino</string>
 
         <!-- Used in util functions to display consistently time and distance all around the app  -->
 

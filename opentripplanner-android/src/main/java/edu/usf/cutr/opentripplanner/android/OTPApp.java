@@ -293,8 +293,6 @@ public class OTPApp extends Application {
     public static final String INTENT_NOTIFICATION_RESUME_APP_WITH_TRIP_ID
             = "edu.usf.cutr.opentripplanner.android.OpenTripPlanner.NOTIFICATION_RESUME";
 
-    public static final int NOTIFICATION_ID = 0;
-
     /**
      * Sets the currently selected OTP server
      *
