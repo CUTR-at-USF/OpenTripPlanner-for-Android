@@ -4312,8 +4312,13 @@ public class MainFragment extends Fragment implements
             else if (intent.getAction().equals(OTPApp.INTENT_NOTIFICATION_ACTION_DISMISS_UPDATES)){
                 notificationManager =
                         (NotificationManager) mApplicationContext.getSystemService(Context.NOTIFICATION_SERVICE);
-                notificationManager.cancel(Integer
-                        .parseInt(intent.getStringExtra(OTPApp.BUNDLE_KEY_INTENT_TRIP_ID)));
+                if (intent.getStringExtra(OTPApp.BUNDLE_KEY_INTENT_TRIP_ID) != null){
+                    notificationManager.cancelAll();
+                }
+                else{
+                    notificationManager.cancel(Integer
+                            .parseInt(intent.getStringExtra(OTPApp.BUNDLE_KEY_INTENT_TRIP_ID)));
+                }
                 Toast.makeText(mApplicationContext,
                         getResources().getString(R.string.notification_disable_updates_info),
                         Toast.LENGTH_SHORT).show();
