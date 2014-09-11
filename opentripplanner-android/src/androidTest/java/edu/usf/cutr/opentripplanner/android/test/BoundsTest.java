@@ -79,8 +79,7 @@ public class BoundsTest extends AndroidTestCase {
 
         // Porto, Portugal server
         serverPorto.setRegion("Porto, Portugal");
-        serverPorto.setBaseURL(
-                "http://env-8084044.jelastic.servint.net/opentripplanner-api-webapp/ws");
+        serverPorto.setBaseURL("http://env-8084044.jelastic.servint.net/opentripplanner-api-webapp/ws");
         serverPorto.setBounds("40.96826,-8.77817,41.40688,-8.27958");
         serverPorto.setLanguage("pt_PT");
         serverPorto.setContactName("Ricardo Reis da Silva");
