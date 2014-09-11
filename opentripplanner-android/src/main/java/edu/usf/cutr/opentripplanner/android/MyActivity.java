@@ -203,6 +203,7 @@ public class MyActivity extends FragmentActivity implements OtpFragment {
         super.onDestroy();
     }
 
+
     @Override
     public void onItinerariesLoaded(List<Itinerary> itineraries) {
         currentItineraryList.clear();
