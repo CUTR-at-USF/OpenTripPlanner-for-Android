@@ -4099,8 +4099,8 @@ public class MainFragment extends Fragment implements
         return updatedLegs;
     }
 
-    private String generateDelayText(int delay){
-        String delayText = ConversionUtils.getFormattedDurationTextNoSeconds(delay, true, mApplicationContext);
+    private String generateDelayText(int delay, boolean longFormat){
+        String delayText = ConversionUtils.getFormattedDurationTextNoSeconds(delay, longFormat, mApplicationContext);
         if (delay == 0){
             delayText = getResources()
                     .getString(R.string.map_markers_warning_live_upates_on_time);
@@ -4128,32 +4128,32 @@ public class MainFragment extends Fragment implements
         NotificationCompat.InboxStyle inboxStyle =
                 new NotificationCompat.InboxStyle();
         if (legsUpdated == 1){
-            delayText = generateDelayText(leg.departureDelay) + " " +
+            delayText = generateDelayText(leg.departureDelay, false) + " " +
                     getResources().getString(R.string.notification_stop_name_conector) + " "
                     + getResources().getString(R.string.notification_origin);
-            inboxStyle.addLine(generateDelayText(leg.departureDelay) + " " +
+            inboxStyle.addLine(generateDelayText(leg.departureDelay, false) + " " +
                     getResources().getString(R.string.notification_stop_name_conector) + " "
                     + getResources().getString(R.string.notification_origin) + ", "
                     + leg.from.name);
         }
         else if (legsUpdated == 2){
-            delayText = generateDelayText(leg.arrivalDelay) + " " +
+            delayText = generateDelayText(leg.arrivalDelay, false) + " " +
                     getResources().getString(R.string.notification_stop_name_conector) + " "
                     + getResources().getString(R.string.notification_destination);
-            inboxStyle.addLine(generateDelayText(leg.arrivalDelay) + " " +
+            inboxStyle.addLine(generateDelayText(leg.arrivalDelay, false) + " " +
                     getResources().getString(R.string.notification_stop_name_conector) + " "
                     + getResources().getString(R.string.notification_destination) +", "
                     + leg.to.name);
         }
         else if (legsUpdated == 3){
             if (leg.departureDelay == leg.arrivalDelay){
-                delayText = generateDelayText(leg.departureDelay) + " " +
+                delayText = generateDelayText(leg.departureDelay, false) + " " +
                         getResources().getString(R.string.notification_stop_name_conector) + " "
                         + getResources().getString(R.string.notification_origin)  + " " +
                         getResources().getString(R.string.notification_two_delays_connector) + " "
                         +
                         getResources().getString(R.string.notification_destination);
-                inboxStyle.addLine(generateDelayText(leg.departureDelay));
+                inboxStyle.addLine(generateDelayText(leg.departureDelay, true));
                 inboxStyle.addLine(getResources().getString(R.string.notification_stop_name_conector) + " "
                         + getResources().getString(R.string.notification_origin) + ","
                         + " " + leg.from.name);
@@ -4162,18 +4162,18 @@ public class MainFragment extends Fragment implements
                         + " " + leg.to.name);
             }
             else{
-                delayText =  generateDelayText(leg.departureDelay) + " " +
+                delayText =  generateDelayText(leg.departureDelay, false) + " " +
                         getResources().getString(R.string.notification_stop_name_conector) + " "
                         + getResources().getString(R.string.notification_origin)  + " " +
                         getResources().getString(R.string.notification_two_delays_connector) + " "
                         +
-                        generateDelayText(leg.arrivalDelay) + " " +
+                        generateDelayText(leg.arrivalDelay, false) + " " +
                         getResources().getString(R.string.notification_stop_name_conector) + " "
                         + getResources().getString(R.string.notification_destination);
-                inboxStyle.addLine(generateDelayText(leg.departureDelay) + " " +
+                inboxStyle.addLine(generateDelayText(leg.departureDelay, false) + " " +
                         getResources().getString(R.string.notification_stop_name_conector) + " "
                         + leg.from.name);
-                inboxStyle.addLine( generateDelayText(leg.arrivalDelay) + " " +
+                inboxStyle.addLine( generateDelayText(leg.arrivalDelay, false) + " " +
                         getResources().getString(R.string.notification_stop_name_conector) + " "
                         + leg.to.name);
             }
