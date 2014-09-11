@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -4167,8 +4168,9 @@ public class MainFragment extends Fragment implements
                                 notificationPendingIntentDismissUpdates);
         NotificationManager notificationManager =
                 (NotificationManager) mApplicationContext.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        notificationManager.notify(OTPApp.NOTIFICATION_ID, mBuilder.build());
+        Notification notification = mBuilder.build();
+        notification.defaults |= Notification.DEFAULT_SOUND;
+        notificationManager.notify(OTPApp.NOTIFICATION_ID, notification);
     }
 
     /**
