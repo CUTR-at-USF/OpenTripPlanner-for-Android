@@ -515,6 +515,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied."</strin
                 <!-- Toast -->
                 <string name="notification_disable_updates_info">Updates cancelled</string>
 
+            <!-- Text -->
+            <string name="notification_stop_name_conector">at</string>
+            <string name="notification_two_delays_connector">and</string>
+            <string name="notification_origin">origin</string>
+            <string name="notification_destination">destination</string>
+
         <!-- Used in util functions to display consistently time and distance all around the app  -->
 
             <!-- Time -->

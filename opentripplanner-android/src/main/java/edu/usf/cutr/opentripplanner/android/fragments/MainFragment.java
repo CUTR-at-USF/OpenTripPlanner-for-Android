@@ -4099,25 +4099,8 @@ public class MainFragment extends Fragment implements
         return updatedLegs;
     }
 
-    private void showNotification(Leg leg, int legsUpdated){
-        if (!getFragmentListener().getCurrentItinerary().contains(leg)){
-            return;
-        }
-        Integer delay;
-        if (legsUpdated == 1){
-            delay = leg.departureDelay;
-        }
-        else if (legsUpdated == 2){
-            delay = leg.arrivalDelay;
-        }
-        else if (legsUpdated == 3){
-            delay = leg.departureDelay;
-            showNotification(leg, 2);
-        }
-        else{
-            return;
-        }
-        String delayText = ConversionUtils.getFormattedDurationTextNoSeconds(delay, true, mApplicationContext);
+    private String generateDelayText(int delay, boolean longFormat){
+        String delayText = ConversionUtils.getFormattedDurationTextNoSeconds(delay, longFormat, mApplicationContext);
         if (delay == 0){
             delayText = getResources()
                     .getString(R.string.map_markers_warning_live_upates_on_time);
@@ -4133,6 +4116,71 @@ public class MainFragment extends Fragment implements
                     + getResources()
                     .getString(R.string.map_markers_warning_live_upates_early_arrival);
         }
+        return delayText;
+    }
+
+    private void showNotification(Leg leg, int legsUpdated){
+        if (!getFragmentListener().getCurrentItinerary().contains(leg)){
+            return;
+        }
+        String delayText;
+
+        NotificationCompat.InboxStyle inboxStyle =
+                new NotificationCompat.InboxStyle();
+        if (legsUpdated == 1){
+            delayText = generateDelayText(leg.departureDelay, false) + " " +
+                    getResources().getString(R.string.notification_stop_name_conector) + " "
+                    + getResources().getString(R.string.notification_origin);
+            inboxStyle.addLine(generateDelayText(leg.departureDelay, false) + " " +
+                    getResources().getString(R.string.notification_stop_name_conector) + " "
+                    + getResources().getString(R.string.notification_origin) + ", "
+                    + leg.from.name);
+        }
+        else if (legsUpdated == 2){
+            delayText = generateDelayText(leg.arrivalDelay, false) + " " +
+                    getResources().getString(R.string.notification_stop_name_conector) + " "
+                    + getResources().getString(R.string.notification_destination);
+            inboxStyle.addLine(generateDelayText(leg.arrivalDelay, false) + " " +
+                    getResources().getString(R.string.notification_stop_name_conector) + " "
+                    + getResources().getString(R.string.notification_destination) +", "
+                    + leg.to.name);
+        }
+        else if (legsUpdated == 3){
+            if (leg.departureDelay == leg.arrivalDelay){
+                delayText = generateDelayText(leg.departureDelay, false) + " " +
+                        getResources().getString(R.string.notification_stop_name_conector) + " "
+                        + getResources().getString(R.string.notification_origin)  + " " +
+                        getResources().getString(R.string.notification_two_delays_connector) + " "
+                        +
+                        getResources().getString(R.string.notification_destination);
+                inboxStyle.addLine(generateDelayText(leg.departureDelay, true));
+                inboxStyle.addLine(getResources().getString(R.string.notification_stop_name_conector) + " "
+                        + getResources().getString(R.string.notification_origin) + ","
+                        + " " + leg.from.name);
+                inboxStyle.addLine(getResources().getString(R.string.notification_stop_name_conector) + " "
+                        + getResources().getString(R.string.notification_destination) + ","
+                        + " " + leg.to.name);
+            }
+            else{
+                delayText =  generateDelayText(leg.departureDelay, false) + " " +
+                        getResources().getString(R.string.notification_stop_name_conector) + " "
+                        + getResources().getString(R.string.notification_origin)  + " " +
+                        getResources().getString(R.string.notification_two_delays_connector) + " "
+                        +
+                        generateDelayText(leg.arrivalDelay, false) + " " +
+                        getResources().getString(R.string.notification_stop_name_conector) + " "
+                        + getResources().getString(R.string.notification_destination);
+                inboxStyle.addLine(generateDelayText(leg.departureDelay, false) + " " +
+                        getResources().getString(R.string.notification_stop_name_conector) + " "
+                        + leg.from.name);
+                inboxStyle.addLine( generateDelayText(leg.arrivalDelay, false) + " " +
+                        getResources().getString(R.string.notification_stop_name_conector) + " "
+                        + leg.to.name);
+            }
+        }
+        else{
+            return;
+        }
 
         Intent notificationIntentOpenApp = new Intent(OTPApp.INTENT_NOTIFICATION_ACTION_OPEN_APP);
         notificationIntentOpenApp.putExtra(OTPApp.BUNDLE_KEY_INTENT_TRIP_ID, leg.tripId);
@@ -4140,14 +4188,15 @@ public class MainFragment extends Fragment implements
                 .getBroadcast(mApplicationContext,
                         0,
                         notificationIntentOpenApp,
-                        PendingIntent.FLAG_CANCEL_CURRENT);
+                        PendingIntent.FLAG_UPDATE_CURRENT);
 
         Intent notificationIntentDismissUpdates = new Intent(OTPApp.INTENT_NOTIFICATION_ACTION_DISMISS_UPDATES);
+        notificationIntentDismissUpdates.putExtra(OTPApp.BUNDLE_KEY_INTENT_TRIP_ID, leg.tripId);
         PendingIntent notificationPendingIntentDismissUpdates = PendingIntent
                 .getBroadcast(mApplicationContext,
                         0,
                         notificationIntentDismissUpdates,
-                        PendingIntent.FLAG_CANCEL_CURRENT);
+                        PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(mApplicationContext)
@@ -4166,11 +4215,14 @@ public class MainFragment extends Fragment implements
                                 getResources()
                                         .getString(R.string.notification_disable_updates_button),
                                 notificationPendingIntentDismissUpdates);
+        mBuilder.setStyle(inboxStyle);
         NotificationManager notificationManager =
                 (NotificationManager) mApplicationContext.getSystemService(Context.NOTIFICATION_SERVICE);
         Notification notification = mBuilder.build();
-        notification.defaults |= Notification.DEFAULT_SOUND;
-        notificationManager.notify(OTPApp.NOTIFICATION_ID, notification);
+        notification.defaults = Notification.DEFAULT_ALL;
+        notification.flags |= Notification.FLAG_AUTO_CANCEL | Notification.FLAG_SHOW_LIGHTS;
+        Integer notificationID = Integer.parseInt(leg.tripId);
+        notificationManager.notify(notificationID, notification);
     }
 
     /**
@@ -4251,9 +4303,6 @@ public class MainFragment extends Fragment implements
                 requestTimesForTrips.execute(legsToUpdateArray);
             }
             else if (intent.getAction().equals(OTPApp.INTENT_NOTIFICATION_ACTION_OPEN_APP)){
-                notificationManager =
-                (NotificationManager) mApplicationContext.getSystemService(Context.NOTIFICATION_SERVICE);
-                notificationManager.cancel(OTPApp.NOTIFICATION_ID);
                 Intent activityIntent = new Intent(mApplicationContext, MyActivity.class);
                 activityIntent.setAction(OTPApp.INTENT_NOTIFICATION_RESUME_APP_WITH_TRIP_ID);
                 activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -4263,7 +4312,13 @@ public class MainFragment extends Fragment implements
             else if (intent.getAction().equals(OTPApp.INTENT_NOTIFICATION_ACTION_DISMISS_UPDATES)){
                 notificationManager =
                         (NotificationManager) mApplicationContext.getSystemService(Context.NOTIFICATION_SERVICE);
-                notificationManager.cancel(OTPApp.NOTIFICATION_ID);
+                if (intent.getStringExtra(OTPApp.BUNDLE_KEY_INTENT_TRIP_ID) != null){
+                    notificationManager.cancelAll();
+                }
+                else{
+                    notificationManager.cancel(Integer
+                            .parseInt(intent.getStringExtra(OTPApp.BUNDLE_KEY_INTENT_TRIP_ID)));
+                }
                 Toast.makeText(mApplicationContext,
                         getResources().getString(R.string.notification_disable_updates_info),
                         Toast.LENGTH_SHORT).show();
