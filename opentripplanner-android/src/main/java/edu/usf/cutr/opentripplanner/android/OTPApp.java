@@ -260,7 +260,7 @@ public class OTPApp extends Application {
 
     public static final float defaultMyLocationZoomLevel = 16;
 
-    public static final String FORMAT_COORDINATES = "#.00000";
+    public static final String FORMAT_COORDINATES = "#0.00000";
 
     public static final String FORMAT_DISTANCE_METERS = "%.0f";
 
