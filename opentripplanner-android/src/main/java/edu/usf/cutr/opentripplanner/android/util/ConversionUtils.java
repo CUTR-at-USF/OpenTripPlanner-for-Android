@@ -434,12 +434,18 @@ public class ConversionUtils {
      * @param routeShortName to use if necessary
      * @return a valid route long name
      */
-    public static String getRouteLongNameSafe(String routeLongName, String routeShortName) {
+    public static String getRouteLongNameSafe(String routeLongName, String routeShortName,
+                                              boolean includeShortName) {
         String routeName = "";
 
         if (routeShortName != null || routeLongName != null) {
             if (routeLongName != null) {
-                routeName += routeLongName;
+                if (includeShortName && routeShortName != null){
+                    routeName = routeShortName + " " + "(" + routeLongName + ")";
+                }
+                else{
+                    routeName += routeLongName;
+                }
             } else if (routeShortName != null) {
                 routeName += routeShortName;
             }

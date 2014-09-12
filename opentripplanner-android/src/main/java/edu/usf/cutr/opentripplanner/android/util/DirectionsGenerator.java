@@ -459,13 +459,7 @@ public class DirectionsGenerator {
             shortName = leg.routeShortName ;
         }
 
-        if (!leg.routeLongName.contains(shortName)){
-            route = shortName + " " + "(" + leg.routeLongName + ")";
-        }
-        else{
-            route = leg.routeLongName;
-        }
-
+        route = ConversionUtils.getRouteLongNameSafe(leg.routeLongName, shortName, true);
 
         direction.setTransit(true);
 
