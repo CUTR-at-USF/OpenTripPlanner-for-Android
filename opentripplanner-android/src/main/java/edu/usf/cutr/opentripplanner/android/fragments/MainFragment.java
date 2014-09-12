@@ -3083,7 +3083,10 @@ public class MainFragment extends Fragment implements
             }
             if (animateCamera > 0) {
                 LatLngBounds routeBounds = boundsCreator.build();
-                showRouteOnMapAnimateCamera(routeBounds, firstTransitMarker, animateCamera);
+                if (((SupportMapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap()
+                        != null){
+                    showRouteOnMapAnimateCamera(routeBounds, firstTransitMarker, animateCamera);
+                }
             }
         }
     }
