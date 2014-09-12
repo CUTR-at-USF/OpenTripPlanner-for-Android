@@ -462,7 +462,7 @@
             <string name="about_screen_app_full_name">OpenTripPlanner para Android</string>
 
             <!-- App description -->
-            <string name="about_screen_app_description">Aplicação Android para planeamento multi-modal e navegação utilizando qualquer servidor OpenTripPlanner.
+            <string name="about_screen_app_description">Aplicação Android para navegação e planeamento multimodal utilizando qualquer servidor OpenTripPlanner.
 Consulte mais detalhes na <a href="https://github.com/CUTR-at-USF/OpenTripPlanner-for-Android/wiki">página do projecto no GitHub</a>.
 </string>
 
@@ -481,11 +481,11 @@ Khoa Tran\n
 Sean Barbeau (sjbarbeau@gmail.com)\n
 Vreixo Gonzalez\n
 Obrigado ao <a href="http://thenounproject.com">thenounproject.com</a> pelos ícones usados nos
-botões e o
+botões e ao
 <a href="http://mapicons.nicolasmollet.com">Nicollas Mollet \"Maps Icons Collection\"</a>
 pelos ícones do mapa.\n Obrigado ao programa Google Summer of Code por ter financiado o desenvolvimento durante o
 Verão de 2013!
-Esta aplicação usa a \"Google Play Services Maps API V2\", pressione em baixo para ver os termos da licença."</string>
+Esta aplicação usa a \"Google Play Services Maps API V2\", pressione em baixo para consultar os termos da licença."</string>
 
         <!-- Play services license -->
         <string name="about_screen_button_play_services_license">Licença dos Serviços da Play</string>
