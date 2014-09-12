@@ -47,7 +47,7 @@
                 <string name="text_box_dialog_location_type_map_point">Point sur la carte</string>
 
             <!-- Virtual keyboard "done" button label -->
-            <!--<string name="text_box_virtual_keyboard_done_label">GO!</string>-->
+            <string name="text_box_virtual_keyboard_done_label">Y Aller</string>
 
         <!-- Start/End markers -->
         <string name="map_markers_start_marker_title">Départ</string>
@@ -518,10 +518,10 @@ SANS AUCUNE GARANTIE OU CONDITION D\'AUCUNE SORTE, explicite ou implicite."</str
                 <string name="notification_disable_updates_info">Mises à jour annulées</string>
 
             <!-- Text -->
-            <!--<string name="notification_stop_name_conector">at</string>-->
-            <!--<string name="notification_two_delays_connector">and</string>-->
-            <!--<string name="notification_origin">origin</string>-->
-            <!--<string name="notification_destination">destination</string>-->
+            <string name="notification_stop_name_conector">à</string>
+            <string name="notification_two_delays_connector">et</string>
+            <string name="notification_origin">départ</string>
+            <string name="notification_destination">arrivée</string>
 
         <!-- Used in util functions to display consistently time and distance all around the app  -->
 
