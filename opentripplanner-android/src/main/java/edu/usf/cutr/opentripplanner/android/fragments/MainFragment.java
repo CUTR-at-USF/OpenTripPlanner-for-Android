@@ -1153,11 +1153,13 @@ public class MainFragment extends Fragment implements
                                     .getString(R.string.toast_tripplanner_current_location_error),
                             Toast.LENGTH_LONG).show();
                 } else {
-                    if (mMap.getCameraPosition().zoom < OTPApp.defaultMyLocationZoomLevel) {
-                        mMap.animateCamera(CameraUpdateFactory
-                                .newLatLngZoom(mCurrentLatLng, OTPApp.defaultMyLocationZoomLevel));
-                    } else {
-                        mMap.animateCamera(CameraUpdateFactory.newLatLng(getLastLocation()));
+                    if (!mMapFailed){
+                        if (mMap.getCameraPosition().zoom < OTPApp.defaultMyLocationZoomLevel) {
+                            mMap.animateCamera(CameraUpdateFactory
+                                    .newLatLngZoom(mCurrentLatLng, OTPApp.defaultMyLocationZoomLevel));
+                        } else {
+                            mMap.animateCamera(CameraUpdateFactory.newLatLng(getLastLocation()));
+                        }
                     }
                 }
             }
@@ -1201,77 +1203,79 @@ public class MainFragment extends Fragment implements
         OnClickListener oclSwapOriginDestination = new OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                boolean tempBoolean;
-                CustomAddress tempAddress;
-                tempBoolean = mIsStartLocationGeocodingCompleted;
-                mIsStartLocationGeocodingCompleted = mIsEndLocationGeocodingCompleted;
-                mIsEndLocationGeocodingCompleted = tempBoolean;
-                tempBoolean = mIsStartLocationChangedByUser;
-                mIsStartLocationChangedByUser = mIsEndLocationChangedByUser;
-                mIsEndLocationChangedByUser = tempBoolean;
-                tempAddress = mStartAddress;
-                mStartAddress = mEndAddress;
-                mEndAddress = tempAddress;
-                SharedPreferences.Editor prefsEditor = mPrefs.edit();
-                Boolean tempPref = mPrefs
-                        .getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, false);
-                prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, mPrefs
-                        .getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false));
-                prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, tempPref);
-                prefsEditor.commit();
-                Marker mOldStartMarker = mStartMarker;
-                MarkerOptions newStartMarkerOptions = new MarkerOptions();
-                MarkerOptions newEndMarkerOptions = new MarkerOptions();
-                if (mEndMarker != null) {
-                    newStartMarkerOptions.snippet(mEndMarker.getSnippet());
-                    newStartMarkerOptions.title(mEndMarker.getTitle());
-                    newStartMarkerOptions.position(mEndMarker.getPosition());
-                    newStartMarkerOptions.icon(BitmapDescriptorFactory
-                            .defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                }
-                if (mStartMarker != null) {
-                    mStartMarker.remove();
-                }
-                if (mEndMarker != null){
-                    mStartMarker = mMap.addMarker(newStartMarkerOptions);
-                    mStartMarkerPosition = mStartMarker.getPosition();
-                }
-                else{
-                    mStartMarker = null;
-                    mStartMarkerPosition = null;
-                }
-                if (mOldStartMarker != null) {
-                    newEndMarkerOptions.snippet(mOldStartMarker.getSnippet());
-                    newEndMarkerOptions.title(mOldStartMarker.getTitle());
-                    newEndMarkerOptions.position(mOldStartMarker.getPosition());
-                    newEndMarkerOptions.icon(BitmapDescriptorFactory
-                            .defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                }
-                if (mEndMarker != null) {
-                    mEndMarker.remove();
-                }
-                if (mOldStartMarker != null){
-                    mEndMarker = mMap.addMarker(newEndMarkerOptions);
-                    mEndMarkerPosition = mEndMarker.getPosition();
-                }
-                else{
-                    mEndMarker = null;
-                    mEndMarkerPosition = null;
-                }
+                if (!mMapFailed){
+                    boolean tempBoolean;
+                    CustomAddress tempAddress;
+                    tempBoolean = mIsStartLocationGeocodingCompleted;
+                    mIsStartLocationGeocodingCompleted = mIsEndLocationGeocodingCompleted;
+                    mIsEndLocationGeocodingCompleted = tempBoolean;
+                    tempBoolean = mIsStartLocationChangedByUser;
+                    mIsStartLocationChangedByUser = mIsEndLocationChangedByUser;
+                    mIsEndLocationChangedByUser = tempBoolean;
+                    tempAddress = mStartAddress;
+                    mStartAddress = mEndAddress;
+                    mEndAddress = tempAddress;
+                    SharedPreferences.Editor prefsEditor = mPrefs.edit();
+                    Boolean tempPref = mPrefs
+                            .getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, false);
+                    prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, mPrefs
+                            .getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false));
+                    prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, tempPref);
+                    prefsEditor.commit();
+                    Marker mOldStartMarker = mStartMarker;
+                    MarkerOptions newStartMarkerOptions = new MarkerOptions();
+                    MarkerOptions newEndMarkerOptions = new MarkerOptions();
+                    if (mEndMarker != null) {
+                        newStartMarkerOptions.snippet(mEndMarker.getSnippet());
+                        newStartMarkerOptions.title(mEndMarker.getTitle());
+                        newStartMarkerOptions.position(mEndMarker.getPosition());
+                        newStartMarkerOptions.icon(BitmapDescriptorFactory
+                                .defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                    }
+                    if (mStartMarker != null) {
+                        mStartMarker.remove();
+                    }
+                    if (mEndMarker != null){
+                        mStartMarker = mMap.addMarker(newStartMarkerOptions);
+                        mStartMarkerPosition = mStartMarker.getPosition();
+                    }
+                    else{
+                        mStartMarker = null;
+                        mStartMarkerPosition = null;
+                    }
+                    if (mOldStartMarker != null) {
+                        newEndMarkerOptions.snippet(mOldStartMarker.getSnippet());
+                        newEndMarkerOptions.title(mOldStartMarker.getTitle());
+                        newEndMarkerOptions.position(mOldStartMarker.getPosition());
+                        newEndMarkerOptions.icon(BitmapDescriptorFactory
+                                .defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                    }
+                    if (mEndMarker != null) {
+                        mEndMarker.remove();
+                    }
+                    if (mOldStartMarker != null){
+                        mEndMarker = mMap.addMarker(newEndMarkerOptions);
+                        mEndMarkerPosition = mEndMarker.getPosition();
+                    }
+                    else{
+                        mEndMarker = null;
+                        mEndMarkerPosition = null;
+                    }
 
-                CharSequence tempCharSequence = mTbStartLocation.getText();
-                setTextBoxLocation(mTbEndLocation.getText().toString(), true);
-                setTextBoxLocation(tempCharSequence.toString(), false);
+                    CharSequence tempCharSequence = mTbStartLocation.getText();
+                    setTextBoxLocation(mTbEndLocation.getText().toString(), true);
+                    setTextBoxLocation(tempCharSequence.toString(), false);
 
-                if (TextUtils.isEmpty(mTbStartLocation.getText())) {
-                    mTbStartLocation.setHint(getResources()
-                            .getString(R.string.text_box_start_location_hint));
+                    if (TextUtils.isEmpty(mTbStartLocation.getText())) {
+                        mTbStartLocation.setHint(getResources()
+                                .getString(R.string.text_box_start_location_hint));
+                    }
+                    if (TextUtils.isEmpty(mTbEndLocation.getText())) {
+                        mTbEndLocation.setHint(getResources()
+                                .getString(R.string.text_box_end_location_hint));
+                    }
+                    processRequestTrip();
                 }
-                if (TextUtils.isEmpty(mTbEndLocation.getText())) {
-                    mTbEndLocation.setHint(getResources()
-                            .getString(R.string.text_box_end_location_hint));
-                }
-                processRequestTrip();
             }
         };
         mBtnSwapOriginDestination.setOnClickListener(oclSwapOriginDestination);
@@ -2046,15 +2050,17 @@ public class MainFragment extends Fragment implements
      * @param isStartTextbox to select text box to removes focus from
      */
     private void removeFocus(boolean isStartTextbox) {
-        if (isStartTextbox) {
-            mTbStartLocation.clearFocus();
-            if (!mTbEndLocation.hasFocus()){
-                mMap.setOnMapClickListener(null);
-            }
-        } else {
-            mTbEndLocation.clearFocus();
-            if (!mTbStartLocation.hasFocus()){
-                mMap.setOnMapClickListener(null);
+        if (!mMapFailed){
+            if (isStartTextbox) {
+                mTbStartLocation.clearFocus();
+                if (!mTbEndLocation.hasFocus()){
+                    mMap.setOnMapClickListener(null);
+                }
+            } else {
+                mTbEndLocation.clearFocus();
+                if (!mTbStartLocation.hasFocus()){
+                    mMap.setOnMapClickListener(null);
+                }
             }
         }
     }
@@ -2335,26 +2341,29 @@ public class MainFragment extends Fragment implements
      * @return the new marker created
      */
     private Marker addStartEndMarker(LatLng latLng, boolean isStartMarker) {
-        MarkerOptions markerOptions = new MarkerOptions().position(latLng)
-                .draggable(true);
-        if (isStartMarker) {
-            markerOptions
-                    .title(mApplicationContext.getResources()
-                            .getString(R.string.map_markers_start_marker_title))
-                    .snippet(mApplicationContext.getResources()
-                            .getString(R.string.map_markers_start_marker_description))
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-            mStartMarkerPosition = latLng;
-            return mMap.addMarker(markerOptions);
-        } else {
-            markerOptions
-                    .title(mApplicationContext.getResources().getString(R.string.map_markers_end_marker_title))
-                    .snippet(mApplicationContext.getResources()
-                            .getString(R.string.map_markers_end_marker_description))
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-            mEndMarkerPosition = latLng;
-            return mMap.addMarker(markerOptions);
+        if (!mMapFailed){
+            MarkerOptions markerOptions = new MarkerOptions().position(latLng)
+                    .draggable(true);
+            if (isStartMarker) {
+                markerOptions
+                        .title(mApplicationContext.getResources()
+                                .getString(R.string.map_markers_start_marker_title))
+                        .snippet(mApplicationContext.getResources()
+                                .getString(R.string.map_markers_start_marker_description))
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                mStartMarkerPosition = latLng;
+                return mMap.addMarker(markerOptions);
+            } else {
+                markerOptions
+                        .title(mApplicationContext.getResources().getString(R.string.map_markers_end_marker_title))
+                        .snippet(mApplicationContext.getResources()
+                                .getString(R.string.map_markers_end_marker_description))
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                mEndMarkerPosition = latLng;
+                return mMap.addMarker(markerOptions);
+            }
         }
+        return null;
     }
 
 
@@ -2628,81 +2637,83 @@ public class MainFragment extends Fragment implements
     public void updateSelectedServer(boolean updateUI) {
         long serverId;
         Server server;
-        if (mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)) {
-            server = new Server(mPrefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""),
-                    mApplicationContext);
-            setSelectedServer(server, updateUI);
-            String bounds;
-            if ((bounds = mPrefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS, null))
-                    != null) {
-                server.setBounds(bounds);
-                addBoundariesRectangle(server);
-            }
-            WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
-
-            if (mCustomServerMetadata == null){
-                MetadataRequest metaRequest = new MetadataRequest(weakContext, mApplicationContext,
-                        this);
-                metaRequest.execute(mPrefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
-            }
-            else{
-                onMetadataRequestComplete(mCustomServerMetadata, false);
-            }
-
-            Log.d(OTPApp.TAG, "Now using custom OTP server: " + mPrefs
-                    .getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
-        } else if ((serverId = mPrefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)) != 0){
-            mCustomServerMetadata = null;
-            ServersDataSource dataSource = ServersDataSource.getInstance(mApplicationContext);
-            dataSource.open();
-            server = new Server(dataSource
-                    .getServer(mPrefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)));
-            dataSource.close();
-
-            setSelectedServer(server, updateUI);
-            addBoundariesRectangle(server);
-
-            if (updateUI){
-                LatLng mCurrentLatLng = getLastLocation();
-
-                if ((mCurrentLatLng != null) && (LocationUtil
-                        .checkPointInBoundingBox(mCurrentLatLng, server,
-                                OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))) {
-                    mMap.animateCamera(CameraUpdateFactory
-                            .newLatLngZoom(mCurrentLatLng, getServerInitialZoom(server)));
-                } else {
-                    mMap.animateCamera(CameraUpdateFactory
-                            .newLatLngZoom(getServerCenter(server), getServerInitialZoom(server)));
-                    setMarker(true, getServerCenter(server), false, true);
+        if (!mMapFailed){
+            if (mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false)) {
+                server = new Server(mPrefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""),
+                        mApplicationContext);
+                setSelectedServer(server, updateUI);
+                String bounds;
+                if ((bounds = mPrefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_BOUNDS, null))
+                        != null) {
+                    server.setBounds(bounds);
+                    addBoundariesRectangle(server);
                 }
-            }
+                WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
 
-            Log.d(OTPApp.TAG, "Now using OTP server: " + server.getRegion());
-        } else {
-            Log.d(OTPApp.TAG, "Server not selected yet, should be first start or app update");
-            return;
-        }
-        if (server != null){
-            if (server.getOffersBikeRental()){
-                mBtnModeRentedBike.setEnabled(true);
+                if (mCustomServerMetadata == null){
+                    MetadataRequest metaRequest = new MetadataRequest(weakContext, mApplicationContext,
+                            this);
+                    metaRequest.execute(mPrefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
+                }
+                else{
+                    onMetadataRequestComplete(mCustomServerMetadata, false);
+                }
+
+                Log.d(OTPApp.TAG, "Now using custom OTP server: " + mPrefs
+                        .getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
+            } else if ((serverId = mPrefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)) != 0){
+                mCustomServerMetadata = null;
+                ServersDataSource dataSource = ServersDataSource.getInstance(mApplicationContext);
+                dataSource.open();
+                server = new Server(dataSource
+                        .getServer(mPrefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0)));
+                dataSource.close();
+
+                setSelectedServer(server, updateUI);
+                addBoundariesRectangle(server);
+
+                if (updateUI){
+                    LatLng mCurrentLatLng = getLastLocation();
+
+                    if ((mCurrentLatLng != null) && (LocationUtil
+                            .checkPointInBoundingBox(mCurrentLatLng, server,
+                                    OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))) {
+                        mMap.animateCamera(CameraUpdateFactory
+                                .newLatLngZoom(mCurrentLatLng, getServerInitialZoom(server)));
+                    } else {
+                        mMap.animateCamera(CameraUpdateFactory
+                                .newLatLngZoom(getServerCenter(server), getServerInitialZoom(server)));
+                        setMarker(true, getServerCenter(server), false, true);
+                    }
+                }
+
+                Log.d(OTPApp.TAG, "Now using OTP server: " + server.getRegion());
+            } else {
+                Log.d(OTPApp.TAG, "Server not selected yet, should be first start or app update");
+                return;
             }
-            else{
-                mBtnModeRentedBike.setChecked(false);
-                mBtnModeRentedBike.setEnabled(false);
-            }
-            if (server.getOffersBikeRental() && mBtnModeRentedBike.isChecked()){
-                BikeRentalLoad bikeRentalGetStations = new BikeRentalLoad(mApplicationContext, true,
-                        this);
-                bikeRentalGetStations.execute(server.getBaseURL());
-            }
-            else{
-                removeBikeStations();
-                listenForBikeUpdates(false);
-            }
-            if (startLocationPlacesAutoCompleteAdapter != null
-                    && endLocationPlacesAutoCompleteAdapter != null){
-                startLocationPlacesAutoCompleteAdapter.setSelectedServer(server);
-                endLocationPlacesAutoCompleteAdapter.setSelectedServer(server);
+            if (server != null){
+                if (server.getOffersBikeRental()){
+                    mBtnModeRentedBike.setEnabled(true);
+                }
+                else{
+                    mBtnModeRentedBike.setChecked(false);
+                    mBtnModeRentedBike.setEnabled(false);
+                }
+                if (server.getOffersBikeRental() && mBtnModeRentedBike.isChecked()){
+                    BikeRentalLoad bikeRentalGetStations = new BikeRentalLoad(mApplicationContext, true,
+                            this);
+                    bikeRentalGetStations.execute(server.getBaseURL());
+                }
+                else{
+                    removeBikeStations();
+                    listenForBikeUpdates(false);
+                }
+                if (startLocationPlacesAutoCompleteAdapter != null
+                        && endLocationPlacesAutoCompleteAdapter != null){
+                    startLocationPlacesAutoCompleteAdapter.setSelectedServer(server);
+                    endLocationPlacesAutoCompleteAdapter.setSelectedServer(server);
+                }
             }
         }
     }
@@ -2873,37 +2884,39 @@ public class MainFragment extends Fragment implements
         LatLng latlng = new LatLng(address.getLatitude(), address.getLongitude());
         LatLng mCurrentLatLng = getLastLocation();
 
-        if (isStartLocation) {
-            if (mIsStartLocationChangedByUser) {
-                if (mEndMarker != null) {
-                    zoomToTwoPoints(latlng, mEndMarkerPosition);
-                } else if (mPrefs
-                        .getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false)) {
-                    if (mCurrentLatLng == null) {
-                        Toast.makeText(mApplicationContext, mApplicationContext.getResources()
-                                .getString(R.string.toast_tripplanner_current_location_error), Toast.LENGTH_LONG)
-                                .show();
+        if (!mMapFailed){
+            if (isStartLocation) {
+                if (mIsStartLocationChangedByUser) {
+                    if (mEndMarker != null) {
+                        zoomToTwoPoints(latlng, mEndMarkerPosition);
+                    } else if (mPrefs
+                            .getBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false)) {
+                        if (mCurrentLatLng == null) {
+                            Toast.makeText(mApplicationContext, mApplicationContext.getResources()
+                                    .getString(R.string.toast_tripplanner_current_location_error), Toast.LENGTH_LONG)
+                                    .show();
+                        } else {
+                            zoomToTwoPoints(latlng, mCurrentLatLng);
+                        }
                     } else {
-                        zoomToTwoPoints(latlng, mCurrentLatLng);
+                        zoomToLocation(latlng);
                     }
-                } else {
-                    zoomToLocation(latlng);
                 }
-            }
-        } else {
-            if (mIsEndLocationChangedByUser) {
-                if (mStartMarker != null) {
-                    zoomToTwoPoints(mStartMarkerPosition, latlng);
-                } else if (mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, false)) {
-                    if (mCurrentLatLng == null) {
-                        Toast.makeText(mApplicationContext, mApplicationContext.getResources()
-                                .getString(R.string.toast_tripplanner_current_location_error), Toast.LENGTH_LONG)
-                                .show();
+            } else {
+                if (mIsEndLocationChangedByUser) {
+                    if (mStartMarker != null) {
+                        zoomToTwoPoints(mStartMarkerPosition, latlng);
+                    } else if (mPrefs.getBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, false)) {
+                        if (mCurrentLatLng == null) {
+                            Toast.makeText(mApplicationContext, mApplicationContext.getResources()
+                                    .getString(R.string.toast_tripplanner_current_location_error), Toast.LENGTH_LONG)
+                                    .show();
+                        } else {
+                            zoomToTwoPoints(mCurrentLatLng, latlng);
+                        }
                     } else {
-                        zoomToTwoPoints(mCurrentLatLng, latlng);
+                        zoomToLocation(latlng);
                     }
-                } else {
-                    zoomToLocation(latlng);
                 }
             }
         }
@@ -3016,7 +3029,7 @@ public class MainFragment extends Fragment implements
         mModeMarkers = new HashMap<Marker, TripInfo>();
         Marker firstTransitMarker = null;
 
-        if (!itinerary.isEmpty()) {
+        if (!itinerary.isEmpty() && !mMapFailed) {
             LatLngBounds.Builder boundsCreator = LatLngBounds.builder();
 
             int stepIndex = 0;
@@ -3498,7 +3511,7 @@ public class MainFragment extends Fragment implements
 
     @Override
     public void onMetadataRequestComplete(GraphMetadata metadata, boolean updateUI) {
-        if (getActivity() != null) {
+        if (getActivity() != null && !mMapFailed) {
             if (metadata != null){
                 mCustomServerMetadata = metadata;
 
@@ -3553,51 +3566,53 @@ public class MainFragment extends Fragment implements
      *                      Google ones
      */
     public void updateOverlay(String overlayString) {
-        int tile_width = OTPApp.CUSTOM_MAP_TILE_SMALL_WIDTH;
-        int tile_height = OTPApp.CUSTOM_MAP_TILE_SMALL_HEIGHT;
+        if (!mMapFailed){
+            int tile_width = OTPApp.CUSTOM_MAP_TILE_SMALL_WIDTH;
+            int tile_height = OTPApp.CUSTOM_MAP_TILE_SMALL_HEIGHT;
 
-        if (overlayString == null) {
-            overlayString = ConversionUtils.getOverlayString(mApplicationContext);
+            if (overlayString == null) {
+                overlayString = ConversionUtils.getOverlayString(mApplicationContext);
 
-        }
-        if (mSelectedTileOverlay != null) {
-            mSelectedTileOverlay.remove();
-        }
-        if (overlayString.startsWith(OTPApp.MAP_TILE_GOOGLE)) {
-            int mapType = GoogleMap.MAP_TYPE_NORMAL;
-
-            if (overlayString.equals(OTPApp.MAP_TILE_GOOGLE_HYBRID)) {
-                mapType = GoogleMap.MAP_TYPE_HYBRID;
-            } else if (overlayString.equals(OTPApp.MAP_TILE_GOOGLE_NORMAL)) {
-                mapType = GoogleMap.MAP_TYPE_NORMAL;
-            } else if (overlayString.equals(OTPApp.MAP_TILE_GOOGLE_TERRAIN)) {
-                mapType = GoogleMap.MAP_TYPE_TERRAIN;
-            } else if (overlayString.equals(OTPApp.MAP_TILE_GOOGLE_SATELLITE)) {
-                mapType = GoogleMap.MAP_TYPE_SATELLITE;
             }
-            mMap.setMapType(mapType);
-            mMaxZoomLevel = mMap.getMaxZoomLevel();
-        } else {
-            if (overlayString.equals(getResources().getString(R.string.tiles_mapnik))) {
-                mMaxZoomLevel = getResources().getInteger(R.integer.tiles_mapnik_max_zoom);
-            } else if (overlayString.equals(getResources().getString(R.string.tiles_lyrk))) {
-                mMaxZoomLevel = getResources().getInteger(R.integer.tiles_lyrk_max_zoom);
-                tile_width = OTPApp.CUSTOM_MAP_TILE_BIG_WIDTH;
-                tile_height = OTPApp.CUSTOM_MAP_TILE_BIG_HEIGHT;
+            if (mSelectedTileOverlay != null) {
+                mSelectedTileOverlay.remove();
+            }
+            if (overlayString.startsWith(OTPApp.MAP_TILE_GOOGLE)) {
+                int mapType = GoogleMap.MAP_TYPE_NORMAL;
+
+                if (overlayString.equals(OTPApp.MAP_TILE_GOOGLE_HYBRID)) {
+                    mapType = GoogleMap.MAP_TYPE_HYBRID;
+                } else if (overlayString.equals(OTPApp.MAP_TILE_GOOGLE_NORMAL)) {
+                    mapType = GoogleMap.MAP_TYPE_NORMAL;
+                } else if (overlayString.equals(OTPApp.MAP_TILE_GOOGLE_TERRAIN)) {
+                    mapType = GoogleMap.MAP_TYPE_TERRAIN;
+                } else if (overlayString.equals(OTPApp.MAP_TILE_GOOGLE_SATELLITE)) {
+                    mapType = GoogleMap.MAP_TYPE_SATELLITE;
+                }
+                mMap.setMapType(mapType);
+                mMaxZoomLevel = mMap.getMaxZoomLevel();
             } else {
-                mMaxZoomLevel = getResources().getInteger(R.integer.tiles_maquest_max_zoom);
-            }
+                if (overlayString.equals(getResources().getString(R.string.tiles_mapnik))) {
+                    mMaxZoomLevel = getResources().getInteger(R.integer.tiles_mapnik_max_zoom);
+                } else if (overlayString.equals(getResources().getString(R.string.tiles_lyrk))) {
+                    mMaxZoomLevel = getResources().getInteger(R.integer.tiles_lyrk_max_zoom);
+                    tile_width = OTPApp.CUSTOM_MAP_TILE_BIG_WIDTH;
+                    tile_height = OTPApp.CUSTOM_MAP_TILE_BIG_HEIGHT;
+                } else {
+                    mMaxZoomLevel = getResources().getInteger(R.integer.tiles_maquest_max_zoom);
+                }
 
-            mMap.setMapType(GoogleMap.MAP_TYPE_NONE);
-            CustomUrlTileProvider mTileProvider = new CustomUrlTileProvider(
-                    tile_width,
-                    tile_height, overlayString);
-            mSelectedTileOverlay = mMap.addTileOverlay(
-                    new TileOverlayOptions().tileProvider(mTileProvider)
-                            .zIndex(OTPApp.CUSTOM_MAP_TILE_Z_INDEX));
+                mMap.setMapType(GoogleMap.MAP_TYPE_NONE);
+                CustomUrlTileProvider mTileProvider = new CustomUrlTileProvider(
+                        tile_width,
+                        tile_height, overlayString);
+                mSelectedTileOverlay = mMap.addTileOverlay(
+                        new TileOverlayOptions().tileProvider(mTileProvider)
+                                .zIndex(OTPApp.CUSTOM_MAP_TILE_Z_INDEX));
 
-            if (mMap.getCameraPosition().zoom > mMaxZoomLevel) {
-                mMap.moveCamera(CameraUpdateFactory.zoomTo(mMaxZoomLevel));
+                if (mMap.getCameraPosition().zoom > mMaxZoomLevel) {
+                    mMap.moveCamera(CameraUpdateFactory.zoomTo(mMaxZoomLevel));
+                }
             }
         }
     }
@@ -3811,7 +3826,7 @@ public class MainFragment extends Fragment implements
 
     @Override
     public void onCameraChange(CameraPosition position) {
-        if (position.zoom > mMaxZoomLevel) {
+        if (position.zoom > mMaxZoomLevel && !mMapFailed) {
             mMap.moveCamera(CameraUpdateFactory.zoomTo(mMaxZoomLevel));
         }
     }
@@ -3871,11 +3886,13 @@ public class MainFragment extends Fragment implements
                                 bikeRentalStation.bikesAvailable + " | " + getResources()
                                 .getString(R.string.map_markers_bike_rental_available_spaces) + " " +
                                 bikeRentalStation.spacesAvailable);
-                        Marker bikeRentalStationMarker = mMap.addMarker(bikeRentalStationMarkerOption);
-                        BikeRentalStationInfo bikeRentalStationInfo = new BikeRentalStationInfo(position,
-                                bikeRentalStation.name);
+                        if (!mMapFailed){
+                            Marker bikeRentalStationMarker = mMap.addMarker(bikeRentalStationMarkerOption);
+                            BikeRentalStationInfo bikeRentalStationInfo = new BikeRentalStationInfo(position,
+                                    bikeRentalStation.name);
 
-                        mBikeRentalStations.put(bikeRentalStationMarker, bikeRentalStationInfo);
+                            mBikeRentalStations.put(bikeRentalStationMarker, bikeRentalStationInfo);
+                        }
                     }
                     listenForBikeUpdates(true);
                 }
