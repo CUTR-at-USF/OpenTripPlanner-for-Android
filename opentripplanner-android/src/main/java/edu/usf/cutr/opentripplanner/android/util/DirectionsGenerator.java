@@ -345,7 +345,9 @@ public class DirectionsGenerator {
                 return streetName;
             }
         }
-        return null;
+        else {
+            return resources.getString(R.string.street_type_sidewalk);
+        }
     }
 
     public static String getLocalizedRelativeDir(RelativeDirection relDir, Resources resources) {
