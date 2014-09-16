@@ -47,7 +47,7 @@
                 <string name="text_box_dialog_location_type_map_point">Ponto no Mapa</string>
 
             <!-- Virtual keyboard "done" button label -->
-            <!--<string name="text_box_virtual_keyboard_done_label">GO!</string>-->
+            <string name="text_box_virtual_keyboard_done_label">CONCLUIR!</string>
 
         <!-- Start/End markers -->
         <string name="map_markers_start_marker_title">Partida</string>
@@ -68,18 +68,18 @@
                 <string name="map_markers_connector_before_destination">a</string>
 
                 <!-- Real time -->
-                <!--<string name="map_markers_warning_live_udpates">Live updates</string>-->
-                <!--<string name="map_markers_warning_live_upates_on_time">On time</string>-->
-                <!--<string name="map_markers_warning_live_upates_early_arrival">early</string>-->
-                <!--<string name="map_markers_warning_live_upates_late_arrival">late</string>-->
+                <string name="map_markers_warning_live_udpates">Actualizações em tempo-real</string>
+                <string name="map_markers_warning_live_upates_on_time">No horário previsto</string>
+                <string name="map_markers_warning_live_upates_early_arrival">adiantado</string>
+                <string name="map_markers_warning_live_upates_late_arrival">atrasado</string>
 
         <!-- Bike rental stations map markers -->
 
             <!-- Info pop-ups -->
 
                 <!-- Availability info -->
-                <!--<string name="map_markers_bike_rental_available_spaces">Slots:</string>-->
-                <!--<string name="map_markers_bike_rental_available_bikes">Bikes:</string>-->
+                <string name="map_markers_bike_rental_available_spaces">Lugares:</string>
+                <string name="map_markers_bike_rental_available_bikes">Bicicletas:</string>
 
 
         <!-- Toast messages -->
@@ -109,7 +109,7 @@
                     <string name="toast_server_selector_refresh_server_list_error">Não foi possível obter a lista de regiões</string>
 
                     <!-- Obtaining bike rental list -->
-                    <!--<string name="toast_bike_rental_load_request_error">Couldn\'t get bike rental stations</string>-->
+                    <string name="toast_bike_rental_load_request_error">Não foi possível obter postos de aluguer de bicicletas</string>
 
                     <!-- Contacting server -->
                     <string name="toast_no_server_selected_error">Nenhuma região seleccionada</string>
@@ -117,7 +117,7 @@
                     <string name="toast_server_checker_info_error">Aviso: não é possível obter dados da região!</string>
 
                         <!-- Contacting user's region server -->
-                        <!--<string name="toast_server_checker_error_unreachable_detected_server">Your region server is not working. Please try again later.</string>-->
+                        <string name="toast_server_checker_error_unreachable_detected_server">O servidor da sua região não está a funcionar. Por favor tente mais tarde.</string>
 
                     <!-- Editing custom server URL -->
                     <string name="toast_server_checker_error_bad_url">Endereço inválido para região personalizada</string>
@@ -126,7 +126,7 @@
                     <string name="toast_tripplanner_current_location_error">Não foi possível obter a localização actual</string>
 
                     <!-- Obtaining real time updates -->
-                    <!--<string name="toast_realtime_updates_fail">Realtime updates not available for this trip, times might be outdated</string>-->
+                    <string name="toast_realtime_updates_fail">Actualizações em tempo-real não disponíveis para esta viagem, horários podem estar desactualizados</string>
 
 
         <!-- Dialogs -->
@@ -331,15 +331,15 @@
                 <string name="settings_menu_use_intelligent_markers_description">Mover marcadores para uma morada mais próxima ou para um Ponto de Interesse</string>
 
             <!-- Live updates -->
-            <!--<string name="settings_menu_live_updates_category_title">Live updates</string>-->
-            <!--<string name="settings_menu_live_updates">Itinerary Updates</string>-->
-            <!--<string name="settings_menu_live_updates_description">Notify me when trip times change</string>-->
+            <string name="settings_menu_live_updates_category_title">Actualizações em tempo-real</string>
+            <string name="settings_menu_live_updates">Actualizações do Itinerário</string>
+            <string name="settings_menu_live_updates_description">Notificar-me quando os horários da viagem mudarem</string>
 
             <!-- About -->
-            <!--<string name="settings_menu_about_category">About</string>-->
-            <!--<string name="settings_menu_about">About OpenTripPlanner for Android</string>-->
-            <!--<string name="settings_menu_feedback">Send Feedback</string>-->
-            <!--<string name="settings_menu_about_description">License and acknowledgements</string>-->
+            <string name="settings_menu_about_category">Acerca</string>
+            <string name="settings_menu_about">Sobre o OpenTripPlanner para Android</string>
+            <string name="settings_menu_feedback">Fornecer Feedback</string>
+            <string name="settings_menu_about_description">Licença e Reconhecimentos</string>
 
 
     <!-- Step-by-step screen -->
@@ -368,29 +368,29 @@
                 the destination stop under this text, so would be best to avoid expressions like
                  "stops to destination". For example in the trip Barcelona/Paris/London/New York,
                   stops in between are Paris and London, and not New York. See #394 for reference.-->
-                <!--<string name="step_by_step_transit_stops_in_between">stops in between</string>-->
-                <!--<string name="step_by_step_transit_stops_in_between_singular">stop in between</string>-->
+                <string name="step_by_step_transit_stops_in_between">paragens entre</string>
+                <string name="step_by_step_transit_stops_in_between_singular">paragem entre</string>
 
                 <!-- Transit description start -->
                 <string name="step_by_step_transit_connector_stop_name">Paragem</string>
 
                 <!-- Transit headsign connector -->
-                <!--<string name="step_by_step_transit_connector_headsign">to</string>-->
+                <string name="step_by_step_transit_connector_headsign">até</string>
 
                 <!-- Real time -->
-                <!--<string name="step_by_step_transit_warning_live_udpates">Live updates</string>-->
+                <string name="step_by_step_transit_warning_live_udpates">Actualizações em tempo-real</string>
 
                 <!-- Modes -->
 
                     <!-- Modes -->
-                    <!--<string name="step_by_step_transit_mode_tram">tram</string>-->
-                    <!--<string name="step_by_step_transit_mode_subway">subway</string>-->
-                    <!--<string name="step_by_step_transit_mode_rail">rail</string>-->
-                    <!--<string name="step_by_step_transit_mode_bus">bus</string>-->
-                    <!--<string name="step_by_step_transit_mode_ferry">ferry</string>-->
-                    <!--<string name="step_by_step_transit_mode_cable_car">cable car</string>-->
-                    <!--<string name="step_by_step_transit_mode_gondola">gondola</string>-->
-                    <!--<string name="step_by_step_transit_mode_funicular">funicular</string>-->
+                    <string name="step_by_step_transit_mode_tram">trem</string>
+                    <string name="step_by_step_transit_mode_subway">metro</string>
+                    <string name="step_by_step_transit_mode_rail">comboio</string>
+                    <string name="step_by_step_transit_mode_bus">autocarro</string>
+                    <string name="step_by_step_transit_mode_ferry">ferry</string>
+                    <string name="step_by_step_transit_mode_cable_car">eléctrico</string>
+                    <string name="step_by_step_transit_mode_gondola">gôndola</string>
+                    <string name="step_by_step_transit_mode_funicular">elevador</string>
 
             <!-- Non-transit -->
 
@@ -459,47 +459,47 @@
         <!-- App desctiption -->
 
             <!-- App name -->
-            <!--<string name="about_screen_app_full_name">OpenTripPlanner for Android</string>-->
+            <string name="about_screen_app_full_name">OpenTripPlanner para Android</string>
 
             <!-- App description -->
-            <!--<string name="about_screen_app_description">An Android app for multi-modal trip planning and navigation using any OpenTripPlanner server.-->
-<!--See more details at <a href="https://github.com/CUTR-at-USF/OpenTripPlanner-for-Android/wiki">GitHub project page</a>.-->
-<!--</string>-->
+            <string name="about_screen_app_description">Aplicação Android para navegação e planeamento multimodal utilizando qualquer servidor OpenTripPlanner.
+Consulte mais detalhes na <a href="https://github.com/CUTR-at-USF/OpenTripPlanner-for-Android/wiki">página do projecto no GitHub</a>.
+</string>
 
         <!-- Headers -->
 
             <!-- Acknowledgements -->
-            <!--<string name="about_screen_header_acknowledgements">Acknowledgements</string>-->
+            <string name="about_screen_header_acknowledgements">Reconhecimentos</string>
 
             <!-- License -->
-            <!--<string name="about_screen_header_license">License</string>-->
+            <string name="about_screen_header_license">Licença</string>
 
         <!-- Acknowledgements -->
-        <!--<string name="about_screen_acknowledgements">"We'd like to thank the following people for contributing to the project:\n-->
-<!--Marcy Gordon\n-->
-<!--Khoa Tran\n-->
-<!--Sean Barbeau (sjbarbeau@gmail.com)\n-->
-<!--Vreixo Gonzalez\n-->
-<!--Thanks to <a href="http://thenounproject.com">thenounproject.com</a> for the mode icons used in-->
-<!--the buttons and-->
-<!--<a href="http://mapicons.nicolasmollet.com">Nicollas Mollet \"Maps Icons Collection\"</a>-->
-<!--for the map icons.\n Thanks to the Google Summer of Code program for funding development during the-->
-<!--summer of 2013!-->
-<!--This app uses \"Google Play Services Maps API V2\", press below to see license terms."</string>-->
+        <string name="about_screen_acknowledgements">"Gostaríamos de agradecer às seguintes pessoas pelas suas contribuições ao projecto:\n
+Marcy Gordon\n
+Khoa Tran\n
+Sean Barbeau (sjbarbeau@gmail.com)\n
+Vreixo Gonzalez\n
+Obrigado ao <a href="http://thenounproject.com">thenounproject.com</a> pelos ícones usados nos
+botões e ao
+<a href="http://mapicons.nicolasmollet.com">Nicollas Mollet \"Maps Icons Collection\"</a>
+pelos ícones do mapa.\n Obrigado ao programa Google Summer of Code por ter financiado o desenvolvimento durante o
+Verão de 2013!
+Esta aplicação usa a \"Google Play Services Maps API V2\", pressione em baixo para consultar os termos da licença."</string>
 
         <!-- Play services license -->
-        <!--<string name="about_screen_button_play_services_license">Play Services license</string>-->
+        <string name="about_screen_button_play_services_license">Licença dos Serviços da Play</string>
 
         <!-- License -->
-        <!--<string name="about_screen_license_apache">"Copyright (C) 2010-2014 University of South Florida-->
-<!--and individual contributors.\n-->
-<!--All rights reserved.\n-->
-<!--Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except-->
-<!--in compliance with the License. You may obtain-->
-<!--<a href="http://www.apache.org/licenses/LICENSE-2.0">here</a> a copy of the license.\n-->
-<!--Unless required by applicable law or agreed to in writing, software-->
-<!--distributed under the License is distributed on an "AS IS" BASIS,-->
-<!--WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied."</string>-->
+        <string name="about_screen_license_apache">"Copyright (C) 2010-2014 University of South Florida
+and individual contributors.\n
+All rights reserved.\n
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+in compliance with the License. You may obtain
+<a href="http://www.apache.org/licenses/LICENSE-2.0">here</a> a copy of the license.\n
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied."</string>
 
 
 
@@ -511,16 +511,16 @@
             <!-- Disable updates -->
 
                 <!-- Button -->
-                <!--<string name="notification_disable_updates_button">Cancel updates for this trip</string>-->
+                <string name="notification_disable_updates_button">Cancelar actualizações para esta viagem</string>
 
                 <!-- Toast -->
-                <!--<string name="notification_disable_updates_info">Updates cancelled</string>-->
+                <string name="notification_disable_updates_info">Actualizações canceladas</string>
 
             <!-- Text -->
-            <!--<string name="notification_stop_name_conector">at</string>-->
-            <!--<string name="notification_two_delays_connector">and</string>-->
-            <!--<string name="notification_origin">origin</string>-->
-            <!--<string name="notification_destination">destination</string>-->
+            <string name="notification_stop_name_conector">em</string>
+            <string name="notification_two_delays_connector">e</string>
+            <string name="notification_origin">origem</string>
+            <string name="notification_destination">destino</string>
 
         <!-- Used in util functions to display consistently time and distance all around the app  -->
 
@@ -536,9 +536,9 @@
                 <string name="time_full_hours">horas</string>
                 <string name="time_full_minutes">minutos</string>
                 <string name="time_full_seconds">segundos</string>
-                <!--<string name="time_full_hours_singular">hour</string>-->
-                <!--<string name="time_full_minutes_singular">minute</string>-->
-                <!--<string name="time_full_seconds_singular">second</string>-->
+                <string name="time_full_hours_singular">hora</string>
+                <string name="time_full_minutes_singular">minuto</string>
+                <string name="time_full_seconds_singular">segundo</string>
 
                 <!-- Connectors -->
                 <string name="time_connector_next_day">amanhã</string>
