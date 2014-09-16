@@ -262,8 +262,16 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
         }
 
         if (requestParams.getBikeRental()) {
-            String updatedString = params.replace(TraverseMode.BICYCLE.toString(),
-                    TraverseMode.BICYCLE.toString() + OTPApp.OTP_RENTAL_QUALIFIER);
+            String updatedString;
+            if (prefix.equals(OTPApp.FOLDER_STRUCTURE_PREFIX_NEW)){
+                updatedString = params.replace(TraverseMode.BICYCLE.toString(),
+                        TraverseMode.BICYCLE.toString() + OTPApp.OTP_RENTAL_QUALIFIER);
+            }
+            else{
+                updatedString = params.replace(TraverseMode.BICYCLE.toString(),
+                        TraverseMode.BICYCLE.toString() + ", " + TraverseMode.WALK.toString());
+            }
+
             params = updatedString;
         }
 
