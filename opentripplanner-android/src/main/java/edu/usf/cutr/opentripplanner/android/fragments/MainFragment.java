@@ -3240,20 +3240,22 @@ public class MainFragment extends Fragment implements
             LatLng newLimitSouthWestLatLng = mMap.getProjection().fromScreenLocation(newLimitSouthWest);
             LatLng newLimitNorthEastLatLng = mMap.getProjection().fromScreenLocation(newLimitNorthEast);
 
-            if (newLimitNorthEastLatLng.latitude < newLimitSouthWestLatLng.latitude){
-                newLimitNorthEastLatLng = new LatLng(newLimitSouthWestLatLng.latitude,
-                        newLimitNorthEastLatLng.longitude);
-                newLimitSouthWestLatLng = new LatLng(newLimitNorthEastLatLng.latitude,
-                        newLimitSouthWestLatLng.longitude);
-            }
-            if (newLimitNorthEastLatLng.longitude < newLimitSouthWestLatLng.longitude){
-                newLimitNorthEastLatLng = new LatLng(newLimitNorthEastLatLng.latitude,
-                        newLimitSouthWestLatLng.longitude);
-                newLimitSouthWestLatLng = new LatLng(newLimitSouthWestLatLng.latitude,
-                        newLimitNorthEastLatLng.longitude);
-            }
+            if (newLimitSouthWestLatLng != null && newLimitNorthEastLatLng != null){
+                if (newLimitNorthEastLatLng.latitude < newLimitSouthWestLatLng.latitude){
+                    newLimitNorthEastLatLng = new LatLng(newLimitSouthWestLatLng.latitude,
+                            newLimitNorthEastLatLng.longitude);
+                    newLimitSouthWestLatLng = new LatLng(newLimitNorthEastLatLng.latitude,
+                            newLimitSouthWestLatLng.longitude);
+                }
+                if (newLimitNorthEastLatLng.longitude < newLimitSouthWestLatLng.longitude){
+                    newLimitNorthEastLatLng = new LatLng(newLimitNorthEastLatLng.latitude,
+                            newLimitSouthWestLatLng.longitude);
+                    newLimitSouthWestLatLng = new LatLng(newLimitSouthWestLatLng.latitude,
+                            newLimitNorthEastLatLng.longitude);
+                }
 
-            routeBounds = new LatLngBounds(newLimitSouthWestLatLng, newLimitNorthEastLatLng);
+                routeBounds = new LatLngBounds(newLimitSouthWestLatLng, newLimitNorthEastLatLng);
+            }
         }
 
         int routeDefaultPadding = getResources().getInteger(R.integer.route_zoom_padding);
