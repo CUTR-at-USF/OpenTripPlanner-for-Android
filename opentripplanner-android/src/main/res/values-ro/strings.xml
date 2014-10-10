@@ -61,46 +61,46 @@
                 <string name="map_markers_mode_walk_action">Mergi</string>
 
                 <!-- Connectors -->
-                <string name="map_markers_connector_before_stop">de la</string>
-                <string name="map_markers_connector_before_destination">la</string>
+                <string name="map_markers_connector_before_stop">De la</string>
+                <string name="map_markers_connector_before_destination">Pana la</string>
 
 
         <!-- Toast messages -->
 
                 <!-- User input reactions messages -->
                 <string name="toast_map_markers_start_marker_activated">Locul de plecare</string>
-                <string name="toast_map_markers_end_marker_activated">Locul de Destinație</string>
+                <string name="toast_map_markers_end_marker_activated">Locul de destinație</string>
                 <string name="toast_map_markers_marker_out_of_boundaries">Loc situat în afara ariei acoperită de server. Indicator nesetat</string>
 
             <!-- Task completed info messages -->
 
                 <!-- Used alone -->
-                <!--<string name="toast_metadata_request_successful">Transit service downloaded</string>-->
-                <!--<string name="toast_server_checker_successful">OK: Region is working</string>-->
+                <string name="toast_metadata_request_successful">Serviciul de tranzit descarcat</string>
+                <string name="toast_server_checker_successful">OK: Regiune activa</string>
 
                 <!-- Used together: toast_server_selector_detected + "server name" + toast_server_selector_server_change_info -->
                 <string name="toast_server_selector_detected">Găsit</string>
-                <!--<string name="toast_server_selector_server_change_info">Change in Settings</string>-->
+                <string name="toast_server_selector_server_change_info">Schimba in setari</string>
 
             <!-- Errors -->
 
                     <!-- Triggering planning trip task -->
-                    <!--<string name="toast_tripplanner_need_to_place_markers_before_planning">Set an origin and destination first</string>-->
-                    <!--<string name="toast_tripplanner_origin_destination_are_mylocation">Can\'t plan: origin and destination are the same"</string>-->
+                    <string name="toast_tripplanner_need_to_place_markers_before_planning">Selectati o origine si o destinatie</string>
+                    <string name="toast_tripplanner_origin_destination_are_mylocation">Planificare imposibila. Originea si destinatia coincid</string>
 
                     <!-- Obtaining server list -->
-                    <!--<string name="toast_server_selector_refresh_server_list_error">Couldn\'t get region list</string>-->
+                    <string name="toast_server_selector_refresh_server_list_error">Nu s-a putut obtine lista regiunii</string>
 
                     <!-- Contacting server -->
-                    <!--<string name="toast_no_server_selected_error">No region selected</string>-->
-                    <!--<string name="toast_server_checker_error_unreachable">Unable to contact region:</string>-->
-                    <!--<string name="toast_server_checker_info_error">Attention: Cannot obtain region info!</string>-->
+                    <string name="toast_no_server_selected_error">Nicio regiune selectata</string>
+                    <string name="toast_server_checker_error_unreachable">Regiunea nu poate fi accesata:</string>
+                    <string name="toast_server_checker_info_error">Attentie: Nu se pot obtine informatii despre regiune!</string>
 
                     <!-- Editing custom server URL -->
-                    <!--<string name="toast_server_checker_error_bad_url">Bad URL for custom region</string>-->
+                    <string name="toast_server_checker_error_bad_url">URL incorect pentru regiune</string>
 
                     <!-- Obtaining user location: to select server, to display user location address in text box, ... -->
-                    <string name="toast_tripplanner_current_location_error">No sa putut obține locația actuală</string>
+                    <string name="toast_tripplanner_current_location_error">Nu s-a putut obține locația actuală</string>
 
 
         <!-- Dialogs -->
@@ -108,11 +108,11 @@
             <!-- Info -->
 
                 <!-- Task in progress "titleless" dialog messages -->
-                <!--<string name="task_progress_tripplanner_progress">Planning trip. Please wait…</string>-->
-                <!--<string name="task_progress_server_selector_progress">Finding transit service. Please wait…</string>-->
-                <!--<string name="task_progress_server_checker_progress">Getting region info. Please wait…</string>-->
-                <!--<string name="task_progress_geocoding_progress">Finding points-of-interest. Please wait…</string>-->
-                <!--<string name="task_progress_metadata_progress">Finding transit service. Please wait…</string>-->
+                <string name="task_progress_tripplanner_progress">Se planifică. Vă rugăm așteptați…</string>
+                <string name="task_progress_server_selector_progress">Se caută serviciul de tranzit. Vă rugăm așteptați…</string>
+                <string name="task_progress_server_checker_progress">Se obțin informații despre regiune. Vă rugăm așteptați…</string>
+                <string name="task_progress_geocoding_progress">Se caută puncte de interes. Vă rugăm așteptați…</string>
+                <string name="task_progress_metadata_progress">Se caută serviciul de tranzit. Vă rugăm așteptați…</string>
 
                 <!-- Routes drop-down pop-up dialog (menu will be rendered this way prior to API level 15) -->
                 <!--<string name="tripplanner_results_title">Planning Results</string>-->
