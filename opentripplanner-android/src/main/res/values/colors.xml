@@ -26,4 +26,7 @@
     <color name="sysRedFaded">#50FF0000</color>
     <color name="sysWhiteFaded">#50FFFFFF</color>
     <color name="sysYellowFaded">#50FFFF00</color>
+    <color name="primary">#F5893C</color>
+    <color name="primary_dark">#903C00</color>
+    <color name="accent">#F5893C</color>
 </resources>
