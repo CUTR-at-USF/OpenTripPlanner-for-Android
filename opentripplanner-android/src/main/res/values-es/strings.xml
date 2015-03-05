@@ -47,7 +47,7 @@
                 <string name="text_box_dialog_location_type_map_point">Punto en el mapa</string>
 
             <!-- Virtual keyboard "done" button label -->
-            <string name="text_box_virtual_keyboard_done_label">IR!</string>
+            <string name="text_box_virtual_keyboard_done_label">¡IR!</string>
 
         <!-- Start/End markers -->
         <string name="map_markers_start_marker_title">Salida</string>
@@ -93,7 +93,7 @@
 
                 <!-- Used alone -->
                 <string name="toast_metadata_request_successful">Red de transportes descargada correctamente</string>
-                <string name="toast_server_checker_successful">OK: Region is working</string>
+                <string name="toast_server_checker_successful">OK: La región funciona correctamente</string>
                 <string name="toast_bike_rental_load_request_successful">Obtenidas estaciones de bicis de alquiler</string>
 
                 <!-- Used together: toast_server_selector_detected + "server name" + toast_server_selector_server_change_info -->
@@ -115,7 +115,7 @@
                     <!-- Contacting server -->
                     <string name="toast_no_server_selected_error">No se ha escogido ninguna región</string>
                     <string name="toast_server_checker_error_unreachable">No se ha podido contactar con la región:</string>
-                    <string name="toast_server_checker_info_error">Atención: No se ha podido obtener información de la región!</string>
+                    <string name="toast_server_checker_info_error">Atención: ¡No se ha podido obtener información de la región!</string>
 
                         <!-- Contacting user's region server -->
                         <string name="toast_server_checker_error_unreachable_detected_server">Tu región no está funcionando. Por favor intentalo de nuevo más tarde.</string>
@@ -150,8 +150,8 @@
                     <string name="point_type_selector_title">Escoge la localización</string>
 
                     <!-- Options -->
-                    <string name="point_type_selector_start_marker_option">Start location</string>
-                    <string name="point_type_selector_end_marker_option">End location</string>
+                    <string name="point_type_selector_start_marker_option">Ubicación de inicio</string>
+                    <string name="point_type_selector_end_marker_option">Ubicación de destino</string>
 
                 <!-- Geocoding results dialog -->
 
@@ -180,7 +180,7 @@
                     <string name="server_checker_info_custom_server_unknown_bounds">Desconocida</string>
                     <string name="server_checker_info_custom_server_unknown_language">Desoconocido</string>
                     <string name="server_checker_info_custom_server_unknown_name">Desconocida</string>
-                    <string name="server_checker_info_custom_server_unknown_email">email desconocido</string>
+                    <string name="server_checker_info_custom_server_unknown_email">Correo-e desconocido</string>
 
                 <!-- Server selector dialog -->
 
@@ -201,7 +201,7 @@
             <!-- Trip plan error dialog -->
 
                 <!-- Title -->
-                <string name="tripplanner_error_dialog_title">No se ha podido planear el viaje.</string>
+                <string name="tripplanner_error_dialog_title">No se ha podido planificar el viaje.</string>
 
                 <!-- Errors -->
                 <string name="tripplanner_error_not_defined">Disculpa, algo ha ido mal. Por favor intentalo de nuevo.</string>
@@ -214,12 +214,12 @@
                 <string name="tripplanner_error_geocode_from_not_found">Origen no encontrado</string>
                 <string name="tripplanner_error_geocode_to_not_found">Destino no encontrado</string>
                 <string name="tripplanner_error_geocode_from_to_not_found">Origen y destino no encontrados</string>
-                <string name="tripplanner_error_too_close">Viage demasiado corto</string>
+                <string name="tripplanner_error_too_close">Viaje demasiado corto</string>
                 <string name="tripplanner_error_location_not_accessible">La localización escogida no es accesible</string>
                 <string name="tripplanner_error_geocode_from_ambiguous">El origen no está claro</string>
                 <string name="tripplanner_error_geocode_to_ambiguous">El destino no está claro</string>
                 <string name="tripplanner_error_geocode_from_to_ambiguous">Ni el origen ni el destino están claros</string>
-                <string name="tripplanner_error_triangle">Algo ha ido mal. Cambia las pciones de bicicleta los valores e intentalo de nuevo</string>
+                <string name="tripplanner_error_triangle">Algo ha ido mal. Cambia las opciones de valores para bicicleta e intentalo de nuevo</string>
 
                 <!-- Play services error dialog -->
 
@@ -255,7 +255,7 @@
         <!-- Bike options -->
         <string name="left_panel_bike_options_quick">Rápido</string>
         <string name="left_panel_bike_options_flat">Llano</string>
-        <string name="left_panel_bike_options_bike_friendly">Bueno para bicis</string>
+        <string name="left_panel_bike_options_bike_friendly">Óptimo para bicis</string>
 
 
     <!-- Menus -->
@@ -317,7 +317,7 @@
             <!-- Points of Interest and Address Search -->
             <string name="settings_menu_geocoder_preference_category_title">Direcciones y puntos de interés</string>
             <string name="settings_menu_geocoder_preference_provider_title">Proveedor de búsqueda</string>
-            <string name="settings_menu_geocoder_preference_provider_nominatim">Mapquest Nominatim</string>
+            <string name="settings_menu_geocoder_preference_provider_nominatim">MapQuest Nominatim</string>
             <string name="settings_menu_geocoder_preference_provider_google_places">Google Places</string>
 
             <!-- Advanced -->
@@ -352,7 +352,7 @@
         <string name="step_by_step_header_from">De</string>
         <string name="step_by_step_header_to">A</string>
         <string name="step_by_step_header_departure">Sal.</string>
-        <string name="step_by_step_header_arrival">LLeg.</string>
+        <string name="step_by_step_header_arrival">Lleg.</string>
 
         <!-- Drop down menu components -->
         <string name="step_by_step_walking_duration">a pie</string>
@@ -463,7 +463,7 @@
             <string name="about_screen_app_full_name">OpenTripPlanner para Android</string>
 
             <!-- App description -->
-            <string name="about_screen_app_description">Una app para Android de planeamiento de rutas multi-modal y navegación usando cualquier servidor OpenTripPlanner.
+            <string name="about_screen_app_description">Una app para Android de planeamiento de rutas multimodal y navegación usando cualquier servidor OpenTripPlanner.
 Para más detalles ver la <a href="https://github.com/CUTR-at-USF/OpenTripPlanner-for-Android/wiki">página del proyecto en GitHub</a>.
 </string>
 
