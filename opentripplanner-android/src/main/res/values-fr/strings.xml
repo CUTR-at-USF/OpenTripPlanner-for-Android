@@ -68,10 +68,10 @@
                 <string name="map_markers_connector_before_destination">à</string>
 
                 <!-- Real time -->
-                <string name="map_markers_warning_live_udpates">Mises à jour temps réel</string>
-                <string name="map_markers_warning_live_upates_on_time">à l\'heure</string>
-                <string name="map_markers_warning_live_upates_early_arrival">en avance</string>
-                <string name="map_markers_warning_live_upates_late_arrival">en retard</string>
+                <string name="map_markers_warning_live_updates">Mises à jour temps réel</string>
+                <string name="map_markers_warning_live_updates_on_time">à l\'heure</string>
+                <string name="map_markers_warning_live_updates_early_arrival">en avance</string>
+                <string name="map_markers_warning_live_updates_late_arrival">en retard</string>
 
         <!-- Bike rental stations map markers -->
 
@@ -379,7 +379,7 @@
                 <string name="step_by_step_transit_connector_headsign">direction</string>
 
                 <!-- Real time -->
-                <string name="step_by_step_transit_warning_live_udpates">Mises à jour en temps réel</string>
+                <string name="step_by_step_transit_warning_live_updates">Mises à jour en temps réel</string>
 
                 <!-- Modes -->
 
