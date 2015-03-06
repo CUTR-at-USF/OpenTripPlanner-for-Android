@@ -14,69 +14,64 @@
   limitations under the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="edu.usf.cutr.opentripplanner.android">
+          package="edu.usf.cutr.opentripplanner.android">
 
-<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <!-- To plan trip from/to contact address -->
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
 
     <!-- Android Maps API V2 -->
-    <permission
-        android:name="edu.usf.cutr.opentripplanner.android.permission.MAPS_RECEIVE"
-        android:protectionLevel="signature" />
-
-    <uses-permission android:name="edu.usf.cutr.opentripplanner.android.permission.MAPS_RECEIVE" />
-    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <!-- The following permission is not required to use
          Google Maps Android API v2, but is recommended. -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <uses-feature
-        android:glEsVersion="0x00020000"
-        android:required="true" />
+            android:glEsVersion="0x00020000"
+            android:required="true"/>
 
     <supports-screens
-        android:anyDensity="true"
-        android:largeScreens="true"
-        android:normalScreens="true"
-        android:smallScreens="true" />
+            android:anyDensity="true"
+            android:largeScreens="true"
+            android:normalScreens="true"
+            android:smallScreens="true"/>
 
     <application
-        android:name=".OTPApp"
-        android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name"
-        android:allowBackup="true">
-        <activity
-            android:name=".MyActivity"
+            android:name=".OTPApp"
+            android:icon="@drawable/ic_launcher"
             android:label="@string/app_name"
-            android:launchMode="singleTop"
-            android:theme="@style/MyTheme"
-            android:windowSoftInputMode="stateHidden">
+            android:allowBackup="true">
+        <activity
+                android:name=".MyActivity"
+                android:label="@string/app_name"
+                android:launchMode="singleTop"
+                android:theme="@style/MyTheme"
+                android:windowSoftInputMode="stateHidden">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity
-            android:name=".SettingsActivity"
-            android:theme="@style/MyTheme"
-            android:windowSoftInputMode="stateHidden"></activity>
+                android:name=".SettingsActivity"
+                android:theme="@style/MyTheme"
+                android:windowSoftInputMode="stateHidden"></activity>
         <activity
-            android:name=".AboutActivity"
-            android:theme="@style/MyTheme"
-            android:windowSoftInputMode="stateHidden"></activity>
+                android:name=".AboutActivity"
+                android:theme="@style/MyTheme"
+                android:windowSoftInputMode="stateHidden"></activity>
         <activity
-            android:name=".AboutPlayServicesActivity"
-            android:theme="@style/MyTheme"
-            android:windowSoftInputMode="stateHidden"></activity>
+                android:name=".AboutPlayServicesActivity"
+                android:theme="@style/MyTheme"
+                android:windowSoftInputMode="stateHidden"></activity>
 
         <meta-data
-            android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyD5XadJhAK7jIKFz5TcT7t-gsWw_OTvlBI" />
+                android:name="com.google.android.maps.v2.API_KEY"
+                android:value="AIzaSyD5XadJhAK7jIKFz5TcT7t-gsWw_OTvlBI"/>
     </application>
 
 
