@@ -50,12 +50,10 @@ android {
     productFlavors {
         vanilla {
             applicationId = 'edu.usf.cutr.opentripplanner.android'
-            packageName 'edu.usf.cutr.opentripplanner.android'
         }
 
         mobullity {
             applicationId = 'edu.usf.cutr.mobullity.android'
-            packageName 'edu.usf.cutr.mobullity.android'
         }
     }
 
