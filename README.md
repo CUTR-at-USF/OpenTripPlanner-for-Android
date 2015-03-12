@@ -3,13 +3,13 @@ OpenTripPlanner for Android [![Build Status](https://travis-ci.org/CUTR-at-USF/O
 
 An Android app for multi-modal trip planning and navigation using any OpenTripPlanner server.
 
-See more details here:
+Download the app via the [Google Play store](https://play.google.com/store/apps/details?id=edu.usf.cutr.opentripplanner.android).
 
-https://github.com/CUTR-at-USF/OpenTripPlanner-for-Android/wiki
+[![Google Play logo](http://www.android.com/images/brand/android_app_on_play_logo_large.png)](https://play.google.com/store/apps/details?id=edu.usf.cutr.opentripplanner.android)
 
-Full Developer Guide is here:
+See more details on [the wiki](https://github.com/CUTR-at-USF/OpenTripPlanner-for-Android/wiki).
 
-https://github.com/CUTR-at-USF/OpenTripPlanner-for-Android/wiki/Developer-Guide
+Like hacking things?  See our [Developer Guide](https://github.com/CUTR-at-USF/OpenTripPlanner-for-Android/wiki/Developer-Guide) to get started.
 
 ## Build Setup
 
