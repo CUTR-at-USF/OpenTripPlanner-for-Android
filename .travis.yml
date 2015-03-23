@@ -39,7 +39,7 @@ script:
   - ./wait_for_emulator
   - ./gradlew connectedCheck -PdisablePreDex
 
-# Integration with Gitter (https://gitter.im/OneBusAway/onebusaway-android)
+# Integration with Gitter (https://gitter.im/CUTR-at-USF/OpenTripPlanner-for-Android)
 notifications:
   webhooks:
     urls:
