@@ -67,7 +67,7 @@ public class CustomAddress extends Address {
         }
         if (TextUtils.isEmpty(sb.toString())){
             int maxLines = (OTPApp.ADDRESS_MAX_LINES_TO_SHOW > getMaxAddressLineIndex())
-                    ? getMaxAddressLineIndex() : OTPApp.ADDRESS_MAX_LINES_TO_SHOW;
+                    ? getMaxAddressLineIndex() + 1 : OTPApp.ADDRESS_MAX_LINES_TO_SHOW;
             sb.append(getAddressLine(0));
             for (int i = 1; i < maxLines; i++) {
                 if (getAddressLine(i) != null) {
@@ -80,7 +80,7 @@ public class CustomAddress extends Address {
 
     public String getStringAddress(boolean multiline) {
         int maxLines = (OTPApp.ADDRESS_MAX_LINES_TO_SHOW > getMaxAddressLineIndex())
-                ? getMaxAddressLineIndex() : OTPApp.ADDRESS_MAX_LINES_TO_SHOW;
+                ? getMaxAddressLineIndex() + 1 : OTPApp.ADDRESS_MAX_LINES_TO_SHOW;
 
         if (maxLines >= 0) {
 

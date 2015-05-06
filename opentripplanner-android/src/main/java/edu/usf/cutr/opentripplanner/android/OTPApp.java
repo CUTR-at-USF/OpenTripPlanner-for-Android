@@ -36,6 +36,8 @@ public class OTPApp extends Application {
 
     public static final int CHOOSE_CONTACT_REQUEST_CODE = 1;
 
+    public static final int CHOOSE_ADDRESS_REQUEST_CODE = 9;
+
     public static final String METADATA_LOCATION = "/metadata";
 
     public static final String BIKE_RENTAL_LOCATION = "/bike_rental";
@@ -157,6 +159,12 @@ public class OTPApp extends Application {
 
     public static final String BUNDLE_KEY_TRIP_DATE = "trip date";
 
+    public static final String BUNDLE_KEY_TRIP_TIME = "trip time";
+
+    public static final String BUNDLE_KEY_TRIP_HOUR = "trip hour";
+
+    public static final String BUNDLE_KEY_TRIP_MINUTES = "trip minutes";
+
     public static final String BUNDLE_KEY_ARRIVE_BY = "arrive by";
 
     public static final String BUNDLE_KEY_TIMEPICKER_SAVED_HOUR = "timepicker hours";
@@ -180,6 +188,10 @@ public class OTPApp extends Application {
     public static final String BUNDLE_KEY_CUSTOM_SERVER_METADATA = "custom server metadata";
 
     public static final int COLOR_ROUTE_LINE = 0x7F0000FF;
+
+    public static final int NOTIFICATION_ID = 42;
+
+    public static final String TRIP_DESCRIPTION = "trip description";
 
     /**
      * Preference keys
@@ -292,6 +304,27 @@ public class OTPApp extends Application {
 
     public static final String INTENT_NOTIFICATION_RESUME_APP_WITH_TRIP_ID
             = "edu.usf.cutr.opentripplanner.android.OpenTripPlanner.NOTIFICATION_RESUME";
+
+    public static final String INTENT_GET_MY_LOCATION_STRING
+            = "edu.usf.cutr.opentripplanner.android.OpenTripPlanner.GET_MY_LOCATION_STRING";
+
+    public static final String INTENT_GET_END_LOCATION_STRING
+            = "edu.usf.cutr.opentripplanner.android.OpenTripPlanner.GET_END_LOCATION_STRING";
+
+    public static final String SEND_MY_LOCATION_STRING
+            = "edu.usf.cutr.opentripplanner.android.OpenTripPlanner.SEND_MY_LOCATION_STRING";
+
+    public static final String SEND_END_LOCATION_STRING
+            = "edu.usf.cutr.opentripplanner.android.OpenTripPlanner.SEND_END_LOCATION_STRING";
+
+    public static final String LAYOUT_PARAMETERS
+            = "edu.usf.cutr.opentripplanner.android.OpenTripPlanner.LAYOUT_PARAMETERS";
+
+    public static final String STREET_VIEW_STRING
+            = "google.streetview:cbll= %f,%f &cbp=0,90,0,0,1&mz=8";
+
+    public static final String INTENT_WIDGET_SEARCH
+            = "edu.usf.cutr.opentripplanner.android.OpenTripPlanner.WIDGET_SEARCH";
 
     /**
      * Sets the currently selected OTP server

@@ -57,8 +57,8 @@
                 android:background="@drawable/button_layout">
         </ImageButton>
 
-        <AutoCompleteTextView
-                android:id="@id/tbStartLocation"
+        <edu.usf.cutr.opentripplanner.android.util.AutoCompleteTextViewFromZero
+                android:id="@+id/tbStartLocation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:selectAllOnFocus="true"
@@ -66,11 +66,12 @@
                 android:singleLine="true"
                 android:hint="@string/text_box_start_location_hint"
                 android:drawableRight="@android:drawable/ic_input_get"
+                android:drawableLeft="@android:drawable/btn_star_big_off"
                 android:layout_toLeftOf="@id/btnSwapOriginDestination"
                 android:background="@android:drawable/editbox_background">
-        </AutoCompleteTextView>
+        </edu.usf.cutr.opentripplanner.android.util.AutoCompleteTextViewFromZero>
 
-        <AutoCompleteTextView
+        <edu.usf.cutr.opentripplanner.android.util.AutoCompleteTextViewFromZero
                 android:id="@+id/tbEndLocation"
                 android:layout_width="match_parent"
                 android:layout_below="@+id/tbStartLocation"
@@ -80,9 +81,10 @@
                 android:selectAllOnFocus="true"
                 android:singleLine="true"
                 android:drawableRight="@android:drawable/ic_input_get"
+                android:drawableLeft="@android:drawable/btn_star_big_off"
                 android:layout_toLeftOf="@id/btnSwapOriginDestination"
                 android:background="@android:drawable/editbox_background">
-        </AutoCompleteTextView>
+        </edu.usf.cutr.opentripplanner.android.util.AutoCompleteTextViewFromZero>
 
 
         <ImageButton
@@ -109,6 +111,17 @@
                 android:background="@drawable/handle_layout">
         </ImageButton>
 
+        <ImageButton
+            android:id="@+id/btnStreetView"
+            android:layout_height="55dp"
+            android:layout_width="55dp"
+            android:layout_alignParentRight="true"
+            android:layout_above="@id/btnMyLocation"
+            android:layout_marginBottom="2dp"
+            android:src="@android:drawable/ic_menu_camera"
+            android:background="@drawable/button_layout"
+            android:visibility="invisible">
+        </ImageButton>
 
         <RelativeLayout
                 android:id="@id/panelDisplayDirection"

@@ -44,6 +44,7 @@
                 <string name="text_box_dialog_location_type_current_location">Current location</string>
                 <string name="text_box_dialog_location_type_contact">Contact address</string>
                 <string name="text_box_dialog_location_type_map_point">Point on map</string>
+                <string name="text_box_dialog_location_type_favourite">Favourite locations</string>
 
             <!-- Virtual keyboard "done" button label -->
             <string name="text_box_virtual_keyboard_done_label">GO!</string>
@@ -99,6 +100,8 @@
                 <string name="toast_server_selector_detected">Found</string>
                 <string name="toast_server_selector_server_change_info">Change in Settings</string>
 
+                <string name="toast_address_location_added_favourites">Location added to favourites.</string>
+
             <!-- Errors -->
 
                     <!-- Triggering planning trip task -->
@@ -128,6 +131,9 @@
                     <!-- Obtaining real time updates -->
                     <string name="toast_realtime_updates_fail">Realtime updates not available for this trip, times might be outdated</string>
 
+                    <string name="toast_address_location_empty">There is nothing to add.</string>
+
+                    <string name="toast_address_location_already_stored">Address is already saved.</string>
 
         <!-- Dialogs -->
 
@@ -151,6 +157,7 @@
                     <!-- Options -->
                     <string name="point_type_selector_start_marker_option">Start location</string>
                     <string name="point_type_selector_end_marker_option">End location</string>
+                    <string name="point_type_selector_street_view_option">Street view</string>
 
                 <!-- Geocoding results dialog -->
 
@@ -197,6 +204,10 @@
                     <string name="date_time_selector_spinner_arrive">Arrive at:</string>
                     <string name="date_time_selector_spinner_depart">Depart at:</string>
 
+                <!-- Favourite addresses -->
+
+                    <!--Title-->
+                    <string name="favourite_Address_title">Select address</string>
             <!-- Errors -->
 
             <!-- Trip plan error dialog -->
@@ -349,6 +360,27 @@
         <!-- Title -->
         <string name="step_by_step_title">Directions</string>
 
+        <!-- Choose itinerary button -->
+        <string name="step_by_step_choose_itinerary_title">Choose this itinerary</string>
+        <string name="step_by_step_choose_itinerary_notifications">Receive notifications</string>
+        <string name="step_by_step_choose_itinerary_calendar">Create a calendar event</string>
+        <string name="step_by_step_choose_itinerary_alarm">Set an alarm</string>
+            <!-- Alarm setting -->
+            <string name="step_by_step_choose_itinerary_alarm_label">Name of the alarm</string>
+            <string name="step_by_step_choose_itinerary_alarm_repetition">Repetition</string>
+            <string name="initial_monday">M</string>
+            <string name="initial_tuesday">T</string>
+            <string name="initial_wednesday">W</string>
+            <string name="initial_thursday">T</string>
+            <string name="initial_friday">F</string>
+            <string name="initial_saturday">S</string>
+            <string name="initial_sunday">S</string>
+            <!-- Notifications feature -->
+            <string name="step_by_step_choose_itinerary_notifications_remaining_time_begin">minute(s) before departure (</string>
+            <string name="step_by_step_choose_itinerary_notifications_remaining_time_end">)</string>
+            <string name="step_by_step_choose_itinerary_notifications_departure_now">Departure now!</string>
+            <string name="step_by_step_choose_itinerary_notifications_departure_over">This trip is now past.</string>
+
         <!-- Top headers -->
         <string name="step_by_step_header_from">From</string>
         <string name="step_by_step_header_to">To</string>
@@ -458,7 +490,7 @@
 
     <!-- About screen -->
 
-        <!-- App desctiption -->
+        <!-- App description -->
 
             <!-- App name -->
             <string name="about_screen_app_full_name">OpenTripPlanner for Android</string>

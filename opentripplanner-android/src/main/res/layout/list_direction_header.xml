@@ -23,7 +23,7 @@
 
         <TextView
                 android:id="@+id/titleHeader"
-                android:layout_width="fill_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
                 android:layout_toRightOf="@+id/btnDisplayMap"
                 android:gravity="left"
@@ -32,6 +32,26 @@
                 android:textColor="#000000"
                 android:textSize="22sp"
                 android:textStyle="bold"/>
+
+        <ImageButton
+                android:id="@+id/btnShareDirections"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/titleHeader"
+                android:gravity="left"
+                android:padding="5dp"
+                android:background="@null"
+                android:src="@android:drawable/ic_menu_share" />
+
+        <ImageButton
+                android:id="@+id/btnAlarmDirections"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/btnShareDirections"
+                android:gravity="left"
+                android:padding="5dp"
+                android:background="@null"
+                android:src="@android:drawable/ic_menu_my_calendar" />
 
     </RelativeLayout>
 
