@@ -16,14 +16,14 @@
 
 package edu.usf.cutr.opentripplanner.android.fragments;
 
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.api.model.Itinerary;
-import org.opentripplanner.api.model.Leg;
-
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.CalendarContract;
+import android.support.v4.widget.PopupMenuCompat;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -31,12 +31,20 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
+import android.widget.PopupMenu;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.opentripplanner.api.model.Itinerary;
+import org.opentripplanner.api.model.Leg;
+import org.opentripplanner.routing.core.TraverseMode;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.usf.cutr.opentripplanner.android.AlarmActivity;
+import edu.usf.cutr.opentripplanner.android.NotificationService;
 import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.R;
 import edu.usf.cutr.opentripplanner.android.listeners.OtpFragment;
@@ -71,6 +79,8 @@ public class DirectionListFragment extends ExpandableListFragment {
 
     TextView arrivalTimeHeader;
 
+    Spinner tripList;
+
     OTPBundle otpBundle;
 
     @Override
@@ -100,6 +110,8 @@ public class DirectionListFragment extends ExpandableListFragment {
         super.onActivityCreated(savedInstanceState);
 
         ImageButton btnDisplayMap = (ImageButton) header.findViewById(R.id.btnDisplayMap);
+        ImageButton btnShareDirections = (ImageButton) header.findViewById(R.id.btnShareDirections);
+        ImageButton btnAlarmDirections = (ImageButton) header.findViewById(R.id.btnAlarmDirections);
         final OtpFragment ofl = this.getFragmentListener();
         final DirectionListFragment dlf = this;
         OnClickListener oclDisplayDirection = new OnClickListener() {
@@ -109,11 +121,83 @@ public class DirectionListFragment extends ExpandableListFragment {
             }
         };
         btnDisplayMap.setOnClickListener(oclDisplayDirection);
+        btnShareDirections.setOnClickListener(new OnClickListener() {
+
+            public void onClick(View v) {
+
+                // create popup menu
+                View menuItemView = getView().findViewById(R.id.btnShareDirections);
+                PopupMenu popup = new PopupMenu(getActivity(),menuItemView);
+                popup.getMenuInflater().inflate(R.menu.share_menu, popup.getMenu());
+                menuItemView.setOnTouchListener(PopupMenuCompat.getDragToOpenListener(popup));
+
+                //registering popup with OnMenuItemClickListener
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    public boolean onMenuItemClick(MenuItem item) {
+
+                        Intent itn = new Intent();
+                        itn.setAction(Intent.ACTION_SEND);
+                        itn.setType("text/plain");
+
+                        // fill intend content based on chosen menu item
+                        switch (item.getItemId()) {
+                            case R.id.btnShareDirectionsShort:
+                                itn.putExtra(Intent.EXTRA_TEXT, getDepartureArrivalHeaders(false));
+                                break;
+                            case R.id.btnShareDirectionsDetailed:
+                                itn.putExtra(Intent.EXTRA_TEXT, getDepartureArrivalHeaders(true));
+                                break;
+                            default:
+                                break;
+                        }
+                        startActivity(Intent.createChooser(itn, "Share via"));
+                        return true;
+                    }
+                });
+
+                popup.show();
+            }
+        });
+        btnAlarmDirections.setOnClickListener(new OnClickListener() {
+
+            public void onClick(View v) {
+
+                // create popup menu
+                View menuItemView = getView().findViewById(R.id.btnAlarmDirections);
+                PopupMenu popup = new PopupMenu(getActivity(),menuItemView);
+                popup.getMenuInflater().inflate(R.menu.alarm_menu, popup.getMenu());
+                menuItemView.setOnTouchListener(PopupMenuCompat.getDragToOpenListener(popup));
+
+                //registering popup with OnMenuItemClickListener
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    public boolean onMenuItemClick(MenuItem item) {
+
+                        switch (item.getItemId()) {
+                            case R.id.btnAlarmDirectionsAlarm:
+                                setAlarmItinerary();
+                                break;
+                            case R.id.btnAlarmDirectionsNotifications:
+                                setNotificationsItinerary();
+                                break;
+                            case R.id.btnAlarmDirectionsCalendar:
+                                setCalendarItinerary();
+                                break;
+                            default:
+                                break;
+                        }
+                        return true;
+                    }
+                });
+
+                popup.show();
+            }
+        });
 
         fromHeader = (TextView) header.findViewById(R.id.fromHeader);
         toHeader = (TextView) header.findViewById(R.id.toHeader);
         departureTimeHeader = (TextView) header.findViewById(R.id.departureTimeHeader);
         arrivalTimeHeader = (TextView) header.findViewById(R.id.arrivalTimeHeader);
+        tripList = (Spinner) header.findViewById(R.id.itinerarySelection);
 
         if (savedInstanceState != null) {
             otpBundle = (OTPBundle) savedInstanceState
@@ -142,8 +226,6 @@ public class DirectionListFragment extends ExpandableListFragment {
         }
 
         final Activity activity = this.getActivity();
-        Spinner itinerarySelectionSpinner = (Spinner) header.findViewById(R.id.itinerarySelection);
-
         String[] itinerarySummaryList = new String[itineraryList.size()];
 
         boolean isTransitIsTagSet = false;
@@ -193,7 +275,7 @@ public class DirectionListFragment extends ExpandableListFragment {
                 android.R.layout.simple_spinner_item, itinerarySummaryList);
 
         itineraryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        itinerarySelectionSpinner.setAdapter(itineraryAdapter);
+        tripList.setAdapter(itineraryAdapter);
 
         AdapterView.OnItemSelectedListener itinerarySpinnerListener
                 = new AdapterView.OnItemSelectedListener() {
@@ -237,8 +319,8 @@ public class DirectionListFragment extends ExpandableListFragment {
 
             }
         };
-        itinerarySelectionSpinner.setSelection(currentItineraryIndex);
-        itinerarySelectionSpinner.setOnItemSelectedListener(itinerarySpinnerListener);
+        tripList.setSelection(currentItineraryIndex);
+        tripList.setOnItemSelectedListener(itinerarySpinnerListener);
 
         // Populate list with our static array of titles.
         elv = getExpandableListView();
@@ -297,6 +379,66 @@ public class DirectionListFragment extends ExpandableListFragment {
                     .getTimeWithContext(getActivity().getApplicationContext(), agencyTimeZoneOffset,
                             endTimeInSeconds, false));
         }
+    }
+
+    private String getDepartureArrivalHeaders(Boolean detailed) {
+
+        if (detailed) {
+            Toast.makeText(getActivity(), "..", Toast.LENGTH_SHORT).show();
+
+            return "From: " + fromHeader.getText().toString()
+              + "\n At:   " + departureTimeHeader.getText().toString()
+              + "\n To:   " + toHeader.getText().toString()
+              + "\n At:   " + arrivalTimeHeader.getText().toString();
+        } else {
+            return "From: " + fromHeader.getText().toString() + " - " + departureTimeHeader.getText().toString()
+              + "\n To:   " + toHeader.getText().toString() + " - " + arrivalTimeHeader.getText().toString();
+        }
+    }
+
+    private void setAlarmItinerary() {
+        Intent intent = new Intent(getActivity().getApplicationContext(), AlarmActivity.class);
+        intent.putExtra(OTPApp.BUNDLE_KEY_RESULT_TRIP_START_LOCATION, fromHeader.getText().toString());
+        intent.putExtra(OTPApp.BUNDLE_KEY_RESULT_TRIP_END_LOCATION, toHeader.getText().toString());
+        startActivity(intent);
+    }
+
+    private void setNotificationsItinerary() {
+        // Notification title: short trip description
+        String departure = (fromHeader.getText().toString().split(","))[0];
+        String arrival = (toHeader.getText().toString().split(","))[0];
+        String tripDescription = departure + " → " + arrival;
+
+        // Notification content: time remaining before departure; the text contains hour and minutes separated by a :
+        // The minutes have a space at the end that must be removed in order to keep the app alive
+        int tripHour = Integer.parseInt((departureTimeHeader.getText().toString()).split(":")[0]);
+        int tripMinutes = Integer.parseInt(((departureTimeHeader.getText().toString()).split(":")[1]).substring(0,2));
+
+        Intent intent = new Intent(getActivity().getApplicationContext(), NotificationService.class);
+        intent.putExtra(OTPApp.TRIP_DESCRIPTION, tripDescription);
+        intent.putExtra(OTPApp.BUNDLE_KEY_TRIP_TIME, departureTimeHeader.getText().toString().substring(0,5));
+        intent.putExtra(OTPApp.BUNDLE_KEY_TRIP_HOUR, tripHour);
+        intent.putExtra(OTPApp.BUNDLE_KEY_TRIP_MINUTES, tripMinutes);
+        getActivity().startService(intent);
+    }
+
+    private void setCalendarItinerary() {
+        // Obtaining of the selected itinerary, along with its relevant parameters
+        int selecItinID = (int)tripList.getSelectedItemId();
+        Itinerary itinerary = otpBundle.getItineraryList().get(selecItinID);
+        long startTime = Long.parseLong(itinerary.startTime);
+        long endTime = Long.parseLong(itinerary.endTime);
+        String departure = (fromHeader.getText().toString().split(","))[0];
+        String arrival = (toHeader.getText().toString().split(","))[0];
+        String tripDescription = departure + " → " + arrival;
+
+        Intent intent = new Intent(Intent.ACTION_INSERT);
+        intent.setData(CalendarContract.Events.CONTENT_URI);
+        intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startTime);
+        intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime);
+        intent.putExtra(CalendarContract.Events.TITLE, tripDescription);
+        intent.putExtra(CalendarContract.Events.EVENT_LOCATION, departure);
+        startActivity(intent);
     }
 
     @Override

@@ -28,6 +28,7 @@ import com.google.android.gms.maps.model.Marker;
 import java.util.Map;
 
 import edu.usf.cutr.opentripplanner.android.R;
+import edu.usf.cutr.opentripplanner.android.fragments.MainFragment;
 
 public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter{
 
@@ -36,6 +37,8 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter{
     private Map<Marker, TripInfo> markers;
 
     private Context context;
+
+    private MainFragment mainFragment;
 
     public CustomInfoWindowAdapter(LayoutInflater layoutInflater, Context context){
         this.layoutInflater = layoutInflater;
@@ -92,11 +95,16 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter{
                 liveUpdatesText.setText(delayFullText);
             }
         }
+        mainFragment.showStreetViewBtn(true, marker.getPosition());
 
         return view;
     }
 
     public void setMarkers(Map<Marker, TripInfo> markers) {
         this.markers = markers;
+    }
+
+    public void setMainFragment(MainFragment mainFragment) {
+        this.mainFragment = mainFragment;
     }
 }

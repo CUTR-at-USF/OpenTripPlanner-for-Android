@@ -347,6 +347,21 @@
         <!-- Title -->
         <string name="step_by_step_title">Reiseplan</string>
 
+        <!-- Choose itinerary button -->
+        <string name="step_by_step_choose_itinerary_title">Diese Reiseroute wählen</string>
+        <string name="step_by_step_choose_itinerary_notifications">Benachrichtung erhalten</string>
+        <string name="step_by_step_choose_itinerary_calendar">In den Kalender eintragen</string>
+        <string name="step_by_step_choose_itinerary_alarm">Einen Alarm stellen</string>
+            <!-- Alarm setting -->
+            <string name="step_by_step_choose_itinerary_alarm_label">Name des Alarms</string>
+            <string name="initial_monday">M</string>
+            <string name="initial_tuesday">D</string>
+            <string name="initial_wednesday">M</string>
+            <string name="initial_thursday">D</string>
+            <string name="initial_friday">F</string>
+            <string name="initial_saturday">S</string>
+            <string name="initial_sunday">S</string>
+
         <!-- Top headers -->
         <string name="step_by_step_header_from">Von</string>
         <string name="step_by_step_header_to">Nach</string>
@@ -456,7 +471,7 @@
 
     <!-- About screen -->
 
-        <!-- App desctiption -->
+        <!-- App description -->
 
             <!-- App name -->
             <string name="about_screen_app_full_name">OpenTripPlanner für Android</string>

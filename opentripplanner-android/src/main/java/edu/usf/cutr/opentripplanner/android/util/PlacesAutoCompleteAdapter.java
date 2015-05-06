@@ -6,8 +6,12 @@ import android.widget.Filter;
 import android.widget.Filterable;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
+import edu.usf.cutr.opentripplanner.android.model.AddressModel;
 import edu.usf.cutr.opentripplanner.android.model.Server;
+import edu.usf.cutr.opentripplanner.android.sqlite.RecentAddressDb;
 import edu.usf.cutr.opentripplanner.android.util.CustomAddress;
 
 public class PlacesAutoCompleteAdapter extends ArrayAdapter<CustomAddress> implements Filterable {
@@ -44,16 +48,27 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<CustomAddress> imple
             @Override
             protected Filter.FilterResults performFiltering(CharSequence constraint) {
                 FilterResults filterResults = new FilterResults();
-                if (constraint != null) {
+                if (constraint != null && constraint.length() > 0) {
                     // Retrieve the autocomplete results.
                         resultList = LocationUtil.processGeocoding(context, selectedServer,
                                 constraint.toString());
-                    if (resultList != null){
-                        // Assign the data to the FilterResults
-                        filterResults.values = resultList;
-                        filterResults.count = resultList.size();
+                }else if (constraint != null && constraint.length() == 0){
+                    //Retrieve recently used addresses
+                    List<AddressModel> addreses = RecentAddressDb.getInstance(context).getAllAddresses();
+                    if(addreses != null){
+                        resultList.clear();
+                        Locale locale = context.getResources().getConfiguration().locale;
+                        for(AddressModel a : addreses){
+                            resultList.add(a.getAsCustomAddress(locale));
+                        }
                     }
                 }
+                if (resultList != null){
+                    // Assign the data to the FilterResults
+                    filterResults.values = resultList;
+                    filterResults.count = resultList.size();
+                }
+
                 return filterResults;
             }
 

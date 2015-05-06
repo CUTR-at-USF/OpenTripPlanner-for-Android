@@ -26,4 +26,5 @@
     <color name="sysRedFaded">#50FF0000</color>
     <color name="sysWhiteFaded">#50FFFFFF</color>
     <color name="sysYellowFaded">#50FFFF00</color>
+    <color name="transparent">#00000000</color>
 </resources>

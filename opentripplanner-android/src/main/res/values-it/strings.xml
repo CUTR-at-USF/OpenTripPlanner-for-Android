@@ -348,6 +348,19 @@
         <!-- Title -->
         <string name="step_by_step_title">Direzione</string>
 
+        <!-- Choose itinerary button -->
+        <string name="step_by_step_choose_itinerary_title">Scegliere questo itinerario</string>
+        <string name="step_by_step_choose_itinerary_notifications">Ricevere le notifiche</string>
+        <string name="step_by_step_choose_itinerary_alarm">Impostare una sveglia</string>
+            <!-- Alarm setting -->
+            <string name="initial_monday">L</string>
+            <string name="initial_tuesday">M</string>
+            <string name="initial_wednesday">M</string>
+            <string name="initial_thursday">G</string>
+            <string name="initial_friday">V</string>
+            <string name="initial_saturday">S</string>
+            <string name="initial_sunday">D</string>
+
         <!-- Top headers -->
         <string name="step_by_step_header_from">Da</string>
         <string name="step_by_step_header_to">A</string>
@@ -457,7 +470,7 @@
 
     <!-- About screen -->
 
-        <!-- App desctiption -->
+        <!-- App description -->
 
             <!-- App name -->
             <!--<string name="about_screen_app_full_name">OpenTripPlanner for Android</string>-->

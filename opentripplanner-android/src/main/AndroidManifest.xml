@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   Copyright 2012 University of South Florida
-  
+
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
-  
+
          http://www.apache.org/licenses/LICENSE-2.0
-  
+
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and 
+  See the License for the specific language governing permissions and
   limitations under the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -21,6 +21,9 @@
 
     <!-- To plan trip from/to contact address -->
     <uses-permission android:name="android.permission.READ_CONTACTS"/>
+
+    <!-- To set an alarm for a trip -->
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM"/>
 
     <!-- Android Maps API V2 -->
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
@@ -54,24 +57,60 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="edu.usf.cutr.opentripplanner.android.OpenTripPlanner.WIDGET_SEARCH"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
         <activity
                 android:name=".SettingsActivity"
                 android:theme="@style/MyTheme"
-                android:windowSoftInputMode="stateHidden"></activity>
+                android:windowSoftInputMode="stateHidden"/>
         <activity
                 android:name=".AboutActivity"
                 android:theme="@style/MyTheme"
-                android:windowSoftInputMode="stateHidden"></activity>
+                android:windowSoftInputMode="stateHidden"/>
         <activity
                 android:name=".AboutPlayServicesActivity"
                 android:theme="@style/MyTheme"
-                android:windowSoftInputMode="stateHidden"></activity>
+                android:windowSoftInputMode="stateHidden"/>
+        <activity
+            android:name=".AddressFavActivity"
+            android:theme="@style/MyTheme"
+            android:windowSoftInputMode="stateHidden"/>
+
+        <activity
+            android:name=".AlarmActivity"
+            android:theme="@style/MyTheme"
+            android:windowSoftInputMode="stateHidden"/>
+
+        <activity
+            android:name=".OTPAppWidgetLocationActivity"
+            android:theme="@style/Theme.Transparent">
+            <intent-filter>
+                <action android:name="edu.usf.cutr.opentripplanner.android.OpenTripPlanner.GET_MY_LOCATION_STRING"/>
+                <action android:name="edu.usf.cutr.opentripplanner.android.OpenTripPlanner.GET_END_LOCATION_STRING"/>
+            </intent-filter>
+        </activity>
+
+        <service android:name=".NotificationService" />
 
         <meta-data
                 android:name="com.google.android.maps.v2.API_KEY"
-                android:value="AIzaSyD5XadJhAK7jIKFz5TcT7t-gsWw_OTvlBI"/>
+                android:value="AIzaSyALtmLxXCR2t7XhB7EHFJ1_CSI8Henkntk"/>
+
+        <receiver
+            android:name="OTPAppWidgetProvider"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="edu.usf.cutr.opentripplanner.android.OpenTripPlanner.WIDGET_SEARCH" />
+                <action android:name="edu.usf.cutr.opentripplanner.android.OpenTripPlanner.SEND_MY_LOCATION_STRING" />
+                <action android:name="edu.usf.cutr.opentripplanner.android.OpenTripPlanner.SEND_END_LOCATION_STRING" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget" />
+        </receiver>
     </application>
 
 

@@ -348,6 +348,26 @@
         <!-- Title -->
         <string name="step_by_step_title">Feuille de route</string>
 
+        <!-- Choose itinerary button -->
+        <string name="step_by_step_choose_itinerary_title">Choisir cet itinéraire</string>
+        <string name="step_by_step_choose_itinerary_notifications">Recevoir des notifications</string>
+        <string name="step_by_step_choose_itinerary_calendar">Créer un événement dans l\'agenda</string>
+        <string name="step_by_step_choose_itinerary_alarm">Définir une alarme</string>
+            <!-- Alarm setting -->
+            <string name="step_by_step_choose_itinerary_alarm_label">Intitulé de l\'alarme</string>
+            <string name="step_by_step_choose_itinerary_alarm_repetition">Répéter</string>
+            <string name="initial_monday">L</string>
+            <string name="initial_tuesday">M</string>
+            <string name="initial_wednesday">M</string>
+            <string name="initial_thursday">J</string>
+            <string name="initial_friday">V</string>
+            <string name="initial_saturday">S</string>
+            <string name="initial_sunday">D</string>
+            <!-- Notifications feature -->
+            <string name="step_by_step_choose_itinerary_notifications_remaining_time_begin">minute(s) avant le départ (</string>
+            <string name="step_by_step_choose_itinerary_notifications_departure_now">Départ immédiat !</string>
+            <string name="step_by_step_choose_itinerary_notifications_departure_over">Heure de départ dépassée.</string>
+
         <!-- Top headers -->
         <string name="step_by_step_header_from">De</string>
         <string name="step_by_step_header_to">À</string>

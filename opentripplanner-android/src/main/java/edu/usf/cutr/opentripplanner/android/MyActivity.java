@@ -29,6 +29,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.View;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -39,16 +40,19 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.prefs.PreferenceChangeEvent;
+import java.util.Locale;
 
 import edu.usf.cutr.opentripplanner.android.fragments.DirectionListFragment;
 import edu.usf.cutr.opentripplanner.android.fragments.MainFragment;
 import edu.usf.cutr.opentripplanner.android.listeners.DateCompleteListener;
 import edu.usf.cutr.opentripplanner.android.listeners.OtpFragment;
+import edu.usf.cutr.opentripplanner.android.model.AddressModel;
 import edu.usf.cutr.opentripplanner.android.model.OTPBundle;
 import edu.usf.cutr.opentripplanner.android.model.Server;
 import edu.usf.cutr.opentripplanner.android.sqlite.ServersDataSource;
 import edu.usf.cutr.opentripplanner.android.tasks.ServerChecker;
+import edu.usf.cutr.opentripplanner.android.util.AutoCompleteTextViewFromZero;
+import edu.usf.cutr.opentripplanner.android.util.CustomAddress;
 
 /**
  * Main Activity for the OTP for Android app
@@ -98,6 +102,23 @@ public class MyActivity extends FragmentActivity implements OtpFragment {
             fragmentTransaction
                     .replace(R.id.mainFragment, mainFragment, OTPApp.TAG_FRAGMENT_MAIN_FRAGMENT);
             fragmentTransaction.commit();
+        }
+
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        String type = intent.getType();
+        Log.d(OTPApp.TAG,"OnCreate with Intent action " + action);
+        if(OTPApp.INTENT_WIDGET_SEARCH.equals(action) && type != null){
+            if("text/plain".equals(type)){
+                if(intent.getStringExtra("StartLocation")!=null && mainFragment != null) {
+                    Log.d(OTPApp.TAG,"StartLocation: " + intent.getStringExtra("StartLocation"));
+                    mainFragment.setWidgetLocation(intent.getStringExtra("StartLocation"), true);
+                }
+                if(intent.getStringExtra("EndLocation")!=null && mainFragment != null) {
+                    Log.d(OTPApp.TAG,"EndLocation: " + intent.getStringExtra("EndLocation"));
+                    mainFragment.setWidgetLocation(intent.getStringExtra("EndLocation"), false);
+                }
+            }
         }
 
     }
@@ -161,8 +182,8 @@ public class MyActivity extends FragmentActivity implements OtpFragment {
                     if (changedParametersMustRequestTrip) {
                         mainFragment.processRequestTrip();
                     }
-                    break;
                 }
+                break;
             case OTPApp.CHOOSE_CONTACT_REQUEST_CODE:
                 if (resultCode == RESULT_OK) {
                     Log.d(OTPApp.TAG, "CHOOSE CONTACT RESULT OK");
@@ -188,8 +209,66 @@ public class MyActivity extends FragmentActivity implements OtpFragment {
                         mainFragment.processRequestTrip();
                     }
 
-                    break;
                 }
+                break;
+            case OTPApp.CHOOSE_ADDRESS_REQUEST_CODE:
+                if (resultCode == RESULT_OK) {
+                    Log.d(OTPApp.TAG, "CHOOSE ADDRESS RESULT OK");
+
+                    Bundle res = data.getExtras();
+                    String address = res.getString(AddressFavActivity.FAVOURITE_ADDRESS_RESULT_PARAM_NAME);
+                    double latitude = res.getDouble(AddressFavActivity.FAVOURITE_ADDRESS_RESULT_PARAM_LAT);
+                    double longitude = res.getDouble(AddressFavActivity.FAVOURITE_ADDRESS_RESULT_PARAM_LONG);
+
+                    boolean coordsMissing = (latitude == AddressFavActivity.FAVOURITE_ADDRESS_RESULT_PARAM_ERROR_DOUBLE || longitude == AddressFavActivity.FAVOURITE_ADDRESS_RESULT_PARAM_ERROR_DOUBLE);
+                    mainFragment.setTextBoxLocation(address, isButtonStartLocation);
+                    mainFragment.setStar(isButtonStartLocation);
+
+                    SharedPreferences.Editor prefsEditor = PreferenceManager
+                            .getDefaultSharedPreferences(this).edit();
+                    if (isButtonStartLocation){
+                        prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_ORIGIN_IS_MY_LOCATION, false);
+                    }
+                    else{
+                        prefsEditor.putBoolean(OTPApp.PREFERENCE_KEY_DESTINATION_IS_MY_LOCATION, false);
+                    }
+                    prefsEditor.commit();
+                    if(coordsMissing)
+                        mainFragment.processAddress(isButtonStartLocation, address, false);
+                    else{
+                        AddressModel a = new AddressModel(address, latitude, longitude, true, true);
+
+                        mainFragment.useNewAddress(isButtonStartLocation, a.getAsCustomAddress(getResources().getConfiguration().locale), false);
+                    }
+                    mainFragment.setStar(isButtonStartLocation);
+                    mainFragment.processRequestTrip();
+                }
+                else {
+                    mainFragment.refreshStar(isButtonStartLocation);
+                }
+                break;
+        }
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        String type = intent.getType();
+        Log.d(OTPApp.TAG,"On Resume with Intent action " + action);
+        if(action != null && type != null){
+            if("text/plain".equals(type)){
+                if(intent.getStringExtra("StartLocation")!=null && mainFragment != null) {
+                    Log.d(OTPApp.TAG,"StartLocation: " + intent.getStringExtra("StartLocation"));
+                    mainFragment.setWidgetLocation(intent.getStringExtra("StartLocation"), true);
+                }
+                if(intent.getStringExtra("EndLocation")!=null && mainFragment != null) {
+                    Log.d(OTPApp.TAG,"EndLocation: " + intent.getStringExtra("EndLocation"));
+                    mainFragment.setWidgetLocation(intent.getStringExtra("EndLocation"), false);
+                }
+            }
         }
     }
 
