@@ -70,6 +70,7 @@
                 android:windowSoftInputMode="stateHidden"></activity>
 
         <service android:name=".tasks.MetadataRequest" android:exported="false"/>
+        <service android:name=".tasks.OTPGeocoding" android:exported="false"/>
 
         <meta-data
                 android:name="com.google.android.maps.v2.API_KEY"
