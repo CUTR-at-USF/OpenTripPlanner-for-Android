@@ -22,10 +22,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opentripplanner.api.ws.GraphMetadata;
 
 import android.app.Activity;
+import android.app.IntentService;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -41,52 +45,22 @@ import edu.usf.cutr.opentripplanner.android.listeners.MetadataRequestCompleteLis
 /**
  * @author Khoa Tran
  */
+public class MetadataRequest extends IntentService {
+    ObjectMapper mapper;
 
-public class MetadataRequest extends AsyncTask<String, Integer, GraphMetadata> {
-
-    private ProgressDialog progressDialog;
-
-    private WeakReference<Activity> activity;
-
-    private Context context;
-
-    private MetadataRequestCompleteListener callback;
-
-    private static ObjectMapper mapper = null;
-
-    public MetadataRequest(WeakReference<Activity> activity, Context context,
-            MetadataRequestCompleteListener callback) {
-        this.activity = activity;
-        this.context = context;
-        this.callback = callback;
-        Activity activityRetrieved = activity.get();
-        if (activityRetrieved != null) {
-            progressDialog = new ProgressDialog(activityRetrieved);
-        }
+    public MetadataRequest() {
+        super("MetadataRequest");
     }
 
-    protected void onPreExecute() {
-        if (activity.get() != null) {
-            progressDialog.setIndeterminate(true);
-            progressDialog.setCancelable(true);
-            Activity activityRetrieved = activity.get();
-            if (activityRetrieved != null) {
-                progressDialog = ProgressDialog.show(activityRetrieved, "",
-                        context.getResources().getString(R.string.task_progress_metadata_progress), true);
-            }
-        }
-    }
-
-    protected GraphMetadata doInBackground(String... reqs) {
-        String prefix = PreferenceManager.getDefaultSharedPreferences(context)
-                .getString(OTPApp.PREFERENCE_KEY_FOLDER_STRUCTURE_PREFIX
-                        , OTPApp.FOLDER_STRUCTURE_PREFIX_NEW);
-        String u = reqs[0] + prefix + OTPApp.METADATA_LOCATION;
+    public void onHandleIntent(Intent intent) {
+        String reqs = intent.getStringExtra("reqs");
+        String prefix = PreferenceManager.getDefaultSharedPreferences(this)
+                .getString(OTPApp.PREFERENCE_KEY_FOLDER_STRUCTURE_PREFIX,
+                        OTPApp.FOLDER_STRUCTURE_PREFIX_NEW);
+        String u = reqs + prefix + OTPApp.METADATA_LOCATION;
         Log.d(OTPApp.TAG, "URL: " + u);
-
         HttpURLConnection urlConnection = null;
         GraphMetadata metadata = null;
-
         try {
             URL url = new URL(u);
             if (mapper == null) {
@@ -106,11 +80,38 @@ public class MetadataRequest extends AsyncTask<String, Integer, GraphMetadata> {
                 urlConnection.disconnect();
             }
         }
-        return metadata;
+        Intent resultIntent = new Intent(intent.getStringExtra("FILTER"));
+        resultIntent.putExtra("metadata", metadata);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(resultIntent);
     }
 
-    protected void onPostExecute(GraphMetadata metadata) {
-        if (activity.get() != null) {
+    public static class MetadataRequestReceiver extends BroadcastReceiver {
+
+        private ProgressDialog progressDialog;
+
+        private Activity activity;
+
+        private Context context;
+
+        private MetadataRequestCompleteListener callback;
+
+        public MetadataRequestReceiver(Activity activity, Context context,
+                MetadataRequestCompleteListener callback) {
+            this.activity = activity;
+            this.context = context;
+            this.callback = callback;
+            progressDialog = new ProgressDialog(activity);
+        }
+
+        public void showProgressDialog() {
+            progressDialog.setIndeterminate(true);
+            progressDialog.setCancelable(true);
+            progressDialog = ProgressDialog.show(activity, "",
+                    context.getResources().getString(R.string.task_progress_metadata_progress), true);
+        }
+
+        public void onReceive(Context receiverContext, Intent receiverIntent) {
+            GraphMetadata metadata = (GraphMetadata) receiverIntent.getSerializableExtra("metadata");
             try {
                 if (progressDialog != null && progressDialog.isShowing()) {
                     progressDialog.dismiss();
@@ -118,18 +119,19 @@ public class MetadataRequest extends AsyncTask<String, Integer, GraphMetadata> {
             } catch (Exception e) {
                 Log.e(OTPApp.TAG, "Error in Metadata Request PostExecute dismissing dialog: " + e);
             }
-        }
 
-        if (metadata != null) {
-            Toast.makeText(context,
-                    context.getResources().getString(R.string.toast_metadata_request_successful),
-                    Toast.LENGTH_SHORT).show();
-            callback.onMetadataRequestComplete(metadata, true);
-        } else {
-            Toast.makeText(context, context.getResources().getString(R.string.toast_server_checker_info_error),
-                    Toast.LENGTH_SHORT).show();
+            if (metadata != null) {
+                Toast.makeText(context,
+                        context.getResources().getString(R.string.toast_metadata_request_successful),
+                        Toast.LENGTH_SHORT).show();
+                callback.onMetadataRequestComplete(metadata, true);
+            } else {
+                Toast.makeText(context, context.getResources().getString(R.string.toast_server_checker_info_error),
+                        Toast.LENGTH_SHORT).show();
 
-            Log.e(OTPApp.TAG, "No metadata!");
+                Log.e(OTPApp.TAG, "No metadata!");
+            }
         }
     }
 }
+
