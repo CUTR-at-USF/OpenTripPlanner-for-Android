@@ -169,6 +169,7 @@ import edu.usf.cutr.opentripplanner.android.tasks.OTPGeocoding.OTPGeocodingRecei
 import edu.usf.cutr.opentripplanner.android.tasks.RequestTimesForTrips;
 import edu.usf.cutr.opentripplanner.android.tasks.ServerChecker;
 import edu.usf.cutr.opentripplanner.android.tasks.ServerSelector;
+import edu.usf.cutr.opentripplanner.android.tasks.ServerSelector.ServerSelectorReceiver;
 import edu.usf.cutr.opentripplanner.android.tasks.TripRequest;
 import edu.usf.cutr.opentripplanner.android.util.BikeRentalStationInfo;
 import edu.usf.cutr.opentripplanner.android.util.ConversionUtils;
@@ -198,6 +199,8 @@ public class MainFragment extends Fragment implements
         GooglePlayServicesClient.ConnectionCallbacks,
         GoogleMap.OnCameraChangeListener {
 
+    public static final String SERVERSELECTOR_FILTER = "MainFragment_mServerSelectorReceiver";
+    public static final String SERVERSELECTOR_NOLOCATION_FILTER = "MainFragment_mServerSelectorReceiverNoLocation";
     public static final String METADATA_FILTER = "MainFragment_metadatRequestReceiver";
     public static final String OTPGEOCODING_FILTER = "MainFragment_otpGeocodingReceiver";
 
@@ -368,6 +371,10 @@ public class MainFragment extends Fragment implements
 
     private OTPGeocodingReceiver mOtpGeocodingReceiver;
 
+    private ServerSelectorReceiver mServerSelectorReceiver;
+
+    private ServerSelectorReceiver mServerSelectorReceiverNoLocation;
+
     @SuppressWarnings("deprecation")
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private static void removeOnGlobalLayoutListener(View v,
@@ -417,6 +424,12 @@ public class MainFragment extends Fragment implements
         }
         if (mOtpGeocodingReceiver != null) {
             LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mOtpGeocodingReceiver);
+        }
+        if (mServerSelectorReceiver != null) {
+            LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mServerSelectorReceiver);
+        }
+        if (mServerSelectorReceiverNoLocation != null) {
+            LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mServerSelectorReceiverNoLocation);
         }
     }
 
@@ -2109,11 +2122,16 @@ public class MainFragment extends Fragment implements
                     Toast.LENGTH_LONG).show();
         } else {
             ServersDataSource dataSource = ServersDataSource.getInstance(mApplicationContext);
-            WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
-
-            ServerSelector serverSelector = new ServerSelector(weakContext, mApplicationContext,
-                    dataSource, this, mNeedToUpdateServersList, showDialog);
-            serverSelector.execute(mCurrentLatLng);
+            mServerSelectorReceiver = new ServerSelectorReceiver(getActivity(), mApplicationContext,
+                    dataSource, this, showDialog);
+            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mServerSelectorReceiver,
+                    new IntentFilter(SERVERSELECTOR_FILTER));
+            Intent serverSelector = new Intent(getActivity(), ServerSelector.class);
+            mServerSelectorReceiver.showProgressDialog();
+            serverSelector.putExtra("latLng", mCurrentLatLng);
+            serverSelector.putExtra("mustRefreshList", mNeedToUpdateServersList);
+            serverSelector.putExtra("FILTER", SERVERSELECTOR_FILTER);
+            getActivity().startService(serverSelector);
             mSavedLastLocationCheckedForServer = mCurrentLatLng;
         }
         setNeedToRunAutoDetect(false);
@@ -2130,13 +2148,16 @@ public class MainFragment extends Fragment implements
      */
     public void runAutoDetectServerNoLocation(boolean showDialog) {
         ServersDataSource dataSource = ServersDataSource.getInstance(mApplicationContext);
-        WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
+        mServerSelectorReceiverNoLocation = new ServerSelectorReceiver(getActivity(), mApplicationContext,
+                dataSource, this, showDialog);
+        LocalBroadcastManager.getInstance(getActivity())
+            .registerReceiver(mServerSelectorReceiverNoLocation, new IntentFilter(SERVERSELECTOR_NOLOCATION_FILTER));
+        Intent serverSelector = new Intent(getActivity(), ServerSelector.class);
+        mServerSelectorReceiverNoLocation.showProgressDialog();
+        serverSelector.putExtra("mustRefreshList", mNeedToUpdateServersList);
+        serverSelector.putExtra("FILTER", SERVERSELECTOR_NOLOCATION_FILTER);
+        getActivity().startService(serverSelector);
 
-        ServerSelector serverSelector = new ServerSelector(weakContext, mApplicationContext,
-                dataSource, this, mNeedToUpdateServersList, showDialog);
-        LatLng latLngList[] = new LatLng[1];
-        latLngList[0] = null;
-        serverSelector.execute(latLngList);
         setNeedToRunAutoDetect(false);
         setNeedToUpdateServersList(false);
     }
