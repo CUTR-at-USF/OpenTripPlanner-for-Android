@@ -16,6 +16,8 @@
 
 package edu.usf.cutr.opentripplanner.android.tasks;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -29,8 +31,6 @@ import android.util.Log;
 import android.webkit.URLUtil;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import com.google.android.gms.maps.model.LatLng;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -317,9 +317,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
         boolean isInBoundingBox;
         Server server = null;
         for (Server knownServer : knownServers) {
-            // Check bounds here to find server - acceptable error is set to 1000m = 1km
-            isInBoundingBox = LocationUtil
-                    .checkPointInBoundingBox(currentLocation, knownServer, 1000);
+            isInBoundingBox = LocationUtil.checkPointInBoundingBox(currentLocation, knownServer);
 
             if (isInBoundingBox) {
                 server = knownServer;

@@ -22,8 +22,6 @@ public class BoundsTest extends AndroidTestCase {
 
     public static final String TAG = "BoundsTest";
 
-    public static final int ACCEPTABLE_ERROR = 10; // meters
-
     Server serverTampa = new Server();
 
     Server serverPortland = new Server();
@@ -40,6 +38,8 @@ public class BoundsTest extends AndroidTestCase {
     Server serverFijiIDL = new Server();
 
     Server serverChukotkaPeninsulaIDL = new Server();
+
+    Server serverUnitedStates = new Server();
 
     @Override
     protected void setUp() throws Exception {
@@ -112,6 +112,14 @@ public class BoundsTest extends AndroidTestCase {
         serverChukotkaPeninsulaIDL.setContactName("Unknown");
         serverChukotkaPeninsulaIDL.setContactEmail("Unknown");
 
+        // United States
+        serverUnitedStates.setRegion("United States");
+        serverUnitedStates.setBaseURL("http://us-server.com");
+        serverUnitedStates.setBounds("24.5454892,-124.16933,49.273757,-69.965541");
+        serverUnitedStates.setLanguage("en_US");
+        serverUnitedStates.setContactName("Unknown");
+        serverUnitedStates.setContactEmail("Unknown");
+
         super.setUp();
     }
 
@@ -119,96 +127,100 @@ public class BoundsTest extends AndroidTestCase {
         // Tampa server
         LatLng pointInTampa1 = new LatLng(27.9710, -82.4650);
         Assert.assertTrue(
-                LocationUtil.checkPointInBoundingBox(pointInTampa1, serverTampa, ACCEPTABLE_ERROR));
+                LocationUtil.checkPointInBoundingBox(pointInTampa1, serverTampa));
 
         LatLng pointOutOfTampa1 = new LatLng(45.416, -122.839);
         Assert.assertFalse(LocationUtil
-                .checkPointInBoundingBox(pointOutOfTampa1, serverTampa, ACCEPTABLE_ERROR));
+                .checkPointInBoundingBox(pointOutOfTampa1, serverTampa));
 
         // Portland server
         LatLng pointInPortland1 = new LatLng(45.518, -122.6800);
         Assert.assertTrue(LocationUtil
-                .checkPointInBoundingBox(pointInPortland1, serverPortland, ACCEPTABLE_ERROR));
+                .checkPointInBoundingBox(pointInPortland1, serverPortland));
 
         LatLng pointOutOfPortland1 = new LatLng(45.416, -122.939);
         Assert.assertFalse(LocationUtil
-                .checkPointInBoundingBox(pointOutOfPortland1, serverPortland, ACCEPTABLE_ERROR));
+                .checkPointInBoundingBox(pointOutOfPortland1, serverPortland));
 
         // Greenville server
         LatLng pointInGreenville1 = new LatLng(34.84733, -82.39693);
         Assert.assertTrue(LocationUtil
-                .checkPointInBoundingBox(pointInGreenville1, serverGreenville, ACCEPTABLE_ERROR));
+                .checkPointInBoundingBox(pointInGreenville1, serverGreenville));
 
         LatLng pointOutOfGreenville1 = new LatLng(45.416, -122.839);
         Assert.assertFalse(LocationUtil
-                .checkPointInBoundingBox(pointOutOfGreenville1, serverGreenville,
-                        ACCEPTABLE_ERROR));
+                .checkPointInBoundingBox(pointOutOfGreenville1, serverGreenville));
 
         // Calgary server
         LatLng pointInCalgary1 = new LatLng(50.7100302, -114.6108674);
         Assert.assertTrue(LocationUtil
-                .checkPointInBoundingBox(pointInCalgary1, serverCalgary, ACCEPTABLE_ERROR));
+                .checkPointInBoundingBox(pointInCalgary1, serverCalgary));
 
         LatLng pointOutOfCalgary1 = new LatLng(45.416, -122.839);
         Assert.assertFalse(LocationUtil
-                .checkPointInBoundingBox(pointOutOfCalgary1, serverCalgary, ACCEPTABLE_ERROR));
+                .checkPointInBoundingBox(pointOutOfCalgary1, serverCalgary));
 
         // Porto server
         LatLng pointInPorto1 = new LatLng(41.1554, -8.6078);
         Assert.assertTrue(
-                LocationUtil.checkPointInBoundingBox(pointInPorto1, serverPorto, ACCEPTABLE_ERROR));
+                LocationUtil.checkPointInBoundingBox(pointInPorto1, serverPorto));
 
         LatLng pointOutOfPorto1 = new LatLng(45.416, -122.839);
         Assert.assertFalse(LocationUtil
-                .checkPointInBoundingBox(pointOutOfPorto1, serverPorto, ACCEPTABLE_ERROR));
+                .checkPointInBoundingBox(pointOutOfPorto1, serverPorto));
 
         // Portland big bounds server
         LatLng pointInPortlandBigBounds1 = new LatLng(45.518, -122.6800);
         Assert.assertTrue(LocationUtil
-                .checkPointInBoundingBox(pointInPortlandBigBounds1, serverPortlandBigBounds,
-                        ACCEPTABLE_ERROR));
+                .checkPointInBoundingBox(pointInPortlandBigBounds1, serverPortlandBigBounds));
 
         LatLng pointOutOfPortlandBigBounds1 = new LatLng(27.9710, -82.4650);
         Assert.assertFalse(LocationUtil
-                .checkPointInBoundingBox(pointOutOfPortlandBigBounds1, serverPortlandBigBounds,
-                        ACCEPTABLE_ERROR));
+                .checkPointInBoundingBox(pointOutOfPortlandBigBounds1, serverPortlandBigBounds));
 
         // FijiIDL server
         LatLng pointInFijiIDLPositive = new LatLng(-16.407, -179.8141);
         Assert.assertTrue(LocationUtil
-                .checkPointInBoundingBox(pointInFijiIDLPositive, serverFijiIDL, ACCEPTABLE_ERROR));
+                .checkPointInBoundingBox(pointInFijiIDLPositive, serverFijiIDL));
 
         LatLng pointOutOfFijiIDLPositive = new LatLng(-17.6995, 175.6581);
         Assert.assertFalse(LocationUtil
-                .checkPointInBoundingBox(pointOutOfFijiIDLPositive, serverFijiIDL,
-                        ACCEPTABLE_ERROR));
+                .checkPointInBoundingBox(pointOutOfFijiIDLPositive, serverFijiIDL));
 
         LatLng pointInFijiIDLNegative = new LatLng(-16.9089, -179.8151);
         Assert.assertTrue(LocationUtil
-                .checkPointInBoundingBox(pointInFijiIDLNegative, serverFijiIDL, ACCEPTABLE_ERROR));
+                .checkPointInBoundingBox(pointInFijiIDLNegative, serverFijiIDL));
 
         LatLng pointOutOfFijiIDLNegative = new LatLng(-16.5907, -178.8570);
         Assert.assertFalse(LocationUtil
-                .checkPointInBoundingBox(pointOutOfFijiIDLNegative, serverFijiIDL,
-                        ACCEPTABLE_ERROR));
+                .checkPointInBoundingBox(pointOutOfFijiIDLNegative, serverFijiIDL));
 
         // ChukotkaPeninsulaIDL server
         LatLng pointInChukotkaPeninsulaIDLPositive = new LatLng(66.8878, 179.1520);
         Assert.assertTrue(LocationUtil.checkPointInBoundingBox(pointInChukotkaPeninsulaIDLPositive,
-                serverChukotkaPeninsulaIDL, ACCEPTABLE_ERROR));
+                serverChukotkaPeninsulaIDL));
 
         LatLng pointOutOfChukotkaPeninsulaIDLPositive = new LatLng(-17.6995, 175.6581);
         Assert.assertFalse(LocationUtil
                 .checkPointInBoundingBox(pointOutOfChukotkaPeninsulaIDLPositive,
-                        serverChukotkaPeninsulaIDL, ACCEPTABLE_ERROR));
+                        serverChukotkaPeninsulaIDL));
 
         LatLng pointInChukotkaPeninsulaIDLNegative = new LatLng(67.2878, -179.7276);
         Assert.assertTrue(LocationUtil.checkPointInBoundingBox(pointInChukotkaPeninsulaIDLNegative,
-                serverChukotkaPeninsulaIDL, ACCEPTABLE_ERROR));
+                serverChukotkaPeninsulaIDL));
 
         LatLng pointOutOfChukotkaPeninsulaIDLNegative = new LatLng(67.2878, -178.7276);
         Assert.assertFalse(LocationUtil
                 .checkPointInBoundingBox(pointOutOfChukotkaPeninsulaIDLNegative,
-                        serverChukotkaPeninsulaIDL, ACCEPTABLE_ERROR));
+                        serverChukotkaPeninsulaIDL));
+
+        // USA server
+        LatLng pointInUsaPositive = new LatLng(28.05866283764341, -82.41802878677845);
+        Assert.assertTrue(LocationUtil.checkPointInBoundingBox(pointInUsaPositive,
+                serverUnitedStates));
+
+        LatLng pointOutOfUsaPositive = new LatLng(67.2878, -178.7276);
+        Assert.assertFalse(LocationUtil
+                .checkPointInBoundingBox(pointOutOfUsaPositive, serverUnitedStates));
     }
 }

@@ -696,8 +696,7 @@ public class MainFragment extends Fragment implements
                 LatLng markerLatlng = marker.getPosition();
 
                 if (((mOTPApp.getSelectedServer() != null) && LocationUtil
-                        .checkPointInBoundingBox(markerLatlng, mOTPApp.getSelectedServer(),
-                                OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))
+                        .checkPointInBoundingBox(markerLatlng, mOTPApp.getSelectedServer()))
                         || (mOTPApp.getSelectedServer() == null)) {
                     if ((mStartMarker != null) && (marker.hashCode() == mStartMarker.hashCode())) {
                         if (mPrefs
@@ -2246,8 +2245,7 @@ public class MainFragment extends Fragment implements
         SharedPreferences.Editor prefsEditor = mPrefs.edit();
 
         if (((mOTPApp.getSelectedServer() != null) && LocationUtil
-                .checkPointInBoundingBox(latlng, mOTPApp.getSelectedServer(),
-                        OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))
+                .checkPointInBoundingBox(latlng, mOTPApp.getSelectedServer()))
                 || (mOTPApp.getSelectedServer() == null)) {
             if (showMessage) {
                 String toastText;
@@ -2682,8 +2680,7 @@ public class MainFragment extends Fragment implements
                     LatLng mCurrentLatLng = getLastLocation();
 
                     if ((mCurrentLatLng != null) && (LocationUtil
-                            .checkPointInBoundingBox(mCurrentLatLng, server,
-                                    OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))) {
+                            .checkPointInBoundingBox(mCurrentLatLng, server))) {
                         mMap.animateCamera(CameraUpdateFactory
                                 .newLatLngZoom(mCurrentLatLng, getServerInitialZoom(server)));
                     } else {
@@ -3556,8 +3553,7 @@ public class MainFragment extends Fragment implements
 
                 if (updateUI){
                     if ((mCurrentLatLng != null) && (LocationUtil
-                            .checkPointInBoundingBox(mCurrentLatLng, selectedServer,
-                                    OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))) {
+                            .checkPointInBoundingBox(mCurrentLatLng, selectedServer))) {
                         mMap.animateCamera(CameraUpdateFactory
                                 .newLatLngZoom(mCurrentLatLng, getServerInitialZoom(selectedServer)));
                     } else {
@@ -3733,8 +3729,7 @@ public class MainFragment extends Fragment implements
                         if ((mOTPApp.getSelectedServer() != null)
                                 && (!LocationUtil
                                 .checkPointInBoundingBox(mCurrentLatLng,
-                                        mOTPApp.getSelectedServer(),
-                                        OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR))
+                                        mOTPApp.getSelectedServer()))
                                 && (((mSavedLastLocationCheckedForServer != null) && (distance[0]
                                 > OTPApp.COORDINATES_IMPORTANT_DIFFERENCE))
                                 || (mSavedLastLocationCheckedForServer == null))) {
@@ -3750,8 +3745,7 @@ public class MainFragment extends Fragment implements
                             Server selectedServer = mOTPApp.getSelectedServer();
                             if ((selectedServer != null) && selectedServer.areBoundsSet()) {
                                 if (LocationUtil
-                                        .checkPointInBoundingBox(mCurrentLatLng, selectedServer,
-                                                OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)) {
+                                        .checkPointInBoundingBox(mCurrentLatLng, selectedServer)) {
                                     mMap.animateCamera(CameraUpdateFactory
                                             .newLatLngZoom(mCurrentLatLng,
                                                     getServerInitialZoom(selectedServer)));

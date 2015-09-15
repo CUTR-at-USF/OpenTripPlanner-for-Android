@@ -17,6 +17,7 @@
 package edu.usf.cutr.opentripplanner.android.util;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.PolyUtil;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -36,7 +37,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import edu.usf.cutr.opentripplanner.android.OTPApp;
 import edu.usf.cutr.opentripplanner.android.R;
@@ -45,7 +45,6 @@ import edu.usf.cutr.opentripplanner.android.pois.GooglePlaces;
 import edu.usf.cutr.opentripplanner.android.pois.Nominatim;
 import edu.usf.cutr.opentripplanner.android.pois.POI;
 import edu.usf.cutr.opentripplanner.android.pois.Places;
-import edu.usf.cutr.opentripplanner.android.util.CustomAddress;
 
 /**
  * Various utilities related to location data
@@ -104,48 +103,26 @@ public class LocationUtil {
      *
      * @param location        current location of the user
      * @param selectedServer  OTP server being compared to the current location
-     * @param acceptableError the amount of allowed error, in meters
      * @return true if the location of the user is within the bounding box of the selectedServer,
      * false if it is not
      */
-    public static boolean checkPointInBoundingBox(LatLng location, Server selectedServer,
-            int acceptableError) {
-        float[] resultLeft = new float[3];
-        float[] resultRight = new float[3];
-        float[] resultUp = new float[3];
-        float[] resultDown = new float[3];
-        float[] resultHorizontal = new float[3];
-        float[] resultVertical = new float[3];
+    public static boolean checkPointInBoundingBox(LatLng location, Server selectedServer) {
+        LatLng lowerLeft = new LatLng(selectedServer.getLowerLeftLatitude(),
+                selectedServer.getLowerLeftLongitude());
+        LatLng upperLeft = new LatLng(selectedServer.getUpperRightLatitude(),
+                selectedServer.getLowerLeftLongitude());
+        LatLng upperRight = new LatLng(selectedServer.getUpperRightLatitude(),
+                selectedServer.getUpperRightLongitude());
+        LatLng lowerRight = new LatLng(selectedServer.getLowerLeftLatitude(),
+                selectedServer.getUpperRightLongitude());
 
-        double locationLat = location.latitude;
-        double locationLon = location.longitude;
+        List<LatLng> rectangle = new ArrayList<LatLng>(2);
+        rectangle.add(lowerLeft);
+        rectangle.add(upperLeft);
+        rectangle.add(upperRight);
+        rectangle.add(lowerRight);
 
-        double leftLat = locationLat;
-        double leftLon = selectedServer.getLowerLeftLongitude();
-        double rightLat = locationLat;
-        double rightLon = selectedServer.getUpperRightLongitude();
-
-        Location.distanceBetween(locationLat, locationLon, leftLat, leftLon, resultLeft);
-        Location.distanceBetween(locationLat, locationLon, rightLat, rightLon, resultRight);
-
-        double upLat = selectedServer.getUpperRightLatitude();
-        double upLon = locationLon;
-        double downLat = selectedServer.getLowerLeftLatitude();
-        double downLon = locationLon;
-
-        Location.distanceBetween(locationLat, locationLon, upLat, upLon, resultUp);
-        Location.distanceBetween(locationLat, locationLon, downLat, downLon, resultDown);
-
-        Location.distanceBetween(locationLat, leftLon, locationLat, rightLon, resultHorizontal);
-        Location.distanceBetween(upLat, locationLon, downLat, locationLon, resultVertical);
-
-        if (resultLeft[0] + resultRight[0] - resultHorizontal[0] > acceptableError) {
-            return false;
-        } else if (resultUp[0] + resultDown[0] - resultVertical[0] > acceptableError) {
-            return false;
-        }
-
-        return true;
+        return PolyUtil.containsLocation(location, rectangle, true);
     }
 
     public static ArrayList<CustomAddress> processGeocoding(Context context, Server selectedServer,
@@ -294,8 +271,8 @@ public class LocationUtil {
             for (Iterator<CustomAddress> it=addresses.iterator(); it.hasNext();) {
                 CustomAddress address = it.next();
                 if (!LocationUtil.checkPointInBoundingBox(
-                        new LatLng(address.getLatitude(), address.getLongitude()), selectedServer,
-                        OTPApp.CHECK_BOUNDS_ACCEPTABLE_ERROR)) {
+                        new LatLng(address.getLatitude(), address.getLongitude()),
+                        selectedServer)) {
                     it.remove();
                 }
             }

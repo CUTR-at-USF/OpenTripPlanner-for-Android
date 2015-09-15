@@ -120,4 +120,6 @@ dependencies {
     compile 'edu.usf.cutr.opentripplanner.android:opentripplanner-pojos:1.0.0-SNAPSHOT'
     // OpenCSV, for parsing the OTP Server Directory Google Doc
     compile 'net.sf.opencsv:opencsv:2.3'
+    // Map util (point in bounding box)
+    compile 'com.google.maps.android:android-maps-utils:0.4'
 }
