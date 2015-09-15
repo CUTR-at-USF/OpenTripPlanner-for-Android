@@ -112,7 +112,10 @@ tasks.whenTaskAdded { theTask ->
 
 dependencies {
     compile 'com.android.support:support-v4:21.0.0'
-    compile 'com.google.android.gms:play-services:7.8.0'
+    // Only include Google Play Services maps and location libraries
+    compile 'com.google.android.gms:play-services-maps:7.8.0'
+    compile 'com.google.android.gms:play-services-location:7.8.0'
+    // Jackson is used for parsing JSON REST API responses
     compile 'com.fasterxml.jackson.core:jackson-core:2.4.1'
     compile 'com.fasterxml.jackson.core:jackson-annotations:2.4.1'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.4.1.1'
