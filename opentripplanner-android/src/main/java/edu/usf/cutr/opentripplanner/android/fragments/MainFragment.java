@@ -16,6 +16,39 @@
 
 package edu.usf.cutr.opentripplanner.android.fragments;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.model.TileOverlay;
+import com.google.android.gms.maps.model.TileOverlayOptions;
+
+import org.opentripplanner.api.model.Itinerary;
+import org.opentripplanner.api.model.Leg;
+import org.opentripplanner.api.ws.GraphMetadata;
+import org.opentripplanner.api.ws.Request;
+import org.opentripplanner.index.model.TripTimeShort;
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.bike_rental.BikeRentalStationList;
+import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
+
 import android.animation.LayoutTransition;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -93,40 +126,6 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.location.LocationClient;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.UiSettings;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.maps.model.TileOverlay;
-import com.google.android.gms.maps.model.TileOverlayOptions;
-
-import org.opentripplanner.api.model.Itinerary;
-import org.opentripplanner.api.model.Leg;
-import org.opentripplanner.api.ws.GraphMetadata;
-import org.opentripplanner.api.ws.Request;
-import org.opentripplanner.index.model.TripTimeShort;
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.bike_rental.BikeRentalStationList;
-import org.opentripplanner.routing.core.OptimizeType;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
-
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.net.URLEncoder;
@@ -169,16 +168,19 @@ import edu.usf.cutr.opentripplanner.android.tasks.ServerSelector;
 import edu.usf.cutr.opentripplanner.android.tasks.TripRequest;
 import edu.usf.cutr.opentripplanner.android.util.BikeRentalStationInfo;
 import edu.usf.cutr.opentripplanner.android.util.ConversionUtils;
+import edu.usf.cutr.opentripplanner.android.util.CustomAddress;
 import edu.usf.cutr.opentripplanner.android.util.CustomInfoWindowAdapter;
 import edu.usf.cutr.opentripplanner.android.util.DateTimeDialog;
 import edu.usf.cutr.opentripplanner.android.util.DirectionsGenerator;
 import edu.usf.cutr.opentripplanner.android.util.LocationUtil;
+import edu.usf.cutr.opentripplanner.android.util.PlacesAutoCompleteAdapter;
 import edu.usf.cutr.opentripplanner.android.util.RangeSeekBar;
 import edu.usf.cutr.opentripplanner.android.util.RangeSeekBar.OnRangeSeekBarChangeListener;
 import edu.usf.cutr.opentripplanner.android.util.RightDrawableOnTouchListener;
 import edu.usf.cutr.opentripplanner.android.util.TripInfo;
-import edu.usf.cutr.opentripplanner.android.util.PlacesAutoCompleteAdapter;
-import edu.usf.cutr.opentripplanner.android.util.CustomAddress;
+
+import static com.google.android.gms.location.LocationServices.API;
+import static com.google.android.gms.location.LocationServices.FusedLocationApi;
 
 /**
  * Main UI screen of the mOTPApp, showing the map.
@@ -191,8 +193,8 @@ public class MainFragment extends Fragment implements
         TripRequestCompleteListener, MetadataRequestCompleteListener,
         BikeRentalLoadCompleteListener, RequestTimesForTripsCompleteListener, OTPGeocodingListener,
         DateCompleteListener, OnRangeSeekBarChangeListener<Double>, ServerCheckerCompleteListener,
-        GooglePlayServicesClient.OnConnectionFailedListener,
-        GooglePlayServicesClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        GoogleApiClient.ConnectionCallbacks,
         GoogleMap.OnCameraChangeListener {
 
     private static LocationManager sLocationManager;
@@ -201,7 +203,7 @@ public class MainFragment extends Fragment implements
 
     private Context mApplicationContext;
 
-    private LocationClient mLocationClient;
+    private GoogleApiClient mGoogleApiClient;
 
     private OtpFragment mFragmentListener;
 
@@ -1892,7 +1894,7 @@ public class MainFragment extends Fragment implements
         mMapFailed = false;
 
         if (mMap == null) {
-            mMap = ((SupportMapFragment) getFragmentManager().findFragmentById(R.id.map))
+            mMap = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map))
                     .getMap();
             // Check if we were successful in obtaining the map.
             if (mMap == null) {
@@ -2408,10 +2410,14 @@ public class MainFragment extends Fragment implements
     public void onStart() {
         super.onStart();
 
-        mLocationClient = new LocationClient(mApplicationContext, this, this);
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                .addApi(API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
 
         if (mMapFailed) {
-            mMap = ((SupportMapFragment) getFragmentManager().findFragmentById(R.id.map))
+            mMap = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map))
                     .getMap();
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
@@ -2433,8 +2439,8 @@ public class MainFragment extends Fragment implements
      * request or is disconnected.
      */
     public void connectLocationClient() {
-        if (!mLocationClient.isConnected() && !mLocationClient.isConnecting()) {
-            mLocationClient.connect();
+        if (!mGoogleApiClient.isConnected() && !mGoogleApiClient.isConnecting()) {
+            mGoogleApiClient.connect();
         }
     }
 
@@ -2444,8 +2450,8 @@ public class MainFragment extends Fragment implements
      * To avoid errors only tries if it's connected.
      */
     public void disconnectLocationClient() {
-        if (mLocationClient.isConnected()) {
-            mLocationClient.disconnect();
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
         }
     }
 
@@ -3083,7 +3089,8 @@ public class MainFragment extends Fragment implements
             }
             if (animateCamera > 0) {
                 LatLngBounds routeBounds = boundsCreator.build();
-                if (((SupportMapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap()
+                if (((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map))
+                        .getMap()
                         != null){
                     showRouteOnMapAnimateCamera(routeBounds, firstTransitMarker, animateCamera);
                 }
@@ -3633,9 +3640,9 @@ public class MainFragment extends Fragment implements
      * @return a LatLng object with the most updated user coordinates
      */
     public LatLng getLastLocation() {
-        if (mLocationClient != null){
-            if (mLocationClient.isConnected()) {
-                Location loc = mLocationClient.getLastLocation();
+        if (mGoogleApiClient != null) {
+            if (mGoogleApiClient.isConnected()) {
+                Location loc = FusedLocationApi.getLastLocation(mGoogleApiClient);
 
                 if (loc != null) {
                     LatLng mCurrentLocation = new LatLng(loc.getLatitude(), loc.getLongitude());
@@ -3695,7 +3702,7 @@ public class MainFragment extends Fragment implements
      */
     @Override
     public void onConnected(Bundle connectionHint) {
-        Location mCurrentLocation = mLocationClient.getLastLocation();
+        Location mCurrentLocation = FusedLocationApi.getLastLocation(mGoogleApiClient);
         boolean autodetectServerTriggered = false;
 
         if ((!mMapFailed)) {
@@ -3787,7 +3794,7 @@ public class MainFragment extends Fragment implements
     }
 
     @Override
-    public void onDisconnected() {
+    public void onConnectionSuspended(int i) {
     }
 
     /**
