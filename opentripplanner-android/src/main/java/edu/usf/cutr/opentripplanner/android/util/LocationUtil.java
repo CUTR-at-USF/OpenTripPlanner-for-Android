@@ -35,7 +35,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import edu.usf.cutr.opentripplanner.android.OTPApp;
@@ -175,24 +174,17 @@ public class LocationUtil {
             Geocoder gc = new Geocoder(context);
             try {
                 List<Address> androidTypeAddresses;
-                //TODO Temporary workaround while Google does not solve the problem with Android Geocoder, see issue #396
-                /*if (selectedServer != null) {
+                if (selectedServer != null) {
+                    //Temporary workaround while Google does not solve the problem with Android Geocoder, see issue #396
                     androidTypeAddresses = gc.getFromLocationName(address,
-                            context.getResources().getInteger(R.integer.geocoder_max_results),
+                            context.getResources().getInteger(R.integer.geocoder_max_results)/*,
                             selectedServer.getLowerLeftLatitude(),
                             selectedServer.getLowerLeftLongitude(),
                             selectedServer.getUpperRightLatitude(),
-                            selectedServer.getUpperRightLongitude());
+                            selectedServer.getUpperRightLongitude()*/);
                 } else {
                     androidTypeAddresses = gc.getFromLocationName(address,
                             context.getResources().getInteger(R.integer.geocoder_max_results));
-                }*/
-                if (geocodingForMarker){
-                    androidTypeAddresses = gc.getFromLocationName(address,
-                            context.getResources().getInteger(R.integer.geocoder_max_results));
-                }
-                else{
-                    androidTypeAddresses = new ArrayList<Address>();
                 }
                 for (Address androidTypeAddress : androidTypeAddresses){
                     addresses.add(new CustomAddress(androidTypeAddress));
@@ -276,6 +268,8 @@ public class LocationUtil {
                     it.remove();
                 }
             }
+
+            return addressesFiltered;
         }
         return addresses;
     }
