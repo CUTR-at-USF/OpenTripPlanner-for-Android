@@ -35,6 +35,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import edu.usf.cutr.opentripplanner.android.OTPApp;
@@ -175,13 +176,12 @@ public class LocationUtil {
             try {
                 List<Address> androidTypeAddresses;
                 if (selectedServer != null) {
-                    //Temporary workaround while Google does not solve the problem with Android Geocoder, see issue #396
                     androidTypeAddresses = gc.getFromLocationName(address,
-                            context.getResources().getInteger(R.integer.geocoder_max_results)/*,
+                            context.getResources().getInteger(R.integer.geocoder_max_results),
                             selectedServer.getLowerLeftLatitude(),
                             selectedServer.getLowerLeftLongitude(),
                             selectedServer.getUpperRightLatitude(),
-                            selectedServer.getUpperRightLongitude()*/);
+                            selectedServer.getUpperRightLongitude());
                 } else {
                     androidTypeAddresses = gc.getFromLocationName(address,
                             context.getResources().getInteger(R.integer.geocoder_max_results));
@@ -268,8 +268,6 @@ public class LocationUtil {
                     it.remove();
                 }
             }
-
-            return addressesFiltered;
         }
         return addresses;
     }
