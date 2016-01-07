@@ -175,8 +175,7 @@ public class LocationUtil {
             Geocoder gc = new Geocoder(context);
             try {
                 List<Address> androidTypeAddresses;
-                //TODO Temporary workaround while Google does not solve the problem with Android Geocoder, see issue #396
-                /*if (selectedServer != null) {
+                if (selectedServer != null) {
                     androidTypeAddresses = gc.getFromLocationName(address,
                             context.getResources().getInteger(R.integer.geocoder_max_results),
                             selectedServer.getLowerLeftLatitude(),
@@ -186,13 +185,6 @@ public class LocationUtil {
                 } else {
                     androidTypeAddresses = gc.getFromLocationName(address,
                             context.getResources().getInteger(R.integer.geocoder_max_results));
-                }*/
-                if (geocodingForMarker){
-                    androidTypeAddresses = gc.getFromLocationName(address,
-                            context.getResources().getInteger(R.integer.geocoder_max_results));
-                }
-                else{
-                    androidTypeAddresses = new ArrayList<Address>();
                 }
                 for (Address androidTypeAddress : androidTypeAddresses){
                     addresses.add(new CustomAddress(androidTypeAddress));
