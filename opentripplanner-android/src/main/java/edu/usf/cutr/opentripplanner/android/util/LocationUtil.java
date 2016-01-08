@@ -283,14 +283,16 @@ public class LocationUtil {
     /**
      * Try to grab the developer key from an unversioned resource file, if it exists
      *
-     * @return the developer key from an unversioned resource file, or empty string if it doesn't
+     * @param context
+     * @param apiKeyResourceId Resource ID of the raw file containing the API key
+     * @return the developer key from a resource file, or empty string if it doesn't
      * exist
      */
-    private static String getKeyFromResource(Context context) {
+    private static String getKeyFromResource(Context context, int apiKeyResourceId) {
         String strKey = "";
 
         try {
-            InputStream in = context.getResources().openRawResource(R.raw.googleplaceskey);
+            InputStream in = context.getResources().openRawResource(apiKeyResourceId);
             BufferedReader r = new BufferedReader(new InputStreamReader(in));
             StringBuilder total = new StringBuilder();
 
@@ -328,7 +330,7 @@ public class LocationUtil {
                 );
                 params.put(GooglePlaces.PARAM_RADIUS, Double.toString(selectedServer.getRadius()));
             }
-            p = new GooglePlaces(getKeyFromResource(context));
+            p = new GooglePlaces(getKeyFromResource(context, R.raw.googleplaceskey));
 
             Log.d(OTPApp.TAG, "Using Google Places!");
         } else {
@@ -344,7 +346,7 @@ public class LocationUtil {
                         Double.toString(selectedServer.getUpperRightLatitude()));
             }
 
-            p = new Nominatim();
+            p = new Nominatim(getKeyFromResource(context, R.raw.mapquestgeocoderkey));
 
             Log.d(OTPApp.TAG, "Using Nominatim!");
         }

@@ -16,11 +16,11 @@
 
 package edu.usf.cutr.opentripplanner.android.pois;
 
-import android.util.Log;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -63,7 +63,10 @@ public class Nominatim implements Places {
 
     private static final String TAG_NAME = "display_name";
 
-    public Nominatim() {
+    private String mApiKey;
+
+    public Nominatim(String apiKey) {
+        mApiKey = apiKey;
     }
 
     //	http://open.mapquestapi.com/nominatim/v1/search?format=json&q=Walmart&viewbox=-82.8511308,27.6236434,-82.0559399,28.3251809&bounded=1
@@ -99,6 +102,8 @@ public class Nominatim implements Places {
                     + "," + encodedParamBottom;
             request += "&bounded=1";
         }
+
+        request += "&key=" + mApiKey;
 
         Log.d(OTPApp.TAG, request);
 
