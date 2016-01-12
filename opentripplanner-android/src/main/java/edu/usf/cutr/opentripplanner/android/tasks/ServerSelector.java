@@ -20,12 +20,15 @@ import com.google.android.gms.maps.model.LatLng;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.IntentService;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.Editable;
 import android.util.Log;
 import android.webkit.URLUtil;
@@ -68,72 +71,28 @@ import static edu.usf.cutr.opentripplanner.android.OTPApp.PREFERENCE_KEY_SELECTE
  * @author Khoa Tran
  */
 
-public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
-        implements ServerCheckerCompleteListener {
-
+public class ServerSelector extends IntentService {
     private Server selectedServer;
-
-    private ProgressDialog progressDialog;
-
-    private WeakReference<Activity> activity;
-
-    private Context context;
-
+    private boolean mustRefreshList;
+    private boolean isAutoDetectEnabled;
     private static List<Server> knownServers = new ArrayList<Server>();
+    private ServersDataSource dataSource;
 
-    private boolean mustRefreshList = false;
-
-    private boolean isAutoDetectEnabled = true;
-
-    private ServerSelectorCompleteListener callback;
-
-    private boolean selectedCustomServer;
-
-    private boolean showDialog;
-
-    public ServersDataSource dataSource = null;
-
-    /**
-     * Constructs a new ServerSelector
-     *
-     * @param mustRefreshList true if we should download a new list of servers from the Google
-     *                        Doc, false if we should use cached list of servers
-     * @param showDialog      true if a progress dialog is requested
-     */
-    public ServerSelector(WeakReference<Activity> activity, Context context,
-            ServersDataSource dataSource, ServerSelectorCompleteListener callback,
-            boolean mustRefreshList, boolean showDialog) {
-        this.activity = activity;
-        this.context = context;
-        this.dataSource = dataSource;
-        this.callback = callback;
-        this.mustRefreshList = mustRefreshList;
-        this.showDialog = showDialog;
-        Activity activityRetrieved = activity.get();
-        if ((activityRetrieved != null) && showDialog) {
-            progressDialog = new ProgressDialog(activityRetrieved);
-        }
+    public ServerSelector() {
+        super("ServerSelector");
     }
 
-    protected void onPreExecute() {
-        Activity activityRetrieved = activity.get();
-        if ((activityRetrieved != null) && showDialog) {
-            progressDialog.setIndeterminate(true);
-            progressDialog.setCancelable(true);
-            progressDialog = ProgressDialog.show(activityRetrieved, "",
-                    context.getResources().getString(R.string.task_progress_server_selector_progress), true);
-        }
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-
-        isAutoDetectEnabled = prefs.getBoolean(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER,
-                true);
+    private void init(Intent intent) {
+        this.mustRefreshList = intent.getBooleanExtra("mustRefreshList", false);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        isAutoDetectEnabled = prefs.getBoolean(OTPApp.PREFERENCE_KEY_AUTO_DETECT_SERVER, true);
     }
 
-
-    protected Integer doInBackground(LatLng... latLng) {
-        LatLng currentLocation = latLng[0];
-
+    public void onHandleIntent(Intent intent) {
+        init(intent);
+        LatLng latLng = (LatLng) intent.getParcelableExtra("latLng");
+        dataSource = ServersDataSource.getInstance(getApplicationContext());
+        LatLng currentLocation = latLng;
         List<Server> serverList = null;
 
         // If not forced to refresh list
@@ -149,7 +108,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
             Log.d(OTPApp.TAG,
                     "No data from sqlite. Attempt retrieving servers from google spreadsheet");
             serverList = downloadServerList(
-                    context.getResources().getString(R.string.servers_spreadsheet_url));
+                    getResources().getString(R.string.servers_spreadsheet_url));
 
             // Insert new list to database
             if (serverList != null && !serverList.isEmpty()) {
@@ -159,10 +118,12 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
 
             // If still null
             if (serverList == null || serverList.isEmpty()) {
-                return null;
+                Intent resultIntent = new Intent(intent.getStringExtra("FILTER"));
+                resultIntent.putExtra("selectedServer", selectedServer);
+                LocalBroadcastManager.getInstance(this).sendBroadcast(resultIntent);
+                return;
             }
         }
-
         knownServers.clear();
         knownServers.addAll(serverList);
 
@@ -171,7 +132,21 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
             selectedServer = findOptimalSever(currentLocation);
         }
 
-        return serverList.size();
+        Intent resultIntent = new Intent(
+                intent.getStringExtra("return_action"));
+        resultIntent.putExtra("serverListSize", serverList.size());
+        resultIntent.putExtra("selectedServer", selectedServer);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(resultIntent);
+    }
+
+    private void insertServerListToDatabase(List<Server> servers) {
+        dataSource.open();
+        for (Server server : servers) {
+            if (dataSource.createServer(server) == null) {
+                Log.e(OTPApp.TAG, "Some server fields are incorrect, server not added");
+            }
+        }
+        dataSource.close();
     }
 
     private List<Server> getServersFromSQLite() {
@@ -196,7 +171,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
             servers = null;
         }
         dataSource.close();
-//		Toast.makeText(activity.getApplicationContext(), shown, Toast.LENGTH_SHORT).show();
+//    Toast.makeText(activity.getApplicationContext(), shown, Toast.LENGTH_SHORT).show();
 
         return servers;
     }
@@ -288,16 +263,6 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
 
     }
 
-    private void insertServerListToDatabase(List<Server> servers) {
-        dataSource.open();
-        for (Server server : servers) {
-            if (dataSource.createServer(server) == null) {
-                Log.e(OTPApp.TAG, "Some server fields are incorrect, server not added");
-            }
-        }
-        dataSource.close();
-    }
-
     /**
      * Automatically detects the correct OTP server based on the location of the device
      *
@@ -328,42 +293,86 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
         return server;
     }
 
-    protected void onPostExecute(Integer result) {
-        if ((activity.get() != null) && showDialog) {
-            try {
-                if (progressDialog != null && progressDialog.isShowing()) {
-                    progressDialog.dismiss();
-                }
-            } catch (Exception e) {
-                Log.e(OTPApp.TAG, "Error in Server Selector PostExecute dismissing dialog: " + e);
+    public static class ServerSelectorReceiver extends BroadcastReceiver
+            implements ServerCheckerCompleteListener {
+        private Server selectedServer;
+
+        private ProgressDialog progressDialog;
+
+        private Activity activity;
+
+        private Context context;
+
+        private ServerSelectorCompleteListener callback;
+
+        private boolean selectedCustomServer;
+
+        private boolean showDialog;
+
+        public ServersDataSource dataSource = null;
+
+        /**
+         * Constructs a new ServerSelector
+         *
+         * @param mustRefreshList true if we should download a new list of servers from the Google
+         *                        Doc, false if we should use cached list of servers
+         * @param showDialog      true if a progress dialog is requested
+         */
+        public ServerSelectorReceiver(Activity activity, Context context,
+                ServersDataSource dataSource, ServerSelectorCompleteListener callback, boolean showDialog) {
+            this.activity = activity;
+            this.context = context;
+            this.dataSource = dataSource;
+            this.callback = callback;
+            this.showDialog = showDialog;
+            this.progressDialog = new ProgressDialog(activity);
+        }
+
+        public void showProgressDialog() {
+            if (showDialog) {
+                progressDialog.setIndeterminate(true);
+                progressDialog.setCancelable(true);
+                progressDialog = ProgressDialog.show(activity, "",
+                        context.getResources().getString(R.string.task_progress_server_selector_progress), true);
             }
         }
 
-        if (selectedServer != null) {
-            //We've already auto-selected a server
-            ServerChecker serverChecker = new ServerChecker(activity,
-                    context, ServerSelector.this, false, false, true);
-            serverChecker.execute(selectedServer);
-        } else if (knownServers != null && !knownServers.isEmpty()) {
-            Log.d(OTPApp.TAG,
-                    "No server automatically selected.  User will need to choose the OTP server.");
 
-            // Create dialog for user to choose
-            List<String> serverNames = new ArrayList<String>();
-            for (Server server : knownServers) {
-                serverNames.add(server.getRegion());
+        public void onReceive(Context receiverContext, Intent receiverIntent) {
+            Integer result = (Integer) receiverIntent.getSerializableExtra("serverListSize");
+            selectedServer = (Server) receiverIntent.getSerializableExtra("selectedServer");
+            if (showDialog) {
+                try {
+                    if (progressDialog != null && progressDialog.isShowing()) {
+                        progressDialog.dismiss();
+                    }
+                } catch (Exception e) {
+                    Log.e(OTPApp.TAG, "Error in Server Selector PostExecute dismissing dialog: " + e);
+                }
             }
 
-            Collections.sort(serverNames);
+            if (selectedServer != null) {
+                //We've already auto-selected a server
+                ServerChecker serverChecker = new ServerChecker(new WeakReference<Activity>(activity),
+                        context, ServerSelectorReceiver.this, false, false, true);
+                serverChecker.execute(selectedServer);
+            } else if (knownServers != null && !knownServers.isEmpty()) {
+                Log.d(OTPApp.TAG,
+                        "No server automatically selected.  User will need to choose the OTP server.");
 
-            serverNames.add(0, context.getResources().getString(R.string.server_checker_info_custom_server_name));
+                // Create dialog for user to choose
+                List<String> serverNames = new ArrayList<String>();
+                for (Server server : knownServers) {
+                    serverNames.add(server.getRegion());
+                }
 
-            final CharSequence[] items = serverNames.toArray(new CharSequence[serverNames.size()]);
+                Collections.sort(serverNames);
 
-            Activity activityRetrieved = activity.get();
+                serverNames.add(0, context.getResources().getString(R.string.server_checker_info_custom_server_name));
 
-            if (activityRetrieved != null) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(activityRetrieved);
+                final CharSequence[] items = serverNames.toArray(new CharSequence[serverNames.size()]);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
                 builder.setTitle(context.getResources()
                         .getString(R.string.server_checker_info_title));
                 builder.setItems(items, new DialogInterface.OnClickListener() {
@@ -376,68 +385,63 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
                             SharedPreferences prefs = PreferenceManager
                                     .getDefaultSharedPreferences(context);
 
-                            Activity activityRetrieved = activity.get();
+                            final EditText tbBaseURL = new EditText(activity);
+                            String actualCustomServer = prefs
+                                    .getString(PREFERENCE_KEY_CUSTOM_SERVER_URL, "");
+                            tbBaseURL.setText(actualCustomServer);
 
-                            if (activityRetrieved != null) {
-                                final EditText tbBaseURL = new EditText(activityRetrieved);
-                                String actualCustomServer = prefs
-                                        .getString(PREFERENCE_KEY_CUSTOM_SERVER_URL, "");
-                                tbBaseURL.setText(actualCustomServer);
+                            AlertDialog.Builder urlAlert = new AlertDialog.Builder(activity);
+                            urlAlert.setTitle(context.getResources()
+                                    .getString(
+                                            R.string.server_selector_custom_server_alert_title));
+                            urlAlert.setView(tbBaseURL);
+                            urlAlert.setPositiveButton(
+                                    context.getResources().getString(android.R.string.ok),
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog,
+                                                int whichButton) {
+                                            Editable tbEditable = tbBaseURL.getText();
+                                            if (tbEditable != null) {
+                                                String value = tbEditable.toString().trim();
+                                                if (URLUtil.isValidUrl(value)) {
+                                                    SharedPreferences.Editor prefsEditor
+                                                            = PreferenceManager
+                                                            .getDefaultSharedPreferences(
+                                                                    context)
+                                                            .edit();
+                                                    prefsEditor
+                                                            .putString(
+                                                                    PREFERENCE_KEY_CUSTOM_SERVER_URL,
+                                                                    value);
 
-                                AlertDialog.Builder urlAlert = new AlertDialog.Builder(
-                                        activityRetrieved);
-                                urlAlert.setTitle(context.getResources()
-                                        .getString(
-                                                R.string.server_selector_custom_server_alert_title));
-                                urlAlert.setView(tbBaseURL);
-                                urlAlert.setPositiveButton(
-                                        context.getResources().getString(android.R.string.ok),
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog,
-                                                    int whichButton) {
-                                                Editable tbEditable = tbBaseURL.getText();
-                                                if (tbEditable != null) {
-                                                    String value = tbEditable.toString().trim();
-                                                    if (URLUtil.isValidUrl(value)) {
-                                                        SharedPreferences.Editor prefsEditor
-                                                                = PreferenceManager
-                                                                .getDefaultSharedPreferences(
-                                                                        context)
-                                                                .edit();
-                                                        prefsEditor
-                                                                .putString(
-                                                                        PREFERENCE_KEY_CUSTOM_SERVER_URL,
-                                                                        value);
-
-                                                        ServerChecker serverChecker
-                                                                = new ServerChecker(activity,
-                                                                context, ServerSelector.this, true,
-                                                                true, false);
-                                                        serverChecker.execute(
-                                                                new Server(value, context));
-                                                        prefsEditor.commit();
-                                                    } else {
-                                                        Toast.makeText(context,
-                                                                context.getResources()
-                                                                        .getString(
-                                                                                R.string.settings_menu_custom_server_url_description_error_url),
-                                                                Toast.LENGTH_SHORT).show();
-                                                    }
+                                                    ServerChecker serverChecker
+                                                            = new ServerChecker(new WeakReference<Activity>(activity),
+                                                            context, ServerSelectorReceiver.this, true,
+                                                            true, false);
+                                                    serverChecker.execute(
+                                                            new Server(value, context));
+                                                    prefsEditor.commit();
+                                                } else {
+                                                    Toast.makeText(context,
+                                                            context.getResources()
+                                                                   .getString(
+                                                                            R.string.settings_menu_custom_server_url_description_error_url),
+                                                            Toast.LENGTH_SHORT).show();
                                                 }
-
                                             }
-                                        });
-                                selectedCustomServer = true;
-                                urlAlert.create().show();
-                            }
+
+                                        }
+                                 });
+                            selectedCustomServer = true;
+                            urlAlert.create().show();
                         } else {
                             //User picked server from the list
                             for (Server server : knownServers) {
                                 //If this server region matches what the user picked, then set the server as the selected server
                                 if (server.getRegion().equals(items[item])) {
                                     selectedServer = server;
-                                    ServerChecker serverChecker = new ServerChecker(activity,
-                                            context, ServerSelector.this, false, false, false);
+                                    ServerChecker serverChecker = new ServerChecker(new WeakReference<Activity>(activity),
+                                            context, ServerSelectorReceiver.this, false, false, false);
                                     serverChecker.execute(selectedServer);
                                     break;
                                 }
@@ -447,76 +451,76 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
                     }
                 });
                 builder.show();
-            }
-        } else {
-            Log.e(OTPApp.TAG, "Server list could not be downloaded!!");
-            Toast.makeText(context,
-                    context.getResources().getString(R.string.toast_server_selector_refresh_server_list_error),
-                    Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void onServerCheckerComplete(String result, boolean isCustomServer,
-            boolean isAutoDetected, boolean isWorking) {
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(context);
-        SharedPreferences.Editor prefsEditor = prefs.edit();
-        if (isCustomServer){
-            if (isWorking) {
-                prefsEditor.putBoolean(PREFERENCE_KEY_AUTO_DETECT_SERVER, false);
-                prefsEditor.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, true);
-                prefsEditor.putBoolean(PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, true);
-                prefsEditor.commit();
-                if (selectedCustomServer) {
-                    String baseURL = prefs.getString(PREFERENCE_KEY_CUSTOM_SERVER_URL, "");
-                    selectedServer = new Server(baseURL, context);
-                    callback.onServerSelectorComplete(selectedServer);
-                }
             } else {
-                prefsEditor.putBoolean(PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, false);
-                prefsEditor.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false);
-                prefsEditor.commit();
+                Log.e(OTPApp.TAG, "Server list could not be downloaded!!");
                 Toast.makeText(context,
-                        context.getResources().getString(R.string.toast_server_checker_error_bad_url),
+                        context.getResources().getString(R.string.toast_server_selector_refresh_server_list_error),
                         Toast.LENGTH_SHORT).show();
             }
         }
-        else{
-            if (isWorking){
-                if (isAutoDetected){
-                    long serverId = prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0);
-                    Server s = null;
-                    boolean serverIsChanged = true;
-                    if (serverId != 0) {
-                        dataSource.open();
-                        s = dataSource.getServer(prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0));
-                        dataSource.close();
+
+        @Override
+        public void onServerCheckerComplete(String result, boolean isCustomServer,
+                boolean isAutoDetected, boolean isWorking) {
+            SharedPreferences prefs = PreferenceManager
+                    .getDefaultSharedPreferences(context);
+            SharedPreferences.Editor prefsEditor = prefs.edit();
+            if (isCustomServer){
+                if (isWorking) {
+                    prefsEditor.putBoolean(PREFERENCE_KEY_AUTO_DETECT_SERVER, false);
+                    prefsEditor.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, true);
+                    prefsEditor.putBoolean(PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, true);
+                    prefsEditor.commit();
+                    if (selectedCustomServer) {
+                        String baseURL = prefs.getString(PREFERENCE_KEY_CUSTOM_SERVER_URL, "");
+                        selectedServer = new Server(baseURL, context);
+                        callback.onServerSelectorComplete(selectedServer);
                     }
-                    if (s != null) {
-                        serverIsChanged = !(s.getRegion().equals(selectedServer.getRegion()));
-                    }
-                    if (showDialog || serverIsChanged) {
-                        Toast.makeText(context,
-                                context.getResources()
-                                        .getString(R.string.toast_server_selector_detected) + " "
-                                        + selectedServer.getRegion() + ". " + context.getResources()
-                                        .getString(R.string.toast_server_selector_server_change_info),
-                                Toast.LENGTH_SHORT).show();
-                    }
+                } else {
+                    prefsEditor.putBoolean(PREFERENCE_KEY_CUSTOM_SERVER_URL_IS_VALID, false);
+                    prefsEditor.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false);
+                    prefsEditor.commit();
+                    Toast.makeText(context,
+                            context.getResources().getString(R.string.toast_server_checker_error_bad_url),
+                            Toast.LENGTH_SHORT).show();
                 }
-                prefsEditor.putLong(PREFERENCE_KEY_SELECTED_SERVER,
-                        selectedServer.getId());
-                prefsEditor.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false);
-                prefsEditor.commit();
-                callback.onServerSelectorComplete(selectedServer);
             }
             else{
-                Toast.makeText(context,
-                        context.getResources()
-                                .getString(R.string.
-                                        toast_server_checker_error_unreachable_detected_server),
-                        Toast.LENGTH_SHORT).show();
+                if (isWorking){
+                    if (isAutoDetected){
+                        long serverId = prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0);
+                        Server s = null;
+                        boolean serverIsChanged = true;
+                        if (serverId != 0) {
+                            dataSource.open();
+                            s = dataSource.getServer(prefs.getLong(OTPApp.PREFERENCE_KEY_SELECTED_SERVER, 0));
+                            dataSource.close();
+                        }
+                        if (s != null) {
+                            serverIsChanged = !(s.getRegion().equals(selectedServer.getRegion()));
+                        }
+                        if (showDialog || serverIsChanged) {
+                            Toast.makeText(context,
+                                    context.getResources()
+                                            .getString(R.string.toast_server_selector_detected) + " "
+                                            + selectedServer.getRegion() + ". " + context.getResources()
+                                            .getString(R.string.toast_server_selector_server_change_info),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    prefsEditor.putLong(PREFERENCE_KEY_SELECTED_SERVER,
+                            selectedServer.getId());
+                    prefsEditor.putBoolean(PREFERENCE_KEY_SELECTED_CUSTOM_SERVER, false);
+                    prefsEditor.commit();
+                    callback.onServerSelectorComplete(selectedServer);
+                }
+                else{
+                    Toast.makeText(context,
+                            context.getResources()
+                                    .getString(R.string.
+                                            toast_server_checker_error_unreachable_detected_server),
+                            Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }

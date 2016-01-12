@@ -18,12 +18,14 @@ package edu.usf.cutr.opentripplanner.android.tasks;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.IntentService;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.os.AsyncTask;
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 import edu.usf.cutr.opentripplanner.android.OTPApp;
@@ -37,64 +39,48 @@ import edu.usf.cutr.opentripplanner.android.util.CustomAddress;
  * @author Khoa Tran
  */
 
-public class OTPGeocoding extends AsyncTask<String, Integer, Long> {
+public class OTPGeocoding extends IntentService {
+    Server selectedServer;
+    boolean geocodingForMarker;
+    ArrayList<CustomAddress> addressesReturn;
 
-    private WeakReference<Activity> activity;
-
-    private Context context;
-
-    private boolean isStartTextbox;
-
-    private OTPGeocodingListener callback;
-
-    private boolean geocodingForMarker;
-
-    private ArrayList<CustomAddress> addressesReturn = new ArrayList<CustomAddress>();
-
-    private Server selectedServer;
-
-    public OTPGeocoding(WeakReference<Activity> activity, Context context, boolean isStartTextbox,
-                        boolean geocodingForMarker, Server selectedServer,
-                        OTPGeocodingListener callback) {
-        this.context = context;
-        this.activity = activity;
-        this.isStartTextbox = isStartTextbox;
-        this.callback = callback;
-        this.selectedServer = selectedServer;
-        this.geocodingForMarker = geocodingForMarker;
+    public OTPGeocoding() {
+        super("OTPGeocoding");
     }
 
-    protected void onPreExecute() {
-        // Do nothing
-    }
-
-    protected Long doInBackground(String... reqs) {
+    public void onHandleIntent(Intent intent) {
+        this.selectedServer = (Server) intent.getSerializableExtra("selectedServer");
+        this.geocodingForMarker = intent.getBooleanExtra("geocodingForMarker", false);
+        String[] reqs = intent.getStringArrayExtra("params");
         long count = reqs.length;
-        addressesReturn = LocationUtil.processGeocoding(context, selectedServer, geocodingForMarker, reqs);
-        return count;
+        addressesReturn = LocationUtil.processGeocoding(this, selectedServer, geocodingForMarker, reqs);
+        Intent resultIntent = new Intent(intent.getStringExtra("FILTER"));
+        resultIntent.putExtra("count", count);
+        resultIntent.putExtra("addressesReturn", addressesReturn);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(resultIntent);
     }
 
-    protected void onCancelled(Long result) {
-        Activity activityRetrieved = activity.get();
-        if (activityRetrieved != null) {
-            AlertDialog.Builder geocoderAlert = new AlertDialog.Builder(activityRetrieved);
-            geocoderAlert.setTitle(R.string.geocoder_results_title)
-                    .setMessage(R.string.geocoder_results_no_results_message)
-                    .setCancelable(false)
-                    .setPositiveButton(context.getResources().getString(android.R.string.ok),
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                }
-                            }
-                    );
+    public static class OTPGeocodingReceiver extends BroadcastReceiver {
 
-            AlertDialog alert = geocoderAlert.create();
-            alert.show();
+        private boolean isStartTextbox;
+
+        private OTPGeocodingListener callback;
+
+        private boolean geocodingForMarker;
+
+        private ArrayList<CustomAddress> addressesReturn;
+
+        public OTPGeocodingReceiver(boolean isStartTextbox, boolean geocodingForMarker, 
+                OTPGeocodingListener callback) {
+            this.isStartTextbox = isStartTextbox;
+            this.callback = callback;
+            this.geocodingForMarker = geocodingForMarker;
         }
-        Log.e(OTPApp.TAG, "No geocoding processed!");
-    }
 
-    protected void onPostExecute(Long result) {
-        callback.onOTPGeocodingComplete(isStartTextbox, addressesReturn, geocodingForMarker);
+        public void onReceive(Context receiverContext, Intent receiverIntent) {
+            Long result = (Long) receiverIntent.getSerializableExtra("count");
+            addressesReturn = (ArrayList<CustomAddress>) receiverIntent.getSerializableExtra("addressesReturn");
+            callback.onOTPGeocodingComplete(isStartTextbox, addressesReturn, geocodingForMarker);
+        }
     }
 }

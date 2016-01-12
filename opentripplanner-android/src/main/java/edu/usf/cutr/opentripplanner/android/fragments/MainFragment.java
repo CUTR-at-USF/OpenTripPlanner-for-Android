@@ -86,6 +86,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.DrawerLayout.DrawerListener;
 import android.text.Editable;
@@ -161,10 +162,13 @@ import edu.usf.cutr.opentripplanner.android.model.Server;
 import edu.usf.cutr.opentripplanner.android.sqlite.ServersDataSource;
 import edu.usf.cutr.opentripplanner.android.tasks.BikeRentalLoad;
 import edu.usf.cutr.opentripplanner.android.tasks.MetadataRequest;
+import edu.usf.cutr.opentripplanner.android.tasks.MetadataRequest.MetadataRequestReceiver;
 import edu.usf.cutr.opentripplanner.android.tasks.OTPGeocoding;
+import edu.usf.cutr.opentripplanner.android.tasks.OTPGeocoding.OTPGeocodingReceiver;
 import edu.usf.cutr.opentripplanner.android.tasks.RequestTimesForTrips;
 import edu.usf.cutr.opentripplanner.android.tasks.ServerChecker;
 import edu.usf.cutr.opentripplanner.android.tasks.ServerSelector;
+import edu.usf.cutr.opentripplanner.android.tasks.ServerSelector.ServerSelectorReceiver;
 import edu.usf.cutr.opentripplanner.android.tasks.TripRequest;
 import edu.usf.cutr.opentripplanner.android.util.BikeRentalStationInfo;
 import edu.usf.cutr.opentripplanner.android.util.ConversionUtils;
@@ -196,6 +200,11 @@ public class MainFragment extends Fragment implements
         GoogleApiClient.OnConnectionFailedListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleMap.OnCameraChangeListener {
+
+    public static final String SERVERSELECTOR_FILTER = "MainFragment_mServerSelectorReceiver";
+    public static final String SERVERSELECTOR_NOLOCATION_FILTER = "MainFragment_mServerSelectorReceiverNoLocation";
+    public static final String METADATA_FILTER = "MainFragment_metadatRequestReceiver";
+    public static final String OTPGEOCODING_FILTER = "MainFragment_otpGeocodingReceiver";
 
     private static LocationManager sLocationManager;
 
@@ -360,7 +369,13 @@ public class MainFragment extends Fragment implements
 
     private GraphMetadata mCustomServerMetadata = null;
 
-    private OTPGeocoding mGeoCodingTask;
+    private MetadataRequestReceiver mMetadatRequestReceiver;
+
+    private OTPGeocodingReceiver mOtpGeocodingReceiver;
+
+    private ServerSelectorReceiver mServerSelectorReceiver;
+
+    private ServerSelectorReceiver mServerSelectorReceiverNoLocation;
 
     @SuppressWarnings("deprecation")
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -397,6 +412,26 @@ public class MainFragment extends Fragment implements
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OtpFragment");
+        }
+        mMetadatRequestReceiver = new MetadataRequestReceiver(activity, activity.getApplicationContext(), this);
+        LocalBroadcastManager.getInstance(activity)
+            .registerReceiver(mMetadatRequestReceiver, new IntentFilter(METADATA_FILTER));
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (mMetadatRequestReceiver != null) {
+            LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMetadatRequestReceiver);
+        }
+        if (mOtpGeocodingReceiver != null) {
+            LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mOtpGeocodingReceiver);
+        }
+        if (mServerSelectorReceiver != null) {
+            LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mServerSelectorReceiver);
+        }
+        if (mServerSelectorReceiverNoLocation != null) {
+            LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mServerSelectorReceiverNoLocation);
         }
     }
 
@@ -2088,11 +2123,16 @@ public class MainFragment extends Fragment implements
                     Toast.LENGTH_LONG).show();
         } else {
             ServersDataSource dataSource = ServersDataSource.getInstance(mApplicationContext);
-            WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
-
-            ServerSelector serverSelector = new ServerSelector(weakContext, mApplicationContext,
-                    dataSource, this, mNeedToUpdateServersList, showDialog);
-            serverSelector.execute(mCurrentLatLng);
+            mServerSelectorReceiver = new ServerSelectorReceiver(getActivity(), mApplicationContext,
+                    dataSource, this, showDialog);
+            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mServerSelectorReceiver,
+                    new IntentFilter(SERVERSELECTOR_FILTER));
+            Intent serverSelector = new Intent(getActivity(), ServerSelector.class);
+            mServerSelectorReceiver.showProgressDialog();
+            serverSelector.putExtra("latLng", mCurrentLatLng);
+            serverSelector.putExtra("mustRefreshList", mNeedToUpdateServersList);
+            serverSelector.putExtra("FILTER", SERVERSELECTOR_FILTER);
+            getActivity().startService(serverSelector);
             mSavedLastLocationCheckedForServer = mCurrentLatLng;
         }
         setNeedToRunAutoDetect(false);
@@ -2109,13 +2149,16 @@ public class MainFragment extends Fragment implements
      */
     public void runAutoDetectServerNoLocation(boolean showDialog) {
         ServersDataSource dataSource = ServersDataSource.getInstance(mApplicationContext);
-        WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
+        mServerSelectorReceiverNoLocation = new ServerSelectorReceiver(getActivity(), mApplicationContext,
+                dataSource, this, showDialog);
+        LocalBroadcastManager.getInstance(getActivity())
+            .registerReceiver(mServerSelectorReceiverNoLocation, new IntentFilter(SERVERSELECTOR_NOLOCATION_FILTER));
+        Intent serverSelector = new Intent(getActivity(), ServerSelector.class);
+        mServerSelectorReceiverNoLocation.showProgressDialog();
+        serverSelector.putExtra("mustRefreshList", mNeedToUpdateServersList);
+        serverSelector.putExtra("FILTER", SERVERSELECTOR_NOLOCATION_FILTER);
+        getActivity().startService(serverSelector);
 
-        ServerSelector serverSelector = new ServerSelector(weakContext, mApplicationContext,
-                dataSource, this, mNeedToUpdateServersList, showDialog);
-        LatLng latLngList[] = new LatLng[1];
-        latLngList[0] = null;
-        serverSelector.execute(latLngList);
         setNeedToRunAutoDetect(false);
         setNeedToUpdateServersList(false);
     }
@@ -2552,24 +2595,28 @@ public class MainFragment extends Fragment implements
      */
     public void processAddress(final boolean isStartTextBox, String address, Double originalLat,
                                Double originalLon, boolean geocodingForMarker) {
-        WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
 
-        mGeoCodingTask = new OTPGeocoding(weakContext, mApplicationContext,
-                isStartTextBox, geocodingForMarker, mOTPApp.getSelectedServer(), this);
+        mOtpGeocodingReceiver = new OTPGeocodingReceiver(isStartTextBox, geocodingForMarker, this);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mOtpGeocodingReceiver,
+                new IntentFilter(OTPGEOCODING_FILTER));
         LatLng mCurrentLatLng = getLastLocation();
 
         if (address.equalsIgnoreCase(this.getResources().getString(R.string.text_box_my_location))) {
             if (mCurrentLatLng != null) {
                 if (isStartTextBox){
                     mIsStartLocationGeocodingCompleted = false;
-                    mGeoCodingTask.execute(address, String.valueOf(mCurrentLatLng.latitude),
-                            String.valueOf(mCurrentLatLng.longitude));
                 }
                 else{
                     mIsEndLocationGeocodingCompleted = false;
-                    mGeoCodingTask.execute(address, String.valueOf(mCurrentLatLng.latitude),
-                            String.valueOf(mCurrentLatLng.longitude));
                 }
+                Intent optGeocoding = new Intent(getActivity(), OTPGeocoding.class);
+                String[] params = { address, String.valueOf(mCurrentLatLng.latitude),
+                        String.valueOf(mCurrentLatLng.longitude) };
+                optGeocoding.putExtra("params", params);
+                optGeocoding.putExtra("selectedServer", mOTPApp.getSelectedServer());
+                optGeocoding.putExtra("geocodingForMarker", geocodingForMarker);
+                optGeocoding.putExtra("FILTER", OTPGEOCODING_FILTER);
+                getActivity().startService(optGeocoding);
             } else {
                 Toast.makeText(mApplicationContext,
                         mApplicationContext.getResources()
@@ -2588,12 +2635,17 @@ public class MainFragment extends Fragment implements
             }
             if (isStartTextBox){
                 mIsStartLocationGeocodingCompleted = false;
-                mGeoCodingTask.execute(address, latString, lonString);
             }
             else{
                 mIsEndLocationGeocodingCompleted = false;
-                mGeoCodingTask.execute(address, latString, lonString);
             }
+            Intent optGeocoding = new Intent(getActivity(), OTPGeocoding.class);
+            String[] params = { address, latString, lonString };
+            optGeocoding.putExtra("params", params);
+            optGeocoding.putExtra("selectedServer", mOTPApp.getSelectedServer());
+            optGeocoding.putExtra("geocodingForMarker", geocodingForMarker);
+            optGeocoding.putExtra("FILTER", OTPGEOCODING_FILTER);
+            getActivity().startService(optGeocoding);
         }
     }
 
@@ -2655,9 +2707,11 @@ public class MainFragment extends Fragment implements
                 WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
 
                 if (mCustomServerMetadata == null){
-                    MetadataRequest metaRequest = new MetadataRequest(weakContext, mApplicationContext,
-                            this);
-                    metaRequest.execute(mPrefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
+                    Intent metaRequest = new Intent(getActivity(), MetadataRequest.class);
+                    mMetadatRequestReceiver.showProgressDialog();
+                    metaRequest.putExtra("reqs", mPrefs.getString(OTPApp.PREFERENCE_KEY_CUSTOM_SERVER_URL, ""));
+                    metaRequest.putExtra("FILTER", METADATA_FILTER);
+                    getActivity().startService(metaRequest);
                 }
                 else{
                     onMetadataRequestComplete(mCustomServerMetadata, false);

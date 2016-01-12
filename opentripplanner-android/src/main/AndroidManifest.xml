@@ -69,6 +69,10 @@
                 android:theme="@style/MyTheme"
                 android:windowSoftInputMode="stateHidden"></activity>
 
+        <service android:name=".tasks.MetadataRequest" android:exported="false"/>
+        <service android:name=".tasks.OTPGeocoding" android:exported="false"/>
+        <service android:name=".tasks.ServerSelector" android:exported="false"/>
+
         <meta-data
                 android:name="com.google.android.maps.v2.API_KEY"
                 android:value="AIzaSyD5XadJhAK7jIKFz5TcT7t-gsWw_OTvlBI"/>

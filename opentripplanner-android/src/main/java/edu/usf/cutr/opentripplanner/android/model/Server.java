@@ -26,7 +26,9 @@ import edu.usf.cutr.opentripplanner.android.exceptions.ServerListParsingExceptio
  * Modified by Khoa Tran
  */
 
-public class Server {
+public class Server implements java.io.Serializable {
+
+    private static final long serialVersionUID = 7306023856160948263L;
 
     private long id;
 
