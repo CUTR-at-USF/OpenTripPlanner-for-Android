@@ -97,9 +97,6 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -115,10 +112,10 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -228,7 +225,11 @@ public class MainFragment extends Fragment implements
 
     private ViewGroup mNavigationDrawerLeftPane;
 
-    private ListView mDdlOptimization;
+    private RadioButton mBtnModeQuick;
+
+    private RadioButton mBtnModeSafe;
+
+    private RadioButton mBtnModeTransfersOrBike;
 
     private CheckBox mBtnModeBus;
 
@@ -256,8 +257,13 @@ public class MainFragment extends Fragment implements
 
     private ImageButton mBtnDisplayDirection;
 
-    private MenuItem mGPS;
+    private Button mBtnGPS;
 
+    private Button mBtnSettings;
+
+    private Button mBtnServerInfo;
+
+    private Button mBtnFeedback;
 
     private GoogleMap mMap;
 
@@ -403,8 +409,6 @@ public class MainFragment extends Fragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-
         getActivity().getSupportFragmentManager()
                 .addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
                     public void onBackStackChanged() {
@@ -473,8 +477,10 @@ public class MainFragment extends Fragment implements
             mTbEndLocation = (AutoCompleteTextView) mainView.findViewById(R.id.tbEndLocation);
 
             mBtnSwapOriginDestination = (ImageButton) mainView.findViewById(R.id.btnSwapOriginDestination);
-            mDdlOptimization = (ListView) mainView
-                    .findViewById(R.id.spinOptimization);
+
+            mBtnModeQuick = (RadioButton) mainView.findViewById(R.id.btnModeQuick);
+            mBtnModeSafe = (RadioButton) mainView.findViewById(R.id.btnModeSafe);
+            mBtnModeTransfersOrBike = (RadioButton) mainView.findViewById(R.id.btnModeTransfersOrBike);
 
             mBtnModeWalk = (RadioButton) mainView.findViewById(R.id.btnModeWalk);
             mBtnModeBike = (RadioButton) mainView.findViewById(R.id.btnModeBike);
@@ -511,6 +517,14 @@ public class MainFragment extends Fragment implements
 
             mBtnHandle = (ImageButton) mainView.findViewById(R.id.btnHandle);
             mDrawerLayout = (DrawerLayout) mainView.findViewById(R.id.drawerLayout);
+
+            mBtnGPS = (Button) mainView.findViewById(R.id.btnGPS);
+
+            mBtnSettings = (Button) mainView.findViewById(R.id.btnSettings);
+
+            mBtnServerInfo = (Button) mainView.findViewById(R.id.btnServerInfo);
+
+            mBtnFeedback = (Button) mainView.findViewById(R.id.btnFeedback);
 
             mTbStartLocation.setImeOptions(EditorInfo.IME_ACTION_NEXT);
             mTbEndLocation.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -555,8 +569,6 @@ public class MainFragment extends Fragment implements
         mIsAlarmTripTimeUpdateActive = false;
         mAlarmReceiver = new AlarmReceiver();
 
-        mMap = retrieveMap(mMap);
-
         mOTPApp = ((OTPApp) getActivity().getApplication());
 
         mPrefs = PreferenceManager.getDefaultSharedPreferences(
@@ -580,21 +592,6 @@ public class MainFragment extends Fragment implements
             setTextBoxLocation(getResources().getString(R.string.text_box_my_location), true);
         }
 
-        ArrayAdapter<OptimizeSpinnerItem> optimizationAdapter
-                = new ArrayAdapter<OptimizeSpinnerItem>(
-                getActivity(),
-                android.R.layout.simple_list_item_single_choice,
-                new OptimizeSpinnerItem[]{
-                        new OptimizeSpinnerItem(
-                                getResources().getString(R.string.left_panel_optimization_quick),
-                                OptimizeType.QUICK),
-                        new OptimizeSpinnerItem(
-                                getResources().getString(R.string.left_panel_optimization_safe),
-                                OptimizeType.SAFE),
-                        new OptimizeSpinnerItem(
-                                getResources().getString(R.string.left_panel_optimization_fewest_transfers),
-                                OptimizeType.TRANSFERS)});
-
         Server selectedServer = mOTPApp.getSelectedServer();
         if (selectedServer != null) {
             if (!mMapFailed) {
@@ -606,6 +603,9 @@ public class MainFragment extends Fragment implements
         mCustomInfoWindowAdapter = new CustomInfoWindowAdapter(getLayoutInflater(savedInstanceState), mApplicationContext);
 
         restoreState(savedInstanceState);
+
+        mMap = retrieveMap(mMap);
+        
 
         if (!mMapFailed) {
             updateSelectedServer(false);
@@ -827,12 +827,20 @@ public class MainFragment extends Fragment implements
                         .getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(mTbEndLocation.getWindowToken(), 0);
                 imm.hideSoftInputFromWindow(mTbStartLocation.getWindowToken(), 0);
+                if (isGPSEnabled()) {
+                    mBtnGPS.setText(R.string.menu_button_disable_gps);
+                } else {
+                    mBtnGPS.setText(R.string.menu_button_enable_gps);
+                }
+
+                if (mDrawerLayout != null && mDrawerLayout.isDrawerOpen(Gravity.LEFT)){
+                    mDrawerLayout.closeDrawer(Gravity.LEFT);
+                }
             }
 
             @Override
             public void onDrawerOpened(View arg0) {
-                previousOptimization = ((OptimizeSpinnerItem) mDdlOptimization
-                        .getItemAtPosition(mDdlOptimization.getCheckedItemPosition())).getOptimizeType();
+                previousOptimization = getSelectedOptimization();
                 previousModes = getSelectedTraverseModeSet();
                 previousBikeTriangleMinValue = mBikeTriangleMinValue;
                 previousBikeTriangleMaxValue = mBikeTriangleMaxValue;
@@ -841,9 +849,7 @@ public class MainFragment extends Fragment implements
             @Override
             public void onDrawerClosed(View arg0) {
                 TraverseModeSet newModes = getSelectedTraverseModeSet();
-                OptimizeType newOptimization = ((OptimizeSpinnerItem) mDdlOptimization
-                        .getItemAtPosition(mDdlOptimization.getCheckedItemPosition())).getOptimizeType();
-                boolean sameOptimization = previousOptimization.equals(newOptimization);
+                boolean sameOptimization = previousOptimization.equals(getSelectedOptimization());
                 boolean sameTraverseMode = previousModes.getModes().equals(newModes.getModes());
                 boolean sameBikeTriangle = previousBikeTriangleMinValue == mBikeTriangleMinValue
                         && previousBikeTriangleMaxValue == mBikeTriangleMaxValue;
@@ -1372,28 +1378,181 @@ public class MainFragment extends Fragment implements
             }
         });
 
-        mDdlOptimization.setOnItemClickListener(new OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view,
-                    int position, long id) {
-                if (getSelectedTraverseModeSet().getBicycle()) {
-                    mOptimizationValueToRestoreWhenNoBike = position;
-                }
+        mBtnModeQuick.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 SharedPreferences.Editor editor = mPrefs.edit();
-                editor.putInt(OTPApp.PREFERENCE_KEY_LAST_OPTIMIZATION, position);
+                editor.putInt(OTPApp.PREFERENCE_KEY_LAST_OPTIMIZATION,
+                        mOTPApp.OPTIMIZATION_QUICK);
                 editor.commit();
-                OptimizeSpinnerItem optimizeSpinnerItem = (OptimizeSpinnerItem) mDdlOptimization
-                        .getItemAtPosition(position);
-                if (optimizeSpinnerItem != null) {
-                    showBikeParameters(
-                            optimizeSpinnerItem.getOptimizeType().equals(OptimizeType.TRIANGLE));
-                } else {
-                    Log.e(OTPApp.TAG, "Not possible to change optimization mode because selected"
-                            + "optimization is unknown");
+            }
+        });
+
+        mBtnModeSafe.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                SharedPreferences.Editor editor = mPrefs.edit();
+                editor.putInt(OTPApp.PREFERENCE_KEY_LAST_OPTIMIZATION,
+                        mOTPApp.OPTIMIZATION_SAFE);
+                editor.commit();
+            }
+        });
+
+        mBtnModeTransfersOrBike.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                SharedPreferences.Editor editor = mPrefs.edit();
+                if (mBtnModeBike.isChecked() || mBtnModeRentedBike.isChecked()){
+                    editor.putInt(OTPApp.PREFERENCE_KEY_LAST_OPTIMIZATION,
+                            mOTPApp.OPTIMIZATION_TRIANGLE);
+                    showBikeParameters(isChecked);
                 }
+                else{
+                    editor.putInt(OTPApp.PREFERENCE_KEY_LAST_OPTIMIZATION,
+                            mOTPApp.OPTIMIZATION_TRANSFERS);
+                }
+                editor.commit();
             }
         });
 
         mBikeTriangleParameters.setOnRangeSeekBarChangeListener(this);
+
+        OnClickListener oclSettingsButton = new OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                getActivity().startActivityForResult(
+                        new Intent(getActivity(), SettingsActivity.class),
+                        OTPApp.SETTINGS_REQUEST_CODE);
+                if (mDrawerLayout != null && mDrawerLayout.isDrawerOpen(Gravity.LEFT)){
+                    mDrawerLayout.closeDrawer(Gravity.LEFT);
+                }
+            }
+        };
+        mBtnSettings.setOnClickListener(oclSettingsButton);
+
+        OnClickListener oclFeedback = new OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                Server selectedServer = mOTPApp.getSelectedServer();
+
+                String[] recipients = {selectedServer.getContactEmail(),
+                        getString(R.string.feedback_email_android_developer)};
+
+                String uriText = "mailto:";
+                for (String recipient : recipients) {
+                    uriText += recipient + ";";
+                }
+
+                String subject = "";
+                subject += getResources().getString(R.string.menu_button_feedback_subject);
+                Date d = Calendar.getInstance().getTime();
+                subject += "[" + d.toString() + "]";
+                uriText += "?subject=" + subject;
+
+                String content = ((MyActivity) getActivity()).getCurrentRequestString();
+
+                try {
+                    uriText += "&body=" + URLEncoder.encode(content, OTPApp.URL_ENCODING);
+                } catch (UnsupportedEncodingException e1) {
+                    e1.printStackTrace();
+                    return;
+                }
+
+                Uri uri = Uri.parse(uriText);
+
+                Intent sendIntent = new Intent(Intent.ACTION_SENDTO);
+                sendIntent.setData(uri);
+                startActivity(Intent.createChooser(sendIntent,
+                        getResources().getString(R.string.menu_button_feedback_send_email)));
+
+                if (mDrawerLayout != null && mDrawerLayout.isDrawerOpen(Gravity.LEFT)){
+                    mDrawerLayout.closeDrawer(Gravity.LEFT);
+                }
+            }
+        };
+        mBtnFeedback.setOnClickListener(oclFeedback);
+
+        OnClickListener oclServerInfo = new OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+
+                Server server = mOTPApp.getSelectedServer();
+
+                if (server == null) {
+                    Log.w(OTPApp.TAG,
+                            "Tried to get server info when no server was selected");
+                    Toast.makeText(mApplicationContext, mApplicationContext.getResources()
+                            .getString(R.string.toast_no_server_selected_error), Toast.LENGTH_SHORT)
+                            .show();
+                    return;
+                }
+
+                WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
+
+                ServerChecker serverChecker = new ServerChecker(weakContext, mApplicationContext,
+                        true);
+                serverChecker.execute(server);
+
+
+                if (mDrawerLayout != null && mDrawerLayout.isDrawerOpen(Gravity.LEFT)){
+                    mDrawerLayout.closeDrawer(Gravity.LEFT);
+                }
+
+            }
+        };
+        mBtnServerInfo.setOnClickListener(oclServerInfo);
+
+        OnClickListener oclGPSButton = new OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+
+                Intent myIntent = new Intent(
+                        Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(myIntent);
+
+                if (mDrawerLayout != null && mDrawerLayout.isDrawerOpen(Gravity.LEFT)){
+                    mDrawerLayout.closeDrawer(Gravity.LEFT);
+                }
+
+            }
+        };
+        mBtnGPS.setOnClickListener(oclGPSButton);
+    }
+
+    private OptimizeType getSelectedOptimization(){
+        OptimizeType selectedOptimization = OptimizeType.QUICK;
+        if (mBtnModeSafe.isChecked()){
+            selectedOptimization = OptimizeType.SAFE;
+        }
+        else{
+            if (mBtnModeTransfersOrBike.isChecked()){
+                if (mBtnModeBike.isChecked() || mBtnModeRentedBike.isChecked()){
+                    selectedOptimization = OptimizeType.TRIANGLE;
+                }
+                else{
+                    selectedOptimization = OptimizeType.TRANSFERS;
+                }
+            }
+        }
+        return selectedOptimization;
+    }
+
+    private int getSelectedOptimizationIntValue(){
+        int selectedOptimization = mOTPApp.OPTIMIZATION_QUICK;
+        if (mBtnModeSafe.isChecked()){
+            selectedOptimization = mOTPApp.OPTIMIZATION_SAFE;
+        }
+        else{
+            if (mBtnModeTransfersOrBike.isChecked()){
+                if (mBtnModeBike.isChecked() || mBtnModeRentedBike.isChecked()){
+                    selectedOptimization = mOTPApp.OPTIMIZATION_TRIANGLE;
+                }
+                else{
+                    selectedOptimization = mOTPApp.OPTIMIZATION_TRANSFERS;
+                }
+            }
+        }
+        return selectedOptimization;
     }
 
     /**
@@ -1414,14 +1573,26 @@ public class MainFragment extends Fragment implements
     private void restoreOptimization(){
         int previousOptimization;
         if ((previousOptimization =
-                mPrefs.getInt(mOTPApp.PREFERENCE_KEY_LAST_OPTIMIZATION, -1)) != -1){
-            mDdlOptimization.setItemChecked(previousOptimization, true);
+            mPrefs.getInt(mOTPApp.PREFERENCE_KEY_LAST_OPTIMIZATION, -1)) != -1) {
+                checkOptimization(previousOptimization);
         }
         else{
             SharedPreferences.Editor editor = mPrefs.edit();
-            editor.putInt(OTPApp.PREFERENCE_KEY_LAST_OPTIMIZATION, 0);
+            editor.putInt(OTPApp.PREFERENCE_KEY_LAST_OPTIMIZATION, OTPApp.OPTIMIZATION_QUICK);
             editor.commit();
-            mDdlOptimization.setItemChecked(0, true);
+            checkOptimization(OTPApp.OPTIMIZATION_QUICK);
+        }
+    }
+
+    private void checkOptimization(int intOptimizationValue){
+        if (intOptimizationValue == OTPApp.OPTIMIZATION_QUICK){
+            mBtnModeQuick.setChecked(true);
+        }
+        else if (intOptimizationValue == OTPApp.OPTIMIZATION_SAFE){
+            mBtnModeSafe.setChecked(true);
+        }
+        else {
+            mBtnModeTransfersOrBike.setChecked(true);
         }
     }
 
@@ -1805,23 +1976,12 @@ public class MainFragment extends Fragment implements
 
         request.setArriveBy(mArriveBy);
 
-        OptimizeSpinnerItem optimizeSpinnerItem = (OptimizeSpinnerItem) mDdlOptimization
-                .getItemAtPosition(mDdlOptimization.getCheckedItemPosition());
-        if (optimizeSpinnerItem == null) {
-            optimizeSpinnerItem = (OptimizeSpinnerItem) mDdlOptimization.getItemAtPosition(0);
-        }
-
-        if (optimizeSpinnerItem != null) {
-            request.setOptimize(optimizeSpinnerItem.getOptimizeType());
-            if (optimizeSpinnerItem.getOptimizeType().equals(OptimizeType.TRIANGLE)) {
-                request.setTriangleTimeFactor(mBikeTriangleMinValue);
-                request.setTriangleSlopeFactor(mBikeTriangleMaxValue - mBikeTriangleMinValue);
-                request.setTriangleSafetyFactor(1 - mBikeTriangleMaxValue);
-            }
-        } else {
-            Log.e(OTPApp.TAG,
-                    "Optimization not found, not possible to add it to the request so, most"
-                            + "likely results will be incorrect");
+        OptimizeType selectedOptimization = getSelectedOptimization();
+        request.setOptimize(selectedOptimization);
+        if (selectedOptimization.equals(OptimizeType.TRIANGLE)) {
+            request.setTriangleTimeFactor(mBikeTriangleMinValue);
+            request.setTriangleSlopeFactor(mBikeTriangleMaxValue - mBikeTriangleMinValue);
+            request.setTriangleSafetyFactor(1 - mBikeTriangleMaxValue);
         }
 
         request.setModes(getSelectedTraverseModeSet());
@@ -1938,49 +2098,22 @@ public class MainFragment extends Fragment implements
      *                                when bike mode is abandoned
      */
     private void setBikeOptimizationAdapter(boolean enable, boolean updateOptimizationValue) {
-        ArrayAdapter<OptimizeSpinnerItem> optimizationAdapter;
         int newOptimizationValue;
 
         if (updateOptimizationValue){
             if (enable){
-                mOptimizationValueToRestoreWhenNoBike = mDdlOptimization.getCheckedItemPosition();
+                mOptimizationValueToRestoreWhenNoBike = getSelectedOptimizationIntValue();
             }
         }
 
         if (enable) {
-            optimizationAdapter = new ArrayAdapter<OptimizeSpinnerItem>(
-                    getActivity(),
-                    android.R.layout.simple_list_item_single_choice,
-                    new OptimizeSpinnerItem[]{
-                            new OptimizeSpinnerItem(
-                                    getResources().getString(R.string.left_panel_optimization_quick),
-                                    OptimizeType.QUICK),
-                            new OptimizeSpinnerItem(
-                                    getResources().getString(R.string.left_panel_optimization_safe),
-                                    OptimizeType.SAFE),
-                            new OptimizeSpinnerItem(
-                                    getResources().getString(R.string.left_panel_optimization_bike_triangle),
-                                    OptimizeType.TRIANGLE)});
-            mDdlOptimization.setAdapter(optimizationAdapter);
+            mBtnModeTransfersOrBike.setText(R.string.left_panel_optimization_bike_triangle);
         } else {
-            optimizationAdapter = new ArrayAdapter<OptimizeSpinnerItem>(
-                    getActivity(),
-                    android.R.layout.simple_list_item_single_choice,
-                    new OptimizeSpinnerItem[]{
-                            new OptimizeSpinnerItem(
-                                    getResources().getString(R.string.left_panel_optimization_quick),
-                                    OptimizeType.QUICK),
-                            new OptimizeSpinnerItem(
-                                    getResources().getString(R.string.left_panel_optimization_safe),
-                                    OptimizeType.SAFE),
-                            new OptimizeSpinnerItem(getResources()
-                                    .getString(R.string.left_panel_optimization_fewest_transfers),
-                                    OptimizeType.TRANSFERS)});
-            mDdlOptimization.setAdapter(optimizationAdapter);
+            mBtnModeTransfersOrBike.setText(R.string.left_panel_optimization_fewest_transfers);
         }
         if (updateOptimizationValue){
             if (enable){
-                newOptimizationValue = 2;
+                newOptimizationValue = OTPApp.OPTIMIZATION_TRIANGLE;
             }
             else{
                 if (mOptimizationValueToRestoreWhenNoBike != -1){
@@ -1990,10 +2123,10 @@ public class MainFragment extends Fragment implements
                     newOptimizationValue = mPrefs.getInt(OTPApp.PREFERENCE_KEY_LAST_OPTIMIZATION, -1);
                 }
                 else{
-                    newOptimizationValue = 0;
+                    newOptimizationValue = OTPApp.OPTIMIZATION_QUICK;
                 }
             }
-            mDdlOptimization.setItemChecked(newOptimizationValue, true);
+            checkOptimization(newOptimizationValue);
             SharedPreferences.Editor editor = mPrefs.edit();
             editor.putInt(OTPApp.PREFERENCE_KEY_LAST_OPTIMIZATION, newOptimizationValue);
             editor.commit();
@@ -2719,97 +2852,6 @@ public class MainFragment extends Fragment implements
                 }
             }
         }
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu pMenu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(pMenu, inflater);
-        inflater.inflate(R.menu.menu, pMenu);
-        mGPS = pMenu.getItem(0);
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(final Menu pMenu) {
-        if (isGPSEnabled()) {
-            mGPS.setTitle(R.string.menu_button_disable_gps);
-        } else {
-            mGPS.setTitle(R.string.menu_button_enable_gps);
-        }
-        super.onPrepareOptionsMenu(pMenu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(final MenuItem pItem) {
-        OTPApp app = ((OTPApp) getActivity().getApplication());
-        switch (pItem.getItemId()) {
-            case R.id.gps_settings:
-                Intent myIntent = new Intent(
-                        Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(myIntent);
-                break;
-            case R.id.settings:
-                getActivity().startActivityForResult(
-                        new Intent(getActivity(), SettingsActivity.class),
-                        OTPApp.SETTINGS_REQUEST_CODE);
-                break;
-            case R.id.feedback:
-                Server selectedServer = app.getSelectedServer();
-
-                String[] recipients = {selectedServer.getContactEmail(),
-                        getString(R.string.feedback_email_android_developer)};
-
-                String uriText = "mailto:";
-                for (String recipient : recipients) {
-                    uriText += recipient + ";";
-                }
-
-                String subject = "";
-                subject += getResources().getString(R.string.menu_button_feedback_subject);
-                Date d = Calendar.getInstance().getTime();
-                subject += "[" + d.toString() + "]";
-                uriText += "?subject=" + subject;
-
-                String content = ((MyActivity) getActivity()).getCurrentRequestString();
-
-                try {
-                    uriText += "&body=" + URLEncoder.encode(content, OTPApp.URL_ENCODING);
-                } catch (UnsupportedEncodingException e1) {
-                    e1.printStackTrace();
-                    return false;
-                }
-
-                Uri uri = Uri.parse(uriText);
-
-                Intent sendIntent = new Intent(Intent.ACTION_SENDTO);
-                sendIntent.setData(uri);
-                startActivity(Intent.createChooser(sendIntent,
-                        getResources().getString(R.string.menu_button_feedback_send_email)));
-
-                break;
-            case R.id.server_info:
-                Server server = app.getSelectedServer();
-
-                if (server == null) {
-                    Log.w(OTPApp.TAG,
-                            "Tried to get server info when no server was selected");
-                    Toast.makeText(mApplicationContext, mApplicationContext.getResources()
-                            .getString(R.string.toast_no_server_selected_error), Toast.LENGTH_SHORT)
-                            .show();
-                    break;
-                }
-
-                WeakReference<Activity> weakContext = new WeakReference<Activity>(getActivity());
-
-                ServerChecker serverChecker = new ServerChecker(weakContext, mApplicationContext,
-                        true);
-                serverChecker.execute(server);
-
-                break;
-            default:
-                break;
-        }
-
-        return false;
     }
 
     private Boolean isGPSEnabled() {

@@ -37,14 +37,14 @@ repositories {
 }
 
 android {
-    compileSdkVersion 21
+    compileSdkVersion 23
     buildToolsVersion "21.1.2"
 
     defaultConfig {
         versionCode 17
         versionName "2.1.4"
         minSdkVersion 9
-        targetSdkVersion 13
+        targetSdkVersion 23
     }
 
     // http://stackoverflow.com/questions/20673625/gradle-0-7-0-duplicate-files-during-packaging-of-apk
@@ -111,11 +111,8 @@ tasks.whenTaskAdded { theTask ->
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:21.0.0'
-    // Only include Google Play Services maps and location libraries
-    compile 'com.google.android.gms:play-services-maps:7.8.0'
-    compile 'com.google.android.gms:play-services-location:7.8.0'
-    // Jackson is used for parsing JSON REST API responses
+    compile 'com.android.support:support-v4:21.0.3'
+    compile 'com.google.android.gms:play-services:3.2.65'
     compile 'com.fasterxml.jackson.core:jackson-core:2.4.1'
     compile 'com.fasterxml.jackson.core:jackson-annotations:2.4.1'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.4.1.1'

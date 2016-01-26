@@ -179,6 +179,14 @@ public class OTPApp extends Application {
 
     public static final int COLOR_ROUTE_LINE = 0x7F0000FF;
 
+    public static final int OPTIMIZATION_QUICK = 0;
+
+    public static final int OPTIMIZATION_SAFE = 1;
+
+    public static final int OPTIMIZATION_TRANSFERS = 2;
+
+    public static final int OPTIMIZATION_TRIANGLE = 3;
+
     /**
      * Preference keys
      */
