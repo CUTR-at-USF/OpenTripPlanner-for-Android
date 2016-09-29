@@ -45,6 +45,19 @@ android {
         versionName "2.1.2"
         minSdkVersion 8
         targetSdkVersion 13
+        versionCode 13
+        versionName "2.1.0"
+        applicationId = 'edu.usf.cutr.opentripplanner.android'
+    }
+
+    productFlavors {
+        vanilla {
+            packageName 'edu.usf.cutr.opentripplanner.android'
+        }
+
+        mobullity {
+            packageName 'edu.usf.cutr.mobullity.android'
+        }
     }
 
     productFlavors {
