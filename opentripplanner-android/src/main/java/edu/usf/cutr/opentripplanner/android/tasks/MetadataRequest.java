@@ -24,6 +24,7 @@ import org.opentripplanner.api.ws.GraphMetadata;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -78,10 +79,16 @@ public class MetadataRequest extends AsyncTask<String, Integer, GraphMetadata> {
     }
 
     protected GraphMetadata doInBackground(String... reqs) {
-        String prefix = PreferenceManager.getDefaultSharedPreferences(context)
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String prefix = prefs
                 .getString(OTPApp.PREFERENCE_KEY_FOLDER_STRUCTURE_PREFIX
                         , OTPApp.FOLDER_STRUCTURE_PREFIX_NEW);
-        String u = reqs[0] + prefix + OTPApp.METADATA_LOCATION;
+        String u = reqs[0] + prefix ;
+
+        if (prefs.getInt(OTPApp.PREFERENCE_KEY_API_VERSION, OTPApp.API_VERSION_V2)
+                < OTPApp.API_VERSION_V2) {
+            u += OTPApp.METADATA_LOCATION;
+        }
         Log.d(OTPApp.TAG, "URL: " + u);
 
         HttpURLConnection urlConnection = null;

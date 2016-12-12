@@ -66,14 +66,7 @@ public class ConversionUtils {
 
         duration = 0;
         if (startTime != null && endTime != null) {
-            if (PreferenceManager.getDefaultSharedPreferences(applicationContext)
-                    .getInt(OTPApp.PREFERENCE_KEY_API_VERSION, OTPApp.API_VERSION_V1)
-                    == OTPApp.API_VERSION_V1){
-                duration = (endTime.getTime() - startTime.getTime());
-            }
-            else{
-                duration = (endTime.getTime() - startTime.getTime()) / 1000;
-            }
+            duration = normalizeDuration(endTime.getTime() - startTime.getTime(), applicationContext) ;
         }
         return duration;
     }
@@ -463,4 +456,15 @@ public class ConversionUtils {
         return prefs.getString(OTPApp.PREFERENCE_KEY_MAP_TILE_SOURCE, defaultOverlay);
     }
 
+    public static long normalizeDuration(long duration, Context context) {
+        return normalizeDuration(duration, PreferenceManager.getDefaultSharedPreferences(context));
+    }
+
+    public static long normalizeDuration(long duration, SharedPreferences prefs) {
+        if (prefs.getInt(OTPApp.PREFERENCE_KEY_API_VERSION, OTPApp.API_VERSION_V1)
+                < OTPApp.API_VERSION_V1){
+            return duration / 1000;
+        }
+        return duration;
+    }
 }

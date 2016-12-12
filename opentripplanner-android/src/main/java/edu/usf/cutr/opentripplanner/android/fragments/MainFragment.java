@@ -3146,13 +3146,7 @@ public class MainFragment extends Fragment implements
         CharSequence snippet;
         long legDuration;
         TraverseMode traverseMode = TraverseMode.valueOf(leg.mode);
-
-        if (mPrefs.getInt(OTPApp.PREFERENCE_KEY_API_VERSION, OTPApp.API_VERSION_V1)
-                == OTPApp.API_VERSION_V1){
-            legDuration = leg.duration;
-        } else{
-            legDuration = leg.duration / 1000;
-        }
+        legDuration = ConversionUtils.normalizeDuration(leg.duration, mPrefs);
         if (traverseMode.isTransit()) {
             CharSequence spannableSnippet = ConversionUtils
                     .getTimeWithContext(mApplicationContext, leg.agencyTimeZoneOffset,
@@ -3392,13 +3386,7 @@ public class MainFragment extends Fragment implements
         for (int i = 0; i < itinerarySummaryList.length; i++) {
             boolean isTransitIsTagSet = false;
             Itinerary it = itineraryList.get(i);
-            if (mPrefs.getInt(OTPApp.PREFERENCE_KEY_API_VERSION, OTPApp.API_VERSION_V1)
-                    == OTPApp.API_VERSION_V1){
-                tripDuration = it.duration;
-            }
-            else{
-                tripDuration = it.duration / 1000;
-            }
+            tripDuration = ConversionUtils.normalizeDuration(it.duration, mPrefs);
             for (Leg leg : it.legs) {
                 TraverseMode traverseMode = TraverseMode.valueOf(leg.mode);
                 if (traverseMode.isTransit()) {

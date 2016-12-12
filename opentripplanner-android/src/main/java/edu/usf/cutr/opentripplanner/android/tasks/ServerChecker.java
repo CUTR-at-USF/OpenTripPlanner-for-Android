@@ -195,10 +195,14 @@ public class ServerChecker extends AsyncTask<Server, Long, String> {
             }
 
             if (serverInfo != null){
-                int api_version = serverInfo.serverVersion.major;
+                int api_version = OTPApp.API_VERSION_V3;
                 if (serverInfo.serverVersion.major == 0){
-                    if (serverInfo.serverVersion.minor == OTPApp.API_VERSION_MINOR_011){
+                    if (serverInfo.serverVersion.minor >= OTPApp.API_VERSION_MINOR_019){
+                        api_version = OTPApp.API_VERSION_V2;
+                    }else if (serverInfo.serverVersion.minor >= OTPApp.API_VERSION_MINOR_011){
                         api_version = OTPApp.API_VERSION_V1;
+                    }else {
+                        api_version = OTPApp.API_VERSION_PRE_V1;
                     }
                 }
                 prefsEditor.putInt(OTPApp.PREFERENCE_KEY_API_VERSION,
