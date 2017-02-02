@@ -117,6 +117,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
 
     protected void onPreExecute() {
         Activity activityRetrieved = activity.get();
+        
         if ((activityRetrieved != null) && showDialog) {
             progressDialog.setIndeterminate(true);
             progressDialog.setCancelable(true);
@@ -366,6 +367,7 @@ public class ServerSelector extends AsyncTask<LatLng, Integer, Integer>
                 AlertDialog.Builder builder = new AlertDialog.Builder(activityRetrieved);
                 builder.setTitle(context.getResources()
                         .getString(R.string.server_checker_info_title));
+                        builder.setCancelable(false);
                 builder.setItems(items, new DialogInterface.OnClickListener() {
 
                     public void onClick(DialogInterface dialog, int item) {
