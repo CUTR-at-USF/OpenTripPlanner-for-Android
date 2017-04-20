@@ -50,7 +50,17 @@ public class OTPApp extends Application {
 
     public static final String SERVER_INFO_LOCATION_NEW = "";
 
+    /** Since OTP version 0.11 (API_VERSION_v1), duration is published in seconds, before in ms */
     public static final int API_VERSION_MINOR_011 = 11;
+
+    /** Since OTP version 0.19 (API_VERSION_v2), router metadata is published via /routers/default endpoint */
+    public static final int API_VERSION_MINOR_019 = 19;
+
+    /** Since OTP version 1.0.0 (API_VERSION_v3), busish and trainish modes are not supported any more */
+    public static final int API_VERSION_V3 = 3;
+
+    /** Since OTP version 0.19 (API_VERSION_v2), router metadata is published via /routers/default endpoint */
+    public static final int API_VERSION_V2 = 2;
 
     public static final int API_VERSION_V1 = 1;
 

@@ -169,16 +169,7 @@ public class DirectionListFragment extends ExpandableListFragment {
 
         for (int i = 0; i < itinerarySummaryList.length; i++) {
             Itinerary it = itineraryList.get(i);
-            long tripDuration;
-            if (PreferenceManager.getDefaultSharedPreferences(
-                    getActivity().getApplicationContext())
-                    .getInt(OTPApp.PREFERENCE_KEY_API_VERSION, OTPApp.API_VERSION_V1)
-                    == OTPApp.API_VERSION_V1){
-                tripDuration = it.duration;
-            }
-            else{
-                tripDuration = it.duration / 1000;
-            }
+            long tripDuration = ConversionUtils.normalizeDuration(it.duration, getActivity().getApplicationContext());
             itinerarySummaryList[i] += getString(R.string.step_by_step_total_duration) + " " + ConversionUtils
                     .getFormattedDurationTextNoSeconds(tripDuration, false,
                             getActivity().getApplicationContext());

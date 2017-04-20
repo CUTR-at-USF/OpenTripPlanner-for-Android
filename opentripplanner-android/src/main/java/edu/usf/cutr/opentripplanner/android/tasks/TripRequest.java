@@ -28,6 +28,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -273,6 +274,23 @@ public class TripRequest extends AsyncTask<Request, Integer, Long> {
             }
 
             params = updatedString;
+        }
+
+
+        if (requestParams.getModes().getTrainish()) {
+            // TraverseModeSet.toString() enumerates activated modes, which might not be supported by server
+            // so we filter them out. Should be solved differently, e.g. by  decoupling and introducing
+            // an interface with version dependent implementations
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+            if (prefs.getInt(OTPApp.PREFERENCE_KEY_API_VERSION, OTPApp.API_VERSION_V3)
+                    >= OTPApp.API_VERSION_V3) {
+                String updatedString;
+                updatedString = params.replace(TraverseMode.TRAINISH.toString(), "");
+                updatedString = updatedString.replace(TraverseMode.BUSISH.toString(), "");
+
+                params = updatedString;
+            }
         }
 
         String u = baseURL + prefix + OTPApp.PLAN_LOCATION + params;
