@@ -22,7 +22,7 @@ buildscript {
         classpath 'com.android.tools.build:gradle:1.3.0'
     }
 }
-apply plugin: 'com.android.application'
+apply plugin: 'android'
 
 repositories {
     mavenCentral()
@@ -37,14 +37,14 @@ repositories {
 }
 
 android {
-    compileSdkVersion 21
+    compileSdkVersion 23
     buildToolsVersion "21.1.2"
 
     defaultConfig {
-        versionCode 17
-        versionName "2.1.4"
+        versionCode 15
+        versionName "2.1.2"
         minSdkVersion 9
-        targetSdkVersion 13
+        targetSdkVersion 23
     }
 
     // http://stackoverflow.com/questions/20673625/gradle-0-7-0-duplicate-files-during-packaging-of-apk
@@ -111,7 +111,7 @@ tasks.whenTaskAdded { theTask ->
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:21.0.0'
+    compile 'com.android.support:support-v4:23.1.1'
     // Only include Google Play Services maps and location libraries
     compile 'com.google.android.gms:play-services-maps:7.8.0'
     compile 'com.google.android.gms:play-services-location:7.8.0'
