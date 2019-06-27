@@ -17,9 +17,10 @@
 buildscript {
     repositories {
         jcenter()
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0'
+        classpath 'com.android.tools.build:gradle:3.4.1'
     }
 }
 apply plugin: 'com.android.application'
@@ -34,11 +35,11 @@ repositories {
         // CUTR Releases
         url "https://github.com/CUTR-at-USF/cutr-mvn-repo/raw/master/releases"
     }
+    google()
 }
 
 android {
     compileSdkVersion 21
-    buildToolsVersion "21.1.2"
 
     defaultConfig {
         versionCode 18
@@ -94,7 +95,7 @@ android {
     }
 }
 
-task askForPasswords << {
+task askForPasswords {
     // Must create String because System.readPassword() returns char[]
     // (and assigning that below fails silently)
     def storePw = new String(System.console().readPassword("\nKeystore password: "))
@@ -111,18 +112,18 @@ tasks.whenTaskAdded { theTask ->
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:21.0.0'
+    implementation 'com.android.support:support-v4:21.0.0'
     // Only include Google Play Services maps and location libraries
-    compile 'com.google.android.gms:play-services-maps:7.8.0'
-    compile 'com.google.android.gms:play-services-location:7.8.0'
+    implementation 'com.google.android.gms:play-services-maps:7.8.0'
+    implementation 'com.google.android.gms:play-services-location:7.8.0'
     // Jackson is used for parsing JSON REST API responses
-    compile 'com.fasterxml.jackson.core:jackson-core:2.4.1'
-    compile 'com.fasterxml.jackson.core:jackson-annotations:2.4.1'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.4.1.1'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.4.1'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.4.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.4.1.1'
     // POJOs used for full data-binding via Jackson
-    compile 'edu.usf.cutr.opentripplanner.android:opentripplanner-pojos:1.0.0-SNAPSHOT'
+    implementation 'edu.usf.cutr.opentripplanner.android:opentripplanner-pojos:1.0.0-SNAPSHOT'
     // OpenCSV, for parsing the OTP Server Directory Google Doc
-    compile 'net.sf.opencsv:opencsv:2.3'
+    implementation 'net.sf.opencsv:opencsv:2.3'
     // Map util (point in bounding box)
-    compile 'com.google.maps.android:android-maps-utils:0.4'
+    implementation   'com.google.maps.android:android-maps-utils:0.4'
 }
