@@ -1,11 +1,9 @@
 OpenTripPlanner for Android [![Build Status](https://travis-ci.org/CUTR-at-USF/OpenTripPlanner-for-Android.svg?branch=master)](https://travis-ci.org/CUTR-at-USF/OpenTripPlanner-for-Android) [![Join the chat at https://gitter.im/CUTR-at-USF/OpenTripPlanner-for-Android](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/CUTR-at-USF/OpenTripPlanner-for-Android?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 ===========================
 
+***NOTE: This application isn't being actively maintained. Please check out [OneBusAway](https://onebusaway.org/) instead, which uses OpenTripPlanner to plan trips. See the [OneBusAway Android System Architecture docs](https://github.com/OneBusAway/onebusaway-android/blob/master/SYSTEM_ARCHITECTURE.md) for details.***
+
 An Android app for multi-modal trip planning and navigation using any OpenTripPlanner server.
-
-Download the app via the [Google Play store](https://play.google.com/store/apps/details?id=edu.usf.cutr.opentripplanner.android).
-
-[![Google Play logo](http://www.android.com/images/brand/android_app_on_play_logo_large.png)](https://play.google.com/store/apps/details?id=edu.usf.cutr.opentripplanner.android)
 
 See more details on [the wiki](https://github.com/CUTR-at-USF/OpenTripPlanner-for-Android/wiki).
 
